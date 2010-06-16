@@ -16,4 +16,4 @@ Incontri
 MAR mattina
 GIO mattina tardi
 
-Per martedì 22: CAP 1 + paragrafo generatori (3.10)
+Per martedì 22: CAP 1 + generators (3.10)
