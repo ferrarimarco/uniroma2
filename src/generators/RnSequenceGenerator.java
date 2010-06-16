@@ -100,7 +100,6 @@ public class RnSequenceGenerator implements Generator {
 	private Double perModuleDivision(Long l){
 		
 		result = (l.doubleValue() / module.doubleValue());
-		
 		return result;
 	}
 
