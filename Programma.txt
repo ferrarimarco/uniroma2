@@ -17,3 +17,11 @@ MAR mattina
 GIO mattina tardi
 
 Per martedì 22: CAP 1 + generators (3.10)
+
+----------------------------------------------
+TODO
+
+1- sostituire particolari implementazioni con interfacce (codice più mantenibile).
+Errato: ArrayList<Long> a1 = new ArrayList<Long>(); 
+Corretto1: Collection<Long> a1 = new ArrayList<Long>(); 
+Corretto2 (userei questo): List<Long> a1 = new ArrayList<Long>() se voglio più specificità (List estende Collection)
