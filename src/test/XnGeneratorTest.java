@@ -15,7 +15,7 @@ public class XnGeneratorTest {
 			System.out.print(gen1.getNextValue() + ", ");
 		}
 		System.out.println();
-		System.out.println("Sequenza di gen1: " + gen1.getActualSequence());
+		System.out.println("Sequenza di gen1: " + gen1.getSequence());
 		
 		System.out.println();
 		
@@ -28,7 +28,7 @@ public class XnGeneratorTest {
 		}
 		
 		System.out.println();
-		System.out.println("Sequenza di gen2: " + gen2.getActualSequence());
+		System.out.println("Sequenza di gen2: " + gen2.getSequence());
 	}
 
 }

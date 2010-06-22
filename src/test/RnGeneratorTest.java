@@ -15,7 +15,7 @@ public class RnGeneratorTest {
 			System.out.print(rngen1.getNextValue() + ", ");
 		}
 		System.out.println();
-		System.out.println("Sequenza di rngen1: " + rngen1.getActualSequence());
+		System.out.println("Sequenza di rngen1: " + rngen1.getSequence());
 		
 		System.out.println();
 		
@@ -28,7 +28,7 @@ public class RnGeneratorTest {
 		}
 		
 		System.out.println();
-		System.out.println("Sequenza di rngen2: " + rngen2.getActualSequence());
+		System.out.println("Sequenza di rngen2: " + rngen2.getSequence());
 		
 	}
 }
