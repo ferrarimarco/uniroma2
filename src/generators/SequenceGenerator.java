@@ -13,6 +13,7 @@ public abstract class SequenceGenerator implements Generator{
 	private Long multiplier;
 	private Long module;
 
+	
 	public SequenceGenerator(){
 		
 		//Default seed
