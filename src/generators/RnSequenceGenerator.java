@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class RnSequenceGenerator extends SequenceGenerator  implements Generator {
 
 	private Double result;
-	private ArrayList<Double> sequence;
+	private  ArrayList<Double> sequence;
 	
 	
 	//Costruttore con seed di default
