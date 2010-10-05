@@ -18,7 +18,6 @@ public class RnSequenceGenerator extends SequenceGenerator  implements Generator
 		super();
 		sequence = new ArrayList<Double>();
 		
-		
 		//Aggiungo il seme alla sequenza (primo elemento)
 		sequence.add(perModuleDivision(getX0()));
 	}
@@ -27,16 +26,11 @@ public class RnSequenceGenerator extends SequenceGenerator  implements Generator
 	public RnSequenceGenerator(Long seed){
 		
 		//Inizializzazione
-		super();
+		super(seed);
+		
+		//Sequenza di tutti i numeri generati
 		sequence = new ArrayList<Double>();
 		
-		if ((seed > 0) && (seed % 2 == 1) && (seed % 5 != 0)) {
-			setX0(seed);
-		}else{
-			System.out.println("seed inserito non va bene, uso il seed default (x0 = 1).");
-		}
-		
-	
 		//Aggiungo il seme alla sequenza (primo elemento)
 		sequence.add(perModuleDivision(getX0()));
 	}

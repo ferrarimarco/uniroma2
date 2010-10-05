@@ -26,6 +26,22 @@ public abstract class SequenceGenerator implements Generator{
 		module = GeneratorConstants.MODULE;
 	}
 	
+	public SequenceGenerator(Long seed){
+		
+		//Controllo se il seme va bene
+		if ((seed > 0) && (seed % 2 == 1) && (seed % 5 != 0)) {
+			x0 = seed;
+		}else{
+			System.out.println("seed inserito non va bene, uso il seed default (x0 = 1).");
+		}
+		
+		//Inizializzo variabili per la sequenza
+		xn = x0;
+		n = 0L;
+		multiplier = GeneratorConstants.MULTIPLIER;
+		module = GeneratorConstants.MODULE;
+	}
+	
 	//Genero un nuovo numero della sequenza
 	public Long generateNextValue(){
 		setNext((multiplier * xn) % module);

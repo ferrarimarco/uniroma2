@@ -13,6 +13,8 @@ public class XnSequenceGenerator extends SequenceGenerator implements Generator{
 		
 		//Inizializzazione
 		super();
+		
+		//Sequenza di tutti i numeri generati
 		sequence = new ArrayList<Long>();
 
 		//Aggiungo il seme alla sequenza (primo elemento)
@@ -24,14 +26,10 @@ public class XnSequenceGenerator extends SequenceGenerator implements Generator{
 	public XnSequenceGenerator(Long seed){
 		
 		//Inizializzazione
-		super();
-		sequence = new ArrayList<Long>();
+		super(seed);
 		
-		if ((seed > 0) && (seed % 2 == 1) && (seed % 5 != 0)) {
-			super.setX0(seed);
-		}else{
-			System.out.println("seed inserito non va bene, uso il seed default (x0 = 1).");
-		}
+		//Sequenza di tutti i numeri generati
+		sequence = new ArrayList<Long>();
 		
 		//Aggiungo il seme alla sequenza (primo elemento)
 		sequence.add(getX0());
