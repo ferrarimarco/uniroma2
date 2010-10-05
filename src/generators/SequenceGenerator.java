@@ -8,7 +8,6 @@ public abstract class SequenceGenerator implements Generator{
 	private Long x0;
 	private Long xn;
 	private Long n;
-	private Long next;
 	
 	private Long multiplier;
 	private Long module;
@@ -44,9 +43,9 @@ public abstract class SequenceGenerator implements Generator{
 	
 	//Genero un nuovo numero della sequenza
 	public Long generateNextValue(){
-		setNext((multiplier * xn) % module);
+		xn = (multiplier * xn) % module;
 		
-		return getNext();
+		return xn;
 	}
 	
 	public Long getX0() {
@@ -71,14 +70,6 @@ public abstract class SequenceGenerator implements Generator{
 
 	public void setN(Long n) {
 		this.n = n;
-	}
-
-	public Long getNext() {
-		return next;
-	}
-
-	public void setNext(Long next) {
-		this.next = next;
 	}
 
 	public Long getMultiplier() {
