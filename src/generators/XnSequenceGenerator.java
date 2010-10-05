@@ -33,7 +33,6 @@ public class XnSequenceGenerator extends SequenceGenerator implements Generator{
 			System.out.println("seed inserito non va bene, uso il seed default (x0 = 1).");
 		}
 		
-
 		//Aggiungo il seme alla sequenza (primo elemento)
 		sequence.add(getX0());
 	}
@@ -54,12 +53,10 @@ public class XnSequenceGenerator extends SequenceGenerator implements Generator{
 		return getXn();
 	}
 
-	@Override
 	public ArrayList<Long> getSequence() {
 			return sequence;
 	}
 
-	@Override
 	public Number getActualValue() {
 		return getXn();
 	}

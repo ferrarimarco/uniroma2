@@ -70,6 +70,7 @@ public class RnSequenceGenerator extends SequenceGenerator  implements Generator
 	
 	private Double perModuleDivision(Long l){
 		
+		//Uso doubleValue per evitare problemi con divisione
 		result = (l.doubleValue() / getModule().doubleValue());
 		return result;
 	}
