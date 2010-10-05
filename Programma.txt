@@ -27,6 +27,6 @@ Corretto1: Collection<Long> a1 = new ArrayList<Long>();
 Corretto2 (userei questo): List<Long> a1 = new ArrayList<Long>(); se voglio più specificità (List estende Collection)
 
 
-2- possibile creazione di una superclasse astratta per i generatori, contenente le parti in comune tra Xn e Rn (da sistemare)
+2- possibile creazione di una superclasse astratta per i generatori, contenente le parti in comune tra Xn e Rn. E' solo un "cut & paste" (da sistemare)
 
 3- aggiungere intervallo nel generatore di numeri
