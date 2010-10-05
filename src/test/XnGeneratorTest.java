@@ -6,7 +6,7 @@ public class XnGeneratorTest {
 
 
 	public static void main(String args[]){
-/*
+
 		XnSequenceGenerator gen1 = new XnSequenceGenerator();
 		
 		System.out.print("gen1: ");
@@ -20,7 +20,7 @@ public class XnGeneratorTest {
 		System.out.println();
 
 		System.out.print("gen2: ");
-*/
+
 		XnSequenceGenerator gen2 = new XnSequenceGenerator(101L);
 		
 		for(int i = 0; i<5; i++){
