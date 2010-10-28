@@ -1,23 +1,3 @@
-Marco
-
-LUN 9.30 - 11.00
-MER 11.30 - 13.00
-GIO 9.30 - 11.00, 15.30 - 17.00
-
-
-Daniele
-LUN 9.30 - 11.00, ?
-MER 11.30 - 13.00, ?
-VEN 9.30 - 11.00, ?
-
-
-Incontri
-
-MAR mattina
-GIO mattina tardi
-
-Per mercoledì 23: CAP 1 + generators (3.10)
-
 ----------------------------------------------
 TODO
 
@@ -30,3 +10,14 @@ Corretto2 (userei questo): List<Long> a1 = new ArrayList<Long>(); se voglio più 
 2- possibile creazione di una superclasse astratta per i generatori, contenente le parti in comune tra Xn e Rn. E' solo un "cut & paste" (da sistemare)
 
 3- aggiungere intervallo nel generatore di numeri
+----------------
+Partire da uniforme
+Istogrammi dei generatori
+Realizzare Altri generatori
+Capitolo 1
+------ Incontro
+
+
+Realazione
+CAP1: generatori (teoria + come ho personalizzato i generatori (ES: il nostro 3-erlangiano))
+CAP2: organizzazione del simulatore (nostro è seq eventi): come è fatto sequenziatore e inizializzatore + come ho personalizzato al nostro caso + pseudocodice
