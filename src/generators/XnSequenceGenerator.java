@@ -3,13 +3,6 @@ package generators;
 import interfaces.Generator;
 
 public class XnSequenceGenerator extends SequenceGenerator implements Generator{
-
-	//Costruttore con seed di default
-	public XnSequenceGenerator(){
-		
-		//Inizializzazione
-		super();		
-	}
 	
 	//Costruttore con seed scelto
 	public XnSequenceGenerator(Long seed){

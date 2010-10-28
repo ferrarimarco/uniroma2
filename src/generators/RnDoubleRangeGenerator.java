@@ -1,14 +1,17 @@
 package generators;
 
-public class RnRangeGenerator extends RnSequenceGenerator {
+public class RnDoubleRangeGenerator extends RnSequenceGenerator {
 
 	private Long rangeA;
 	private Long rangeB;
 	
-	public RnRangeGenerator(Long rangeA, Long rangeB){
+	public RnDoubleRangeGenerator(Long rangeA, Long rangeB, Long seed){
+
+		super(seed);
 		
 		this.rangeA = rangeA;
 		this.rangeB = rangeB;
+
 	}
 	
 	public Double getNextValue(){

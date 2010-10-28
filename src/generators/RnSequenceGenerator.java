@@ -6,13 +6,6 @@ import interfaces.Generator;
 public class RnSequenceGenerator extends SequenceGenerator  implements Generator {
 
 	private Double result;
-
-	//Costruttore con seed di default
-	public RnSequenceGenerator(){
-		
-		//Inizializzazione
-		super();
-	}
 	
 	//Costruttore con seed custom
 	public RnSequenceGenerator(Long seed){

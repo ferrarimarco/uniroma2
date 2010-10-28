@@ -12,19 +12,7 @@ public abstract class SequenceGenerator implements Generator{
 	private Long multiplier;
 	private Long module;
 
-	
-	public SequenceGenerator(){
-		
-		//Default seed
-		x0 = 1L;
-		
-		//Inizializzo variabili per la sequenza
-		xn = x0;
-		n = 0L;
-		multiplier = GeneratorConstants.MULTIPLIER;
-		module = GeneratorConstants.MODULE;
-	}
-	
+
 	public SequenceGenerator(Long seed){
 		
 		//Controllo se il seme va bene
