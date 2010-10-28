@@ -2,24 +2,13 @@ package generators;
 
 import interfaces.Generator;
 
-import java.util.ArrayList;
-
 public class XnSequenceGenerator extends SequenceGenerator implements Generator{
-	
-	private ArrayList<Long> sequence;
-	
+
 	//Costruttore con seed di default
 	public XnSequenceGenerator(){
 		
 		//Inizializzazione
-		super();
-		
-		//Sequenza di tutti i numeri generati
-		sequence = new ArrayList<Long>();
-
-		//Aggiungo il seme alla sequenza (primo elemento)
-		sequence.add(getX0());
-		
+		super();		
 	}
 	
 	//Costruttore con seed scelto
@@ -27,12 +16,6 @@ public class XnSequenceGenerator extends SequenceGenerator implements Generator{
 		
 		//Inizializzazione
 		super(seed);
-		
-		//Sequenza di tutti i numeri generati
-		sequence = new ArrayList<Long>();
-		
-		//Aggiungo il seme alla sequenza (primo elemento)
-		sequence.add(getX0());
 	}
 	
 	
@@ -44,15 +27,8 @@ public class XnSequenceGenerator extends SequenceGenerator implements Generator{
 		
 		//incremento contatore sequenza
 		setN(getN() + 1);
-		
-		//Aggiungo il nuovo xn alla lista dei numeri della sequenza
-		sequence.add(getXn());
-		
-		return getXn();
-	}
 
-	public ArrayList<Long> getSequence() {
-			return sequence;
+		return getXn();
 	}
 
 	public Number getActualValue() {
