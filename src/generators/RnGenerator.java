@@ -12,7 +12,6 @@ public class RnGenerator extends AbstractGenerator  implements Generator {
 		
 		//Inizializzazione
 		super(seed);
-		
 	}
 	
 	
