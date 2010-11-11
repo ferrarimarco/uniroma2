@@ -3,12 +3,12 @@ package generators;
 import interfaces.Generator;
 
 
-public class RnSequenceGenerator extends SequenceGenerator  implements Generator {
+public class RnGenerator extends AbstractGenerator  implements Generator {
 
 	private Double result;
 	
 	//Costruttore con seed custom
-	public RnSequenceGenerator(Long seed){
+	public RnGenerator(Long seed){
 		
 		//Inizializzazione
 		super(seed);

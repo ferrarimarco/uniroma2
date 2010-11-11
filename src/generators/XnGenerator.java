@@ -2,10 +2,10 @@ package generators;
 
 import interfaces.Generator;
 
-public class XnSequenceGenerator extends SequenceGenerator implements Generator{
+public class XnGenerator extends AbstractGenerator implements Generator{
 	
 	//Costruttore con seed scelto
-	public XnSequenceGenerator(Long seed){
+	public XnGenerator(Long seed){
 		
 		//Inizializzazione
 		super(seed);

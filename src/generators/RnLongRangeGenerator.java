@@ -2,13 +2,13 @@ package generators;
 
 public class RnLongRangeGenerator {
 
-	private RnSequenceGenerator rng;
+	private RnGenerator rng;
 	private Long rangeStart;
 	private Long rangeEnd;
 	
 	public RnLongRangeGenerator(Long rangeStart, Long rangeEnd, Long seed){
 		
-		rng = new RnSequenceGenerator(seed);
+		rng = new RnGenerator(seed);
 		
 		this.rangeStart = rangeStart;
 		this.rangeEnd = rangeEnd;

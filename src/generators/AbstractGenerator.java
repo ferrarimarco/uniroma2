@@ -3,7 +3,7 @@ package generators;
 import constants.GeneratorConstants;
 import interfaces.Generator;
 
-public abstract class SequenceGenerator implements Generator{
+public abstract class AbstractGenerator implements Generator{
 	
 	private Long x0;
 	private Long xn;
@@ -13,7 +13,7 @@ public abstract class SequenceGenerator implements Generator{
 	private Long module;
 
 
-	public SequenceGenerator(Long seed){
+	public AbstractGenerator(Long seed){
 		
 		//Controllo se il seme va bene
 		if ((seed > 0) && (seed % 2 == 1) && (seed % 5 != 0)) {

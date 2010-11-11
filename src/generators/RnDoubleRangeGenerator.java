@@ -1,6 +1,6 @@
 package generators;
 
-public class RnDoubleRangeGenerator extends RnSequenceGenerator {
+public class RnDoubleRangeGenerator extends RnGenerator {
 
 	private Long rangeA;
 	private Long rangeB;

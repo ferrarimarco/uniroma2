@@ -1,13 +1,13 @@
 package test;
 
-import generators.XnSequenceGenerator;
+import generators.XnGenerator;
 
 public class XnGeneratorTest {
 
 
 	public static void main(String args[]){
 
-		XnSequenceGenerator gen2 = new XnSequenceGenerator(101L);
+		XnGenerator gen2 = new XnGenerator(101L);
 		
 		for(int i = 0; i<10000; i++){
 			System.out.println(gen2.getNextValue());
