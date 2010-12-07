@@ -1,8 +1,8 @@
 package test;
 
-import generators.RnLongRangeGenerator;
+import generators.UniformLongGenerator;
 
-public class RnRangeTest {
+public class UniformLongGeneratorTest {
 
 	
 	private static Long nextValue;
@@ -11,12 +11,12 @@ public class RnRangeTest {
 		
 		int[] testArray = new int[78];
 		
-		RnLongRangeGenerator rngen1 = new RnLongRangeGenerator(2L, 78L, 101L);
+		UniformLongGenerator rngen1 = new UniformLongGenerator(2L, 78L, 101L);
 		
 		for(int i = 0; i<1000000; i++){
-			nextValue = rngen1.getNextValue();
+			nextValue = rngen1.generateNextValue();
 			testArray[nextValue.intValue()]++;
-			//System.out.println(nextValue);
+			System.out.println(nextValue);
 		}
 		
 		for(int i = 0; i< testArray.length; i++){
