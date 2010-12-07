@@ -3,17 +3,17 @@ package generators;
 public class ExponentialGenerator {
 
 	private RnGenerator rng;
-	private Double average;
+	private Double mean;
 	
-	public ExponentialGenerator(Long seed, Double average){
+	public ExponentialGenerator(Long seed, Double mean){
 		
 		this.rng = new RnGenerator(seed);
-		this.average = average;		
+		this.mean = mean;		
 		
 	}
 	
 	public Double generateNextValue(){
-		return (-1.0 * average) * Math.log(rng.getNextValue());
+		return (-1.0 * mean) * Math.log(rng.getNextValue());
 	}
 
 	public RnGenerator getRng() {
@@ -21,6 +21,6 @@ public class ExponentialGenerator {
 	}
 
 	public Double getAverage() {
-		return average;
+		return mean;
 	}
 }
