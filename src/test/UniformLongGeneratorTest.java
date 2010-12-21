@@ -16,7 +16,7 @@ public class UniformLongGeneratorTest {
 		for(int i = 0; i<1000000; i++){
 			nextValue = rngen1.generateNextValue();
 			testArray[nextValue.intValue()]++;
-			System.out.println(nextValue);
+			//System.out.println(nextValue);
 		}
 		
 		for(int i = 0; i< testArray.length; i++){

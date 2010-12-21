@@ -19,6 +19,7 @@ public class XnGenerator implements Generator{
 			x0 = seed;
 		}else{
 			System.out.println("seed inserito non va bene, uso il seed default (x0 = 1).");
+			x0 = 1L;
 		}
 		
 		//Inizializzo variabili per la sequenza
