@@ -34,10 +34,10 @@ public class ExpGenTest {
 			tempi.add(timeString);
 		}
 		
-		FileOutput.textFileWriter(distrib, "C:\\Users\\Marco\\Desktop\\distrib.txt", true, false, true);
-		FileOutput.textFileWriter(tempi, "C:\\Users\\Marco\\Desktop\\tempi.txt", true, false, true);
-		
-		
+		FileOutput.textFileWriter(distrib, "C:\\distrib.txt", true, false, true);
+		FileOutput.textFileWriter(tempi, "C:\\tempi.txt", true, false, true);
+
+
 	}
 
 }
