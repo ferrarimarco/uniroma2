@@ -26,6 +26,18 @@ public class FileOutput {
 		}
 	}
 	
+	public synchronized static void textFileWriterIntArray(Integer[] array, String filePath, Boolean append, Boolean displayOutput, Boolean newLine) {
+		
+		String data;
+		
+		for (int i = 0; i < array.length; i++) {
+			
+			data = array[i].toString();
+			FileOutput.writeLineToTextFile(data, filePath, append, displayOutput, newLine);
+			
+		}
+	}
+	
 	public synchronized static void writeLineToTextFile(String data, String filePath, Boolean append, Boolean displayOutput, Boolean newLine) {
 		
 		try {
