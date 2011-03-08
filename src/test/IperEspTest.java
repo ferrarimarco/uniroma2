@@ -4,9 +4,6 @@ import generators.IperEspGenerator;
 
 public class IperEspTest {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 
 		IperEspGenerator iperGen = new IperEspGenerator(1L, 3L, 2.0, 0.6);
@@ -19,7 +16,6 @@ public class IperEspTest {
 			genTest.elaborateNewValue(time, iperGen.getDensity(time));
 		}
 
-		genTest.finalize("C:\\");
+		genTest.finalize("C:\\IperEsp");
 	}
-
 }
