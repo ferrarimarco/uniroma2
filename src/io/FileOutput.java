@@ -26,13 +26,13 @@ public class FileOutput {
 		}
 	}
 	
-	public synchronized static void textFileWriterIntArray(Integer[] array, String filePath, Boolean append, Boolean displayOutput, Boolean newLine) {
+	public synchronized static void textFileWriterIntArray(int[] testArray, String filePath, Boolean append, Boolean displayOutput, Boolean newLine) {
 		
 		String data;
 		
-		for (int i = 0; i < array.length; i++) {
+		for (int i = 0; i < testArray.length; i++) {
 			
-			data = array[i].toString();
+			data = Integer.toString(testArray[i]);
 			FileOutput.writeLineToTextFile(data, filePath, append, displayOutput, newLine);
 			
 		}

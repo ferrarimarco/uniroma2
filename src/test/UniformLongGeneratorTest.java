@@ -7,7 +7,7 @@ public class UniformLongGeneratorTest {
 
 	public static void main(String[] args) {
 		
-		Integer[] testArray = new Integer[78];
+		int[] testArray = new int[78];
 		
 		UniformLongGenerator rngen1 = new UniformLongGenerator(2L, 78L, 101L);
 		Long nextValue;
