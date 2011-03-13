@@ -7,7 +7,7 @@ public class ErlGenTest {
 	public static void main(String[] args) {
 		
 		ErlangGenerator erl = new ErlangGenerator(1L, 2.0, 1);
-		GeneratorTest genTest = new GeneratorTest();
+		GeneratorTest genTest = new GeneratorTest("C:\\ErlTest", false);
 		Double time;
 
 		for(int i=0; i<1000; i++){
@@ -15,6 +15,6 @@ public class ErlGenTest {
 			genTest.elaborateNewValue(time, erl.getDensity(time));
 		}
 		
-		genTest.finalize("C:\\ErlGen");
+		genTest.finalize();
 	}
 }

@@ -7,7 +7,7 @@ public class IperEspTest {
 	public static void main(String[] args) {
 
 		IperEspGenerator iperGen = new IperEspGenerator(1L, 3L, 2.0, 0.6);
-		GeneratorTest genTest = new GeneratorTest();
+		GeneratorTest genTest = new GeneratorTest("C:\\IperEspGen", false);
 		
 		Double time;
 
@@ -16,6 +16,6 @@ public class IperEspTest {
 			genTest.elaborateNewValue(time, iperGen.getDensity(time));
 		}
 
-		genTest.finalize("C:\\IperEsp");
+		genTest.finalize();
 	}
 }
