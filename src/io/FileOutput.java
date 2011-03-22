@@ -3,7 +3,6 @@ package io;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * This class contains static methods to write data to files.
@@ -12,49 +11,35 @@ import java.util.ArrayList;
  */
 public class FileOutput {
 	
-	private static BufferedWriter bufferedWriter;
+	private BufferedWriter bufferedWriter;
 	
-	public synchronized static void textFileWriter(ArrayList<String> source, String filePath, Boolean append, Boolean displayOutput, Boolean newLine) {
-		
-		String data;
-		
-		for (int i = 0; i < source.size(); i++) {
-			
-			data = source.get(i);
-			FileOutput.writeLineToTextFile(data, filePath, append, displayOutput, newLine);
-			
-		}
-	}
-	
-	public synchronized static void textFileWriterIntArray(int[] testArray, String filePath, Boolean append, Boolean displayOutput, Boolean newLine) {
-		
-		String data;
-		
-		for (int i = 0; i < testArray.length; i++) {
-			
-			data = Integer.toString(testArray[i]);
-			FileOutput.writeLineToTextFile(data, filePath, append, displayOutput, newLine);
-			
-		}
-	}
-	
-	public synchronized static void writeLineToTextFile(String data, String filePath, Boolean append, Boolean displayOutput, Boolean newLine) {
+	public FileOutput(String filePath, Boolean append){
 		
 		try {
 			bufferedWriter = new BufferedWriter(new FileWriter(filePath, append));
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void writeLineToTextFile(String data) {
+		
+		try {
 			bufferedWriter.write(data);
 			bufferedWriter.newLine();
 			
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				bufferedWriter.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
 		}	
+	}
+	
+	public void closeWriter(){
+		try {
+			bufferedWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }

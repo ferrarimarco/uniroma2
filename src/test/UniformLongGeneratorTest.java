@@ -7,17 +7,20 @@ public class UniformLongGeneratorTest {
 
 	public static void main(String[] args) {
 		
-		int[] testArray = new int[78];
+		Integer[] testArray = new Integer[78];
 		
 		UniformLongGenerator rngen1 = new UniformLongGenerator(2L, 78L, 101L);
 		Long nextValue;
+		FileOutput fileOutput = new FileOutput("C:\\distribUnifLongGen.txt", false);
 		
 		for(int i = 0; i<1000000000; i++){
 			nextValue = rngen1.generateNextValue();
 			testArray[nextValue.intValue()]++;
 		}
 		
-		FileOutput.textFileWriterIntArray(testArray, "C:\\distribUnifLongGen.txt", true, false, true);
+		for(int i = 0; i<testArray.length; i++){
+			fileOutput.writeLineToTextFile(testArray[i].toString());
+		}
 	}
 
 }
