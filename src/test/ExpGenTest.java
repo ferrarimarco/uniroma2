@@ -10,11 +10,11 @@ public class ExpGenTest {
 		GeneratorTest genTest = new GeneratorTest("C:\\ExpGen", false);
 		Double time;
 		
-		for(int i=0; i<1000000; i++){
+		for(int i=0; i<1000; i++){
 			time = exp.generateNextValue();
 			genTest.elaborateNewValue(time, exp.getDensity(time));
 		}
-		
+
 		genTest.finalize();
 	}
 
