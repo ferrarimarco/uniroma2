@@ -12,10 +12,15 @@ public class GeneratorTest {
 	private DecimalFormat df;
 	private BufferedWriter bufferedWriterTempi;
 	private BufferedWriter bufferedWriterDens;
+	private Integer[] occorrenze;
 	
 	public GeneratorTest(String resultsPath, Boolean append){
 		timeString = "";
 		resultString = "";
+		//Solo per test con Interi
+		occorrenze = new Integer[120];
+		for(int i=0; i < occorrenze.length; i++)
+			occorrenze[i]=0;
 		
 		df = new DecimalFormat("##.#############");
 		try {
@@ -41,6 +46,28 @@ public class GeneratorTest {
 		}
 	}
 	
+	public void elaborateNewValueInt(Double time){
+		
+		//Inseriamo i valori solo se compatibili con le dimensione dell'Array
+		if (time.intValue() < occorrenze.length)
+		occorrenze[time.intValue()]++;
+	}
+	
+	public void finalizeInt()
+	{
+		try {
+			for(int i=0; i<occorrenze.length; i++)
+			{
+				bufferedWriterTempi.write(occorrenze[i].toString());
+				bufferedWriterTempi.newLine();
+			}
+			
+			bufferedWriterTempi.close();
+			bufferedWriterDens.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	public void finalize(){
 		try {
 			bufferedWriterTempi.close();

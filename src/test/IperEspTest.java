@@ -11,11 +11,11 @@ public class IperEspTest {
 		
 		Double time;
 
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < 1000000; i++) {
 			time = iperGen.generateNextValue();
-			genTest.elaborateNewValue(time, iperGen.getDensity(time));
+			genTest.elaborateNewValueInt(time);
 		}
 
-		genTest.finalize();
+		genTest.finalizeInt();
 	}
 }
