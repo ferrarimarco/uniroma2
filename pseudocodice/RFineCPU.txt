@@ -1,0 +1,105 @@
+* DESCRIZIONE PROCEDURA < Arrivo Utente >;
+PROCEDURE Fine CPU;
+BEGIN
+
+	< esamino stato JOB J uscente >;
+
+	* GESTIONE JOB USCENTE CLASSE 1
+	IF < classe J == 1 >
+	THEN
+		BEGIN
+		* DECIDO CLASSE JOB
+		< calcolo prob per decidere classe di J >;
+		IF < prob <= 0.3 >
+			THEN
+			< J diventa di classe 2 >;
+		ELSE
+			< J diventa di classe 3 >;
+		
+		< esamino stato J >;
+		IF < classe J == 2 >
+			THEN
+			IF < CPU libera >
+				THEN
+				< inserisci J in CPU >;
+			ELSE
+				< inserisci J in codaCpu2 >;
+		
+		ELSE IF < classe J == 3 >
+			THEN
+			IF < CPU libera >
+				THEN
+				< inserisci J in CPU >;
+			ELSE
+				< inserisci J in codaCpu3 >;
+
+		
+		* AGGIORNAMENTO CALENDARIO
+		< prevedi durata Tcpu(J) del servizio cpu >;
+		< aggiorno calendario tcpu := clock + Tcpu(J) >;
+		END
+
+	* GESTIONE JOB USCENTE CLASSE 2 o 3
+	ELSE
+		BEGIN
+		< esamino stato JOB J >;
+		IF < classe J == 2 >
+			THEN
+			* INVIO A HOST
+			< prossima unità NX(J) = HOST per J >;
+			< occupa Host con J >;
+			
+			* AGGIORNAMENTO CALENDARIO
+			< prevedi durata Thost(J) del servizio host >;
+			< aggiorno calendario thost := clock + Thost(J) >;
+
+		ELSE IF < classe J == 3 >
+
+			THEN
+			BEGIN
+			< calcolo prob per instradamento di J >;
+			IF < prob <= 0.1 >
+				THEN
+				BEGIN
+				* INVIO A STAMPANTE
+				< prossima unità NX(J) = ST per J >;
+				< occupa ST con J >;
+			
+				* AGGIORNAMENTO CALENDARIO
+				< prevedi durata Tst(J) del servizio ST >;
+				< aggiorno calendario tst := clock + Tst(J) >;
+				END
+
+			ELSE
+				BEGIN
+				* USCITA JOB DA CPU
+				IF < DISK libero >
+					THEN
+					< occupo DISK con J >;
+
+				ELSE
+					< inserisco J in codaDisk >;
+				END
+
+			* AGGIORNAMENTO CALENDARIO
+			< prevedi Tdisk(J) servizio DISK >;
+			< tdisk:= clock + Tdisk(J) >;
+			END
+			
+			
+		END
+
+	* GESTIONE JOB ENTRANTI
+
+	< calcolo prob per scelta prossimo J >;
+	< esamino stato code >;
+
+	IF <code vuote>
+	   THEN
+		< libera CPU >; 
+	ELSE
+	   < scegli nuovo J da code>;
+	   < introduci nuovo J in CPU >;
+	   
+END
+   

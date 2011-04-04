@@ -1,0 +1,19 @@
+* DESCRIZIONE PROCEDURA < Fine Host >;
+PROCEDURE Fine Host;
+BEGIN
+
+	* GESTISCO JOB USCENTE DALL'HOST
+	< esamina stato JOB J in Host >;
+
+	* INVIO A STAMPANTE, NON MI PREOCCUPO DI CODA
+	< prossima unità NX(J) = ST per J >;
+	< occupa ST con J >;
+
+	* AGGIORNAMENTO CALENDARIO
+	< prevedi durata Tst(J) del servizio stampante >;
+	< aggiorno calendario tst := clock + Tst(J) >;
+
+	* LIBERO HOST (non mi preoccupo di coda)
+	< libero host da J >;
+
+END

@@ -1,0 +1,33 @@
+* DESCRIZIONE PROCEDURA  <FINE DISK>
+PROCEDURE Fine Disk;
+BEGIN
+
+	* GESTIONE JOB USCENTE
+	* INVIO A CPU
+	< prossima unità NX(J) = CPU per J >;
+
+	* DECIDO SE HO TROVATO RECORD
+	IF < prob <= 0.1 >
+		THEN
+		< record trovato >;
+	ELSE
+		< record non trovato >;
+	
+	* USCITA JOB DA DISK
+	IF < CPU libera >
+		THEN
+		< inserisco J in CPU >;
+	ELSE
+		< inserisco J in codaCpuClasse3 >;
+
+	* AGGIORNAMENTO CALENDARIO
+	< prevedi Tcpu(J) servizio CPU >;
+	< tcpu:= clock + Tcpu(J) >;
+		
+	* GESTIONE JOB ENTRANTE
+	IF <codaDisk non vuota>
+	   THEN 
+	   < introduci nuovo JOB J in DISK >;
+	ELSE
+	   < libera Disk >;
+END  
