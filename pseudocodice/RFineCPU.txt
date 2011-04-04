@@ -45,52 +45,50 @@ BEGIN
 		< esamino stato JOB J >;
 		IF < classe J == 2 >
 			THEN
-			* INVIO A HOST
-			< prossima unità NX(J) = HOST per J >;
-			< occupa Host con J >;
-			
-			* AGGIORNAMENTO CALENDARIO
-			< prevedi durata Thost(J) del servizio host >;
-			< aggiorno calendario thost := clock + Thost(J) >;
-
+			BEGIN
+				* INVIO A HOST
+				< prossima unità NX(J) = HOST per J >;
+				< occupa Host con J >;
+				
+				* AGGIORNAMENTO CALENDARIO
+				< prevedi durata Thost(J) del servizio host >;
+				< aggiorno calendario thost := clock + Thost(J) >;
+			END
 		ELSE IF < classe J == 3 >
-
 			THEN
 			BEGIN
-			< calcolo prob per instradamento di J >;
-			IF < prob <= 0.1 >
-				THEN
-				BEGIN
-				* INVIO A STAMPANTE
-				< prossima unità NX(J) = ST per J >;
-				< occupa ST con J >;
-			
-				* AGGIORNAMENTO CALENDARIO
-				< prevedi durata Tst(J) del servizio ST >;
-				< aggiorno calendario tst := clock + Tst(J) >;
-				END
-
-			ELSE
-				BEGIN
-				* USCITA JOB DA CPU
-				IF < DISK libero >
+				< calcolo prob per instradamento di J >;
+				IF < prob <= 0.1 >
 					THEN
-					< occupo DISK con J >;
-
+					BEGIN
+						* INVIO A STAMPANTE
+						< prossima unità NX(J) = ST per J >;
+						< occupa ST con J >;
+					
+						* AGGIORNAMENTO CALENDARIO
+						< prevedi durata Tst(J) del servizio ST >;
+						< aggiorno calendario tst := clock + Tst(J) >;
+					END
 				ELSE
-					< inserisco J in codaDisk >;
-				END
-
-			* AGGIORNAMENTO CALENDARIO
-			< prevedi Tdisk(J) servizio DISK >;
-			< tdisk:= clock + Tdisk(J) >;
+					* USCITA JOB DA CPU
+					BEGIN
+						IF < DISK libero >
+							THEN
+							< occupo DISK con J >;
+		
+						ELSE
+							< inserisco J in codaDisk >;
+					END
+	
+				* AGGIORNAMENTO CALENDARIO
+				< prevedi Tdisk(J) servizio DISK >;
+				< tdisk:= clock + Tdisk(J) >;
 			END
 			
 			
 		END
 
 	* GESTIONE JOB ENTRANTI
-
 	< calcolo prob per scelta prossimo J >;
 	< esamino stato code >;
 
@@ -98,8 +96,9 @@ BEGIN
 	   THEN
 		< libera CPU >; 
 	ELSE
-	   < scegli nuovo J da code>;
-	   < introduci nuovo J in CPU >;
-	   
+		BEGIN
+	   		< scegli nuovo J da code>;
+	   		< introduci nuovo J in CPU >;
+	   END
 END
    

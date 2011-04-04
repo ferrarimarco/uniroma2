@@ -7,15 +7,13 @@ BEGIN
 	* CREO NUOVO JOB
 	< creo nuovo JOB J classe 1 >;
 	< inizializzo J >;
-
-	* CONTROLLO SE JOB NECESSITA DI HOST
-	< creo nuovo HOST H per J >;
+	< creo nuovo HOST H per J se necessario >;
 
 	* CREO STAMPANTE PER JOB
 	< creo nuova STAMPANTE ST per J >;
 
 	* INVIO A CPU
-	< prossima unità NX(J) = CPU per J >;
+	< prossimo centro NX(J) = CPU per J >;
 
 	* USCITA JOB DA DISK
 	IF < CPU libera >
@@ -30,7 +28,5 @@ BEGIN
 	* AGGIORNAMENTO CALENDARIO
 	< prevedi durata Tcpu(J) del servizio cpu >;
 	< aggiorno calendario tcpu := clock + Tcpu(J) >;
-
-	
 
 END

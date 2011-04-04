@@ -3,13 +3,13 @@ BEGIN
 
 	* DICHIARAZIONE VARIABILI E STRUTTURE DATI
 	< variabili stato code (codaCpuClasse1, codaCpuClasse2, codaCpuClasse3, codaDisk) >;
-	< variabili stato unità (CPU, Disk, Host, ST) >;
+	< variabili stato centri (CPU, Disk, Host, ST) >;
 	< variabili di carico (Tter, Tcpu, nio, Tdisk, Thost, Tst) >;
 	< calendario eventi (ta, tcpu, td, th, tst, tfinesim) >;
 	< clock >;
 
 	* DICHIARAZIONE DELLE PROCEDURE DI EVENTO
-	< Arrivo >;
+	< Arrivo Utente >;
 	< Fine CPU >;
 	< Fine Disk >;
 	< Fine Host >;
@@ -17,11 +17,11 @@ BEGIN
 	< Osservatore >;
 
 	* SCHEDULER EVENTI
+	< inizializza variabili di stato code >;
 	< inizializza variabili di stato centri >;
-	< inizializza variabili di stato eventi >;
-	< inizializza code >;
+	< inizializza calendario >;
 	< inizializza clock >;
-	< arrivo primo evento ( ta := ta + TA(1))>;
+	< arrivo primo evento (ta := ta + TA(1)) >;
 	WHILE clock < Tfinesim DO
 		BEGIN
 		< seleziona da calendario prossimo evento X (X = A, CPU, Disk, Host, ST) >;

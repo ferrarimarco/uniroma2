@@ -1,7 +1,6 @@
 * DESCRIZIONE PROCEDURA < Fine Host >;
 PROCEDURE Fine Host;
 BEGIN
-
 	* GESTISCO JOB USCENTE DALL'HOST
 	< esamina stato JOB J in Host >;
 
