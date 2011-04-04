@@ -2,11 +2,11 @@
 PROCEDURE Fine Stampante;
 BEGIN
 	* GESTISCO JOB USCENTE DALLA STAMPANTE
-	< esamino stato JOB in Stampante >;
+	< esamino stato JOB J in Stampante >;
 
 	< invio JOB a osservatore >
 
 	* AGGIORNAMENTO CALENDARIO
-	< prevedo durata Toss(JOB) del servizio osservatore >;
-	< aggiorno calendario toss := clock + Toss(JOB) >;
+	< prevedo durata Toss(J) del servizio osservatore >;
+	< aggiorno calendario toss := clock + Toss(J) >;
 END
