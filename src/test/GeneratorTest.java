@@ -50,7 +50,7 @@ public class GeneratorTest {
 		
 		//Inseriamo i valori solo se compatibili con le dimensione dell'Array
 		if (time.intValue() < occorrenze.length)
-		occorrenze[time.intValue()]++;
+			occorrenze[time.intValue()]++;
 	}
 	
 	public void finalizeInt()

@@ -6,15 +6,17 @@ public class ErlGenTest {
 
 	public static void main(String[] args) {
 		
-		ErlangGenerator erl = new ErlangGenerator(1L, 2.0, 20);
-		GeneratorTest genTest = new GeneratorTest("C:\\ErlTest", false);
+		ErlangGenerator erlGen = new ErlangGenerator(1L, 2.0, 20);
+		GeneratorTest genTest = new GeneratorTest("C:\\ErlGen", false);
 		Double time;
-
-		for(int i=0; i<1000; i++){
-			time = erl.generateNextValue();
-			genTest.elaborateNewValue(time, erl.getDensity(time));
-		}
 		
-		genTest.finalize();
+		for (int i = 0; i < 100000000; i++) {
+			time = erlGen.generateNextValue();
+			genTest.elaborateNewValueInt(time);
+		}
+
+		genTest.finalizeInt();
+		
+
 	}
 }

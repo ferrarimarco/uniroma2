@@ -15,6 +15,7 @@ public class IperEspGenerator implements Generator {
 	public IperEspGenerator(Long seed1, Long seed2, Double mean, Double prob) {
 		tempo1 = mean / 2 * prob;
 		tempo2 = mean / 2 * (1 - prob);
+		
 		expGen1 = new ExponentialGenerator(seed1, tempo1);
 		expGen2 = new ExponentialGenerator(seed2, tempo2);
 		uniGen = new UniformDoubleGenerator(seed1);
@@ -28,7 +29,6 @@ public class IperEspGenerator implements Generator {
 			return expGen1.generateNextValue();
 		else
 			return expGen2.generateNextValue();
-
 	}
 
 	public Double getDensity(Double t) {
