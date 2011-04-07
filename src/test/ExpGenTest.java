@@ -8,15 +8,15 @@ public class ExpGenTest {
 	
 		ExponentialGenerator expGen = new ExponentialGenerator(1L, 10.0);
 		
-		GeneratorTest genTest = new GeneratorTest("C:\\ExpGen", false);
+		GeneratorTest genTest = new GeneratorTest("C:\\ExpGen.txt", false);
 		Double time;
 		
 		for (int i = 0; i < 100000000; i++) {
 			time = expGen.generateNextValue();
-			genTest.elaborateNewValueInt(time);
+			genTest.elaborateNewValue(time);
 		}
 
-		genTest.finalizeInt();
+		genTest.finalize();
 		
 
 	}

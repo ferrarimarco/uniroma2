@@ -8,15 +8,15 @@ public class UniformLongGeneratorTest {
 		
 		
 		UniformLongGenerator unifGen = new UniformLongGenerator(2L, 78L, 101L);
-		GeneratorTest genTest = new GeneratorTest("C:\\UnifGen", false);
+		GeneratorTest genTest = new GeneratorTest("C:\\UnifGen.txt", false);
 		Long time;
 		
 		for (int i = 0; i < 100000000; i++) {
 			time = unifGen.generateNextValue();
-			genTest.elaborateNewValueInt(time.doubleValue());
+			genTest.elaborateNewValue(time.doubleValue());
 		}
 
-		genTest.finalizeInt();
+		genTest.finalize();
 		
 		
 	}
