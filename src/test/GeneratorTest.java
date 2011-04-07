@@ -11,7 +11,7 @@ public class GeneratorTest {
 	
 	public GeneratorTest(String resultsPath, Boolean append){
 
-		results = new Integer[100];
+		results = new Integer[120];
 		
 		//Array initialization
 		for(int i=0; i < results.length; i++)
@@ -25,14 +25,15 @@ public class GeneratorTest {
 	}
 	
 	public void elaborateNewValue(Double time){
-		if(time > results.length)
+
+		if(time >= results.length)
 			results[results.length - 1]++;
 		else{
 			results[time.intValue()]++;
 		}
 	}
 	
-	public void finalize()
+	public void finalizeElaboration()
 	{
 		try {
 			for(int i=0; i<results.length; i++)

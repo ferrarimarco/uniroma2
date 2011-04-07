@@ -15,7 +15,7 @@ public class ErlGenTest {
 			genTest.elaborateNewValue(time);
 		}
 
-		genTest.finalize();
+		genTest.finalizeElaboration();
 		
 
 	}

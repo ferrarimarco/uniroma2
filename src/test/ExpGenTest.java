@@ -16,7 +16,7 @@ public class ExpGenTest {
 			genTest.elaborateNewValue(time);
 		}
 
-		genTest.finalize();
+		genTest.finalizeElaboration();
 		
 
 	}
