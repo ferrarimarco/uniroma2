@@ -6,7 +6,7 @@ public class IperEspTest {
 
 	public static void main(String[] args) {
 
-		IperEspGenerator iperGen = new IperEspGenerator(1L, 1L, 10.0, 0.6);
+		IperEspGenerator iperGen = new IperEspGenerator(1L, 1L, 10.0, 0.3);
 		GeneratorTest genTest = new GeneratorTest("C:\\IperEspGen.txt", false);
 		
 		Double time;
