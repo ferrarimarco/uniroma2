@@ -11,7 +11,7 @@ public class ExpGenTest {
 		GeneratorTest genTest = new GeneratorTest("C:\\ExpGen.txt", false);
 		Double time;
 		
-		for (int i = 0; i < 100000000; i++) {
+		for (int i = 0; i < 10000; i++) {
 			time = expGen.generateNextValue();
 			genTest.elaborateNewValue(time);
 		}

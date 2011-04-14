@@ -6,7 +6,7 @@ public class ErlGenTest {
 
 	public static void main(String[] args) {
 		
-		ErlangGenerator erlGen = new ErlangGenerator(1L, 2.0, 20);
+		ErlangGenerator erlGen = new ErlangGenerator(1L, 10.0, 2);
 		GeneratorTest genTest = new GeneratorTest("C:\\ErlGen.txt", false);
 		Double time;
 		
@@ -16,7 +16,5 @@ public class ErlGenTest {
 		}
 
 		genTest.finalizeElaboration();
-		
-
 	}
 }
