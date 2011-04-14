@@ -10,7 +10,7 @@ public class ErlGenTest {
 		GeneratorTest genTest = new GeneratorTest("C:\\ErlGen.txt", false);
 		Double time;
 		
-		for (int i = 0; i < 100000000; i++) {
+		for (int i = 0; i < 100000; i++) {
 			time = erlGen.generateNextValue();
 			genTest.elaborateNewValue(time);
 		}
