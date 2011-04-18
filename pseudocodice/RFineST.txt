@@ -1,12 +1,10 @@
-* DESCRIZIONE PROCEDURA < Fine Stampante >;
-PROCEDURE Fine Stampante;
+* DESCRIZIONE PROCEDURA < Fine ST >;
+PROCEDURE Fine ST;
 BEGIN
 	* GESTISCO JOB USCENTE DALLA STAMPANTE
-	< esamino stato JOB J in Stampante >;
-
-	< invio JOB a osservatore >
+	< esamino stato JOB J in ST >;
 
 	* AGGIORNAMENTO CALENDARIO
-	< prevedo durata Toss(J) del servizio osservatore >;
-	< aggiorno calendario toss := clock + Toss(J) >;
+	< prevedo durata Tt(J) del servizio terminale >;
+	< aggiorno calendario tt := clock + Tt(J) >;
 END

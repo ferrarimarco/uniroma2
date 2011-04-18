@@ -1,4 +1,4 @@
-* DESCRIZIONE PROCEDURA < Arrivo Utente >;
+* DESCRIZIONE PROCEDURA < Fine CPU >;
 PROCEDURE Fine CPU;
 BEGIN
 
@@ -70,12 +70,13 @@ BEGIN
 						< aggiorno calendario tst := clock + Tst(J) >;
 					END
 				ELSE
-					* USCITA JOB DA CPU
 					BEGIN
 						IF < DISK libero >
 							THEN
-							< occupo DISK con J >;
-		
+							* MEMORIZZA ISTANTE DI ENTRATA JOB IN DISK PER CALCOLO THROUGHPUT
+							< istante di entrata J in DISK := clock >;
+							
+							< occupo DISK con J >;		
 						ELSE
 							< inserisco J in codaDisk >;
 					END

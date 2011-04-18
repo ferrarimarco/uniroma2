@@ -14,6 +14,10 @@ BEGIN
 		< record non trovato >;
 	
 	* USCITA JOB DA DISK
+	
+	* MEMORIZZA ISTANTE DI USCITA JOB DA DISK PER CALCOLO THROUGHPUT
+	< istante di uscita J da DISK := clock >;	
+	
 	IF < CPU libera >
 		THEN
 		< inserisco J in CPU >;
@@ -27,7 +31,10 @@ BEGIN
 	* GESTIONE JOB ENTRANTE
 	IF <codaDisk non vuota>
 	   THEN 
-	   < introduci nuovo JOB J in DISK >;
+		* MEMORIZZA ISTANTE DI ENTRATA JOB IN DISK PER CALCOLO THROUGHPUT
+		< istante di entrata J in DISK := clock >;
+				
+		< occupo DISK con J >;
 	ELSE
 	   < libera Disk >;
 END  

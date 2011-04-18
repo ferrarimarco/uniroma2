@@ -1,10 +1,9 @@
-* DESCRIZIONE PROCEDURA < Arrivo Utente >;
-PROCEDURE Arrivo Utente;
+* DESCRIZIONE PROCEDURA < Fine Terminale >;
+PROCEDURE Fine Terminale;
 BEGIN
 
-	* GESTIONE JOB ENTRANTE
-
-	* CREO NUOVO JOB
+	* GESTIONE JOB USCENTE DA TERMINALE
+	
 	< creo nuovo JOB J classe 1 >;
 	< inizializzo J >;
 	< creo nuovo HOST H per J se necessario >;
@@ -12,10 +11,12 @@ BEGIN
 	* CREO STAMPANTE PER JOB
 	< creo nuova STAMPANTE ST per J >;
 
+	* MEMORIZZA ISTANTE DI USCITA JOB DA TERMINALE PER CALCOLO TEMPO MEDIO DI RISPOSTA
+	< istante di uscita J da TERM := clock >;
+	
 	* INVIO A CPU
 	< prossimo centro NX(J) = CPU per J >;
 
-	* USCITA JOB DA DISK
 	IF < CPU libera >
 		THEN
 		< inserisco J in CPU >;
