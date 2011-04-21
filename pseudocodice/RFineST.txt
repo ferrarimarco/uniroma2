@@ -7,6 +7,12 @@ BEGIN
 	* MEMORIZZA IN CLASSE JOB ISTANTE DI USCITA JOB DA STAMPANTE PER CALCOLO TEMPO MEDIO DI RISPOSTA
 	< istante di uscita J da TERM := clock >;
 	
+	* INVIO A TERMINALE
+	< prossima unità NX(J) = TERM per J >;
+	< occupa TERM con J >;
+	
+	* LIBERO ST
+	< libero ST da J >;
 
 	* AGGIORNAMENTO CALENDARIO
 	< prevedo durata Tt(J) del servizio terminale >;

@@ -23,7 +23,7 @@ BEGIN
 	ELSE
 		< inserisco J in codaCpu >;
 
-	* LIBERO TERMINALE (non mi preoccupo della coda)
+	* LIBERO TERMINALE
 	< libera terminale associato a J >;
 
 	* AGGIORNAMENTO CALENDARIO
