@@ -11,7 +11,7 @@ BEGIN
 	* CREO STAMPANTE PER JOB
 	< creo nuova STAMPANTE ST per J >;
 
-	* MEMORIZZA ISTANTE DI USCITA JOB DA TERMINALE PER CALCOLO TEMPO MEDIO DI RISPOSTA
+	* MEMORIZZA IN CLASSE JOB ISTANTE DI USCITA JOB DA TERMINALE PER CALCOLO TEMPO MEDIO DI RISPOSTA
 	< istante di uscita J da TERM := clock >;
 	
 	* INVIO A CPU
@@ -21,7 +21,7 @@ BEGIN
 		THEN
 		< inserisco J in CPU >;
 	ELSE
-		< inserisco J in codaCpuClasse1 >;
+		< inserisco J in codaCpu >;
 
 	* LIBERO TERMINALE (non mi preoccupo della coda)
 	< libera terminale associato a J >;

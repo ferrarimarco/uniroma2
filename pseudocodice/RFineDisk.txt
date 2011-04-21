@@ -15,8 +15,8 @@ BEGIN
 	
 	* USCITA JOB DA DISK
 	
-	* MEMORIZZA ISTANTE DI USCITA JOB DA DISK PER CALCOLO THROUGHPUT
-	< istante di uscita J da DISK := clock >;	
+	* INCREMENTA CONTATORE JOB USCITI
+	< jDisk++ >;	
 	
 	IF < CPU libera >
 		THEN

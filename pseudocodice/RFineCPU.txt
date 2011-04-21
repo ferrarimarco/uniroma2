@@ -2,7 +2,7 @@
 PROCEDURE Fine CPU;
 BEGIN
 
-	< esamino stato JOB J uscente >;
+	< esamino classe JOB J uscente >;
 
 	* GESTIONE JOB USCENTE CLASSE 1
 	IF < classe J == 1 >
@@ -16,14 +16,14 @@ BEGIN
 		ELSE
 			< J diventa di classe 3 >;
 		
-		< esamino stato J >;
+		< esamino classe J >;
 		IF < classe J == 2 >
 			THEN
 			IF < CPU libera >
 				THEN
 				< inserisci J in CPU >;
 			ELSE
-				< inserisci J in codaCpu2 >;
+				< inserisci J in codaCpu >;
 		
 		ELSE IF < classe J == 3 >
 			THEN
@@ -31,7 +31,7 @@ BEGIN
 				THEN
 				< inserisci J in CPU >;
 			ELSE
-				< inserisci J in codaCpu3 >;
+				< inserisci J in codaCpu >;
 
 		
 		* AGGIORNAMENTO CALENDARIO
@@ -74,7 +74,7 @@ BEGIN
 						IF < DISK libero >
 							THEN
 							* MEMORIZZA ISTANTE DI ENTRATA JOB IN DISK PER CALCOLO THROUGHPUT
-							< istante di entrata J in DISK := clock >;
+							* NON SERVE < istante di entrata J in DISK := clock >;
 							
 							< occupo DISK con J >;		
 						ELSE
@@ -90,15 +90,15 @@ BEGIN
 		END
 
 	* GESTIONE JOB ENTRANTI
-	< calcolo prob per scelta prossimo J >;
-	< esamino stato code >;
+
+	* SCELGO PROSSIMO JOB DA CODA (FIFO)
+	< esamino stato coda >;
 
 	IF <code vuote>
 	   THEN
 		< libera CPU >; 
 	ELSE
 		BEGIN
-	   		< scegli nuovo J da code>;
 	   		< introduci nuovo J in CPU >;
 	   END
 END

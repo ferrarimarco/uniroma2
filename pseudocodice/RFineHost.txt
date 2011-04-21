@@ -4,10 +4,10 @@ BEGIN
 	* GESTISCO JOB USCENTE DALL'HOST
 	< esamina stato JOB J in Host >;
 
-	* MEMORIZZA ISTANTE DI USCITA JOB DA HOST PER CALCOLO TEMPO MEDIO DI RISPOSTA
+	* MEMORIZZA IN CLASSE JOB ISTANTE DI USCITA JOB DA HOST PER CALCOLO TEMPO MEDIO DI RISPOSTA
 	< istante di uscita J da HOST := clock >;
 	
-	* INVIO A STAMPANTE, NON MI PREOCCUPO DI CODA
+	* INVIO A STAMPANTE
 	< prossima unità NX(J) = ST per J >;
 	< occupa ST con J >;
 
@@ -15,6 +15,11 @@ BEGIN
 	< prevedi durata Tst(J) del servizio stampante >;
 	< aggiorno calendario tst := clock + Tst(J) >;
 
-	* LIBERO HOST (non mi preoccupo di coda)
+	* LIBERO HOST
 	< libero host da J >;
+	
+	* CALCOLO TEMPO DI RISPOSTA PER J
+	< Trisp = Tout - Tin >;
+	< memorizzo tempo di risposta >;
+	
 END

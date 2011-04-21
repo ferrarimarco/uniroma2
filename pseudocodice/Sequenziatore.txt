@@ -1,11 +1,13 @@
 * SIMULAZIONE PER SEQUENZIAMENTO DI EVENTI
 BEGIN
 	* DICHIARAZIONE VARIABILI E STRUTTURE DATI
-	< variabili stato code (codaCpuClasse1, codaCpuClasse2, codaCpuClasse3, codaDisk) >;
-	< variabili stato centri (CPU, Disk, Host, ST) >;
-	< variabili di carico (Tt, Tcpu, nio, Tdisk, Thost, Tst) >;
+	< variabili stato code (codaCpu, codaDisk) >;
+	< variabili stato centri (Term, CPU, Disk, Host, ST) >;
+	< variabili di carico (Tt, Tcpu, Tdisk, Thost, Tst) >;
 	< calendario eventi (tt, tcpu, td, th, tst) >;
 	< clock >;
+	< contatore JOB usciti da disk (jDisk) >;
+	< istanti di entrata e uscita per calcolo tempo di risposta del JOB (Trisp, Tin, Tout) >;
 
 	* DICHIARAZIONE DELLE PROCEDURE DI EVENTO
 	< Fine Terminale >;
