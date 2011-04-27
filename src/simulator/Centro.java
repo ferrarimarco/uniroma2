@@ -7,6 +7,9 @@ public class Centro {
 	private String name;
 	private TipoCentro type;
 	private LinkedList<Job> queue;
+	private Boolean isFree;
+	
+	private Job tempJob;
 	
 	//Per contare i Job uscenti
 	private Integer jobOut;
@@ -15,5 +18,29 @@ public class Centro {
 		this.name = name;
 		this.type = type;
 		this.queue = queue;
+		isFree = false;
+	}
+	
+	//Get first Job and remove from Queue
+	public Job popJobFromQueue(){
+		return queue.pop();
+	}
+	
+	public void addJobToQueueLast(Job j){
+		queue.add(j);
+	}
+	
+	public Job getJobFromQueueAndRemove(Integer index){
+		tempJob = queue.get(index);
+		queue.remove(index);
+		return tempJob;
+	}
+
+	public Boolean getIsFree() {
+		return isFree;
+	}
+
+	public void setIsFree(Boolean isFree) {
+		this.isFree = isFree;
 	}
 }
