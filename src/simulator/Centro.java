@@ -5,12 +5,15 @@ import java.util.LinkedList;
 public class Centro {
 
 	private String name;
-	private TipoCentro tipo;
-	private LinkedList queue;
+	private TipoCentro type;
+	private LinkedList<Job> queue;
 	
-	public Centro(String name, TipoCentro tipo, LinkedList queue){
+	//Per contare i Job uscenti
+	private Integer jobOut;
+	
+	public Centro(String name, TipoCentro type, LinkedList<Job> queue){
 		this.name = name;
-		this.tipo = tipo;
+		this.type = type;
 		this.queue = queue;
 	}
 }
