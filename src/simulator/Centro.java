@@ -8,6 +8,7 @@ public class Centro {
 	private TipoCentro type;
 	private LinkedList<Job> queue;
 	private Boolean isFree;
+	private Job currentJob;
 	
 	private Job tempJob;
 	
@@ -42,5 +43,13 @@ public class Centro {
 
 	public void setIsFree(Boolean isFree) {
 		this.isFree = isFree;
+	}
+
+	public Job getCurrentJob() {
+		return currentJob;
+	}
+
+	public void setCurrentJob(Job currentJob) {
+		this.currentJob = currentJob;
 	}
 }
