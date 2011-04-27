@@ -52,4 +52,12 @@ public class Centro {
 	public void setCurrentJob(Job currentJob) {
 		this.currentJob = currentJob;
 	}
+
+	public void setJobOut(Integer jobOut) {
+		this.jobOut = jobOut;
+	}
+
+	public Integer getJobOut() {
+		return jobOut;
+	}
 }
