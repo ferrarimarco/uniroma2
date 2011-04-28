@@ -9,6 +9,7 @@ public class Centro {
 	private LinkedList<Job> queue;
 	private Boolean isFree;
 	private Job currentJob;
+	private TipoEvento t;
 	
 	private Job tempJob;
 	

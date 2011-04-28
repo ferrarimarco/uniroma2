@@ -2,41 +2,43 @@ package simulator;
 
 public class Clock {
 	
+	//Tempo reale
 	private double wallTimeStart, wallTimeStop;
+	
+	//Tempo simulato
 	private double simTime;
 	
 	public Clock()
 	{
 		this.wallTimeStart = System.currentTimeMillis();
-		setSimTime(0.0);
+		simTime = 0.0;
 		
 	}
 
-
 	public void advance(double deltaT)
 	{
-	this.simTime += deltaT;	
-	}
-	
-	public double getSimTime()
-	{
-		return this.simTime;
-	}
-	
-	public void setSimTime(double simTime)
-	{
-		this.simTime = simTime;	
+		simTime += deltaT;	
 	}
 	
 	public void stopTheClock()
 	{
-		this.wallTimeStop = System.currentTimeMillis();
+		wallTimeStop = System.currentTimeMillis();
 	}
 	
 	public double getWallTimeDuration()
 	{
 		stopTheClock();
-		return this.wallTimeStop - this.wallTimeStart;
+		return wallTimeStop - wallTimeStart;
+	}
+	
+	public double getSimTime()
+	{
+		return simTime;
+	}
+	
+	public void setSimTime(double simTime)
+	{
+		this.simTime = simTime;	
 	}
 	
 }

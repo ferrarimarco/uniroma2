@@ -2,25 +2,26 @@ package simulator;
 
 public class Job {
 	
-	private double qTime, startServiceTime, endServiceTime;
+	private double qTime;
+	private double startServiceTime;
+	private double endServiceTime;
+	private int jobClass;
 	
-	public Job(double qTime, double startServiceTime, double endServiceTime)
+	public Job(double qTime, double startServiceTime, double endServiceTime, int jobClass)
 	{
-		setQTime(qTime);
-		setEndServiceTime(startServiceTime);
-		setEndServiceTime(endServiceTime);
+		this.qTime = qTime;
+		this.startServiceTime = startServiceTime;
+		this.endServiceTime = endServiceTime;
+		this.jobClass = jobClass;
 	}
 
 	public Job()
 	{
-		this(0, 0, 0);
+		this(0, 0, 0, 1);
 	}
-	
-	//mutator methods
-	
+
 	public void setQTime(double qTime)
 	{
-	
 		this.qTime = qTime;
 	}
 	
@@ -47,5 +48,13 @@ public class Job {
 	public double getEndServiceTime()
 	{
 		return endServiceTime;
+	}
+
+	public int getJobClass() {
+		return jobClass;
+	}
+
+	public void setJobClass(int jobClass) {
+		this.jobClass = jobClass;
 	}
 }
