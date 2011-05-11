@@ -22,5 +22,10 @@ public class UniformLongGenerator implements Generator {
 		Long l = d.longValue();
 		return l;
 	}
+
+
+	public void setRangeEnd(Long rangeEnd) {
+		this.rangeEnd = rangeEnd;
+	}
 	
 }

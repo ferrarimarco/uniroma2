@@ -1,6 +1,7 @@
 package simulator;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Sequenziatore {
 
@@ -15,6 +16,15 @@ public class Sequenziatore {
 	
 	public Sequenziatore(){
 		
+		cpu = new Centro("Cpu", TipoCentro.CPU, new LinkedList<Job>());
+		disk = new Centro("Disk", TipoCentro.DISK, new LinkedList<Job>());
+		
+		stampanti = new ArrayList<Centro>();
+		host = new ArrayList<Centro>();
+		terminali = new ArrayList<Centro>();
+		
+		calendar = new CalendarioEventi();
+		clock = new Clock();
 	}
 	
 	private void fineTerminale(){
