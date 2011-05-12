@@ -6,10 +6,6 @@ BEGIN
 	
 	< creo nuovo JOB J classe 1 >;
 	< inizializzo J >;
-	< creo nuovo HOST H per J se necessario >;
-
-	* CREO STAMPANTE PER JOB
-	< creo nuova STAMPANTE ST per J >;
 
 	* MEMORIZZA IN CLASSE JOB ISTANTE DI USCITA JOB DA TERMINALE PER CALCOLO TEMPO MEDIO DI RISPOSTA
 	< istante di uscita J da TERM := clock >;

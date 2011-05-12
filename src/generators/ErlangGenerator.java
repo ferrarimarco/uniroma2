@@ -31,9 +31,4 @@ public class ErlangGenerator implements Generator {
 
 		return tSum;
 	}
-	
-	public Double getDensity(Double t){
-		return (Math.pow((k * mu), k) * (Math.exp(-k * mu * tSum) / MathUtils.factorial(k - 1)) * Math.pow(tSum, (k - 1)));
-	}
-
 }

@@ -1,6 +1,8 @@
 package generators;
 
-public class ExponentialGenerator {
+import interfaces.Generator;
+
+public class ExponentialGenerator implements Generator{
 
 	private UniformDoubleGenerator rng;
 	private Double mean;
@@ -14,9 +16,5 @@ public class ExponentialGenerator {
 	
 	public Double generateNextValue(){
 		return (-mean) * Math.log(rng.generateNextValue());
-	}
-	
-	public Double getDensity(Double t){
-		return (1.0/mean) * Math.exp((-(1.0/mean))* t);
 	}
 }

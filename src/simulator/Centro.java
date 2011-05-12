@@ -1,7 +1,8 @@
 package simulator;
 
-import exceptions.NoQueueCenterException;
 import generators.UniformLongGenerator;
+
+import interfaces.Generator;
 
 import java.util.LinkedList;
 
@@ -10,7 +11,7 @@ public class Centro {
 	private String name;
 	private TipoCentro type;
 	private LinkedList<Job> queue;
-	private Boolean isFree;
+	private Boolean free;
 	private Job currentJob;	
 	private Job tempJob;
 	
@@ -22,15 +23,21 @@ public class Centro {
 	private Integer index;
 	private Integer newRangeEnd;
 	
-	public Centro(String name, TipoCentro type, LinkedList<Job> queue){
+	//Per prevedere la durata del servizio
+	private Generator generator;
+	private Double tempMean;
+	
+	public Centro(String name, TipoCentro type, LinkedList<Job> queue, Generator generator){
 		this.name = name;
 		this.type = type;
 		this.queue = queue;
-		isFree = false;
+		free = true;
 		
 		if(type == TipoCentro.DISK){
 			unifGen = new UniformLongGenerator(0L, 0L, 103L);
 		}
+		
+		this.generator = generator;
 	}
 	
 	public Job getJob(){
@@ -47,7 +54,7 @@ public class Centro {
 				this.updateRanges();
 			}
 		}else{
-			throw new NoQueueCenterException();
+			throw new RuntimeException("Centro senza coda");
 		}
 		
 		return tempJob;
@@ -63,19 +70,32 @@ public class Centro {
 		unifGen.setRangeEnd(newRangeEnd.longValue());
 	}
 	
-	public Boolean getIsFree() {
-		return isFree;
+	public Number prevediDurata(Integer jobClass){
+		if(jobClass == 1){
+			tempMean = 0.058;
+		}else if(jobClass == 2){
+			tempMean = 0.074;
+		}else if(jobClass == 3){
+			tempMean = 0.0285;
+		}else{
+			throw new RuntimeException("Classe non prevista");
+		}
+		
+		return (tempMean) * generator.generateNextValue().doubleValue();
 	}
-
-	public void setIsFree(Boolean isFree) {
-		this.isFree = isFree;
+	
+	public Boolean isFree() {
+		return free;
 	}
 
 	public Job getCurrentJob() {
+		free = true;
+		
 		return currentJob;
 	}
 
 	public void setCurrentJob(Job currentJob) {
+		free = false;
 		this.currentJob = currentJob;
 	}
 

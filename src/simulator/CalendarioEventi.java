@@ -29,7 +29,7 @@ public class CalendarioEventi {
 			}
 		}
 		
-		//TO CHECK
+		//Per non ritornare indietro nel tempo
 		calendar[minIndex] = Double.MAX_VALUE;
 		
 		return new Event(tipoEvento[minIndex] , minTime);
