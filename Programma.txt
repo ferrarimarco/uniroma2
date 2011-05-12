@@ -30,3 +30,9 @@ p simulazioni (lunga 1, lunga 2, lunga 3....)
 Domande
 
 - Quando calcoliamo il Tempo di risposta per un dato job, dobbiamo includere anche il tempo speso nel centro terminali?
+
+------------------
+Osservazioni (run replicati)
+- Decidere un numero di osservazioni da effettuare per ogni run (= n)
+- Eseguire n osservazioni per ogni run(x)
+- Per ogni osservazione, fai la media dei tempi ottenuti

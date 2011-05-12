@@ -15,28 +15,17 @@ BEGIN
 			< J diventa di classe 2 >;
 		ELSE
 			< J diventa di classe 3 >;
-		
-		< esamino classe J >;
-		IF < classe J == 2 >
-			THEN
-			IF < CPU libera >
-				THEN
-				< inserisci J in CPU >;
-			ELSE
-				< inserisci J in codaCpu >;
-		
-		ELSE IF < classe J == 3 >
-			THEN
-			IF < CPU libera >
-				THEN
-				< inserisci J in CPU >;
-			ELSE
-				< inserisci J in codaCpu >;
 
+		IF < CPU libera >
+			THEN
+			< inserisci J in CPU >;
+			
+			* AGGIORNAMENTO CALENDARIO
+			< prevedi durata Tcpu(J) del servizio cpu >;
+			< aggiorno calendario tcpu := clock + Tcpu(J) >;
+		ELSE
+			< inserisci J in codaCpu >;
 		
-		* AGGIORNAMENTO CALENDARIO
-		< prevedi durata Tcpu(J) del servizio cpu >;
-		< aggiorno calendario tcpu := clock + Tcpu(J) >;
 		END
 
 	* GESTIONE JOB USCENTE CLASSE 2 o 3

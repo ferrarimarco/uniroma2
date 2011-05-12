@@ -3,10 +3,7 @@ PROCEDURE Fine ST;
 BEGIN
 	* GESTISCO JOB USCENTE DALLA STAMPANTE
 	< esamino stato JOB J in ST >;
-	
-	* MEMORIZZA IN CLASSE JOB ISTANTE DI USCITA JOB DA STAMPANTE PER CALCOLO TEMPO MEDIO DI RISPOSTA
-	< istante di uscita J da TERM := clock >;
-	
+
 	* INVIO A TERMINALE
 	< prossima unità NX(J) = TERM per J >;
 	< occupa TERM con J >;
