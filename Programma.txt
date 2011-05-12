@@ -12,8 +12,9 @@ Inizializzazione sequenziatore
 5- ora procedere con la simulazione
 
 Domande:
-- Quanti job ci sono nel sistema?
-
+- Quanti job ci sono nel sistema? 12
+--------------
+Da fare: implementare parte statistiche.
 --------------
 Idee e note varie
 - Possiamo integrare la generazione dei tempi per le previsioni di servizio direttamente nei centri.

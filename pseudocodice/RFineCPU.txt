@@ -65,14 +65,14 @@ BEGIN
 							* MEMORIZZA ISTANTE DI ENTRATA JOB IN DISK PER CALCOLO THROUGHPUT
 							* NON SERVE < istante di entrata J in DISK := clock >;
 							
-							< occupo DISK con J >;		
+							< occupo DISK con J >;
+							
+							* AGGIORNAMENTO CALENDARIO
+							< prevedi Tdisk(J) servizio DISK >;
+							< tdisk:= clock + Tdisk(J) >;	
 						ELSE
 							< inserisco J in codaDisk >;
 					END
-	
-				* AGGIORNAMENTO CALENDARIO
-				< prevedi Tdisk(J) servizio DISK >;
-				< tdisk:= clock + Tdisk(J) >;
 			END
 			
 			
@@ -89,6 +89,10 @@ BEGIN
 	ELSE
 		BEGIN
 	   		< introduci nuovo J in CPU >;
+	   		
+	   		* AGGIORNAMENTO CALENDARIO
+			< prevedi durata Tcpu(J) del servizio cpu >;
+			< aggiorno calendario tcpu := clock + Tcpu(J) >;
 	   END
 END
    

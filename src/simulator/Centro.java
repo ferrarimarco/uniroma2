@@ -1,5 +1,6 @@
 package simulator;
 
+import generators.UniformDoubleGenerator;
 import generators.UniformLongGenerator;
 
 import interfaces.Generator;
@@ -23,6 +24,9 @@ public class Centro {
 	private Integer index;
 	private Integer newRangeEnd;
 	
+	//Per decidere se ho trovato record su disk
+	private UniformDoubleGenerator isFoundGen;
+	
 	//Per prevedere la durata del servizio
 	private Generator generator;
 	private Double tempMean;
@@ -34,24 +38,31 @@ public class Centro {
 		free = true;
 		
 		if(type == TipoCentro.DISK){
+			jobOut = 0;
 			unifGen = new UniformLongGenerator(0L, 0L, 103L);
+			isFoundGen = new UniformDoubleGenerator(43L);
 		}
 		
 		this.generator = generator;
 	}
 	
-	public Job getJob(){
+	public Job getJobFromQueue(){
+		
+		tempJob = null;
+		
 		if(queue != null){
-			if(type == TipoCentro.CPU){
-				tempJob = queue.pop();
-			}else if(type == TipoCentro.DISK){
-				//Disciplina coda disk è RAND
-				index = unifGen.generateNextValue().intValue();
-				tempJob = queue.get(index);
-				queue.remove(index);
-				
-				//Aggiornamo i ranges del generatore
-				this.updateRanges();
+			if(!queue.isEmpty()){
+				if(type == TipoCentro.CPU){
+					tempJob = queue.pop();
+				}else if(type == TipoCentro.DISK){
+					//Disciplina coda disk è RAND
+					index = unifGen.generateNextValue().intValue();
+					tempJob = queue.get(index);
+					queue.remove(index);
+					
+					//Aggiornamo i ranges del generatore
+					this.updateRanges();
+				}
 			}
 		}else{
 			throw new RuntimeException("Centro senza coda");
@@ -71,15 +82,20 @@ public class Centro {
 	}
 	
 	public Number prevediDurata(Integer jobClass){
-		if(jobClass == 1){
-			tempMean = 0.058;
-		}else if(jobClass == 2){
-			tempMean = 0.074;
-		}else if(jobClass == 3){
-			tempMean = 0.0285;
+		if(type == TipoCentro.CPU){
+			if(jobClass == 1){
+				tempMean = 0.058;
+			}else if(jobClass == 2){
+				tempMean = 0.074;
+			}else if(jobClass == 3){
+				tempMean = 0.0285;
+			}else{
+				throw new RuntimeException("Classe non prevista");
+			}
 		}else{
-			throw new RuntimeException("Classe non prevista");
+			tempMean = 1.0;
 		}
+		
 		
 		return (tempMean) * generator.generateNextValue().doubleValue();
 	}
@@ -88,8 +104,25 @@ public class Centro {
 		return free;
 	}
 
+	private Boolean isFound() {
+		if (isFoundGen.generateNextValue() <= 0.1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public Job getCurrentJob() {
 		free = true;
+		
+		
+		if(type == TipoCentro.DISK){
+			jobOut++;
+			
+			if(this.isFound()){
+				currentJob.setFoundData(true);
+			}
+		}
 		
 		return currentJob;
 	}

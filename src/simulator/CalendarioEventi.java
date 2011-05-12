@@ -2,22 +2,36 @@ package simulator;
 
 public class CalendarioEventi {
 
-	//38 eventi
+	//Stabilire la posizione degli eventi (ES: dove è fineCPU?)
 	private double[] calendar;
-	private TipoEvento[] tipoEvento;
 	
-	private int minIndex;
-	private double minTime;
+	public final Integer cpuIndex;
+	public final Integer diskIndex;
+	public final Integer firstTerminalIndex;
+	public final Integer firstHostIndex;
+	public final Integer firstStIndex;
 	
-	public CalendarioEventi(){
+	private Integer minIndex;
+	private Double minTime;
+	private Double tempTime;
+	
+	public CalendarioEventi(Integer numeroJob){
 		
-		//Array contenente tutti i tipi di evento
-		tipoEvento = TipoEvento.values();
+		cpuIndex = 0;
+		diskIndex = 1;
+		firstTerminalIndex = 2;
+		firstHostIndex = firstTerminalIndex + numeroJob;
+		firstStIndex = firstHostIndex + numeroJob;
+			
+		calendar = new double[2+ (numeroJob * 3)];
 		
-		calendar = new double[tipoEvento.length];
+		for(int i = 0; i < calendar.length; i++){
+			calendar[i] = Double.MAX_VALUE;
+		}
 	}
 	
-	public Event getNextEvent(){
+	//Return indice del prossimo evento
+	public Integer getNextEventIndex(){
 		
 		minIndex = 0;
 		minTime = calendar[minIndex];
@@ -29,18 +43,22 @@ public class CalendarioEventi {
 			}
 		}
 		
-		//Per non ritornare indietro nel tempo
-		calendar[minIndex] = Double.MAX_VALUE;
+		return minIndex;
+	}
+	
+	//Return valore dell'evento calendar[index]
+	public Double getEventTime(Integer index){
 		
-		return new Event(tipoEvento[minIndex] , minTime);
+		tempTime = calendar[index]; 
+		
+		//Per non ritornare indietro nel tempo
+		calendar[index] = Double.MAX_VALUE;
+		
+		return tempTime;
 	}
 	
-	public Event getEventByType(int type){
-		return new Event(tipoEvento[type], calendar[type]);
-	}
-	
-	public void updateEvent(Event event){
-		calendar[event.getEventType().getEventId()] = event.getTime();
+	public void updateEvent(Integer index, Double time){
+		calendar[index] = time;
 	}
 
 	public double[] getCalendar() {
