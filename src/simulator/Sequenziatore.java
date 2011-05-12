@@ -32,7 +32,7 @@ public class Sequenziatore {
 	
 	public Sequenziatore(Integer numeroJob){
 		
-		cpu = new Centro("Cpu", TipoCentro.CPU, new LinkedList<Job>(), new ExponentialGenerator(105L, 1.0));
+		cpu = new Centro("Cpu", TipoCentro.CPU, new LinkedList<Job>(), new ExponentialGenerator(111L, 1.0));
 		disk = new Centro("Disk", TipoCentro.DISK, new LinkedList<Job>(), new ErlangGenerator(107L, 0.033, 3));
 
 		stampanti = new Centro[numeroJob];
@@ -243,7 +243,7 @@ public class Sequenziatore {
 		//Gestione job uscente da Stampante
 		
 		//Prendo il job corrente e libero stampante
-		Job j = host[idCentro].getCurrentJob();
+		Job j = stampanti[idCentro].getCurrentJob();
 		
 		//Invio job uscente a terminale
 		terminali[idCentro].setCurrentJob(j);

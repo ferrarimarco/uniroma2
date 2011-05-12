@@ -39,7 +39,7 @@ public class Centro {
 		
 		if(type == TipoCentro.DISK){
 			jobOut = 0;
-			unifGen = new UniformLongGenerator(0L, 0L, 103L);
+			unifGen = new UniformLongGenerator(0L, 1L, 103L);
 			isFoundGen = new UniformDoubleGenerator(43L);
 		}
 		
@@ -73,7 +73,9 @@ public class Centro {
 	
 	public void addJobToQueue(Job j){
 		queue.add(j);
-		this.updateRanges();
+		
+		if(type == TipoCentro.DISK)
+			this.updateRanges();
 	}
 
 	private void updateRanges(){
@@ -114,7 +116,6 @@ public class Centro {
 	
 	public Job getCurrentJob() {
 		free = true;
-		
 		
 		if(type == TipoCentro.DISK){
 			jobOut++;

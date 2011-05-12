@@ -14,6 +14,7 @@ public class Job {
 		this.jobClass = jobClass;
 		this.identifier = identifier;
 		this.termExitTime = 0.0;
+		this.foundData = false;
 	}
 
 	public int getJobClass() {
