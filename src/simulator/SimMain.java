@@ -46,7 +46,7 @@ public class SimMain {
 				
 				sommaTempiMediRisp += seq.getTempoMedioRispJob();
 				
-				System.out.println("Lungh run: " + j + ". Osservazione: " + i);
+				System.out.println("Lungh run: " + j + ". Osservazione: " + i + " SommaTempiMediRisp: " + sommaTempiMediRisp);
 			}
 			
 			mediaCampionaria = sommaTempiMediRisp / numeroOsservazioni;
@@ -56,11 +56,13 @@ public class SimMain {
 			stimaMediaGordon = mediaCampionariaTot / j;
 			
 			//Scrivo media su file risultati
-			try {
-				bufferedWriterMedieGordon.write(df.format(stimaMediaGordon).toString());
-				bufferedWriterMedieGordon.newLine();
-			} catch (IOException e) {
-				e.printStackTrace();
+			if(stimaMediaGordon != 0){
+				try {
+					bufferedWriterMedieGordon.write(df.format(stimaMediaGordon).toString());
+					bufferedWriterMedieGordon.newLine();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			
 			//Calcolo varianza con Gordon
@@ -69,11 +71,13 @@ public class SimMain {
 			stimaVarianzaGordon = differenzaPerCalcoloVarianza / (j - 1);
 			
 			//Scrivo varianza su file risultati
-			try {
-				bufferedWriterVarianzeGordon.write(df.format(stimaVarianzaGordon).toString());
-				bufferedWriterVarianzeGordon.newLine();
-			} catch (IOException e) {
-				e.printStackTrace();
+			if(stimaMediaGordon != 0){
+				try {
+					bufferedWriterVarianzeGordon.write(df.format(stimaVarianzaGordon).toString());
+					bufferedWriterVarianzeGordon.newLine();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		
