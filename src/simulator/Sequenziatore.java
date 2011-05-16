@@ -35,7 +35,7 @@ public class Sequenziatore {
 	
 	public Sequenziatore(Integer numeroJob){
 
-		cpu = new Centro("Cpu", TipoCentro.CPU, new LinkedList<Job>(), new ExponentialGenerator(SeedCalculator.getSeme(), 1.0));
+		cpu = new Centro("Cpu", TipoCentro.CPU, new LinkedList<Job>(), new ExponentialGenerator(SeedCalculator.getSeme(), 100.0));
 		disk = new Centro("Disk", TipoCentro.DISK, new LinkedList<Job>(), new ErlangGenerator(SeedCalculator.getSeme(), 0.033, 3));
 
 		stampanti = new Centro[numeroJob];
@@ -50,7 +50,7 @@ public class Sequenziatore {
 		tempoRispTuttiJob = 0.0;
 		jobInHost = 0;
 		
-		jobClassGen = new UniformDoubleGenerator(47L);
+		jobClassGen = new UniformDoubleGenerator(SeedCalculator.getSeme());
 		
 		for(int i = 0; i < numeroJob; i++){
 			stampanti[i] = new Centro("ST" + i, TipoCentro.STAMPANTE, null, new UniformDoubleGenerator(2L, 78L, SeedCalculator.getSeme()));
@@ -119,6 +119,7 @@ public class Sequenziatore {
 			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
 			
 		}else{
+			j.chi = "term" + idCentro;
 			cpu.addJobToQueue(j);
 		}
 	}
@@ -183,6 +184,7 @@ public class Sequenziatore {
 						//Aggiorno evento disk
 						calendar.updateEvent(calendar.diskIndex, clock.getSimTime() + durata);
 					}else{
+						j.chi = "CPU";
 						disk.addJobToQueue(j);
 					}
 				}
@@ -196,6 +198,8 @@ public class Sequenziatore {
 		if(j != null){
 			cpu.setCurrentJob(j);
 
+			System.out.println("Chi ha messo o mette in coda? " + j.chi);
+			
 			//Prevedo durata del servizio CPU
 			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
 			
@@ -220,6 +224,7 @@ public class Sequenziatore {
 			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
 			
 		}else{
+			j.chi = "disk";
 			cpu.addJobToQueue(j);
 		}
 

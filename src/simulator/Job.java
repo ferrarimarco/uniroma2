@@ -6,6 +6,8 @@ public class Job {
 	private Integer identifier;
 	private Boolean foundData;
 	
+	public String chi;
+	
 	//Tempo di uscita da terminale
 	private Double termExitTime;
 	
