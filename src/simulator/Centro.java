@@ -125,7 +125,10 @@ public class Centro {
 			}
 		}
 		
-		return currentJob;
+		tempJob = currentJob;
+		currentJob = null;
+		
+		return tempJob;
 	}
 
 	public void setCurrentJob(Job currentJob) {

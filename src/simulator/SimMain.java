@@ -45,8 +45,6 @@ public class SimMain {
 				seq.simula(j);
 				
 				sommaTempiMediRisp += seq.getTempoMedioRispJob();
-				
-				System.out.println("Lungh run: " + j + ". Osservazione: " + i + " SommaTempiMediRisp: " + sommaTempiMediRisp);
 			}
 			
 			mediaCampionaria = sommaTempiMediRisp / numeroOsservazioni;

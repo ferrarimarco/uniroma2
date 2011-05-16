@@ -3,6 +3,7 @@ package simulator;
 import generators.ErlangGenerator;
 import generators.ExponentialGenerator;
 import generators.IperEspGenerator;
+import generators.SeedCalculator;
 import generators.UniformDoubleGenerator;
 
 
@@ -15,7 +16,7 @@ public class Sequenziatore {
 	private Centro[] stampanti;
 	private Centro[] host;
 	private Centro[] terminali;
-	
+
 	private CalendarioEventi calendar;
 	private Clock clock;
 	private Integer nextEventIndex;
@@ -33,9 +34,9 @@ public class Sequenziatore {
 	private Integer jobInHost;
 	
 	public Sequenziatore(Integer numeroJob){
-		
-		cpu = new Centro("Cpu", TipoCentro.CPU, new LinkedList<Job>(), new ExponentialGenerator(111L, 1.0));
-		disk = new Centro("Disk", TipoCentro.DISK, new LinkedList<Job>(), new ErlangGenerator(107L, 0.033, 3));
+
+		cpu = new Centro("Cpu", TipoCentro.CPU, new LinkedList<Job>(), new ExponentialGenerator(SeedCalculator.getSeme(), 1.0));
+		disk = new Centro("Disk", TipoCentro.DISK, new LinkedList<Job>(), new ErlangGenerator(SeedCalculator.getSeme(), 0.033, 3));
 
 		stampanti = new Centro[numeroJob];
 		host = new Centro[numeroJob];
@@ -52,15 +53,15 @@ public class Sequenziatore {
 		jobClassGen = new UniformDoubleGenerator(47L);
 		
 		for(int i = 0; i < numeroJob; i++){
-			stampanti[i] = new Centro("ST" + i, TipoCentro.STAMPANTE, null, new UniformDoubleGenerator(2L, 78L, 23L));
+			stampanti[i] = new Centro("ST" + i, TipoCentro.STAMPANTE, null, new UniformDoubleGenerator(2L, 78L, SeedCalculator.getSeme()));
 		}
 		
 		for(int i = 0; i < numeroJob; i++){
-			host[i] = new Centro("HOST" + i, TipoCentro.HOST, null, new IperEspGenerator(27L, 31L, 0.085, 0.6));
+			host[i] = new Centro("HOST" + i, TipoCentro.HOST, null, new IperEspGenerator(SeedCalculator.getSeme(), SeedCalculator.getSeme(), 0.085, 0.6));
 		}
 		
 		for(int i = 0; i < numeroJob; i++){
-			tempCentro = new Centro("TERM" + i, TipoCentro.TERMINALE, null, new ErlangGenerator(37L, 10.0, 2));
+			tempCentro = new Centro("TERM" + i, TipoCentro.TERMINALE, null, new ErlangGenerator(SeedCalculator.getSeme(), 10.0, 2));
 			
 			//Occupiamo il centro con job (per inizializzazione)
 			tempJob = new Job(1,i);
@@ -108,24 +109,25 @@ public class Sequenziatore {
 		//Prendo il job corrente e libero il terminale
 		Job j = terminali[idCentro].getCurrentJob();
 		j.setTermExitTime(clock.getSimTime());
-		
+
 		//Invio job uscente a cpu
 		if(cpu.isFree()){
 			cpu.setCurrentJob(j);
+			
+			//Prevedo durata del servizio CPU
+			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
+			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
+			
 		}else{
 			cpu.addJobToQueue(j);
 		}
-
-		//Prevedo durata del servizio CPU
-		Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
-		calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
 	}
 	
 	private void fineCpu(){
 		
 		Job j = cpu.getCurrentJob();
 		Integer idCentro = j.getIdentifier();
-		
+
 		if(j.getJobClass() == 1){//Gestione Job uscente classe 1
 			
 			//Calcolo prob per decidere nuova classe job
@@ -134,7 +136,7 @@ public class Sequenziatore {
 			}else{
 				j.setJobClass(3);
 			}
-			
+
 			//Invio job uscente a cpu
 			if(cpu.isFree()){
 				cpu.setCurrentJob(j);
@@ -193,7 +195,7 @@ public class Sequenziatore {
 		j = cpu.getJobFromQueue();
 		if(j != null){
 			cpu.setCurrentJob(j);
-			
+
 			//Prevedo durata del servizio CPU
 			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
 			
@@ -274,7 +276,6 @@ public class Sequenziatore {
 		jobCompletati++;
 	}
 
-	
 	public Double getTempoMedioRispJob() {
 		return tempoMedioRispJob;
 	}
@@ -282,8 +283,6 @@ public class Sequenziatore {
 	public Double getThrDisk() {
 		return thrDisk;
 	}
+
 	
-	//Sequenziatore chiama questo metodo quando seleziona
-	//un evento dal calendario. newCurrentTime è il tempo 
-	//dell'evento appena selezionato
 }
