@@ -26,9 +26,11 @@ public class Sequenziatore {
 	private UniformDoubleGenerator jobClassGen;
 	
 	//Per statistiche
-	private Double mediaTempiRisp;
-	private Integer thrDisk;
+	private Double tempoMedioRispJob;
+	private Double thrDisk;
 	private Integer jobCompletati;
+	private Double tempoRispTuttiJob;
+	private Integer jobInHost;
 	
 	public Sequenziatore(Integer numeroJob){
 		
@@ -43,6 +45,9 @@ public class Sequenziatore {
 		clock = new Clock();
 		
 		jobCompletati = 0;
+		tempoMedioRispJob = 0.0;
+		tempoRispTuttiJob = 0.0;
+		jobInHost = 0;
 		
 		jobClassGen = new UniformDoubleGenerator(47L);
 		
@@ -68,6 +73,7 @@ public class Sequenziatore {
 	}
 	
 	public void simula(Integer lunghezzaRun){
+		
 		while(jobCompletati < lunghezzaRun){
 			nextEventIndex = calendar.getNextEventIndex();
 			nextEventTime = calendar.getEventTime(nextEventIndex);
@@ -86,6 +92,13 @@ public class Sequenziatore {
 				this.fineStampante(nextEventIndex - 2 - (calendar.firstStIndex - calendar.firstTerminalIndex));
 			}
 		}
+		
+		//Per calcolo statistiche
+		if(jobInHost != 0){
+			tempoMedioRispJob = tempoRispTuttiJob / jobInHost;
+		}
+		
+		thrDisk = disk.getJobOut() / (clock.getSimTime());
 	}
 	
 	private void fineTerminale(Integer idCentro){
@@ -227,7 +240,9 @@ public class Sequenziatore {
 		
 		//Prendo il job corrente e libero host
 		Job j = host[idCentro].getCurrentJob();
-		j.setTermExitTime(clock.getSimTime());
+		
+		//Calcolo tempo di risp
+		tempoRispTuttiJob += (clock.getSimTime() - j.getTermExitTime());
 		
 		//Invio job uscente a stampante
 		stampanti[idCentro].setCurrentJob(j);
@@ -237,6 +252,8 @@ public class Sequenziatore {
 		
 		//Aggiorno evento stampante
 		calendar.updateEvent(calendar.firstStIndex + j.getIdentifier(), clock.getSimTime() + durata);
+		
+		jobInHost++;
 	}
 	
 	private void fineStampante(Integer idCentro){
@@ -255,6 +272,15 @@ public class Sequenziatore {
 		calendar.updateEvent(calendar.firstTerminalIndex + j.getIdentifier(), clock.getSimTime() + durata);
 		
 		jobCompletati++;
+	}
+
+	
+	public Double getTempoMedioRispJob() {
+		return tempoMedioRispJob;
+	}
+
+	public Double getThrDisk() {
+		return thrDisk;
 	}
 	
 	//Sequenziatore chiama questo metodo quando seleziona
