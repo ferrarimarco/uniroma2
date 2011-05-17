@@ -121,6 +121,10 @@ public class Sequenziatore {
 		Job j = terminali[idCentro].getCurrentJob();
 		j.setTermExitTime(clock.getSimTime());
 
+		
+		System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": prendo job " + j.getIdentifier() + " class " + j.getJobClass());
+
+		
 		//Invio job uscente a cpu
 		if(cpu.isFree() && cpu.isQueueEmpty()){
 			cpu.setCurrentJob(j);
@@ -129,11 +133,11 @@ public class Sequenziatore {
 			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
 			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
 			
-			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": prendo job " + j.getIdentifier() + " class " + j.getJobClass() + "e lo metto in CPU.");
+			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": prendo job " + j.getIdentifier() + " class " + j.getJobClass() + " e lo metto in CPU.");
 		}else{
 			cpu.addJobToQueue(j);
 			
-			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": prendo job " + j.getIdentifier() + " class " + j.getJobClass() + "e lo metto in coda CPU.");
+			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": prendo job " + j.getIdentifier() + " class " + j.getJobClass() + " e lo metto in coda CPU.");
 		}
 	}
 	
