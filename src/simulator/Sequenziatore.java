@@ -288,7 +288,7 @@ public class Sequenziatore {
 		if(j != null){
 			disk.setCurrentJob(j);
 			
-			//Prevedo durata del servizio CPU
+			//Prevedo durata del servizio Disco
 			Double durata = disk.prevediDurata(j.getJobClass()).doubleValue();
 			durata += clock.getSimTime();
 			
