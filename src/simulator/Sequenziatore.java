@@ -129,7 +129,8 @@ public class Sequenziatore {
 			
 			//Prevedo durata del servizio CPU
 			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
-			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
+			durata += clock.getSimTime();
+			calendar.updateEvent(calendar.cpuIndex, durata);
 			
 			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": metto job " + j.getIdentifier() + " class " + j.getJobClass() + " in CPU.");
 		}else{
@@ -165,9 +166,10 @@ public class Sequenziatore {
 				
 				//Prevedo durata del servizio CPU
 				Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
+				durata += clock.getSimTime();
 				
 				//Aggiorno evento CPU
-				calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
+				calendar.updateEvent(calendar.cpuIndex, durata);
 			}else{
 				cpu.addJobToQueue(j);
 				
@@ -181,9 +183,10 @@ public class Sequenziatore {
 
 				//Prevedo durata del servizio host
 				Double durata = host[idCentro].prevediDurata(j.getIdentifier()).doubleValue();
+				durata += clock.getSimTime();
 				
 				//Aggiorno evento host
-				calendar.updateEvent(calendar.firstHostIndex + j.getIdentifier(), clock.getSimTime() + durata);
+				calendar.updateEvent(calendar.firstHostIndex + j.getIdentifier(), durata);
 				
 				System.out.println("[" + eventCounter++ + "]CPU: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in host " + idCentro);
 				
@@ -194,9 +197,10 @@ public class Sequenziatore {
 
 					//Prevedo durata del servizio stampante
 					Double durata = stampanti[idCentro].prevediDurata(j.getIdentifier()).doubleValue();
+					durata += clock.getSimTime();
 					
 					//Aggiorno evento stampante
-					calendar.updateEvent(calendar.firstStIndex + j.getIdentifier(), clock.getSimTime() + durata);
+					calendar.updateEvent(calendar.firstStIndex + j.getIdentifier(), durata);
 					
 					
 					System.out.println("[" + eventCounter++ + "]CPU: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in st " + idCentro);
@@ -209,9 +213,10 @@ public class Sequenziatore {
 						
 						//Prevedo durata del servizio CPU
 						Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
+						durata += clock.getSimTime();
 						
 						//Aggiorno evento disk
-						calendar.updateEvent(calendar.diskIndex, clock.getSimTime() + durata);
+						calendar.updateEvent(calendar.diskIndex, durata);
 						
 						
 						System.out.println("[" + eventCounter++ + "]CPU: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in disk");
@@ -233,9 +238,10 @@ public class Sequenziatore {
 			
 			//Prevedo durata del servizio CPU
 			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
+			durata += clock.getSimTime();
 			
 			//Aggiorno evento CPU
-			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
+			calendar.updateEvent(calendar.cpuIndex, durata);
 			
 			System.out.println("[" + eventCounter++ + "]CPU (job da coda): Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in cpu");
 			
@@ -257,7 +263,10 @@ public class Sequenziatore {
 			
 			//Prevedo durata del servizio CPU
 			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
-			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
+			durata += clock.getSimTime();
+			
+			//Aggiorno evento cpu
+			calendar.updateEvent(calendar.cpuIndex, durata);
 			
 			System.out.println("[" + eventCounter++ + "]DISK: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in cpu");
 			
@@ -276,7 +285,9 @@ public class Sequenziatore {
 			
 			//Prevedo durata del servizio CPU
 			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
-			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
+			durata += clock.getSimTime();
+			
+			calendar.updateEvent(calendar.cpuIndex, durata);
 			
 			System.out.println("[" + eventCounter++ + "]DISK(job da coda): Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in cpu");
 		}
@@ -297,9 +308,10 @@ public class Sequenziatore {
 
 		//Prevedo durata del servizio stampante
 		Double durata = stampanti[idCentro].prevediDurata(j.getIdentifier()).doubleValue();
+		durata += clock.getSimTime();
 		
 		//Aggiorno evento stampante
-		calendar.updateEvent(calendar.firstStIndex + j.getIdentifier(), clock.getSimTime() + durata);
+		calendar.updateEvent(calendar.firstStIndex + j.getIdentifier(), durata);
 
 		System.out.println("[" + eventCounter++ + "]HOST " + idCentro + ": Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in st " + idCentro);
 		
@@ -321,9 +333,10 @@ public class Sequenziatore {
 
 		//Prevedo durata del servizio terminale
 		Double durata = terminali[idCentro].prevediDurata(j.getIdentifier()).doubleValue();
+		durata += clock.getSimTime();
 		
 		//Aggiorno evento terminale
-		calendar.updateEvent(calendar.firstTerminalIndex + j.getIdentifier(), clock.getSimTime() + durata);
+		calendar.updateEvent(calendar.firstTerminalIndex + j.getIdentifier(), durata);
 		
 		System.out.println("[" + eventCounter++ + "]ST " + idCentro + ": Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in st " + idCentro);
 				
