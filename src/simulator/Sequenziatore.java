@@ -120,11 +120,9 @@ public class Sequenziatore {
 		//Prendo il job corrente e libero il terminale
 		Job j = terminali[idCentro].getCurrentJob();
 		j.setTermExitTime(clock.getSimTime());
-
 		
 		System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": prendo job " + j.getIdentifier() + " class " + j.getJobClass());
 
-		
 		//Invio job uscente a cpu
 		if(cpu.isFree() && cpu.isQueueEmpty()){
 			cpu.setCurrentJob(j);
@@ -133,11 +131,11 @@ public class Sequenziatore {
 			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
 			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
 			
-			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": prendo job " + j.getIdentifier() + " class " + j.getJobClass() + " e lo metto in CPU.");
+			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": metto job " + j.getIdentifier() + " class " + j.getJobClass() + " e in CPU.");
 		}else{
 			cpu.addJobToQueue(j);
 			
-			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": prendo job " + j.getIdentifier() + " class " + j.getJobClass() + " e lo metto in coda CPU.");
+			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": metto job " + j.getIdentifier() + " class " + j.getJobClass() + " e in coda CPU.");
 		}
 	}
 	
@@ -252,8 +250,6 @@ public class Sequenziatore {
 		Job j = disk.getCurrentJob();
 		
 		System.out.println("[" + eventCounter++ + "]DISK: prendo job " + j.getIdentifier() + " class " + j.getJobClass());
-
-		
 		
 		//Invio job uscente a cpu
 		if(cpu.isFree() && cpu.isQueueEmpty()){
@@ -267,9 +263,7 @@ public class Sequenziatore {
 			
 		}else{
 			cpu.addJobToQueue(j);
-			
 			System.out.println("[" + eventCounter++ + "]DISK: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in coda cpu");
-			
 		}
 
 		//Gestione job entrante
@@ -317,6 +311,10 @@ public class Sequenziatore {
 		
 		//Prendo il job corrente e libero stampante
 		Job j = stampanti[idCentro].getCurrentJob();
+		
+		
+		System.out.println("[" + eventCounter++ + "]ST " + idCentro + ": prendo job " + j.getIdentifier() + "  di classe " + j.getJobClass());
+			
 		
 		//Invio job uscente a terminale
 		terminali[idCentro].setCurrentJob(j);
