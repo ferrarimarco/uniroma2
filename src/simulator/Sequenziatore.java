@@ -30,9 +30,6 @@ public class Sequenziatore {
 	private Double tempoRispTuttiJob;
 	private Integer jobInHost;
 	
-	//Debug
-	private Integer eventCounter;
-	
 	public Sequenziatore(Integer numeroJob){
 		
 		cpu = new Centro("Cpu", TipoCentro.CPU, new LinkedList<Job>(), new ExponentialGenerator(SeedCalculator.getSeme(), 1.0));
@@ -49,9 +46,7 @@ public class Sequenziatore {
 		tempoMedioRispJob = 0.0;
 		tempoRispTuttiJob = 0.0;
 		jobInHost = 0;
-		
-		eventCounter = 0;
-		
+
 		jobClassGen = new UniformDoubleGenerator(SeedCalculator.getSeme());
 		
 		for(int i = 0; i < numeroJob; i++){

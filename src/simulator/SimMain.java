@@ -70,6 +70,9 @@ public class SimMain {
 			
 			stimaVarianzaGordon = differenzaPerCalcoloVarianza / (j - 1);
 			
+			if(j == 1)
+				stimaVarianzaGordon = 0.0;
+			
 			//Scrivo varianza su file risultati
 			if(stimaMediaGordon != 0){
 				try {
