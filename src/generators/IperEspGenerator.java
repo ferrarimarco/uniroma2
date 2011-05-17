@@ -9,9 +9,7 @@ public class IperEspGenerator implements Generator {
 	private Double tempo1;
 	private Double tempo2;
 	private Double prob;
-	private Double mean;
 
-	
 	public IperEspGenerator(Long seedExp, Long seedUni, Double mean, Double prob) {
 		tempo1 = mean / (2 * prob);
 		tempo2 = mean / (2 * (1 - prob));
@@ -21,7 +19,6 @@ public class IperEspGenerator implements Generator {
 		expGen = new ExponentialGenerator(seedExp, 1.0);
 		uniGen = new UniformDoubleGenerator(seedUni);
 		this.prob = prob;
-		this.mean = mean;
 	}
 
 	public Double generateNextValue() {

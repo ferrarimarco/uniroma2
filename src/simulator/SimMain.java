@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 
 public class SimMain {
 	
-	public static final Integer numeroJob = 12;
+	public static final Integer numeroJob = 3;
 
 	public static void main(String[] args) {
 		
@@ -41,6 +41,8 @@ public class SimMain {
 			differenzaPerCalcoloVarianza = 0.0;
 			
 			for(int i = 0; i < numeroOsservazioni; i++){
+				System.out.println("---------------------------");
+				System.out.println("Run " + j + " Osservazione " + i);
 				seq = new Sequenziatore(numeroJob);
 				seq.simula(j);
 				

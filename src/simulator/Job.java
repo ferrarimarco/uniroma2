@@ -5,9 +5,7 @@ public class Job {
 	private Integer jobClass;
 	private Integer identifier;
 	private Boolean foundData;
-	
-	public String chi;
-	
+
 	//Tempo di uscita da terminale
 	private Double termExitTime;
 	

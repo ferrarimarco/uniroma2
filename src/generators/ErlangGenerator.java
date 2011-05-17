@@ -1,6 +1,5 @@
 package generators;
 
-import libs.MathUtils;
 import interfaces.Generator;
 
 public class ErlangGenerator implements Generator {
@@ -30,5 +29,9 @@ public class ErlangGenerator implements Generator {
 			tSum = tSum + expGen.generateNextValue();
 
 		return tSum;
+	}
+
+	public Double getMu() {
+		return mu;
 	}
 }

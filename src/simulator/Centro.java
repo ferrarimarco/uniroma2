@@ -143,4 +143,12 @@ public class Centro {
 	public Integer getJobOut() {
 		return jobOut;
 	}
+
+	public Boolean isQueueEmpty() {
+		return queue.isEmpty();
+	}
+
+	public String getName() {
+		return name;
+	}
 }
