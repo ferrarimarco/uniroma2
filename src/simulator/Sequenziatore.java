@@ -251,6 +251,10 @@ public class Sequenziatore {
 		//Prendo il job corrente e libero disk
 		Job j = disk.getCurrentJob();
 		
+		System.out.println("[" + eventCounter++ + "]DISK: prendo job " + j.getIdentifier() + " class " + j.getJobClass());
+
+		
+		
 		//Invio job uscente a cpu
 		if(cpu.isFree() && cpu.isQueueEmpty()){
 			cpu.setCurrentJob(j);
