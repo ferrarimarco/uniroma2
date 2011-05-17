@@ -38,6 +38,9 @@ public class Clock {
 	
 	public void setSimTime(double simTime)
 	{
+		if(simTime < this.simTime)
+			System.out.println("ERRORE CLOCK!!!");
+			
 		this.simTime = simTime;	
 	}
 	

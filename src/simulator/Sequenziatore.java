@@ -32,6 +32,7 @@ public class Sequenziatore {
 	
 	//Debug
 	private String eventoPrec;
+	private Integer eventCounter;
 	
 	public Sequenziatore(Integer numeroJob){
 		
@@ -49,6 +50,8 @@ public class Sequenziatore {
 		tempoMedioRispJob = 0.0;
 		tempoRispTuttiJob = 0.0;
 		jobInHost = 0;
+		
+		eventCounter = 0;
 		
 		jobClassGen = new UniformDoubleGenerator(SeedCalculator.getSeme());
 		
@@ -125,8 +128,12 @@ public class Sequenziatore {
 			//Prevedo durata del servizio CPU
 			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
 			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
+			
+			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": prendo job " + j.getIdentifier() + " class " + j.getJobClass() + "e lo metto in CPU.");
 		}else{
 			cpu.addJobToQueue(j);
+			
+			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": prendo job " + j.getIdentifier() + " class " + j.getJobClass() + "e lo metto in coda CPU.");
 		}
 	}
 	
@@ -135,7 +142,7 @@ public class Sequenziatore {
 		Job j = cpu.getCurrentJob();
 		Integer idCentro = j.getIdentifier();
 
-		System.out.println("CPU: prendo job " + j.getIdentifier() + " class " + j.getJobClass());
+		System.out.println("[" + eventCounter++ + "]CPU: prendo job " + j.getIdentifier() + " class " + j.getJobClass());
 		
 		if(j.getJobClass() == 1){//Gestione Job uscente classe 1
 			
@@ -146,13 +153,13 @@ public class Sequenziatore {
 				j.setJobClass(3);
 			}
 
-			System.out.println("CPU: job " + j.getIdentifier() + " classe 1 diventa classe " + j.getJobClass());
+			System.out.println("[" + eventCounter++ + "]CPU: job " + j.getIdentifier() + " classe 1 diventa classe " + j.getJobClass());
 			
 			//Invio job uscente a cpu
 			if(cpu.isFree() && cpu.isQueueEmpty()){
 				cpu.setCurrentJob(j);
 				
-				System.out.println("CPU: Metto in cpu job " + j.getIdentifier() + " di classe " + j.getJobClass());
+				System.out.println("[" + eventCounter++ + "]CPU: Metto in cpu job " + j.getIdentifier() + " di classe " + j.getJobClass());
 				
 				//Prevedo durata del servizio CPU
 				Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
@@ -162,7 +169,7 @@ public class Sequenziatore {
 			}else{
 				cpu.addJobToQueue(j);
 				
-				System.out.println("CPU: Metto in coda cpu job " + j.getIdentifier() + "  di classe " + j.getJobClass());
+				System.out.println("[" + eventCounter++ + "]CPU: Metto in coda cpu job " + j.getIdentifier() + "  di classe " + j.getJobClass());
 			}
 			
 		}else{//Gestione Job uscente classe 2 o 3
@@ -176,7 +183,7 @@ public class Sequenziatore {
 				//Aggiorno evento host
 				calendar.updateEvent(calendar.firstHostIndex + j.getIdentifier(), clock.getSimTime() + durata);
 				
-				System.out.println("CPU: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in host " + idCentro);
+				System.out.println("[" + eventCounter++ + "]CPU: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in host " + idCentro);
 				
 			}else if(j.getJobClass() == 3){
 				if(j.getFoundData()){
@@ -190,7 +197,7 @@ public class Sequenziatore {
 					calendar.updateEvent(calendar.firstStIndex + j.getIdentifier(), clock.getSimTime() + durata);
 					
 					
-					System.out.println("CPU: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in st " + idCentro);
+					System.out.println("[" + eventCounter++ + "]CPU: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in st " + idCentro);
 					
 				}else{
 					
@@ -205,11 +212,11 @@ public class Sequenziatore {
 						calendar.updateEvent(calendar.diskIndex, clock.getSimTime() + durata);
 						
 						
-						System.out.println("CPU: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in disk");
+						System.out.println("[" + eventCounter++ + "]CPU: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in disk");
 						
 					}else{
 						disk.addJobToQueue(j);
-						System.out.println("CPU: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in coda disk");
+						System.out.println("[" + eventCounter++ + "]CPU: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in coda disk");
 					}
 				}
 			}else{
@@ -228,7 +235,7 @@ public class Sequenziatore {
 			//Aggiorno evento CPU
 			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
 			
-			System.out.println("CPU (job da coda): Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in cpu");
+			System.out.println("[" + eventCounter++ + "]CPU (job da coda): Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in cpu");
 			
 		}
 	}
@@ -248,12 +255,12 @@ public class Sequenziatore {
 			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
 			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
 			
-			System.out.println("DISK: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in cpu");
+			System.out.println("[" + eventCounter++ + "]DISK: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in cpu");
 			
 		}else{
 			cpu.addJobToQueue(j);
 			
-			System.out.println("DISK: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in coda cpu");
+			System.out.println("[" + eventCounter++ + "]DISK: Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in coda cpu");
 			
 		}
 
@@ -269,7 +276,7 @@ public class Sequenziatore {
 			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
 			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
 			
-			System.out.println("DISK(job da coda): Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in cpu");
+			System.out.println("[" + eventCounter++ + "]DISK(job da coda): Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in cpu");
 		}
 	}
 	
@@ -292,7 +299,7 @@ public class Sequenziatore {
 		//Aggiorno evento stampante
 		calendar.updateEvent(calendar.firstStIndex + j.getIdentifier(), clock.getSimTime() + durata);
 
-		System.out.println("HOST " + idCentro + ": Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in st " + idCentro);
+		System.out.println("[" + eventCounter++ + "]HOST " + idCentro + ": Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in st " + idCentro);
 		
 		jobInHost++;
 	}
@@ -312,7 +319,7 @@ public class Sequenziatore {
 		//Aggiorno evento terminale
 		calendar.updateEvent(calendar.firstTerminalIndex + j.getIdentifier(), clock.getSimTime() + durata);
 		
-		System.out.println("ST " + idCentro + ": Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in st " + idCentro);
+		System.out.println("[" + eventCounter++ + "]ST " + idCentro + ": Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in st " + idCentro);
 				
 		jobCompletati++;
 	}
