@@ -295,7 +295,7 @@ public class Sequenziatore {
 			calendar.updateEvent(calendar.cpuIndex, durata);
 			
 			System.out.println("[" + eventCounter++ + "]DISK (job da coda): aggiorno evento fineCpu con durata " + durata);
-			System.out.println("[" + eventCounter++ + "]DISK(job da coda): Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in cpu");
+			System.out.println("[" + eventCounter++ + "]DISK (job da coda): Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in cpu");
 		}
 	}
 	
