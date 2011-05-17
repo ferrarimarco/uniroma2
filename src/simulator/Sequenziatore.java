@@ -289,13 +289,13 @@ public class Sequenziatore {
 			disk.setCurrentJob(j);
 			
 			//Prevedo durata del servizio CPU
-			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
+			Double durata = disk.prevediDurata(j.getJobClass()).doubleValue();
 			durata += clock.getSimTime();
 			
-			calendar.updateEvent(calendar.cpuIndex, durata);
+			calendar.updateEvent(calendar.diskIndex, durata);
 			
-			System.out.println("[" + eventCounter++ + "]DISK (job da coda): aggiorno evento fineCpu con durata " + durata);
-			System.out.println("[" + eventCounter++ + "]DISK (job da coda): Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in cpu");
+			System.out.println("[" + eventCounter++ + "]DISK (job da coda): aggiorno evento fineDisk con durata " + durata);
+			System.out.println("[" + eventCounter++ + "]DISK (job da coda): Metto job " + j.getIdentifier() + "  di classe " + j.getJobClass() + " in disk");
 		}
 	}
 	
