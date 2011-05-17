@@ -131,11 +131,11 @@ public class Sequenziatore {
 			Double durata = cpu.prevediDurata(j.getJobClass()).doubleValue();
 			calendar.updateEvent(calendar.cpuIndex, clock.getSimTime() + durata);
 			
-			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": metto job " + j.getIdentifier() + " class " + j.getJobClass() + " e in CPU.");
+			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": metto job " + j.getIdentifier() + " class " + j.getJobClass() + " in CPU.");
 		}else{
 			cpu.addJobToQueue(j);
 			
-			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": metto job " + j.getIdentifier() + " class " + j.getJobClass() + " e in coda CPU.");
+			System.out.println("[" + eventCounter++ + "]TERM " + idCentro + ": metto job " + j.getIdentifier() + " class " + j.getJobClass() + " in coda CPU.");
 		}
 	}
 	
