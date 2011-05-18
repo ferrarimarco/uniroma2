@@ -12,7 +12,7 @@ public class SimMain {
 	public static void main(String[] args) {
 		
 		Integer numeroOsservazioni = 50;
-		Integer lunghezzaMaxRun = 50;
+		Integer lunghezzaMaxRun = 500;
 		Sequenziatore seq;
 		BufferedWriter bufferedWriterMedieGordon = null;
 		BufferedWriter bufferedWriterVarianzeGordon = null;
@@ -34,43 +34,43 @@ public class SimMain {
 			e.printStackTrace();
 		}
 		
-		for(int j = 1; j < lunghezzaMaxRun + 1; j++){
+		for(int i = 1; i <= numeroOsservazioni; i++){
 			
 			sommaTempiMediRisp = 0.0;
 			mediaCampionariaTot = 0.0;
 			differenzaPerCalcoloVarianza = 0.0;
+		
+			System.out.println("Inizio osservazione " + i);
 			
-			for(int i = 0; i < numeroOsservazioni; i++){
-				System.out.println("---------------------------");
-				System.out.println("Run " + j + " Osservazione " + i);
+			for(int j = 1; j <= lunghezzaMaxRun; j++){
 				seq = new Sequenziatore(numeroJob);
 				seq.simula(j);
 				
 				sommaTempiMediRisp += seq.getTempoMedioRispJob();
 			}
+
+			System.out.println("Fine osservazione " + i);
 			
-			mediaCampionaria = sommaTempiMediRisp / numeroOsservazioni;
+			mediaCampionaria = sommaTempiMediRisp / lunghezzaMaxRun;
 			mediaCampionariaTot += mediaCampionaria;			
 			
 			//Calcolo media con Gordon
-			stimaMediaGordon = mediaCampionariaTot / j;
+			stimaMediaGordon = mediaCampionariaTot / i;
 			
 			//Scrivo media su file risultati
-			if(stimaMediaGordon != 0){
-				try {
-					bufferedWriterMedieGordon.write(df.format(stimaMediaGordon).toString());
-					bufferedWriterMedieGordon.newLine();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			try {
+				bufferedWriterMedieGordon.write(df.format(stimaMediaGordon).toString());
+				bufferedWriterMedieGordon.newLine();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 			
 			//Calcolo varianza con Gordon
 			differenzaPerCalcoloVarianza += Math.pow(mediaCampionaria - stimaMediaGordon, 2);
 			
-			stimaVarianzaGordon = differenzaPerCalcoloVarianza / (j - 1);
+			stimaVarianzaGordon = differenzaPerCalcoloVarianza / (i - 1);
 			
-			if(j == 1)
+			if(i == 1)
 				stimaVarianzaGordon = 0.0;
 			
 			//Scrivo varianza su file risultati
