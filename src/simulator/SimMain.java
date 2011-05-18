@@ -14,10 +14,59 @@ public class SimMain {
 	public static final Integer numeroJob = 12;
 	public static final Integer numeroOsservazioniP = 20;
 	public static final Integer lunghezzaMaxRunN = 15;
+	public static final String serPath = "c:\\seqStab.ser";
+	
+	public static final Boolean stabilizazzione = false;
 
 	public static void main(String[] args) {
 		
-		Sequenziatore seq;
+		if(stabilizazzione){
+			SimMain.runStab();
+		}else{
+			SimMain.runStat(serPath);
+		}
+		
+	}
+
+	private static void salvaSequenziatore(Sequenziatore seq, String path){
+		
+		FileOutputStream fos = null;
+		ObjectOutputStream out = null;
+		
+		try{
+			fos = new FileOutputStream(path);
+			out = new ObjectOutputStream(fos);
+			out.writeObject(seq);
+			out.close();
+		}catch(IOException ex){
+			ex.printStackTrace();
+		}
+	}
+	
+	private static Sequenziatore caricaSequenziatore(String path){
+		
+		Sequenziatore seq = null;
+		FileInputStream fis = null;
+		ObjectInputStream in = null;
+		
+		try{
+			fis = new FileInputStream(path);
+			in = new ObjectInputStream(fis);
+			seq = (Sequenziatore)in.readObject();
+			in.close();
+		}catch(IOException ex){
+			ex.printStackTrace();
+		}
+		catch(ClassNotFoundException ex){
+			ex.printStackTrace();
+		}
+		
+		return seq;
+	}
+	
+	private static void runStab(){
+		
+		Sequenziatore seq = null;
 		BufferedWriter bufferedWriterMedieGordon = null;
 		BufferedWriter bufferedWriterVarianzeGordon = null;
 		
@@ -28,7 +77,7 @@ public class SimMain {
 		Double stimaVarianzaGordon = 0.0;
 		Double differenzaPerCalcoloVarianza = 0.0;
 		
-		DecimalFormat df = new DecimalFormat("#.########");
+		DecimalFormat df = new DecimalFormat("#.############");
 		
 		try {
 			bufferedWriterMedieGordon = new BufferedWriter(new FileWriter("c:\\medieGordon.txt", false));
@@ -85,47 +134,32 @@ public class SimMain {
 			}
 		}
 		
+		//Salvo il sequenziatore dell'ultimo run
+		SimMain.salvaSequenziatore(seq, serPath);
+	
 		try {
 			bufferedWriterMedieGordon.close();
 			bufferedWriterVarianzeGordon.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 	}
 
-	private static void salvaSequenziatore(Sequenziatore seq, String path){
+	private static void runStat(String path){
 		
-		FileOutputStream fos = null;
-		ObjectOutputStream out = null;
+		//Carico sequenziatore stabile
+		Sequenziatore seqStabile;
 		
-		try{
-			fos = new FileOutputStream(path);
-			out = new ObjectOutputStream(fos);
-			out.writeObject(seq);
-			out.close();
-		}catch(IOException ex){
-			ex.printStackTrace();
+		for(int i = 1; i <= lunghezzaMaxRunN; i++){
+
+			System.out.println("Lunghezza run " + i);
+			
+			for(int j = 1; j <= numeroOsservazioniP; j++){
+				seqStabile = SimMain.caricaSequenziatore(path);
+				seqStabile.simula(j);
+			}
 		}
-	}
-	
-	private static Sequenziatore caricaSequenziatore(String path){
-		
-		Sequenziatore seq = null;
-		FileInputStream fis = null;
-		ObjectInputStream in = null;
-		
-		try{
-			fis = new FileInputStream(path);
-			in = new ObjectInputStream(fis);
-			seq = (Sequenziatore)in.readObject();
-			in.close();
-		}catch(IOException ex){
-			ex.printStackTrace();
-		}
-		catch(ClassNotFoundException ex){
-			ex.printStackTrace();
-		}
-		
-		return seq;
+
 	}
 }
