@@ -1,6 +1,8 @@
 package simulator;
 
-public class Clock {
+import java.io.Serializable;
+
+public class Clock implements Serializable {
 	
 	//Tempo reale
 	private double wallTimeStart, wallTimeStop;

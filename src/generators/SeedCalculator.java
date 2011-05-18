@@ -1,6 +1,8 @@
 package generators;
 
-public class SeedCalculator {
+import java.io.Serializable;
+
+public class SeedCalculator implements Serializable {
 	
 	private static Long s = 1L;
 

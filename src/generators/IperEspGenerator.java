@@ -1,8 +1,10 @@
 package generators;
 
+import java.io.Serializable;
+
 import interfaces.Generator;
 
-public class IperEspGenerator implements Generator {
+public class IperEspGenerator implements Generator, Serializable {
 
 	private ExponentialGenerator expGen;
 	private UniformDoubleGenerator uniGen;

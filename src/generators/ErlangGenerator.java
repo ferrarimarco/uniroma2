@@ -1,8 +1,10 @@
 package generators;
 
+import java.io.Serializable;
+
 import interfaces.Generator;
 
-public class ErlangGenerator implements Generator {
+public class ErlangGenerator implements Generator, Serializable {
 
 	private ExponentialGenerator expGen;
 	private Integer k;

@@ -1,9 +1,11 @@
 package generators;
 
+import java.io.Serializable;
+
 import constants.GeneratorConstants;
 import interfaces.Generator;
 
-public class XnGenerator implements Generator{
+public class XnGenerator implements Generator, Serializable{
 	
 	private Long x0;
 	private Long xn;

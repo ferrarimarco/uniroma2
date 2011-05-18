@@ -7,9 +7,10 @@ import generators.SeedCalculator;
 import generators.UniformDoubleGenerator;
 
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
-public class Sequenziatore {
+public class Sequenziatore implements Serializable {
 
 	private Centro cpu;
 	private Centro disk;

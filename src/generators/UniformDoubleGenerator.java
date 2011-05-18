@@ -1,9 +1,11 @@
 package generators;
 
+import java.io.Serializable;
+
 import interfaces.Generator;
 
 
-public class UniformDoubleGenerator implements Generator {
+public class UniformDoubleGenerator implements Generator, Serializable {
 
 	private XnGenerator xng;
 	

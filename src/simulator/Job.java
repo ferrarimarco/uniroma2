@@ -1,6 +1,8 @@
 package simulator;
 
-public class Job {
+import java.io.Serializable;
+
+public class Job implements Serializable {
 	
 	private Integer jobClass;
 	private Integer identifier;

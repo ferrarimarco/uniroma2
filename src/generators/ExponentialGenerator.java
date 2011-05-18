@@ -1,8 +1,10 @@
 package generators;
 
+import java.io.Serializable;
+
 import interfaces.Generator;
 
-public class ExponentialGenerator implements Generator{
+public class ExponentialGenerator implements Generator, Serializable{
 
 	private UniformDoubleGenerator rng;
 	private Double mean;

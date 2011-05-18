@@ -1,6 +1,8 @@
 package simulator;
 
-public class CalendarioEventi {
+import java.io.Serializable;
+
+public class CalendarioEventi implements Serializable {
 
 	//Stabilire la posizione degli eventi (ES: dove è fineCPU?)
 	private double[] calendar;

@@ -5,9 +5,10 @@ import generators.UniformLongGenerator;
 
 import interfaces.Generator;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
-public class Centro {
+public class Centro implements Serializable {
 
 	private String name;
 	private TipoCentro type;
