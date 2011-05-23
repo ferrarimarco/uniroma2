@@ -170,6 +170,8 @@ public class SimMain {
 			//Salvo lo stato stabile
 			path = SimMain.pathSeq + i + ".ser";
 			SimMain.salvaSequenziatore(seq, path);
+			
+			System.out.println("Salvataggio simulatore stabile per" + i + " client.");
 		}
 		
 	}
