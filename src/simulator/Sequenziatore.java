@@ -70,9 +70,9 @@ public class Sequenziatore implements Serializable {
 		}
 	}
 	
-	public void simula(Integer lunghezzaRun){
+	public void simula(Integer lunghezzaRun, Double clockStabile){
 		
-		while(jobCompletati < lunghezzaRun){
+		while(jobCompletati < lunghezzaRun || clock.getSimTime() >= clockStabile){
 			nextEventIndex = calendar.getNextEventIndex();
 			nextEventTime = calendar.getEventTime(nextEventIndex);
 			
@@ -297,5 +297,8 @@ public class Sequenziatore implements Serializable {
 		return thrDisk;
 	}
 
+	public Double getStabClock(){
+		return clock.getSimTime();
+	}
 	
 }

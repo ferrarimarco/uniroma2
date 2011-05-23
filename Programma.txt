@@ -12,28 +12,22 @@ Inizializzazione sequenziatore
 5- ora procedere con la simulazione
 
 Domande:
-- Quanti job ci sono nel sistema? 12
---------------
-Da fare: implementare parte statistiche.
+OK - Quanti job ci sono nel sistema? 12
+
 --------------
 Idee e note varie
-- Possiamo integrare la generazione dei tempi per le previsioni di servizio direttamente nei centri.
+OK - Possiamo integrare la generazione dei tempi per le previsioni di servizio direttamente nei centri.
 ---------------------
 Note ultimo incontro:
 
-120 host
-120 stampanti
+12 host
+12 stampanti
 
-In calendario ci saranno 120 entry per stampante (una per job) e 120 entry per terminale (una per job), 120 entry per host. Oltre ovviamente alle entry già presenti e definite
+In calendario ci saranno 12 entry per stampante (una per job) e 12 entry per terminale (una per job), 12 entry per host. Oltre ovviamente alle entry già presenti e definite
 
 p simulazioni (lunga 1, lunga 2, lunga 3....)
-------------------
-Domande
+--------------
 
-- Quando calcoliamo il Tempo di risposta per un dato job, dobbiamo includere anche il tempo speso nel centro terminali?
+- Quando calcoliamo il Tempo di risposta per un dato job, dobbiamo includere anche il tempo speso nel centro terminali? NO
 
-------------------
-Osservazioni (run replicati)
-- Decidere un numero di osservazioni da effettuare per ogni run (= n)
-- Eseguire n osservazioni per ogni run(x)
-- Per ogni osservazione, fai la media dei tempi ottenuti
+- Se salvo lo stato del simulatore a 12 client, poi come faccio a fare le stime per un numero di client diverso da 12?

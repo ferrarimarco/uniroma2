@@ -11,21 +11,22 @@ import java.text.DecimalFormat;
 
 public class SimMain {
 	
-	public static final Integer numeroJob = 12;
-	public static final Integer numeroOsservazioniP = 20;
-	public static final Integer lunghezzaMaxRunN = 15;
-	public static final String serPath = "c:\\seqStab.ser";
-	
-	public static final Boolean stabilizazzione = false;
+	public static final Integer numeroJob = 120;
+	public static final Integer numeroOsservazioniP = 50;
+	public static final Integer lunghezzaMaxRunN = 1000;
+	public static final String pathSeq = "c:\\SeqStabileClient";
+	public static final Integer mode = 0;
+	public static final Double clockStabile = 0.0;
 
 	public static void main(String[] args) {
 		
-		if(stabilizazzione){
+		if(mode == 0){//Stabilizzazione
 			SimMain.runStab();
+		}else if(mode == 1){//Salvataggio di tutti gli stati stabili di partenza
+			SimMain.runSalvataggioStatoStabile();
 		}else{
-			SimMain.runStat(serPath);
+			//SimMain.runStat();
 		}
-		
 	}
 
 	private static void salvaSequenziatore(Sequenziatore seq, String path){
@@ -77,12 +78,11 @@ public class SimMain {
 		Double stimaVarianzaGordon = 0.0;
 		Double differenzaPerCalcoloVarianza = 0.0;
 		
-		DecimalFormat df = new DecimalFormat("#.############");
+		DecimalFormat df = new DecimalFormat("#.#########");
 		
 		try {
 			bufferedWriterMedieGordon = new BufferedWriter(new FileWriter("c:\\medieGordon.txt", false));
 			bufferedWriterVarianzeGordon = new BufferedWriter(new FileWriter("c:\\varianzeGordon.txt", false));
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -98,7 +98,7 @@ public class SimMain {
 			for(int j = 1; j <= numeroOsservazioniP; j++){
 
 				seq = new Sequenziatore(numeroJob);
-				seq.simula(j);
+				seq.simula(j, Double.MAX_VALUE);
 				
 				sommaTempiMediRisp += seq.getTempoMedioRispJob();
 			}
@@ -134,9 +134,17 @@ public class SimMain {
 			}
 		}
 		
-		//Salvo il sequenziatore dell'ultimo run
-		SimMain.salvaSequenziatore(seq, serPath);
-	
+		//Scrivo anche clock stabile su file risultati (riuso quello delle medie)
+		try {
+			bufferedWriterMedieGordon.write("Clock per stato stabile: " + seq.getStabClock());
+			System.out.println("Clock per stato stabile: " + seq.getStabClock());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		//Salvo il sequenziatore in stato stabile
+		SimMain.salvaSequenziatore(seq, SimMain.pathSeq);
+		
 		try {
 			bufferedWriterMedieGordon.close();
 			bufferedWriterVarianzeGordon.close();
@@ -146,6 +154,22 @@ public class SimMain {
 
 	}
 
+	private static void runSalvataggioStatoStabile(){
+		
+		Sequenziatore seq;
+		String path = null;
+		
+		for(int i = 1; i <= SimMain.numeroJob; i += 10){
+			seq = new Sequenziatore(i);
+			seq.simula(SimMain.lunghezzaMaxRunN, SimMain.clockStabile);
+			
+			//Salvo lo stato stabile
+			path = SimMain.pathSeq + i + ".ser";
+			SimMain.salvaSequenziatore(seq, path);
+		}
+		
+	}
+	
 	private static void runStat(String path){
 		
 		//Carico sequenziatore stabile
@@ -157,7 +181,7 @@ public class SimMain {
 			
 			for(int j = 1; j <= numeroOsservazioniP; j++){
 				seqStabile = SimMain.caricaSequenziatore(path);
-				seqStabile.simula(j);
+				//seqStabile.simula(j);
 			}
 		}
 
