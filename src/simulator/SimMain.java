@@ -1,5 +1,8 @@
 package simulator;
 
+import generators.SeedCalculator;
+import generators.UniformLongGenerator;
+
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,8 +18,8 @@ public class SimMain {
 	public static final Integer numeroOsservazioniP = 50;
 	public static final Integer lunghezzaMaxRunN = 1000;
 	public static final String pathSeq = "c:\\SeqStabileClient";
-	public static final Integer mode = 0;
-	public static final Double clockStabile = 0.0;
+	public static final Integer mode = 1;
+	public static final Double clockStabile = 82.230004136;
 
 	public static void main(String[] args) {
 		
@@ -98,15 +101,19 @@ public class SimMain {
 			for(int j = 1; j <= numeroOsservazioniP; j++){
 
 				seq = new Sequenziatore(numeroJob);
+				
+				//Clock con Double.MAX_VALUE perché non conosciamo ancora il clock di stabilizzazione
 				seq.simula(j, Double.MAX_VALUE);
 				
+				//Sommo tutti i tempi medi di risposta per richieste verso Host
 				sommaTempiMediRisp += seq.getTempoMedioRispJob();
 			}
 			
+			//Divido per numero di osservazioni per avere media campionaria
 			mediaCampionaria = sommaTempiMediRisp / numeroOsservazioniP;
-			mediaCampionariaTot += mediaCampionaria;			
 			
-			//Calcolo media con Gordon
+			//Calcolo media con Gordon			
+			mediaCampionariaTot += mediaCampionaria;
 			stimaMediaGordon = mediaCampionariaTot / i;
 			
 			//Scrivo media su file risultati
@@ -119,9 +126,9 @@ public class SimMain {
 			
 			//Calcolo varianza con Gordon
 			differenzaPerCalcoloVarianza += Math.pow(mediaCampionaria - stimaMediaGordon, 2);
-			
 			stimaVarianzaGordon = differenzaPerCalcoloVarianza / (i - 1);
 			
+			//Gestisco la prima iterazione
 			if(i == 1)
 				stimaVarianzaGordon = 0.0;
 			
@@ -134,16 +141,13 @@ public class SimMain {
 			}
 		}
 		
-		//Scrivo anche clock stabile su file risultati (riuso quello delle medie)
+		//Scrivo clock stabile su file risultati (riuso quello delle medie)
 		try {
 			bufferedWriterMedieGordon.write("Clock per stato stabile: " + seq.getStabClock());
 			System.out.println("Clock per stato stabile: " + seq.getStabClock());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		//Salvo il sequenziatore in stato stabile
-		SimMain.salvaSequenziatore(seq, SimMain.pathSeq);
 		
 		try {
 			bufferedWriterMedieGordon.close();
@@ -170,20 +174,28 @@ public class SimMain {
 		
 	}
 	
-	private static void runStat(String path){
+	private static void runStat(Integer numeroClient){
 		
 		//Carico sequenziatore stabile
 		Sequenziatore seqStabile;
+		Double tempoMedioRispTuttiJob = 0.0;
+		Integer totaleLunghezzeRun = 0;
+		Integer tempLunghezzaRun = 0;
 		
-		for(int i = 1; i <= lunghezzaMaxRunN; i++){
-
-			System.out.println("Lunghezza run " + i);
+		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
+		
+		for(int i = 1; i <= numeroOsservazioniP; i++){
 			
-			for(int j = 1; j <= numeroOsservazioniP; j++){
-				seqStabile = SimMain.caricaSequenziatore(path);
-				//seqStabile.simula(j);
+			tempLunghezzaRun = genLunghRun.generateNextValue().intValue();
+			totaleLunghezzeRun += tempLunghezzaRun;
+			
+			for(int j = 1; j <= tempLunghezzaRun; j++){
+				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
+				seqStabile.simula(tempLunghezzaRun, Double.MAX_VALUE);
+				
+				tempoMedioRispTuttiJob += seqStabile.getTempoMedioRispJob();
 			}
 		}
-
+		
 	}
 }
