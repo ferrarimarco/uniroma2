@@ -16,7 +16,7 @@ public class SimMain {
 	
 	public static final Integer numeroJob = 120;
 	public static final Integer numeroOsservazioniP = 50;
-	public static final Integer lunghezzaMaxRunN = 100;
+	public static final Integer lunghezzaMaxRunN = 2000;
 	public static final String pathSeq = "c:\\SeqStabileClient";
 	public static final Integer mode = 0;
 	public static final Double clockStabile = 82.230004136;
@@ -82,6 +82,7 @@ public class SimMain {
 		double[] arrayXj = new double[numeroOsservazioniP];
 		Double sommaTuttiXj;
 		Double en;
+		Double valoreAttuale = 0.0;
 		
 		//Variabili per stima varianza Gordon
 		Double differenzaPerCalcoloVarianza;
@@ -103,11 +104,12 @@ public class SimMain {
 			en = 0.0;
 			differenzaPerCalcoloVarianza = 0.0;
 			stimaVarianzaGordon = 0.0;
+			
 
 			System.out.println("Lunghezza run " + i);
 			
 			for(int j = 1; j <= numeroOsservazioniP; j++){
-
+	
 				seq = new Sequenziatore(numeroJob);
 				
 				//Clock con 0 perché non conosciamo ancora il clock di stabilizzazione
@@ -115,20 +117,20 @@ public class SimMain {
 				
 				//Prendo il j-esimo campione del run di lunghezza i-esima
 				xij = seq.getTempoMedioRispJob();
-				
+
 				//Sommo tutti i tempi medi di risposta per richieste verso Host
-				sommaTempiMediRispXij += xij;
-				
+				arrayXj[j - 1] = arrayXj[j - 1] + xij;
 				//Calcolo media campionaria
-				mediaCampionariaXj = sommaTempiMediRispXij / i;
-				arrayXj[j - 1] = mediaCampionariaXj;
-				
+				mediaCampionariaXj = arrayXj[j - 1]/i;
+
 				//Somma di tutti gli Xj per calcolo media con Gordon
 				sommaTuttiXj += mediaCampionariaXj;
+
 			}
 						
 			//Divido per numero di osservazioni per avere media campionaria
 			en = sommaTuttiXj / numeroOsservazioniP;
+			System.out.println("en "+ en);
 
 			//Scrivo media su file risultati
 			try {
