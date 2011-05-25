@@ -74,12 +74,14 @@ public class SimMain {
 		BufferedWriter bufferedWriterMedieGordon = null;
 		BufferedWriter bufferedWriterVarianzeGordon = null;
 		
-		Double mediaCampionaria = 0.0;
-		Double mediaCampionariaTot = 0.0;
-		Double sommaTempiMediRisp = 0.0;
-		Double stimaMediaGordon = 0.0;
-		Double stimaVarianzaGordon = 0.0;
+		Double xij = 0.0;
+		Double sommaTempiMediRispXij = 0.0;	
+		Double mediaCampionariaXj = 0.0;
+		double[] arrayXj = new double[numeroOsservazioniP];
+		Double sommaTuttiXj = 0.0;
+		Double en = 0.0;
 		Double differenzaPerCalcoloVarianza = 0.0;
+		Double stimaVarianzaGordon = 0.0;
 		
 		DecimalFormat df = new DecimalFormat("#.#########");
 		
@@ -92,8 +94,9 @@ public class SimMain {
 
 		for(int i = 1; i <= lunghezzaMaxRunN; i++){
 			
-			sommaTempiMediRisp = 0.0;
-			mediaCampionaria = 0.0;
+			sommaTempiMediRispXij = 0.0;
+			sommaTuttiXj = 0.0;
+			en = 0.0;
 			differenzaPerCalcoloVarianza = 0.0;
 
 			System.out.println("Lunghezza run " + i);
@@ -105,33 +108,38 @@ public class SimMain {
 				//Clock con Double.MAX_VALUE perché non conosciamo ancora il clock di stabilizzazione
 				seq.simula(j, Double.MAX_VALUE);
 				
+				//Prendo il j-esimo campione del run di lunghezza i-esima
+				xij = seq.getTempoMedioRispJob();
+				
 				//Sommo tutti i tempi medi di risposta per richieste verso Host
-				sommaTempiMediRisp += seq.getTempoMedioRispJob();
+				sommaTempiMediRispXij += xij;
+				
+				//Calcolo media campionaria
+				mediaCampionariaXj = sommaTempiMediRispXij / i;
+				arrayXj[j] = mediaCampionariaXj;
+				
+				//Somma di tutti gli Xj per calcolo media con Gordon
+				sommaTuttiXj += mediaCampionariaXj;
 			}
-			
+						
 			//Divido per numero di osservazioni per avere media campionaria
-			mediaCampionaria = sommaTempiMediRisp / numeroOsservazioniP;
-			
-			//Calcolo media con Gordon			
-			mediaCampionariaTot += mediaCampionaria;
-			stimaMediaGordon = mediaCampionariaTot / i;
-			
+			en = sommaTuttiXj / numeroOsservazioniP;
+
 			//Scrivo media su file risultati
 			try {
-				bufferedWriterMedieGordon.write(df.format(stimaMediaGordon).toString());
+				bufferedWriterMedieGordon.write(df.format(en).toString());
 				bufferedWriterMedieGordon.newLine();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			
 			//Calcolo varianza con Gordon
-			differenzaPerCalcoloVarianza += Math.pow(mediaCampionaria - stimaMediaGordon, 2);
-			stimaVarianzaGordon = differenzaPerCalcoloVarianza / (i - 1);
+			for(int j = 0; j < numeroOsservazioniP; j++){
+				differenzaPerCalcoloVarianza += Math.pow(arrayXj[j] - en, 2);
+			}
 			
-			//Gestisco la prima iterazione
-			if(i == 1)
-				stimaVarianzaGordon = 0.0;
-			
+			stimaVarianzaGordon = differenzaPerCalcoloVarianza / (numeroOsservazioniP - 1);				
+
 			//Scrivo varianza su file risultati
 			try {
 				bufferedWriterVarianzeGordon.write(df.format(stimaVarianzaGordon).toString());
@@ -163,26 +171,31 @@ public class SimMain {
 		Sequenziatore seq;
 		String path = null;
 		
-		for(int i = 1; i <= SimMain.numeroJob; i += 10){
+		for(int i = 10; i <= SimMain.numeroJob; i += 10){
 			seq = new Sequenziatore(i);
-			seq.simula(SimMain.lunghezzaMaxRunN, SimMain.clockStabile);
+			seq.simula(-1, SimMain.clockStabile);
 			
 			//Salvo lo stato stabile
 			path = SimMain.pathSeq + i + ".ser";
 			SimMain.salvaSequenziatore(seq, path);
 			
-			System.out.println("Salvataggio simulatore stabile per" + i + " client.");
+			System.out.println("Salvataggio simulatore stabile per " + i + " client.");
 		}
 		
 	}
-	
+	/*
 	private static void runStat(Integer numeroClient){
 		
 		//Carico sequenziatore stabile
 		Sequenziatore seqStabile;
 		Double tempoMedioRispTuttiJob = 0.0;
-		Integer totaleLunghezzeRun = 0;
+		Double totaleLunghezzeRun = 0.0;
 		Integer tempLunghezzaRun = 0;
+		
+		Double nSegnato = 0.0;
+		Double ySegnato = 0.0;
+		Double s2yn = 0.0;
+		Double syn = 0.0;
 		
 		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
 		
@@ -199,5 +212,9 @@ public class SimMain {
 			}
 		}
 		
-	}
+		nSegnato = totaleLunghezzeRun / numeroOsservazioniP;
+		ySegnato = tempoMedioRispTuttiJob / numeroOsservazioniP;
+		
+		//syn = (1.0 / (numeroOsservazioniP - 1)) * ();
+	}*/
 }
