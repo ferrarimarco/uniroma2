@@ -16,10 +16,11 @@ public class SimMain {
 	
 	public static final Integer numeroJob = 120;
 	public static final Integer numeroOsservazioniP = 50;
-	public static final Integer lunghezzaMaxRunN = 1000;
+	public static final Integer lunghezzaMaxRunN = 100;
 	public static final String pathSeq = "c:\\SeqStabileClient";
 	public static final Integer mode = 0;
 	public static final Double clockStabile = 82.230004136;
+	public static final Double alpha = 0.1;
 
 	public static void main(String[] args) {
 		
@@ -74,14 +75,17 @@ public class SimMain {
 		BufferedWriter bufferedWriterMedieGordon = null;
 		BufferedWriter bufferedWriterVarianzeGordon = null;
 		
-		Double xij = 0.0;
-		Double sommaTempiMediRispXij = 0.0;	
-		Double mediaCampionariaXj = 0.0;
+		//Variabili per stima media Gordon
+		Double xij;
+		Double sommaTempiMediRispXij;	
+		Double mediaCampionariaXj;
 		double[] arrayXj = new double[numeroOsservazioniP];
-		Double sommaTuttiXj = 0.0;
-		Double en = 0.0;
-		Double differenzaPerCalcoloVarianza = 0.0;
-		Double stimaVarianzaGordon = 0.0;
+		Double sommaTuttiXj;
+		Double en;
+		
+		//Variabili per stima varianza Gordon
+		Double differenzaPerCalcoloVarianza;
+		Double stimaVarianzaGordon;
 		
 		DecimalFormat df = new DecimalFormat("#.#########");
 		
@@ -98,6 +102,7 @@ public class SimMain {
 			sommaTuttiXj = 0.0;
 			en = 0.0;
 			differenzaPerCalcoloVarianza = 0.0;
+			stimaVarianzaGordon = 0.0;
 
 			System.out.println("Lunghezza run " + i);
 			
@@ -106,7 +111,7 @@ public class SimMain {
 				seq = new Sequenziatore(numeroJob);
 				
 				//Clock con 0 perché non conosciamo ancora il clock di stabilizzazione
-				seq.simula(j, 0.0);
+				seq.simula(i, 0.0);
 				
 				//Prendo il j-esimo campione del run di lunghezza i-esima
 				xij = seq.getTempoMedioRispJob();
@@ -183,38 +188,45 @@ public class SimMain {
 		}
 		
 	}
-	/*
+	
 	private static void runStat(Integer numeroClient){
 		
 		//Carico sequenziatore stabile
 		Sequenziatore seqStabile;
-		Double tempoMedioRispTuttiJob = 0.0;
-		Double totaleLunghezzeRun = 0.0;
-		Integer tempLunghezzaRun = 0;
+		
+		Integer n = 0;
+		Double yj;
 		
 		Double nSegnato = 0.0;
+		int[] arrayN = new int[numeroOsservazioniP];
+		Double sommaTuttiN = 0.0;
+		
 		Double ySegnato = 0.0;
-		Double s2yn = 0.0;
-		Double syn = 0.0;
+		double[] arrayY = new double[numeroOsservazioniP];
+		Double sommaTuttiYj = 0.0;
 		
 		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
 		
 		for(int i = 1; i <= numeroOsservazioniP; i++){
 			
-			tempLunghezzaRun = genLunghRun.generateNextValue().intValue();
-			totaleLunghezzeRun += tempLunghezzaRun;
+			//Generiamo un intero per sapere quanto deve essere lungo il run
+			n = genLunghRun.generateNextValue().intValue();
+			yj = 0.0;
+			arrayN[i - 1] = n;
+			sommaTuttiN += n;
 			
-			for(int j = 1; j <= tempLunghezzaRun; j++){
+			for(int j = 1; j <= n; j++){
 				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
-				seqStabile.simula(tempLunghezzaRun, Double.MAX_VALUE);
+				seqStabile.simula(n, Double.MAX_VALUE);
 				
-				tempoMedioRispTuttiJob += seqStabile.getTempoMedioRispJob();
+				yj += seqStabile.getTempoMedioRispJob();
 			}
+			
+			arrayY[i - 1] = yj;
+			sommaTuttiYj += yj; 
 		}
 		
-		nSegnato = totaleLunghezzeRun / numeroOsservazioniP;
-		ySegnato = tempoMedioRispTuttiJob / numeroOsservazioniP;
-		
-		//syn = (1.0 / (numeroOsservazioniP - 1)) * ();
-	}*/
+		nSegnato = sommaTuttiN / numeroOsservazioniP;
+		ySegnato = sommaTuttiYj / numeroOsservazioniP;		
+	}
 }
