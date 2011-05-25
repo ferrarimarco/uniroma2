@@ -18,7 +18,7 @@ public class SimMain {
 	public static final Integer numeroOsservazioniP = 50;
 	public static final Integer lunghezzaMaxRunN = 1000;
 	public static final String pathSeq = "c:\\SeqStabileClient";
-	public static final Integer mode = 1;
+	public static final Integer mode = 0;
 	public static final Double clockStabile = 82.230004136;
 
 	public static void main(String[] args) {
@@ -105,8 +105,8 @@ public class SimMain {
 
 				seq = new Sequenziatore(numeroJob);
 				
-				//Clock con Double.MAX_VALUE perché non conosciamo ancora il clock di stabilizzazione
-				seq.simula(j, Double.MAX_VALUE);
+				//Clock con 0 perché non conosciamo ancora il clock di stabilizzazione
+				seq.simula(j, 0.0);
 				
 				//Prendo il j-esimo campione del run di lunghezza i-esima
 				xij = seq.getTempoMedioRispJob();
@@ -116,7 +116,7 @@ public class SimMain {
 				
 				//Calcolo media campionaria
 				mediaCampionariaXj = sommaTempiMediRispXij / i;
-				arrayXj[j] = mediaCampionariaXj;
+				arrayXj[j - 1] = mediaCampionariaXj;
 				
 				//Somma di tutti gli Xj per calcolo media con Gordon
 				sommaTuttiXj += mediaCampionariaXj;
