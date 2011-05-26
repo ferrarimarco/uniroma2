@@ -16,7 +16,7 @@ public class SimMain {
 	
 	public static final Integer numeroJob = 120;
 	public static final Integer numeroOsservazioniP = 50;
-	public static final Integer lunghezzaMaxRunN = 2000;
+	public static final Integer lunghezzaMaxRunN = 6000;
 	public static final String pathSeq = "c:\\SeqStabileClient";
 	public static final Integer mode = 0;
 	public static final Double clockStabile = 82.230004136;
@@ -142,7 +142,8 @@ public class SimMain {
 			
 			//Calcolo varianza con Gordon
 			for(int j = 0; j < numeroOsservazioniP; j++){
-				differenzaPerCalcoloVarianza += Math.pow(arrayXj[j] - en, 2);
+				mediaCampionariaXj = arrayXj[j]/i;
+				differenzaPerCalcoloVarianza += Math.pow(mediaCampionariaXj - en, 2);
 			}
 			
 			stimaVarianzaGordon = differenzaPerCalcoloVarianza / (numeroOsservazioniP - 1);				
