@@ -14,14 +14,22 @@ import java.text.DecimalFormat;
 
 public class SimMain {
 	
-	public static final Integer numeroJob = 120;
+	public static final Integer numeroClient = 120;
 	public static final Integer numeroOsservazioniP = 50;
 	public static final Integer lunghezzaMaxRunN = 100;
 	public static final String pathSeq = "c:\\SeqStabileClient";
 	public static final Integer mode = 0;
 	public static final Double clockStabile = 82.230004136;
+	
 	public static final Double alpha = 0.1;
-
+	
+	//area = 0.95
+	public static final Double area = 1 - (alpha / 2);
+	
+	//Da tabella
+	public static final Double uAlphaMezzi = 1.645;
+	
+	
 	public static void main(String[] args) {
 		
 		if(mode == 0){//Stabilizzazione
@@ -29,7 +37,26 @@ public class SimMain {
 		}else if(mode == 1){//Salvataggio di tutti gli stati stabili di partenza
 			SimMain.runSalvataggioStatoStabile();
 		}else{
-			//SimMain.runStat();
+			
+			//Per scrivere risultati
+			BufferedWriter bufferedWriterIglehart = null;
+			
+			try {
+				bufferedWriterIglehart = new BufferedWriter(new FileWriter("c:\\medieGordon.txt", false));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			for(int i = 10; i <= numeroClient; i += 10){
+				SimMain.runStat(i, bufferedWriterIglehart);
+			}
+			
+			try {
+				bufferedWriterIglehart.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
 		}
 	}
 
@@ -107,7 +134,7 @@ public class SimMain {
 			
 			for(int j = 1; j <= numeroOsservazioniP; j++){
 	
-				seq = new Sequenziatore(numeroJob);
+				seq = new Sequenziatore(numeroClient);
 				
 				//Clock con 0 perché non conosciamo ancora il clock di stabilizzazione
 				seq.simula(i, 0.0);
@@ -154,10 +181,10 @@ public class SimMain {
 			}
 		}
 		
-		//Scrivo clock stabile su file risultati (riuso quello delle medie)
+		//Scrivo clock ultimo run su file risultati (riuso quello delle medie)
 		try {
-			bufferedWriterMedieGordon.write("Clock per stato stabile: " + seq.getStabClock());
-			System.out.println("Clock per stato stabile: " + seq.getStabClock());
+			bufferedWriterMedieGordon.write("Clock ultimo run: " + seq.getStabClock());
+			System.out.println("Clock ultimo run: " + seq.getStabClock());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -176,7 +203,7 @@ public class SimMain {
 		Sequenziatore seq;
 		String path = null;
 		
-		for(int i = 10; i <= SimMain.numeroJob; i += 10){
+		for(int i = 10; i <= SimMain.numeroClient; i += 10){
 			seq = new Sequenziatore(i);
 			seq.simula(-1, SimMain.clockStabile);
 			
@@ -189,7 +216,13 @@ public class SimMain {
 		
 	}
 	
-	private static void runStat(Integer numeroClient){
+	private static void runStat(Integer numeroClient, BufferedWriter bufferedWriter){
+		
+		try {
+			bufferedWriter.write("NumeroClient = " + numeroClient);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		//Carico sequenziatore stabile
 		Sequenziatore seqStabile;
@@ -200,33 +233,72 @@ public class SimMain {
 		Double nSegnato = 0.0;
 		int[] arrayN = new int[numeroOsservazioniP];
 		Double sommaTuttiN = 0.0;
+		Double sommaPerS2n = 0.0;
+		Double s2n = 0.0;
 		
 		Double ySegnato = 0.0;
 		double[] arrayY = new double[numeroOsservazioniP];
 		Double sommaTuttiYj = 0.0;
+		Double sommaPerS2y = 0.0;
+		Double s2y;
+		
+		Double sommaPerS2yn = 0.0;
+		Double s2yn = 0.0;
+		
+		Double D = 0.0;
+		Double k = 0.0;
+		
+		Double iglehartBasso = 0.0;
+		Double iglehartAlto = 0.0;
 		
 		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
 		
-		for(int i = 1; i <= numeroOsservazioniP; i++){
+
+		for(int j = 1; j <= numeroOsservazioniP; j++){
 			
 			//Generiamo un intero per sapere quanto deve essere lungo il run
 			n = genLunghRun.generateNextValue().intValue();
 			yj = 0.0;
-			arrayN[i - 1] = n;
+			arrayN[j - 1] = n;
 			sommaTuttiN += n;
 			
-			for(int j = 1; j <= n; j++){
+			for(int i = 1; i <= n; i++){
 				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
 				seqStabile.simula(n, Double.MAX_VALUE);
 				
 				yj += seqStabile.getTempoMedioRispJob();
 			}
 			
-			arrayY[i - 1] = yj;
-			sommaTuttiYj += yj; 
+			arrayY[j - 1] = yj;
+			sommaTuttiYj += yj;
 		}
 		
 		nSegnato = sommaTuttiN / numeroOsservazioniP;
-		ySegnato = sommaTuttiYj / numeroOsservazioniP;		
+		ySegnato = sommaTuttiYj / numeroOsservazioniP;
+		
+		for(int j = 0; j < numeroOsservazioniP; j++){
+			sommaPerS2yn += (arrayY[j] - ySegnato) * (arrayN[j] - nSegnato);
+			sommaPerS2n += Math.pow((arrayN[j] - nSegnato), 2);
+			sommaPerS2y += Math.pow((arrayY[j] - ySegnato), 2);
+		}
+		
+		s2n = sommaPerS2n / (numeroOsservazioniP - 1);
+		s2y = sommaPerS2y / (numeroOsservazioniP - 1);
+
+		s2yn = sommaPerS2yn / (numeroOsservazioniP - 1);
+		k = Math.pow(uAlphaMezzi, 2) / numeroOsservazioniP;
+		
+		D = Math.pow((ySegnato * nSegnato) - (k * s2yn), 2) - 
+			((Math.pow(nSegnato, 2) - (k * s2n)) * ((Math.pow(ySegnato, 2) - (k * s2y)))); 
+		
+		iglehartBasso = (((ySegnato * nSegnato) - (k * s2yn)) - Math.sqrt(D)) / (Math.pow(nSegnato, 2) - k * s2n);
+		iglehartAlto = (((ySegnato * nSegnato) - (k * s2yn)) + Math.sqrt(D)) / (Math.pow(nSegnato, 2) - k * s2n);
+		
+		try {
+			bufferedWriter.write("iglehartBasso, iglehartAlto = " + iglehartBasso + ", " + iglehartAlto);
+			bufferedWriter.write("");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
