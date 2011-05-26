@@ -16,7 +16,7 @@ public class SimMain {
 	
 	public static final Integer numeroJob = 120;
 	public static final Integer numeroOsservazioniP = 50;
-	public static final Integer lunghezzaMaxRunN = 6000;
+	public static final Integer lunghezzaMaxRunN = 100;
 	public static final String pathSeq = "c:\\SeqStabileClient";
 	public static final Integer mode = 0;
 	public static final Double clockStabile = 82.230004136;
@@ -72,23 +72,22 @@ public class SimMain {
 	private static void runStab(){
 		
 		Sequenziatore seq = null;
+		
+		//Variabili per studio output
 		BufferedWriter bufferedWriterMedieGordon = null;
 		BufferedWriter bufferedWriterVarianzeGordon = null;
+		DecimalFormat df = new DecimalFormat("#.#########");
 		
 		//Variabili per stima media Gordon
 		Double xij;
-		Double sommaTempiMediRispXij;	
 		Double mediaCampionariaXj;
 		double[] arrayXj = new double[numeroOsservazioniP];
 		Double sommaTuttiXj;
 		Double en;
-		Double valoreAttuale = 0.0;
 		
 		//Variabili per stima varianza Gordon
 		Double differenzaPerCalcoloVarianza;
 		Double stimaVarianzaGordon;
-		
-		DecimalFormat df = new DecimalFormat("#.#########");
 		
 		try {
 			bufferedWriterMedieGordon = new BufferedWriter(new FileWriter("c:\\medieGordon.txt", false));
@@ -99,14 +98,12 @@ public class SimMain {
 
 		for(int i = 1; i <= lunghezzaMaxRunN; i++){
 			
-			sommaTempiMediRispXij = 0.0;
 			sommaTuttiXj = 0.0;
 			en = 0.0;
 			differenzaPerCalcoloVarianza = 0.0;
 			stimaVarianzaGordon = 0.0;
 			
-
-			System.out.println("Lunghezza run " + i);
+			System.out.println("Lunghezza run: " + i);
 			
 			for(int j = 1; j <= numeroOsservazioniP; j++){
 	
@@ -120,17 +117,17 @@ public class SimMain {
 
 				//Sommo tutti i tempi medi di risposta per richieste verso Host
 				arrayXj[j - 1] = arrayXj[j - 1] + xij;
+				
 				//Calcolo media campionaria
-				mediaCampionariaXj = arrayXj[j - 1]/i;
+				mediaCampionariaXj = arrayXj[j - 1] / i;
 
 				//Somma di tutti gli Xj per calcolo media con Gordon
 				sommaTuttiXj += mediaCampionariaXj;
-
 			}
 						
 			//Divido per numero di osservazioni per avere media campionaria
 			en = sommaTuttiXj / numeroOsservazioniP;
-			System.out.println("en "+ en);
+			System.out.println("Stima media Gordon: en = " + en);
 
 			//Scrivo media su file risultati
 			try {
@@ -142,7 +139,7 @@ public class SimMain {
 			
 			//Calcolo varianza con Gordon
 			for(int j = 0; j < numeroOsservazioniP; j++){
-				mediaCampionariaXj = arrayXj[j]/i;
+				mediaCampionariaXj = arrayXj[j] / i;
 				differenzaPerCalcoloVarianza += Math.pow(mediaCampionariaXj - en, 2);
 			}
 			
