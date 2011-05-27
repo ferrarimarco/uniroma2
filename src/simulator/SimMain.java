@@ -15,12 +15,12 @@ import java.text.DecimalFormat;
 public class SimMain {
 	
 	public static final Integer numeroClient = 120;
-	public static final Integer numeroOsservazioniP = 50;
-	public static final Integer lunghezzaMaxRunN = 100;
-	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
-	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
-	public static final String pathSeq = "c:\\SeqStabileClient";
-	public static final String pathRisultatiIglehart = "c:\\iglehart.txt";
+	public static final Integer numeroOsservazioniP = 1;
+	public static final Integer lunghezzaMaxRunN = 7000;
+	public static final String pathRisultatiMedieGordon = "d:\\medieGordon.txt";
+	public static final String pathRisultatiVarianzeGordon = "d:\\varianzeGordon.txt";
+	public static final String pathSeq = "d:\\SeqStabileClient";
+	public static final String pathRisultatiIglehart = "d:\\iglehart.txt";
 	public static final Integer mode = 0;
 	public static final Double clockStabile = 82.230004136;
 	
@@ -182,6 +182,8 @@ public class SimMain {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
+			System.out.println("Clock run di lunghezza" + i + " (ultima osservazione): " + seq.getStabClock());
 		}
 		
 		//Scrivo clock ultimo run su file risultati (riuso quello delle medie)
