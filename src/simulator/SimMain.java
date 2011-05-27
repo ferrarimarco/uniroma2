@@ -42,7 +42,7 @@ public class SimMain {
 			BufferedWriter bufferedWriterIglehart = null;
 			
 			try {
-				bufferedWriterIglehart = new BufferedWriter(new FileWriter("c:\\medieGordon.txt", false));
+				bufferedWriterIglehart = new BufferedWriter(new FileWriter("c:\\iglehart.txt", false));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
