@@ -183,7 +183,7 @@ public class SimMain {
 				e.printStackTrace();
 			}
 			
-			System.out.println("Clock run di lunghezza" + i + " (ultima osservazione): " + seq.getStabClock());
+			System.out.println("Clock: " + seq.getStabClock());
 		}
 		
 		//Scrivo clock ultimo run su file risultati (riuso quello delle medie)
