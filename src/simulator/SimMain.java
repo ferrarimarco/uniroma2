@@ -17,7 +17,10 @@ public class SimMain {
 	public static final Integer numeroClient = 120;
 	public static final Integer numeroOsservazioniP = 50;
 	public static final Integer lunghezzaMaxRunN = 100;
+	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
+	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
 	public static final String pathSeq = "c:\\SeqStabileClient";
+	public static final String pathRisultatiIglehart = "c:\\iglehart.txt";
 	public static final Integer mode = 0;
 	public static final Double clockStabile = 82.230004136;
 	
@@ -42,7 +45,7 @@ public class SimMain {
 			BufferedWriter bufferedWriterIglehart = null;
 			
 			try {
-				bufferedWriterIglehart = new BufferedWriter(new FileWriter("c:\\iglehart.txt", false));
+				bufferedWriterIglehart = new BufferedWriter(new FileWriter(pathRisultatiIglehart, false));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -117,8 +120,8 @@ public class SimMain {
 		Double stimaVarianzaGordon;
 		
 		try {
-			bufferedWriterMedieGordon = new BufferedWriter(new FileWriter("c:\\medieGordon.txt", false));
-			bufferedWriterVarianzeGordon = new BufferedWriter(new FileWriter("c:\\varianzeGordon.txt", false));
+			bufferedWriterMedieGordon = new BufferedWriter(new FileWriter(pathRisultatiMedieGordon, false));
+			bufferedWriterVarianzeGordon = new BufferedWriter(new FileWriter(pathRisultatiVarianzeGordon, false));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
