@@ -15,14 +15,14 @@ import java.text.DecimalFormat;
 public class SimMain {
 	
 	public static final Integer numeroClient = 120;
-	public static final Integer numeroOsservazioniP = 1;
+	public static final Integer numeroOsservazioniP = 3;
 	public static final Integer lunghezzaMaxRunN = 7000;
-	public static final String pathRisultatiMedieGordon = "d:\\medieGordon.txt";
-	public static final String pathRisultatiVarianzeGordon = "d:\\varianzeGordon.txt";
-	public static final String pathSeq = "d:\\SeqStabileClient";
-	public static final String pathRisultatiIglehart = "d:\\iglehart.txt";
-	public static final Integer mode = 0;
-	public static final Double clockStabile = 82.230004136;
+	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
+	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
+	public static final String pathSeq = "c:\\SeqStabileClient";
+	public static final String pathRisultatiIglehart = "c:\\iglehart.txt";
+	public static final Integer mode = 2;
+	public static final Double clockStabile = 4507.956638059268;
 	
 	public static final Double alpha = 0.1;
 	
@@ -51,6 +51,7 @@ public class SimMain {
 			}
 			
 			for(int i = 10; i <= numeroClient; i += 10){
+				System.out.println("Inizio Run statistici per " + i + " client.");
 				SimMain.runStat(i, bufferedWriterIglehart);
 			}
 			
@@ -225,6 +226,7 @@ public class SimMain {
 		
 		try {
 			bufferedWriter.write("NumeroClient = " + numeroClient);
+			bufferedWriter.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -259,22 +261,22 @@ public class SimMain {
 		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
 		
 
-		for(int j = 1; j <= numeroOsservazioniP; j++){
+		for(int j = 0; j < numeroOsservazioniP; j++){
 			
 			//Generiamo un intero per sapere quanto deve essere lungo il run
 			n = genLunghRun.generateNextValue().intValue();
 			yj = 0.0;
-			arrayN[j - 1] = n;
+			arrayN[j] = n;
 			sommaTuttiN += n;
 			
 			for(int i = 1; i <= n; i++){
 				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
-				seqStabile.simula(n, Double.MAX_VALUE);
+				seqStabile.simula(n, 0.0);
 				
 				yj += seqStabile.getTempoMedioRispJob();
 			}
 			
-			arrayY[j - 1] = yj;
+			arrayY[j] = yj;
 			sommaTuttiYj += yj;
 		}
 		
@@ -289,10 +291,11 @@ public class SimMain {
 		
 		s2n = sommaPerS2n / (numeroOsservazioniP - 1);
 		s2y = sommaPerS2y / (numeroOsservazioniP - 1);
-
 		s2yn = sommaPerS2yn / (numeroOsservazioniP - 1);
+		
 		k = Math.pow(uAlphaMezzi, 2) / numeroOsservazioniP;
 		
+		//TO CHECK!
 		D = Math.pow((ySegnato * nSegnato) - (k * s2yn), 2) - 
 			((Math.pow(nSegnato, 2) - (k * s2n)) * ((Math.pow(ySegnato, 2) - (k * s2y)))); 
 		
@@ -301,7 +304,8 @@ public class SimMain {
 		
 		try {
 			bufferedWriter.write("iglehartBasso, iglehartAlto = " + iglehartBasso + ", " + iglehartAlto);
-			bufferedWriter.write("");
+			bufferedWriter.newLine();
+			System.out.println("iglehartBasso, iglehartAlto = " + iglehartBasso + ", " + iglehartAlto);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
