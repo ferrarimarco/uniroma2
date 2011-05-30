@@ -15,14 +15,18 @@ import java.text.DecimalFormat;
 public class SimMain {
 	
 	public static final Integer numeroClient = 120;
-	public static final Integer numeroOsservazioniP = 3;
+	public static final Integer numeroOsservazioniP = 50;
 	public static final Integer lunghezzaMaxRunN = 7000;
 	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
 	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
 	public static final String pathSeq = "c:\\SeqStabileClient";
 	public static final String pathRisultatiIglehart = "c:\\iglehart.txt";
 	public static final Integer mode = 2;
-	public static final Double clockStabile = 4507.956638059268;
+	
+	//Clock per lunghezza run = 6000
+	//public static final Double clockStabile = 4507.956638059268;
+	
+	public static final Double clockStabile = 100000.0;
 	
 	public static final Double alpha = 0.1;
 	
@@ -31,6 +35,9 @@ public class SimMain {
 	
 	//Da tabella
 	public static final Double uAlphaMezzi = 1.645;
+	
+	//Calcolo k
+	public static final Double k = Math.pow(uAlphaMezzi, 2) / numeroOsservazioniP;;
 	
 	
 	public static void main(String[] args) {
@@ -158,7 +165,6 @@ public class SimMain {
 						
 			//Divido per numero di osservazioni per avere media campionaria
 			en = sommaTuttiXj / numeroOsservazioniP;
-			System.out.println("Stima media Gordon: en = " + en);
 
 			//Scrivo media su file risultati
 			try {
@@ -176,6 +182,10 @@ public class SimMain {
 			
 			stimaVarianzaGordon = differenzaPerCalcoloVarianza / (numeroOsservazioniP - 1);				
 
+			//Debug
+			System.out.println("Stima media Gordon: en = " + en);
+			System.out.println("Stima varianza Gordon: s2 = " + stimaVarianzaGordon);
+			
 			//Scrivo varianza su file risultati
 			try {
 				bufferedWriterVarianzeGordon.write(df.format(stimaVarianzaGordon).toString());
@@ -233,6 +243,7 @@ public class SimMain {
 		
 		//Carico sequenziatore stabile
 		Sequenziatore seqStabile;
+		DecimalFormat df = new DecimalFormat("#.######");
 		
 		Integer n = 0;
 		Double yj;
@@ -253,14 +264,13 @@ public class SimMain {
 		Double s2yn = 0.0;
 		
 		Double D = 0.0;
-		Double k = 0.0;
 		
+		Double denominatoreIglehart = 0.0;
 		Double iglehartBasso = 0.0;
 		Double iglehartAlto = 0.0;
 		
 		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
 		
-
 		for(int j = 0; j < numeroOsservazioniP; j++){
 			
 			//Generiamo un intero per sapere quanto deve essere lungo il run
@@ -293,19 +303,18 @@ public class SimMain {
 		s2y = sommaPerS2y / (numeroOsservazioniP - 1);
 		s2yn = sommaPerS2yn / (numeroOsservazioniP - 1);
 		
-		k = Math.pow(uAlphaMezzi, 2) / numeroOsservazioniP;
-		
 		//TO CHECK!
 		D = Math.pow((ySegnato * nSegnato) - (k * s2yn), 2) - 
 			((Math.pow(nSegnato, 2) - (k * s2n)) * ((Math.pow(ySegnato, 2) - (k * s2y)))); 
 		
-		iglehartBasso = (((ySegnato * nSegnato) - (k * s2yn)) - Math.sqrt(D)) / (Math.pow(nSegnato, 2) - k * s2n);
-		iglehartAlto = (((ySegnato * nSegnato) - (k * s2yn)) + Math.sqrt(D)) / (Math.pow(nSegnato, 2) - k * s2n);
+		denominatoreIglehart = (Math.pow(nSegnato, 2) - k * s2n);
+		iglehartBasso = (((ySegnato * nSegnato) - (k * s2yn)) - Math.sqrt(D)) / denominatoreIglehart;
+		iglehartAlto = (((ySegnato * nSegnato) - (k * s2yn)) + Math.sqrt(D)) / denominatoreIglehart;
 		
 		try {
-			bufferedWriter.write("iglehartBasso, iglehartAlto = " + iglehartBasso + ", " + iglehartAlto);
+			bufferedWriter.write("iglehartBasso, iglehartAlto = " + df.format(iglehartBasso) + ", " + df.format(iglehartAlto));
 			bufferedWriter.newLine();
-			System.out.println("iglehartBasso, iglehartAlto = " + iglehartBasso + ", " + iglehartAlto);
+			System.out.println("iglehartBasso, iglehartAlto = " + df.format(iglehartBasso) + ", " + df.format(iglehartAlto));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

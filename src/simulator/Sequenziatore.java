@@ -27,7 +27,7 @@ public class Sequenziatore implements Serializable {
 	//Per statistiche
 	private Double tempoMedioRispJob;
 	private Double thrDisk;
-	private Integer jobCompletati;
+
 	private Double tempoRispTuttiJob;
 	private Integer jobInHost;
 	
@@ -43,7 +43,6 @@ public class Sequenziatore implements Serializable {
 		calendar = new CalendarioEventi(numeroJob);
 		clock = new Clock();
 		
-		jobCompletati = 0;
 		tempoMedioRispJob = 0.0;
 		tempoRispTuttiJob = 0.0;
 		jobInHost = 0;
@@ -72,7 +71,7 @@ public class Sequenziatore implements Serializable {
 	
 	public void simula(Integer lunghezzaRun, Double clockStabile){
 		
-		while(jobCompletati < lunghezzaRun || clock.getSimTime() <= clockStabile){
+		while(jobInHost < lunghezzaRun || clock.getSimTime() <= clockStabile){
 			nextEventIndex = calendar.getNextEventIndex();
 			nextEventTime = calendar.getEventTime(nextEventIndex);
 			
@@ -285,8 +284,6 @@ public class Sequenziatore implements Serializable {
 		
 		//Aggiorno evento terminale
 		calendar.updateEvent(calendar.firstTerminalIndex + j.getIdentifier(), durata);
-
-		jobCompletati++;
 	}
 
 	public Double getTempoMedioRispJob() {
