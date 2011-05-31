@@ -11,6 +11,6 @@ public class SeedCalculator implements Serializable {
 			return (s = s + 4L);
 		else
 			return (s = s + 2L);
-		
+
 	}
 }

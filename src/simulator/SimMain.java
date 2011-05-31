@@ -15,13 +15,13 @@ import java.text.DecimalFormat;
 public class SimMain {
 	
 	public static final Integer numeroClient = 120;
-	public static final Integer numeroOsservazioniP = 50;
+	public static final Integer numeroOsservazioniP = 2;
 	public static final Integer lunghezzaMaxRunN = 7000;
 	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
 	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
 	public static final String pathSeq = "c:\\SeqStabileClient";
 	public static final String pathRisultatiIglehart = "c:\\iglehart.txt";
-	public static final Integer mode = 2;
+	public static final Integer mode = 0;
 	
 	//Clock per lunghezza run = 6000
 	//public static final Double clockStabile = 4507.956638059268;

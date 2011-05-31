@@ -15,16 +15,8 @@ public class XnGenerator implements Generator, Serializable{
 
 
 	public XnGenerator(Long seed){
-		
-		//Controllo se il seme va bene
-		if ((seed > 0) && (seed % 2 == 1) && (seed % 5 != 0)) {
-			x0 = seed;
-		}else{
-			System.out.println("seed inserito non va bene, uso il seed default (x0 = 1).");
-			x0 = 1L;
-		}
-		
 		//Inizializzo variabili per la sequenza
+		x0 = seed;
 		xn = x0;
 		multiplier = GeneratorConstants.MULTIPLIER;
 		module = GeneratorConstants.MODULE;
@@ -36,14 +28,6 @@ public class XnGenerator implements Generator, Serializable{
 		xn = (multiplier * xn) % module;
 		
 		return xn;
-	}
-	
-	public Long getX0() {
-		return x0;
-	}
-
-	public void setX0(Long x0) {
-		this.x0 = x0;
 	}
 
 	protected void setXn(Long xn){
