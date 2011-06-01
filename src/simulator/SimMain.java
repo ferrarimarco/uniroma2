@@ -45,27 +45,7 @@ public class SimMain {
 		}else if(mode == 1){//Salvataggio di tutti gli stati stabili di partenza
 			SimMain.runSalvataggioStatoStabile();
 		}else{
-			
-			//Per scrivere risultati
-			BufferedWriter bufferedWriterIglehart = null;
-			
-			try {
-				bufferedWriterIglehart = new BufferedWriter(new FileWriter(pathRisultatiIglehart, false));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-			for(int i = 10; i <= numeroClient; i += 10){
-				System.out.println("Inizio Run statistici per " + i + " client.");
-				SimMain.runStat(i, bufferedWriterIglehart);
-			}
-			
-			try {
-				bufferedWriterIglehart.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
+			SimMain.runStat();
 		}
 	}
 
@@ -218,101 +198,117 @@ public class SimMain {
 		String path = null;
 		
 		for(int i = 10; i <= SimMain.numeroClient; i += 10){
+			System.out.println("Salvataggio simulatore stabile per " + i + " client.");
+			
 			seq = new Sequenziatore(i);
 			seq.simula(-1, SimMain.clockStabile);
 			
 			//Salvo lo stato stabile
 			path = SimMain.pathSeq + i + ".ser";
 			SimMain.salvaSequenziatore(seq, path);
-			
-			System.out.println("Salvataggio simulatore stabile per " + i + " client.");
 		}
 		
 	}
 	
-	private static void runStat(Integer numeroClient, BufferedWriter bufferedWriter){
+	private static void runStat(){
+		
+		//Per scrivere risultati
+		BufferedWriter bufferedWriterIglehart = null;
 		
 		try {
-			bufferedWriter.write("NumeroClient = " + numeroClient);
-			bufferedWriter.newLine();
+			bufferedWriterIglehart = new BufferedWriter(new FileWriter(pathRisultatiIglehart, false));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		//Carico sequenziatore stabile
-		Sequenziatore seqStabile;
-		DecimalFormat df = new DecimalFormat("#.######");
-		
-		Integer n = 0;
-		Double yj;
-		
-		Double nSegnato = 0.0;
-		int[] arrayN = new int[numeroOsservazioniP];
-		Double sommaTuttiN = 0.0;
-		Double sommaPerS2n = 0.0;
-		Double s2n = 0.0;
-		
-		Double ySegnato = 0.0;
-		double[] arrayY = new double[numeroOsservazioniP];
-		Double sommaTuttiYj = 0.0;
-		Double sommaPerS2y = 0.0;
-		Double s2y;
-		
-		Double sommaPerS2yn = 0.0;
-		Double s2yn = 0.0;
-		
-		Double D = 0.0;
-		
-		Double denominatoreIglehart = 0.0;
-		Double iglehartBasso = 0.0;
-		Double iglehartAlto = 0.0;
-		
-		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
-		
-		for(int j = 0; j < numeroOsservazioniP; j++){
-			
-			//Generiamo un intero per sapere quanto deve essere lungo il run
-			n = genLunghRun.generateNextValue().intValue();
-			yj = 0.0;
-			arrayN[j] = n;
-			sommaTuttiN += n;
-			
-			for(int i = 1; i <= n; i++){
-				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
-				seqStabile.simula(n, 0.0);
-				
-				yj += seqStabile.getTempoMedioRispJob();
-			}
-			
-			arrayY[j] = yj;
-			sommaTuttiYj += yj;
-		}
-		
-		nSegnato = sommaTuttiN / numeroOsservazioniP;
-		ySegnato = sommaTuttiYj / numeroOsservazioniP;
-		
-		for(int j = 0; j < numeroOsservazioniP; j++){
-			sommaPerS2yn += (arrayY[j] - ySegnato) * (arrayN[j] - nSegnato);
-			sommaPerS2n += Math.pow((arrayN[j] - nSegnato), 2);
-			sommaPerS2y += Math.pow((arrayY[j] - ySegnato), 2);
-		}
-		
-		s2n = sommaPerS2n / (numeroOsservazioniP - 1);
-		s2y = sommaPerS2y / (numeroOsservazioniP - 1);
-		s2yn = sommaPerS2yn / (numeroOsservazioniP - 1);
-		
-		//TO CHECK!
-		D = Math.pow((ySegnato * nSegnato) - (k * s2yn), 2) - 
-			((Math.pow(nSegnato, 2) - (k * s2n)) * ((Math.pow(ySegnato, 2) - (k * s2y)))); 
-		
-		denominatoreIglehart = (Math.pow(nSegnato, 2) - k * s2n);
-		iglehartBasso = (((ySegnato * nSegnato) - (k * s2yn)) - Math.sqrt(D)) / denominatoreIglehart;
-		iglehartAlto = (((ySegnato * nSegnato) - (k * s2yn)) + Math.sqrt(D)) / denominatoreIglehart;
-		
 		try {
-			bufferedWriter.write("iglehartBasso, iglehartAlto = " + df.format(iglehartBasso) + ", " + df.format(iglehartAlto));
-			bufferedWriter.newLine();
-			System.out.println("iglehartBasso, iglehartAlto = " + df.format(iglehartBasso) + ", " + df.format(iglehartAlto));
+			bufferedWriterIglehart.write("NumeroClient = " + numeroClient);
+			bufferedWriterIglehart.newLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		//Per sequenziatore stabile
+		Sequenziatore seqStabile;
+		
+		DecimalFormat df = new DecimalFormat("#.############");
+		
+		for (int h = 10; h <= numeroClient; h += 10){
+			System.out.println("Inizio Run statistici per " + h + " client.");
+			
+			Integer n = 0;
+			Double yj;
+			Double nSegnato = 0.0;
+			int[] arrayN = new int[numeroOsservazioniP];
+			Double sommaTuttiN = 0.0;
+			Double sommaPerS2n = 0.0;
+			Double s2n = 0.0;
+			Double ySegnato = 0.0;
+			double[] arrayY = new double[numeroOsservazioniP];
+			Double sommaTuttiYj = 0.0;
+			Double sommaPerS2y = 0.0;
+			Double s2y;
+			Double sommaPerS2yn = 0.0;
+			Double s2yn = 0.0;
+			Double D = 0.0;
+			Double numeratoreComuneIglehart = 0.0;
+			Double denominatoreIglehart = 0.0;
+			Double iglehartBasso = 0.0;
+			Double iglehartAlto = 0.0;
+			UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
+			
+			for (int j = 0; j < numeroOsservazioniP; j++) {
+
+				//Generiamo un intero per sapere quanto deve essere lungo il run
+				n = genLunghRun.generateNextValue().intValue();
+				yj = 0.0;
+				arrayN[j] = n;
+				sommaTuttiN += n;
+
+				for (int i = 1; i <= n; i++) {
+					seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq
+							+ numeroClient + ".ser");
+					seqStabile.simula(seqStabile.getJobInHost() + n, 0.0);
+
+					yj += seqStabile.getTempoMedioRispJob();
+				}
+
+				arrayY[j] = yj;
+				sommaTuttiYj += yj;
+			}
+			nSegnato = sommaTuttiN / numeroOsservazioniP;
+			ySegnato = sommaTuttiYj / numeroOsservazioniP;
+			for (int j = 0; j < numeroOsservazioniP; j++) {
+				sommaPerS2yn += (arrayY[j] - ySegnato) * (arrayN[j] - nSegnato);
+				sommaPerS2n += Math.pow((arrayN[j] - nSegnato), 2);
+				sommaPerS2y += Math.pow((arrayY[j] - ySegnato), 2);
+			}
+			s2n = sommaPerS2n / (numeroOsservazioniP - 1);
+			s2y = sommaPerS2y / (numeroOsservazioniP - 1);
+			s2yn = sommaPerS2yn / (numeroOsservazioniP - 1);
+			D = Math.pow((ySegnato * nSegnato) - (k * s2yn), 2)
+					- ((Math.pow(nSegnato, 2) - (k * s2n)) * ((Math.pow(
+							ySegnato, 2) - (k * s2y))));
+			numeratoreComuneIglehart = (ySegnato * nSegnato) - (k * s2yn);
+			denominatoreIglehart = (Math.pow(nSegnato, 2) - k * s2n);
+			iglehartBasso = (numeratoreComuneIglehart - Math.sqrt(D))
+					/ denominatoreIglehart;
+			iglehartAlto = (numeratoreComuneIglehart + Math.sqrt(D))
+					/ denominatoreIglehart;
+			try {
+				bufferedWriterIglehart.write("iglehartBasso, iglehartAlto = "
+						+ df.format(iglehartBasso) + ", "
+						+ df.format(iglehartAlto));
+				bufferedWriterIglehart.newLine();
+				System.out.println("iglehartBasso, iglehartAlto = "
+						+ df.format(iglehartBasso) + ", "
+						+ df.format(iglehartAlto));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			bufferedWriterIglehart.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

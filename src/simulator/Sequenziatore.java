@@ -95,10 +95,7 @@ public class Sequenziatore implements Serializable {
 		}
 		
 		//Per calcolo statistiche
-		if(jobInHost != 0){
-			tempoMedioRispJob = tempoRispTuttiJob / jobInHost;
-		}
-		
+		tempoMedioRispJob = tempoRispTuttiJob / jobInHost;
 		thrDisk = disk.getJobOut() / (clock.getSimTime());
 	}
 	
@@ -296,6 +293,10 @@ public class Sequenziatore implements Serializable {
 
 	public Double getStabClock(){
 		return clock.getSimTime();
+	}
+
+	public Integer getJobInHost() {
+		return jobInHost;
 	}
 	
 }
