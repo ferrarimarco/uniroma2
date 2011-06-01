@@ -16,7 +16,7 @@ public class SimMain {
 	
 	public static final Integer numeroClient = 120;
 	public static final Integer numeroOsservazioniP = 50;
-	public static final Integer lunghezzaMaxRunN = 5000;
+	public static final Integer lunghezzaMaxRunN = 6000;
 	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
 	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
 	public static final String pathSeq = "c:\\SeqStabileClient";
@@ -24,7 +24,7 @@ public class SimMain {
 	public static final Integer mode = 2;
 	
 	//Clock per lunghezza run = 3000
-	public static final Double clockStabile = 6000.0;
+	public static final Double clockStabile = 13000.0;
 	
 	public static final Double alpha = 0.1;
 	
@@ -264,12 +264,12 @@ public class SimMain {
 				yj = 0.0;
 				arrayN[j] = n;
 				sommaTuttiN += n;
-
+				System.out.println("j "+j);
+				System.out.println("n "+n);
 				for (int i = 1; i <= n; i++) {
 					seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq
 							+ numeroClient + ".ser");
-					seqStabile.simula(seqStabile.getJobInHost() + n, 0.0);
-
+					seqStabile.simula(seqStabile.getJobInHost() + i, 0.0);
 					yj += seqStabile.getTempoMedioRispJob();
 				}
 
