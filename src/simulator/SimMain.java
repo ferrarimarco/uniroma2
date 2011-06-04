@@ -234,6 +234,7 @@ public class SimMain {
 		DecimalFormat df = new DecimalFormat("#.############");
 		
 		for (int h = 10; h <= numeroClient; h += 10) {
+			
 			System.out.println("Inizio Run statistici per " + h + " client.");
 			
 			Integer n = 0;
@@ -265,8 +266,10 @@ public class SimMain {
 				yj = 0.0;
 				arrayN[j] = n;
 				sommaTuttiN += n;
-				System.out.println("j " + j);
-				System.out.println("n " + n);
+				
+				System.out.println("Osservazione (j): " + j);
+				System.out.println("Lunghezza run estratta (n): " + n);
+				
 				for (int i = 1; i <= n; i++) {
 					seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
 					seqStabile.simula(seqStabile.getJobInHost() + i, 0.0);
