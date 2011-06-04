@@ -23,85 +23,84 @@ public class SimMain {
 	public static final String pathRisultatiIglehart = "c:\\iglehart.txt";
 	public static final Integer mode = 2;
 	
-	//Clock per lunghezza run = 3000
+	// Clock per lunghezza run = 3000
 	public static final Double clockStabile = 13000.0;
 	
 	public static final Double alpha = 0.1;
 	
-	//area = 0.95
+	// area = 0.95
 	public static final Double area = 1 - (alpha / 2);
 	
-	//Da tabella
+	// Da tabella
 	public static final Double uAlphaMezzi = 1.645;
 	
-	//Calcolo k
+	// Calcolo k
 	public static final Double k = Math.pow(uAlphaMezzi, 2) / numeroOsservazioniP;;
 	
-	
 	public static void main(String[] args) {
-		
-		if(mode == 0){//Stabilizzazione
+
+		if (mode == 0) {// Stabilizzazione
 			SimMain.runStab();
-		}else if(mode == 1){//Salvataggio di tutti gli stati stabili di partenza
+		} else if (mode == 1) {// Salvataggio di tutti gli stati stabili di
+								// partenza
 			SimMain.runSalvataggioStatoStabile();
-		}else{
+		} else {
 			SimMain.runStat();
 		}
 	}
+	
+	private static void salvaSequenziatore(Sequenziatore seq, String path) {
 
-	private static void salvaSequenziatore(Sequenziatore seq, String path){
-		
 		FileOutputStream fos = null;
 		ObjectOutputStream out = null;
 		
-		try{
+		try {
 			fos = new FileOutputStream(path);
 			out = new ObjectOutputStream(fos);
 			out.writeObject(seq);
 			out.close();
-		}catch(IOException ex){
+		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
 	}
 	
-	private static Sequenziatore caricaSequenziatore(String path){
-		
+	private static Sequenziatore caricaSequenziatore(String path) {
+
 		Sequenziatore seq = null;
 		FileInputStream fis = null;
 		ObjectInputStream in = null;
 		
-		try{
+		try {
 			fis = new FileInputStream(path);
 			in = new ObjectInputStream(fis);
-			seq = (Sequenziatore)in.readObject();
+			seq = (Sequenziatore) in.readObject();
 			in.close();
-		}catch(IOException ex){
+		} catch (IOException ex) {
 			ex.printStackTrace();
-		}
-		catch(ClassNotFoundException ex){
+		} catch (ClassNotFoundException ex) {
 			ex.printStackTrace();
 		}
 		
 		return seq;
 	}
 	
-	private static void runStab(){
-		
+	private static void runStab() {
+
 		Sequenziatore seq = null;
 		
-		//Variabili per studio output
+		// Variabili per studio output
 		BufferedWriter bufferedWriterMedieGordon = null;
 		BufferedWriter bufferedWriterVarianzeGordon = null;
 		DecimalFormat df = new DecimalFormat("#.#########");
 		
-		//Variabili per stima media Gordon
+		// Variabili per stima media Gordon
 		Double xij;
 		Double mediaCampionariaXj;
 		double[] arrayXj = new double[numeroOsservazioniP];
 		Double sommaTuttiXj;
 		Double en;
 		
-		//Variabili per stima varianza Gordon
+		// Variabili per stima varianza Gordon
 		Double differenzaPerCalcoloVarianza;
 		Double stimaVarianzaGordon;
 		
@@ -111,8 +110,8 @@ public class SimMain {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		for(int i = 1; i <= lunghezzaMaxRunN; i++){
+		
+		for (int i = 1; i <= lunghezzaMaxRunN; i++) {
 			
 			sommaTuttiXj = 0.0;
 			en = 0.0;
@@ -121,30 +120,31 @@ public class SimMain {
 			
 			System.out.println("Lunghezza run: " + i);
 			
-			for(int j = 1; j <= numeroOsservazioniP; j++){
-	
+			for (int j = 1; j <= numeroOsservazioniP; j++) {
+				
 				seq = new Sequenziatore(numeroClient);
 				
-				//Clock con 0 perché non conosciamo ancora il clock di stabilizzazione
+				// Clock con 0 perché non conosciamo ancora il clock di
+				// stabilizzazione
 				seq.simula(i, 0.0);
 				
-				//Prendo il j-esimo campione del run di lunghezza i-esima
+				// Prendo il j-esimo campione del run di lunghezza i-esima
 				xij = seq.getTempoMedioRispJob();
-
-				//Sommo tutti i tempi medi di risposta per richieste verso Host
+				
+				// Sommo tutti i tempi medi di risposta per richieste verso Host
 				arrayXj[j - 1] = arrayXj[j - 1] + xij;
 				
-				//Calcolo media campionaria
+				// Calcolo media campionaria
 				mediaCampionariaXj = arrayXj[j - 1] / i;
-
-				//Somma di tutti gli Xj per calcolo media con Gordon
+				
+				// Somma di tutti gli Xj per calcolo media con Gordon
 				sommaTuttiXj += mediaCampionariaXj;
 			}
-						
-			//Divido per numero di osservazioni per avere media campionaria
+			
+			// Divido per numero di osservazioni per avere media campionaria
 			en = sommaTuttiXj / numeroOsservazioniP;
-
-			//Scrivo media su file risultati
+			
+			// Scrivo media su file risultati
 			try {
 				bufferedWriterMedieGordon.write(df.format(en).toString());
 				bufferedWriterMedieGordon.newLine();
@@ -152,19 +152,19 @@ public class SimMain {
 				e.printStackTrace();
 			}
 			
-			//Calcolo varianza con Gordon
-			for(int j = 0; j < numeroOsservazioniP; j++){
+			// Calcolo varianza con Gordon
+			for (int j = 0; j < numeroOsservazioniP; j++) {
 				mediaCampionariaXj = arrayXj[j] / i;
 				differenzaPerCalcoloVarianza += Math.pow(mediaCampionariaXj - en, 2);
 			}
 			
-			stimaVarianzaGordon = differenzaPerCalcoloVarianza / (numeroOsservazioniP - 1);				
-
-			//Debug
+			stimaVarianzaGordon = differenzaPerCalcoloVarianza / (numeroOsservazioniP - 1);
+			
+			// Debug
 			System.out.println("Stima media Gordon: en = " + en);
 			System.out.println("Stima varianza Gordon: s2 = " + stimaVarianzaGordon);
 			
-			//Scrivo varianza su file risultati
+			// Scrivo varianza su file risultati
 			try {
 				bufferedWriterVarianzeGordon.write(df.format(stimaVarianzaGordon).toString());
 				bufferedWriterVarianzeGordon.newLine();
@@ -175,7 +175,7 @@ public class SimMain {
 			System.out.println("Clock: " + seq.getStabClock());
 		}
 		
-		//Scrivo clock ultimo run su file risultati (riuso quello delle medie)
+		// Scrivo clock ultimo run su file risultati (riuso quello delle medie)
 		try {
 			bufferedWriterMedieGordon.write("Clock ultimo run: " + seq.getStabClock());
 			System.out.println("Clock ultimo run: " + seq.getStabClock());
@@ -189,30 +189,30 @@ public class SimMain {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-	}
-
-	private static void runSalvataggioStatoStabile(){
 		
+	}
+	
+	private static void runSalvataggioStatoStabile() {
+
 		Sequenziatore seq;
 		String path = null;
 		
-		for(int i = 10; i <= SimMain.numeroClient; i += 10){
+		for (int i = 10; i <= SimMain.numeroClient; i += 10) {
 			System.out.println("Salvataggio simulatore stabile per " + i + " client.");
 			
 			seq = new Sequenziatore(i);
 			seq.simula(-1, SimMain.clockStabile);
 			
-			//Salvo lo stato stabile
+			// Salvo lo stato stabile
 			path = SimMain.pathSeq + i + ".ser";
 			SimMain.salvaSequenziatore(seq, path);
 		}
 		
 	}
 	
-	private static void runStat(){
-		
-		//Per scrivere risultati
+	private static void runStat() {
+
+		// Per scrivere risultati
 		BufferedWriter bufferedWriterIglehart = null;
 		
 		try {
@@ -228,12 +228,12 @@ public class SimMain {
 			e.printStackTrace();
 		}
 		
-		//Per sequenziatore stabile
+		// Per sequenziatore stabile
 		Sequenziatore seqStabile;
 		
 		DecimalFormat df = new DecimalFormat("#.############");
 		
-		for (int h = 10; h <= numeroClient; h += 10){
+		for (int h = 10; h <= numeroClient; h += 10) {
 			System.out.println("Inizio Run statistici per " + h + " client.");
 			
 			Integer n = 0;
@@ -258,56 +258,75 @@ public class SimMain {
 			UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
 			
 			for (int j = 0; j < numeroOsservazioniP; j++) {
-
-				//Generiamo un intero per sapere quanto deve essere lungo il run
+				
+				// Generiamo un intero per sapere quanto deve essere lungo il
+				// run
 				n = genLunghRun.generateNextValue().intValue();
 				yj = 0.0;
 				arrayN[j] = n;
 				sommaTuttiN += n;
-				System.out.println("j "+j);
-				System.out.println("n "+n);
+				System.out.println("j " + j);
+				System.out.println("n " + n);
 				for (int i = 1; i <= n; i++) {
-					seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq
-							+ numeroClient + ".ser");
+					seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
 					seqStabile.simula(seqStabile.getJobInHost() + i, 0.0);
 					yj += seqStabile.getTempoMedioRispJob();
 				}
-
+				
 				arrayY[j] = yj;
 				sommaTuttiYj += yj;
 			}
+			
 			nSegnato = sommaTuttiN / numeroOsservazioniP;
 			ySegnato = sommaTuttiYj / numeroOsservazioniP;
+			
 			for (int j = 0; j < numeroOsservazioniP; j++) {
 				sommaPerS2yn += (arrayY[j] - ySegnato) * (arrayN[j] - nSegnato);
 				sommaPerS2n += Math.pow((arrayN[j] - nSegnato), 2);
 				sommaPerS2y += Math.pow((arrayY[j] - ySegnato), 2);
 			}
+			
 			s2n = sommaPerS2n / (numeroOsservazioniP - 1);
 			s2y = sommaPerS2y / (numeroOsservazioniP - 1);
 			s2yn = sommaPerS2yn / (numeroOsservazioniP - 1);
-			D = Math.pow((ySegnato * nSegnato) - (k * s2yn), 2)
-					- ((Math.pow(nSegnato, 2) - (k * s2n)) * ((Math.pow(
-							ySegnato, 2) - (k * s2y))));
+			
+			D = Math.pow((ySegnato * nSegnato) - (k * s2yn), 2) - ((Math.pow(nSegnato, 2) - (k * s2n)) * ((Math.pow(ySegnato, 2) - (k * s2y))));
+			
 			numeratoreComuneIglehart = (ySegnato * nSegnato) - (k * s2yn);
 			denominatoreIglehart = (Math.pow(nSegnato, 2) - k * s2n);
-			iglehartBasso = (numeratoreComuneIglehart - Math.sqrt(D))
-					/ denominatoreIglehart;
-			iglehartAlto = (numeratoreComuneIglehart + Math.sqrt(D))
-					/ denominatoreIglehart;
+			
+			iglehartBasso = (numeratoreComuneIglehart - Math.sqrt(D)) / denominatoreIglehart;
+			iglehartAlto = (numeratoreComuneIglehart + Math.sqrt(D)) / denominatoreIglehart;
+			
+			System.out.println("iglehartBasso, iglehartAlto = " + df.format(iglehartBasso) + ", " + df.format(iglehartAlto));
+			
 			try {
-				bufferedWriterIglehart.write("iglehartBasso, iglehartAlto = "
-						+ df.format(iglehartBasso) + ", "
-						+ df.format(iglehartAlto));
+				bufferedWriterIglehart.write("ySegnato = " + df.format(ySegnato));
 				bufferedWriterIglehart.newLine();
-				System.out.println("iglehartBasso, iglehartAlto = "
-						+ df.format(iglehartBasso) + ", "
-						+ df.format(iglehartAlto));
+				
+				bufferedWriterIglehart.write("nSegnato = " + df.format(nSegnato));
+				bufferedWriterIglehart.newLine();
+				
+				bufferedWriterIglehart.write("s2n = " + df.format(s2n));
+				bufferedWriterIglehart.newLine();
+				
+				bufferedWriterIglehart.write("s2y = " + df.format(s2y));
+				bufferedWriterIglehart.newLine();
+				
+				bufferedWriterIglehart.write("s2yn = " + df.format(s2yn));
+				bufferedWriterIglehart.newLine();
+				
+				bufferedWriterIglehart.write("iglehartBasso, iglehartAlto = " + df.format(iglehartBasso) + ", " + df.format(iglehartAlto));
+				bufferedWriterIglehart.newLine();
+	
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		try {
+			bufferedWriterIglehart.write("--------------");
+			bufferedWriterIglehart.newLine();
+			
 			bufferedWriterIglehart.close();
 		} catch (IOException e) {
 			e.printStackTrace();
