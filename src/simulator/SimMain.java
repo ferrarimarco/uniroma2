@@ -374,12 +374,12 @@ public class SimMain {
 			
 			System.out.println("Osservazione (j) " + j);
 			
-				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
-				seqStabile.setTau(tempoServizioDisk * 8);
-				seqStabile.setClockInizialePerThroughput(genClock.generateNextValue());
-				seqStabile.simula(seqStabile.getJobInHost() + n, 0.0);
-				totaleJobinDisk += seqStabile.getJobInDisk();
-				valoriThroughput[seqStabile.getJobInDisk()]++;
+			seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
+			seqStabile.setTau(tempoServizioDisk * 8);
+			seqStabile.setClockInizialePerThroughput(genClock.generateNextValue());
+			seqStabile.simula(seqStabile.getJobInHost() + n, 0.0);
+			totaleJobinDisk += seqStabile.getJobInDisk();
+			valoriThroughput[seqStabile.getJobInDisk()]++;
 		}
 		
 		try {
