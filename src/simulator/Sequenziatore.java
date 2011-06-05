@@ -75,11 +75,10 @@ public class Sequenziatore implements Serializable {
 		}
 	}
 	
-	public void simula(Integer lunghezzaRun, Double clockStabile, Double tau){
+	public void simula(Integer lunghezzaRun, Double clockStabile){
 		
 		//Per calcolo throughput
 		clockIniziale = clock.getSimTime();
-		this.tau = tau;
 		
 		while(jobInHost < lunghezzaRun || clock.getSimTime() <= clockStabile){
 			nextEventIndex = calendar.getNextEventIndex();
@@ -301,6 +300,10 @@ public class Sequenziatore implements Serializable {
 		return tempoMedioRispJob;
 	}
 
+	public void setTau(Double tau){
+		this.tau = tau;
+	}
+	
 	public Integer getThrDisk() {
 		return thrDisk;
 	}

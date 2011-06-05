@@ -137,7 +137,7 @@ public class SimMain {
 				
 				// Clock con 0 perché non conosciamo ancora il clock di
 				// stabilizzazione
-				seq.simula(i, 0.0, 0.0);
+				seq.simula(i, 0.0);
 				
 				// Prendo il j-esimo campione del run di lunghezza i-esima
 				xij = seq.getTempoMedioRispJob();
@@ -212,7 +212,7 @@ public class SimMain {
 			System.out.println("Salvataggio simulatore stabile per " + i + " client.");
 			
 			seq = new Sequenziatore(i);
-			seq.simula(-1, SimMain.clockStabile, 0.0);
+			seq.simula(-1, SimMain.clockStabile);
 			
 			// Salvo lo stato stabile
 			path = SimMain.pathSeq + i + ".ser";
@@ -284,7 +284,7 @@ public class SimMain {
 				
 				for (int i = 1; i <= n; i++) {
 					seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + h + ".ser");
-					seqStabile.simula(seqStabile.getJobInHost() + i, 0.0, 0.0);
+					seqStabile.simula(seqStabile.getJobInHost() + i, 0.0);
 					yj += seqStabile.getTempoMedioRispJob();
 				}
 				
@@ -370,7 +370,8 @@ public class SimMain {
 			
 			for (int i = 1; i <= n; i++) {
 				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
-				seqStabile.simula(seqStabile.getThrDisk() + i, 0.0, 0.33);
+				seqStabile.simula(seqStabile.getThrDisk() + i, 0.0);
+				seqStabile.setTau(0.66);
 				valoriThroughput[seqStabile.getThrDisk()]++;
 			}
 		}
