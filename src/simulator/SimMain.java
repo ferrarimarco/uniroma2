@@ -221,19 +221,19 @@ public class SimMain {
 			e.printStackTrace();
 		}
 		
-		try {
-			bufferedWriterIglehart.write("NumeroClient = " + numeroClient);
-			bufferedWriterIglehart.newLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
 		// Per sequenziatore stabile
 		Sequenziatore seqStabile;
 		
 		DecimalFormat df = new DecimalFormat("#.############");
 		
 		for (int h = 10; h <= numeroClient; h += 10) {
+			
+			try {
+				bufferedWriterIglehart.write("NumeroClient = " + h);
+				bufferedWriterIglehart.newLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			
 			System.out.println("Inizio Run statistici per " + h + " client.");
 			
@@ -322,14 +322,14 @@ public class SimMain {
 				bufferedWriterIglehart.write("iglehartBasso, iglehartAlto = " + df.format(iglehartBasso) + ", " + df.format(iglehartAlto));
 				bufferedWriterIglehart.newLine();
 	
+				bufferedWriterIglehart.write("--------------");
+				bufferedWriterIglehart.newLine();				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+		
 		try {
-			bufferedWriterIglehart.write("--------------");
-			bufferedWriterIglehart.newLine();
-			
 			bufferedWriterIglehart.close();
 		} catch (IOException e) {
 			e.printStackTrace();
