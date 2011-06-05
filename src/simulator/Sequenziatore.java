@@ -31,7 +31,7 @@ public class Sequenziatore implements Serializable {
 	
 	//Throughput
 	private Integer jobInDisk;
-	private Double clockIniziale;
+	private Double clockInizialePerThroughput;
 	private Double tau;
 	
 	public Sequenziatore(Integer numeroJob){
@@ -52,6 +52,7 @@ public class Sequenziatore implements Serializable {
 
 		jobInDisk = 0;
 		tau = 0.0;
+		clockInizialePerThroughput = 0.0;
 
 		jobClassGen = new UniformDoubleGenerator(SeedCalculator.getSeme());
 		
@@ -76,9 +77,6 @@ public class Sequenziatore implements Serializable {
 	}
 	
 	public void simula(Integer lunghezzaRun, Double clockStabile){
-		
-		//Per calcolo throughput
-		clockIniziale = clock.getSimTime();
 		
 		while(jobInHost < lunghezzaRun || clock.getSimTime() <= clockStabile){
 			nextEventIndex = calendar.getNextEventIndex();
@@ -251,7 +249,7 @@ public class Sequenziatore implements Serializable {
 		}
 
 		//Per Calcolo throughput
-		if((clock.getSimTime() - clockIniziale) <= tau)
+		if((clock.getSimTime() >= clockInizialePerThroughput) & ((clock.getSimTime() - clockInizialePerThroughput) <= tau))
 			jobInDisk++;
 	}
 	
@@ -313,5 +311,9 @@ public class Sequenziatore implements Serializable {
 	
 	public void setTau(Double tau){
 		this.tau = tau;
+	}
+	
+	public void setClockInizialePerThroughput(Double clockCondition){
+		this.clockInizialePerThroughput = clock.getSimTime() + clockCondition;
 	}
 }

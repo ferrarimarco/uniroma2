@@ -1,6 +1,7 @@
 package simulator;
 
 import generators.SeedCalculator;
+import generators.UniformDoubleGenerator;
 import generators.UniformLongGenerator;
 
 import java.io.BufferedWriter;
@@ -21,10 +22,10 @@ public class SimMain {
 	public static final Integer lunghezzaMaxRunN = 6000;
 	
 	//Calcolo throughput
-	public static final Integer numeroOsservazioniPerThroughput = 5000;
+	public static final Integer numeroOsservazioniPerThroughput = 100;
 	public static final Integer lunghezzaArrayThroughput = 100;
 	public static final Double tempoServizioDisk = 0.033;
-	public static final Integer mode = 3;
+	public static final Integer mode = 1;
 	
 	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
 	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
@@ -361,8 +362,10 @@ public class SimMain {
 		Double mediaThroughput = 0.0;
 		int[] valoriThroughput = new int[lunghezzaArrayThroughput];
 		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
-		UniformLongGenerator genTau = new UniformLongGenerator(0L, 10L, SeedCalculator.getSeme());
+		UniformDoubleGenerator genClock = new UniformDoubleGenerator(0L, 84L, SeedCalculator.getSeme());
 		BufferedWriter bufferedWriterThrDisk = null;
+		
+		//Clock stabile per n = 50: 13086.550077183962
 		
 		for (int j = 0; j < numeroOsservazioniPerThroughput; j++) {
 			
@@ -374,12 +377,13 @@ public class SimMain {
 				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
 				
 				//Geriamo un intervallo tau di lunghezza variabile
-				seqStabile.setTau(tempoServizioDisk * genTau.generateNextValue());
-				
+				seqStabile.setTau(tempoServizioDisk * 10);
+				seqStabile.setClockInizialePerThroughput(genClock.generateNextValue());
 				seqStabile.simula(seqStabile.getJobInHost() + n, 0.0);
 				totaleJobinDisk += seqStabile.getJobInDisk();
 				valoriThroughput[seqStabile.getJobInDisk()]++;
 		}
+		
 		try {
 			bufferedWriterThrDisk = new BufferedWriter(new FileWriter(pathRisultatiThrDisk, false));
 			bufferedWriterThrDisk.newLine();
