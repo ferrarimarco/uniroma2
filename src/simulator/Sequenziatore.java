@@ -251,7 +251,7 @@ public class Sequenziatore implements Serializable {
 		}
 
 		//Per Calcolo throughput
-		if(clock.getSimTime() - clockIniziale <= tau)
+		if((clock.getSimTime() - clockIniziale) <= tau)
 			jobInDisk++;
 	}
 	
