@@ -21,16 +21,16 @@ public class SimMain {
 	public static final Integer lunghezzaMaxRunN = 6000;
 	
 	//Calcolo throughput
-	public static final Integer numeroOsservazioniPerThroughput = 5000;
+	public static final Integer numeroOsservazioniPerThroughput = 10;
 	public static final Integer lunghezzaArrayThroughput = 14;
 
-	public static final Integer mode = 1;
+	public static final Integer mode = 3;
 	
 	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
 	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
-	public static final String pathSeq = "c:\\SeqStabileClient";
+	public static final String pathSeq = "d:\\SeqStabileClient";
 	public static final String pathRisultatiIglehart = "c:\\iglehart.txt";
-	public static final String pathRisultatiThrDisk = "c:\\thrDisk.txt";
+	public static final String pathRisultatiThrDisk = "d:\\thrDisk.txt";
 	
 	// Clock per lunghezza run = 3000
 	public static final Double clockStabile = 13000.0;
@@ -370,9 +370,11 @@ public class SimMain {
 			
 			for (int i = 1; i <= n; i++) {
 				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
-				seqStabile.simula(seqStabile.getThrDisk() + i, 0.0);
-				seqStabile.setTau(0.66);
+				seqStabile.simula(seqStabile.getJobInHost() + i, 0.0);
+				seqStabile.setTau(1000.66);
 				valoriThroughput[seqStabile.getThrDisk()]++;
+				
+				System.out.println("Osservazione(j) " + j + " : " + seqStabile.getThrDisk());
 			}
 		}
 		

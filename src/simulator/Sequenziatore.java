@@ -249,7 +249,7 @@ public class Sequenziatore implements Serializable {
 			
 			calendar.updateEvent(calendar.diskIndex, durata);
 		}
-		
+
 		//Per Calcolo throughput
 		if(clock.getSimTime() - clockIniziale <= tau){
 			thrDisk++;
