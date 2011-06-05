@@ -245,6 +245,7 @@ public class SimMain {
 			Double sommaPerS2n = 0.0;
 			Double s2n = 0.0;
 			Double ySegnato = 0.0;
+			Double mediaTeorica = 0.0;
 			double[] arrayY = new double[numeroOsservazioniP];
 			Double sommaTuttiYj = 0.0;
 			Double sommaPerS2y = 0.0;
@@ -283,6 +284,8 @@ public class SimMain {
 			nSegnato = sommaTuttiN / numeroOsservazioniP;
 			ySegnato = sommaTuttiYj / numeroOsservazioniP;
 			
+			mediaTeorica = ySegnato / nSegnato;
+
 			for (int j = 0; j < numeroOsservazioniP; j++) {
 				sommaPerS2yn += (arrayY[j] - ySegnato) * (arrayN[j] - nSegnato);
 				sommaPerS2n += Math.pow((arrayN[j] - nSegnato), 2);
@@ -318,6 +321,9 @@ public class SimMain {
 				
 				bufferedWriterIglehart.write("s2yn = " + df.format(s2yn));
 				bufferedWriterIglehart.newLine();
+				
+				bufferedWriterIglehart.write("mediaTeorica = ySegnato / nSegnato = " + df.format(mediaTeorica));
+				bufferedWriterIglehart.newLine();		
 				
 				bufferedWriterIglehart.write("iglehartBasso, iglehartAlto = " + df.format(iglehartBasso) + ", " + df.format(iglehartAlto));
 				bufferedWriterIglehart.newLine();
