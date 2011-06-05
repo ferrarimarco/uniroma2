@@ -51,6 +51,7 @@ public class Sequenziatore implements Serializable {
 		jobInHost = 0;
 		
 		thrDisk = 0;
+		tau = 0.0;
 
 		jobClassGen = new UniformDoubleGenerator(SeedCalculator.getSeme());
 		
