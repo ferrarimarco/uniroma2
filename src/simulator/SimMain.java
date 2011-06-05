@@ -370,7 +370,7 @@ public class SimMain {
 			
 			for (int i = 1; i <= n; i++) {
 				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
-				seqStabile.simula(seqStabile.getJobInHost() + i, 0.0);
+				seqStabile.simula(seqStabile.getThrDisk() + i, 0.0);
 				valoriThroughput[seqStabile.getThrDisk()]++;
 			}
 		}
