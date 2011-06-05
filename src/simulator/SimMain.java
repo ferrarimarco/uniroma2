@@ -24,7 +24,7 @@ public class SimMain {
 	public static final Integer numeroOsservazioniPerThroughput = 5000;
 	public static final Integer lunghezzaArrayThroughput = 100;
 	public static final Double TempSerHost = 0.085;
-	public static final Integer mode = 1;
+	public static final Integer mode = 3;
 	
 	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
 	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
