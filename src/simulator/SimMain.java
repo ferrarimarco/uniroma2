@@ -22,7 +22,7 @@ public class SimMain {
 	
 	//Calcolo throughput
 	public static final Integer numeroOsservazioniPerThroughput = 2;
-	public static final Integer lunghezzaArrayThroughput = 800;
+	public static final Integer lunghezzaArrayThroughput = 100;
 
 	public static final Integer mode = 3;
 	
@@ -359,6 +359,7 @@ public class SimMain {
 		Integer n;
 		int[] valoriThroughput = new int[lunghezzaArrayThroughput];
 		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
+		UniformLongGenerator genTau = new UniformLongGenerator(10L, 20L, SeedCalculator.getSeme());
 		BufferedWriter bufferedWriterThrDisk = null;
 		
 		for (int j = 0; j < numeroOsservazioniPerThroughput; j++) {
@@ -366,14 +367,16 @@ public class SimMain {
 			// Generiamo un intero per sapere quanto deve essere lungo il run
 			n = genLunghRun.generateNextValue().intValue();
 			
-			System.out.println("Osservazione (j) " + j + " di " + numeroOsservazioniPerThroughput);
+			System.out.println("Osservazione (j) " + j);
 			
 			for (int i = 1; i <= n; i++) {
 				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
-				//seqStabile.setTau(0.08);
+				
+				//Geriamo un intervallo tau di lunghezza variabile
+				seqStabile.setTau(0.085 * genTau.generateNextValue());
+				
 				seqStabile.simula(seqStabile.getJobInHost() + i, 0.0);
-				System.out.println(seqStabile.getThrDisk());
-				valoriThroughput[seqStabile.getThrDisk().intValue()]++;
+				valoriThroughput[seqStabile.getJobInDisk()]++;
 			}
 		}
 		
