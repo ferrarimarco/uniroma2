@@ -24,12 +24,15 @@ public class Sequenziatore implements Serializable {
 	private Double nextEventTime;
 	private UniformDoubleGenerator jobClassGen;
 	
-	//Per statistiche
+	//Tempo di risposta
 	private Double tempoMedioRispJob;
-	private Double thrDisk;
-
 	private Double tempoRispTuttiJob;
 	private Integer jobInHost;
+	
+	//Throughput
+	private Integer thrDisk;
+	private final Double tau = 0.33;
+	private Double clockIniziale;
 	
 	public Sequenziatore(Integer numeroJob){
 		
@@ -46,6 +49,8 @@ public class Sequenziatore implements Serializable {
 		tempoMedioRispJob = 0.0;
 		tempoRispTuttiJob = 0.0;
 		jobInHost = 0;
+		
+		thrDisk = 0;
 
 		jobClassGen = new UniformDoubleGenerator(SeedCalculator.getSeme());
 		
@@ -70,6 +75,9 @@ public class Sequenziatore implements Serializable {
 	}
 	
 	public void simula(Integer lunghezzaRun, Double clockStabile){
+		
+		//Per calcolo throughput
+		clockIniziale = clock.getSimTime();
 		
 		while(jobInHost < lunghezzaRun || clock.getSimTime() <= clockStabile){
 			nextEventIndex = calendar.getNextEventIndex();
@@ -96,7 +104,6 @@ public class Sequenziatore implements Serializable {
 		
 		//Per calcolo statistiche
 		tempoMedioRispJob = tempoRispTuttiJob / jobInHost;
-		thrDisk = disk.getJobOut() / (clock.getSimTime());
 	}
 	
 	private void fineTerminale(Integer idCentro){
@@ -241,6 +248,11 @@ public class Sequenziatore implements Serializable {
 			
 			calendar.updateEvent(calendar.diskIndex, durata);
 		}
+		
+		//Per Calcolo throughput
+		if(clock.getSimTime() - clockIniziale <= tau){
+			thrDisk++;
+		}
 	}
 	
 	private void fineHost(Integer idCentro){
@@ -287,7 +299,7 @@ public class Sequenziatore implements Serializable {
 		return tempoMedioRispJob;
 	}
 
-	public Double getThrDisk() {
+	public Integer getThrDisk() {
 		return thrDisk;
 	}
 
