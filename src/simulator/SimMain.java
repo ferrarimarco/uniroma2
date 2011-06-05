@@ -21,7 +21,7 @@ public class SimMain {
 	public static final Integer lunghezzaMaxRunN = 6000;
 	
 	//Calcolo throughput
-	public static final Integer numeroOsservazioniPerThroughput = 10;
+	public static final Integer numeroOsservazioniPerThroughput = 5000;
 	public static final Integer lunghezzaArrayThroughput = 14;
 
 	public static final Integer mode = 3;
@@ -370,11 +370,9 @@ public class SimMain {
 			
 			for (int i = 1; i <= n; i++) {
 				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
+				seqStabile.setTau(0.33);
 				seqStabile.simula(seqStabile.getJobInHost() + i, 0.0);
-				seqStabile.setTau(1000.66);
 				valoriThroughput[seqStabile.getThrDisk()]++;
-				
-				System.out.println("Osservazione(j) " + j + " : " + seqStabile.getThrDisk());
 			}
 		}
 		
