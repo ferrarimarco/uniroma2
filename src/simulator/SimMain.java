@@ -21,16 +21,16 @@ public class SimMain {
 	public static final Integer lunghezzaMaxRunN = 6000;
 	
 	//Calcolo throughput
-	public static final Integer numeroOsservazioniPerThroughput = 10;
+	public static final Integer numeroOsservazioniPerThroughput = 5000;
 	public static final Integer lunghezzaArrayThroughput = 14;
 
-	public static final Integer mode = 3;
+	public static final Integer mode = 1;
 	
 	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
 	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
-	public static final String pathSeq = "d:\\SeqStabileClient";
+	public static final String pathSeq = "c:\\SeqStabileClient";
 	public static final String pathRisultatiIglehart = "c:\\iglehart.txt";
-	public static final String pathRisultatiThrDisk = "d:\\thrDisk.txt";
+	public static final String pathRisultatiThrDisk = "c:\\thrDisk.txt";
 	
 	// Clock per lunghezza run = 3000
 	public static final Double clockStabile = 13000.0;
@@ -137,7 +137,7 @@ public class SimMain {
 				
 				// Clock con 0 perché non conosciamo ancora il clock di
 				// stabilizzazione
-				seq.simula(i, 0.0);
+				seq.simula(i, 0.0, 0.0);
 				
 				// Prendo il j-esimo campione del run di lunghezza i-esima
 				xij = seq.getTempoMedioRispJob();
@@ -212,7 +212,7 @@ public class SimMain {
 			System.out.println("Salvataggio simulatore stabile per " + i + " client.");
 			
 			seq = new Sequenziatore(i);
-			seq.simula(-1, SimMain.clockStabile);
+			seq.simula(-1, SimMain.clockStabile, 0.0);
 			
 			// Salvo lo stato stabile
 			path = SimMain.pathSeq + i + ".ser";
@@ -284,7 +284,7 @@ public class SimMain {
 				
 				for (int i = 1; i <= n; i++) {
 					seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + h + ".ser");
-					seqStabile.simula(seqStabile.getJobInHost() + i, 0.0);
+					seqStabile.simula(seqStabile.getJobInHost() + i, 0.0, 0.0);
 					yj += seqStabile.getTempoMedioRispJob();
 				}
 				
@@ -370,7 +370,7 @@ public class SimMain {
 			
 			for (int i = 1; i <= n; i++) {
 				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
-				seqStabile.simula(seqStabile.getThrDisk() + i, 0.0);
+				seqStabile.simula(seqStabile.getThrDisk() + i, 0.0, 0.33);
 				valoriThroughput[seqStabile.getThrDisk()]++;
 			}
 		}
