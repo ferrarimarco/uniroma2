@@ -21,16 +21,16 @@ public class SimMain {
 	public static final Integer lunghezzaMaxRunN = 6000;
 	
 	//Calcolo throughput
-	public static final Integer numeroOsservazioniPerThroughput = 1000;
+	public static final Integer numeroOsservazioniPerThroughput = 5000;
 	public static final Integer lunghezzaArrayThroughput = 100;
 	public static final Double tempoServizioDisk = 0.033;
 	public static final Integer mode = 3;
 	
 	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
 	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
-	public static final String pathSeq = "c:\\SeqStabileClient";
+	public static final String pathSeq = "d:\\SeqStabileClient";
 	public static final String pathRisultatiIglehart = "c:\\iglehart.txt";
-	public static final String pathRisultatiThrDisk = "c:\\thrDisk.txt";
+	public static final String pathRisultatiThrDisk = "d:\\thrDisk.txt";
 	
 	// Clock per lunghezza run = 3000
 	public static final Double clockStabile = 13000.0;
@@ -385,11 +385,12 @@ public class SimMain {
 			bufferedWriterThrDisk.newLine();
 			
 			for(int i = 0; i < valoriThroughput.length; i++){
-				bufferedWriterThrDisk.write("Indice = " + i + ": " + valoriThroughput[i]);
+				bufferedWriterThrDisk.write("" + valoriThroughput[i]);
 				bufferedWriterThrDisk.newLine();
 			}
-			mediaThroughput = totaleJobinDisk/numeroOsservazioniPerThroughput;
-			bufferedWriterThrDisk.write("Media Throughput=" + mediaThroughput);
+			
+			mediaThroughput = totaleJobinDisk / numeroOsservazioniPerThroughput;
+			bufferedWriterThrDisk.write("Media Throughput = " + mediaThroughput);
 			bufferedWriterThrDisk.newLine();
 			bufferedWriterThrDisk.close();
 			
