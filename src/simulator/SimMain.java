@@ -23,7 +23,7 @@ public class SimMain {
 	//Calcolo throughput
 	public static final Integer numeroOsservazioniPerThroughput = 5000;
 	public static final Integer lunghezzaArrayThroughput = 100;
-	public static final Double TempSerHost = 0.085;
+	public static final Double tempoServizioDisk = 0.033;
 	public static final Integer mode = 3;
 	
 	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
@@ -370,8 +370,9 @@ public class SimMain {
 			System.out.println("Osservazione (j) " + j);
 			
 				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
+				
 				//Geriamo un intervallo tau di lunghezza variabile
-				seqStabile.setTau(TempSerHost* genTau.generateNextValue());
+				seqStabile.setTau(tempoServizioDisk * genTau.generateNextValue());
 				
 				seqStabile.simula(seqStabile.getJobInHost() + n, 0.0);
 				valoriThroughput[seqStabile.getJobInDisk()]++;
