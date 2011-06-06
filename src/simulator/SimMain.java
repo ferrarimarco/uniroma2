@@ -334,6 +334,9 @@ public class SimMain {
 				bufferedWriterIglehart.write("s2yn = " + df.format(s2yn));
 				bufferedWriterIglehart.newLine();
 				
+				bufferedWriterIglehart.write("D = " + df.format(D));
+				bufferedWriterIglehart.newLine();
+				
 				bufferedWriterIglehart.write("mediaTeorica = ySegnato / nSegnato = " + df.format(mediaTeorica));
 				bufferedWriterIglehart.newLine();		
 				
@@ -341,7 +344,7 @@ public class SimMain {
 				bufferedWriterIglehart.newLine();
 	
 				bufferedWriterIglehart.write("--------------");
-				bufferedWriterIglehart.newLine();				
+				bufferedWriterIglehart.newLine();			
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -375,7 +378,7 @@ public class SimMain {
 			System.out.println("Osservazione (j) " + j);
 			
 			seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
-			seqStabile.setTau(tempoServizioDisk * 8);
+			seqStabile.setTau(tempoServizioDisk * 3);
 			seqStabile.setClockInizialePerThroughput(44.0);
 			seqStabile.simula(seqStabile.getJobInHost() + n, 0.0);
 			totaleJobinDisk += seqStabile.getJobInDisk();
@@ -384,8 +387,7 @@ public class SimMain {
 		
 		try {
 			bufferedWriterThrDisk = new BufferedWriter(new FileWriter(pathRisultatiThrDisk, false));
-			bufferedWriterThrDisk.newLine();
-			
+
 			for(int i = 0; i < valoriThroughput.length; i++){
 				bufferedWriterThrDisk.write("" + valoriThroughput[i]);
 				bufferedWriterThrDisk.newLine();
