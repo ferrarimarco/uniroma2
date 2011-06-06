@@ -22,16 +22,16 @@ public class SimMain {
 	public static final Integer lunghezzaMaxRunN = 6000;
 	
 	//Calcolo throughput
-	public static final Integer numeroOsservazioniPerThroughput = 5000;
+	public static final Integer numeroOsservazioniPerThroughput = 100;
 	public static final Integer lunghezzaArrayThroughput = 100;
 	public static final Double tempoServizioDisk = 0.033;
 	public static final Integer mode = 3;
 	
 	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
 	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
-	public static final String pathSeq = "d:\\SeqStabileClient";
+	public static final String pathSeq = "c:\\SeqStabileClient";
 	public static final String pathRisultatiIglehart = "c:\\iglehart.txt";
-	public static final String pathRisultatiThrDisk = "d:\\thrDisk.txt";
+	public static final String pathRisultatiThrDisk = "c:\\thrDisk.txt";
 	
 	// Clock per lunghezza run = 3000
 	public static final Double clockStabile = 13000.0;
@@ -362,7 +362,7 @@ public class SimMain {
 		Double mediaThroughput = 0.0;
 		int[] valoriThroughput = new int[lunghezzaArrayThroughput];
 		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
-		UniformDoubleGenerator genClock = new UniformDoubleGenerator(0L, 84L, SeedCalculator.getSeme());
+
 		BufferedWriter bufferedWriterThrDisk = null;
 		
 		//Clock stabile per n = 50: 13086.550077183962
@@ -376,7 +376,7 @@ public class SimMain {
 			
 			seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
 			seqStabile.setTau(tempoServizioDisk * 8);
-			seqStabile.setClockInizialePerThroughput(genClock.generateNextValue());
+			seqStabile.setClockInizialePerThroughput(44.0);
 			seqStabile.simula(seqStabile.getJobInHost() + n, 0.0);
 			totaleJobinDisk += seqStabile.getJobInDisk();
 			valoriThroughput[seqStabile.getJobInDisk()]++;

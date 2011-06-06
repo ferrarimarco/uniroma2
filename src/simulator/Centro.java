@@ -152,4 +152,9 @@ public class Centro implements Serializable {
 	public String getName() {
 		return name;
 	}
+
+	public void setGenerator(Generator generator) {
+	
+		this.generator = generator;
+	}
 }

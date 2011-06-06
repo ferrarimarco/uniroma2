@@ -7,6 +7,8 @@ import generators.SeedCalculator;
 import generators.UniformDoubleGenerator;
 
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.LinkedList;
 
@@ -73,6 +75,26 @@ public class Sequenziatore implements Serializable {
 			terminali[i] = tempCentro;
 			
 			calendar.updateEvent(calendar.firstTerminalIndex + i, tempCentro.prevediDurata(1).doubleValue());
+		}
+	}
+	
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException{
+		in.defaultReadObject();
+		
+		//Impostiamo nuovi semi
+		cpu.setGenerator(new ExponentialGenerator(SeedCalculator.getSeme(), 1.0));
+		disk.setGenerator(new ErlangGenerator(SeedCalculator.getSeme(), 0.033, 3));
+		
+		for(int i = 0; i < stampanti.length; i++){
+			stampanti[i].setGenerator(new UniformDoubleGenerator(2L, 78L, SeedCalculator.getSeme()));
+		}
+		
+		for(int i = 0; i < host.length; i++){
+			host[i].setGenerator(new IperEspGenerator(SeedCalculator.getSeme(), SeedCalculator.getSeme(), 0.085, 0.6));
+		}
+		
+		for(int i = 0; i < terminali.length; i++){
+			terminali[i].setGenerator(new ErlangGenerator(SeedCalculator.getSeme(), 10.0, 2));
 		}
 	}
 	
