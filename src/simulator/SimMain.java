@@ -22,7 +22,7 @@ public class SimMain {
 	public static final Integer lunghezzaMaxRunN = 6000;
 	
 	//Calcolo throughput
-	public static final Integer numeroOsservazioniPerThroughput = 100;
+	public static final Integer numeroOsservazioniPerThroughput = 5000;
 	public static final Integer lunghezzaArrayThroughput = 100;
 	public static final Double tempoServizioDisk = 0.033;
 	public static final Integer mode = 3;
@@ -362,7 +362,7 @@ public class SimMain {
 		Double mediaThroughput = 0.0;
 		int[] valoriThroughput = new int[lunghezzaArrayThroughput];
 		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
-
+		Integer clientThr = 50;
 		BufferedWriter bufferedWriterThrDisk = null;
 		
 		//Clock stabile per n = 50: 13086.550077183962
@@ -374,8 +374,8 @@ public class SimMain {
 			
 			System.out.println("Osservazione (j) " + j);
 			
-			seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + numeroClient + ".ser");
-			seqStabile.setTau(tempoServizioDisk * 8);
+			seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + clientThr + ".ser");
+			seqStabile.setTau(tempoServizioDisk * 4);
 			seqStabile.setClockInizialePerThroughput(44.0);
 			seqStabile.simula(seqStabile.getJobInHost() + n, 0.0);
 			totaleJobinDisk += seqStabile.getJobInDisk();
@@ -384,7 +384,6 @@ public class SimMain {
 		
 		try {
 			bufferedWriterThrDisk = new BufferedWriter(new FileWriter(pathRisultatiThrDisk, false));
-			bufferedWriterThrDisk.newLine();
 			
 			for(int i = 0; i < valoriThroughput.length; i++){
 				bufferedWriterThrDisk.write("" + valoriThroughput[i]);
