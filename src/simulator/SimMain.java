@@ -23,16 +23,16 @@ public class SimMain {
 	
 	//Calcolo throughput
 	public static final Integer clientThr = 50;
-	public static final Integer numeroOsservazioniPerThroughput = 5000;
+	public static final Integer numeroOsservazioniPerThroughput = 10000;
 	public static final Integer lunghezzaArrayThroughput = 100;
 	public static final Double tempoServizioDisk = 0.033;
-	public static final Integer mode = 2;
+	public static final Integer mode = 3;
 	
 	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
 	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
-	public static final String pathSeq = "c:\\SeqStabileClient";
+	public static final String pathSeq = "d:\\SeqStabileClient";
 	public static final String pathRisultatiIglehart = "c:\\iglehart.txt";
-	public static final String pathRisultatiThrDisk = "c:\\thrDisk.txt";
+	public static final String pathRisultatiThrDisk = "d:\\thrDisk.txt";
 	
 	// Clock per lunghezza run = 3000
 	public static final Double clockStabile = 13000.0;
@@ -334,6 +334,9 @@ public class SimMain {
 				
 				bufferedWriterIglehart.write("s2yn = " + df.format(s2yn));
 				bufferedWriterIglehart.newLine();
+				
+				bufferedWriterIglehart.write("D = " + df.format(D));
+				bufferedWriterIglehart.newLine();		
 				
 				bufferedWriterIglehart.write("mediaTeorica = ySegnato / nSegnato = " + df.format(mediaTeorica));
 				bufferedWriterIglehart.newLine();		
