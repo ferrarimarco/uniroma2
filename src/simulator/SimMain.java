@@ -1,7 +1,6 @@
 package simulator;
 
 import generators.SeedCalculator;
-import generators.UniformDoubleGenerator;
 import generators.UniformLongGenerator;
 
 import java.io.BufferedWriter;
@@ -28,25 +27,23 @@ public class SimMain {
 	public static final Double tempoServizioDisk = 0.033;
 	public static final Integer mode = 3;
 	
-	public static final String pathRisultatiMedieGordon = "c:\\medieGordon.txt";
-	public static final String pathRisultatiVarianzeGordon = "c:\\varianzeGordon.txt";
-	public static final String pathSeq = "d:\\SeqStabileClient";
-	public static final String pathRisultatiIglehart = "c:\\iglehart.txt";
-	public static final String pathRisultatiThrDisk = "d:\\thrDisk.txt";
+	//Per salvare i risultati
+	public static final String diskPath = "c:\\";
+	public static final String pathRisultatiMedieGordon = diskPath + "medieGordon.txt";
+	public static final String pathRisultatiVarianzeGordon = diskPath + "varianzeGordon.txt";
+	public static final String pathRisultatiIglehart = diskPath + "iglehart.txt";
+	public static final String pathRisultatiThrDisk = diskPath + "thrDisk.txt";
+	public static final String pathSeq = diskPath + "SeqStabileClient";
+	public static final String estensioneSequenziatori = ".ser";
 	
-	// Clock per lunghezza run = 3000
+	// Clock per lunghezza run = 5000
 	public static final Double clockStabile = 13000.0;
 	
+	//Per run statistici
 	public static final Double alpha = 0.1;
-	
-	// area = 0.95
-	public static final Double area = 1 - (alpha / 2);
-	
-	// Da tabella
-	public static final Double uAlphaMezzi = 1.645;
-	
-	// Calcolo k
-	public static final Double k = Math.pow(uAlphaMezzi, 2) / numeroOsservazioniP;;
+	public static final Double area = 1 - (alpha / 2); // area = 0.95
+	public static final Double uAlphaMezzi = 1.645; // Da tabella normale std
+	public static final Double k = Math.pow(uAlphaMezzi, 2) / numeroOsservazioniP; // Calcolo k
 	
 
 	public static void main(String[] args) {
@@ -55,9 +52,9 @@ public class SimMain {
 			SimMain.runStab();
 		} else if (mode == 1) {// Salvataggio di tutti gli stati stabili di partenza
 			SimMain.runSalvataggioStatoStabile();
-		} else if (mode == 2){
+		} else if (mode == 2){// Run statistici
 			SimMain.runStat();
-		}else if(mode == 3){
+		}else if(mode == 3){// Run per calcolo Thr disk
 			SimMain.runStatThroughputDisk();
 		}
 	}
@@ -217,7 +214,7 @@ public class SimMain {
 			seq.simula(-1, SimMain.clockStabile);
 			
 			// Salvo lo stato stabile
-			path = SimMain.pathSeq + i + ".ser";
+			path = SimMain.pathSeq + i + estensioneSequenziatori;
 			SimMain.salvaSequenziatore(seq, path);
 		}
 		
@@ -285,7 +282,7 @@ public class SimMain {
 				System.out.println("Lunghezza run estratta (n): " + n);
 				
 				for (int i = 1; i <= n; i++) {
-					seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + h + ".ser");
+					seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + h + estensioneSequenziatori);
 					seqStabile.simula(seqStabile.getJobInHost() + i, 0.0);
 					yj += seqStabile.getTempoMedioRispJob();
 				}
@@ -378,7 +375,7 @@ public class SimMain {
 			
 			System.out.println("Osservazione (j) " + j);
 			
-			seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + clientThr + ".ser");
+			seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + clientThr + estensioneSequenziatori);
 			seqStabile.setTau(tempoServizioDisk * 3);
 			seqStabile.setClockInizialePerThroughput(44.0);
 			seqStabile.simula(seqStabile.getJobInHost() + n, 0.0);
