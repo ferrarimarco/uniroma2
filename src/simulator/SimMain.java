@@ -404,7 +404,7 @@ public class SimMain {
 			
 			arrayThr[seqStabile.getJobInDisk()]++;
 			
-			yj += seqStabile.getJobInDisk();
+			yj = seqStabile.getJobInDisk();
 
 			arrayY[j] = yj;
 			sommaTuttiYj += yj;
