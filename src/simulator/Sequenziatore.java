@@ -99,7 +99,8 @@ public class Sequenziatore implements Serializable {
 	}
 	
 	public void simula(Integer lunghezzaRun, Double clockStabile){
-		
+		tempoRispTuttiJob = 0.0;
+		jobInHost = 0;
 		while(jobInHost < lunghezzaRun || clock.getSimTime() <= clockStabile){
 			nextEventIndex = calendar.getNextEventIndex();
 			nextEventTime = calendar.getEventTime(nextEventIndex);
