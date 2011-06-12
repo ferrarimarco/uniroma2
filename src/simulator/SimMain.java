@@ -22,13 +22,12 @@ public class SimMain {
 	
 	//Calcolo throughput
 	public static final Integer clientThr = 50;
-	public static final Integer numeroOsservazioniPerThroughput = 10000;
-	public static final Integer lunghezzaArrayThroughput = 100;
+	public static final Integer numeroOsservazioniPerThroughput = 5000;
 	public static final Double tempoServizioDisk = 0.033;
 	public static final Integer mode = 3;
 	
 	//Per salvare i risultati
-	public static final String diskPath = "c:\\";
+	public static final String diskPath = "d:\\";
 	public static final String pathRisultatiMedieGordon = diskPath + "medieGordon.txt";
 	public static final String pathRisultatiVarianzeGordon = diskPath + "varianzeGordon.txt";
 	public static final String pathRisultatiIglehart = diskPath + "iglehart.txt";
@@ -255,7 +254,7 @@ public class SimMain {
 			Double sommaPerS2n = 0.0;
 			Double s2n = 0.0;
 			Double ySegnato = 0.0;
-			Double mediaTeorica = 0.0;
+			Double rispEffettiva = 0.0;
 			double[] arrayY = new double[numeroOsservazioniP];
 			Double sommaTuttiYj = 0.0;
 			Double sommaPerS2y = 0.0;
@@ -294,7 +293,7 @@ public class SimMain {
 			nSegnato = sommaTuttiN / numeroOsservazioniP;
 			ySegnato = sommaTuttiYj / numeroOsservazioniP;
 			
-			mediaTeorica = ySegnato / nSegnato;
+			rispEffettiva = ySegnato / nSegnato;
 
 			for (int j = 0; j < numeroOsservazioniP; j++) {
 				sommaPerS2yn += (arrayY[j] - ySegnato) * (arrayN[j] - nSegnato);
@@ -335,7 +334,7 @@ public class SimMain {
 				bufferedWriterIglehart.write("D = " + df.format(D));
 				bufferedWriterIglehart.newLine();		
 				
-				bufferedWriterIglehart.write("mediaTeorica = ySegnato / nSegnato = " + df.format(mediaTeorica));
+				bufferedWriterIglehart.write("rispEffettiva = ySegnato / nSegnato = " + df.format(rispEffettiva));
 				bufferedWriterIglehart.newLine();		
 				
 				bufferedWriterIglehart.write("iglehartBasso, iglehartAlto = " + df.format(iglehartBasso) + ", " + df.format(iglehartAlto));
@@ -358,13 +357,33 @@ public class SimMain {
 	private static void runStatThroughputDisk(){
 		
 		Sequenziatore seqStabile = null;
-		Double totaleJobinDisk = 0.0;
-		Integer n;
-		Double mediaThroughput = 0.0;
-		int[] valoriThroughput = new int[lunghezzaArrayThroughput];
-		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
+
 		
+		Integer n;		
+		Integer yj = 0;
+		Double nSegnato = 0.0;
+		int[] arrayN = new int[numeroOsservazioniPerThroughput];
+		Double sommaTuttiN = 0.0;
+		Double sommaPerS2n = 0.0;
+		Double s2n = 0.0;
+		Double ySegnato = 0.0;
+		Double rispEffettiva = 0.0;
+		int[] arrayY = new int[numeroOsservazioniPerThroughput];
+		Double sommaTuttiYj = 0.0;
+		Double sommaPerS2y = 0.0;
+		Double s2y;
+		Double sommaPerS2yn = 0.0;
+		Double s2yn = 0.0;
+		Double D = 0.0;
+		Double numeratoreComuneIglehart = 0.0;
+		Double denominatoreIglehart = 0.0;
+		Double iglehartBasso = 0.0;
+		Double iglehartAlto = 0.0;
+		UniformLongGenerator genLunghRun = new UniformLongGenerator(50L, 100L, SeedCalculator.getSeme());
+		int[] arrayThr = new int[numeroOsservazioniPerThroughput];
+	
 		BufferedWriter bufferedWriterThrDisk = null;
+		DecimalFormat df = new DecimalFormat("#.############");
 		
 		//Clock stabile per n = 50: 13086.550077183962
 		
@@ -372,6 +391,9 @@ public class SimMain {
 			
 			// Generiamo un intero per sapere quanto deve essere lungo il run
 			n = genLunghRun.generateNextValue().intValue();
+
+			arrayN[j] = n;
+			sommaTuttiN += n;
 			
 			System.out.println("Osservazione (j) " + j);
 			
@@ -379,26 +401,76 @@ public class SimMain {
 			seqStabile.setTau(tempoServizioDisk * 3);
 			seqStabile.setClockInizialePerThroughput(44.0);
 			seqStabile.simula(seqStabile.getJobInHost() + n, 0.0);
-			totaleJobinDisk += seqStabile.getJobInDisk();
-			valoriThroughput[seqStabile.getJobInDisk()]++;
+			
+			arrayThr[seqStabile.getJobInDisk()]++;
+			
+			yj += seqStabile.getJobInDisk();
+
+			arrayY[j] = yj;
+			sommaTuttiYj += yj;
 		}
 		
+		nSegnato = sommaTuttiN / numeroOsservazioniPerThroughput;
+		ySegnato = sommaTuttiYj / numeroOsservazioniPerThroughput;
+		
+		rispEffettiva = ySegnato / nSegnato;
+
+		for (int j = 0; j < numeroOsservazioniPerThroughput; j++) {
+			sommaPerS2yn += (arrayY[j] - ySegnato) * (arrayN[j] - nSegnato);
+			sommaPerS2n += Math.pow((arrayN[j] - nSegnato), 2);
+			sommaPerS2y += Math.pow((arrayY[j] - ySegnato), 2);
+		}
+		
+		s2n = sommaPerS2n / (numeroOsservazioniPerThroughput - 1);
+		s2y = sommaPerS2y / (numeroOsservazioniPerThroughput - 1);
+		s2yn = sommaPerS2yn / (numeroOsservazioniPerThroughput - 1);
+		
+		D = Math.pow((ySegnato * nSegnato) - (k * s2yn), 2) - ((Math.pow(nSegnato, 2) - (k * s2n)) * ((Math.pow(ySegnato, 2) - (k * s2y))));
+		
+		numeratoreComuneIglehart = (ySegnato * nSegnato) - (k * s2yn);
+		denominatoreIglehart = (Math.pow(nSegnato, 2) - k * s2n);
+		
+		iglehartBasso = (numeratoreComuneIglehart - Math.sqrt(D)) / denominatoreIglehart;
+		iglehartAlto = (numeratoreComuneIglehart + Math.sqrt(D)) / denominatoreIglehart;
+
 		try {
 			bufferedWriterThrDisk = new BufferedWriter(new FileWriter(pathRisultatiThrDisk, false));
 			
-			for(int i = 0; i < valoriThroughput.length; i++){
-				bufferedWriterThrDisk.write("" + valoriThroughput[i]);
+			for(int i = 0; i < arrayThr.length; i++){
+				bufferedWriterThrDisk.write("" + arrayThr[i]);
 				bufferedWriterThrDisk.newLine();
 			}
 			
-			mediaThroughput = totaleJobinDisk / numeroOsservazioniPerThroughput;
-			bufferedWriterThrDisk.write("Media Throughput = " + mediaThroughput);
+			bufferedWriterThrDisk.write("--------------");
 			bufferedWriterThrDisk.newLine();
-			bufferedWriterThrDisk.close();
 			
+			bufferedWriterThrDisk.write("ySegnato = " + df.format(ySegnato));
+			bufferedWriterThrDisk.newLine();
+			
+			bufferedWriterThrDisk.write("nSegnato = " + df.format(nSegnato));
+			bufferedWriterThrDisk.newLine();
+			
+			bufferedWriterThrDisk.write("s2n = " + df.format(s2n));
+			bufferedWriterThrDisk.newLine();
+			
+			bufferedWriterThrDisk.write("s2y = " + df.format(s2y));
+			bufferedWriterThrDisk.newLine();
+			
+			bufferedWriterThrDisk.write("s2yn = " + df.format(s2yn));
+			bufferedWriterThrDisk.newLine();
+			
+			bufferedWriterThrDisk.write("D = " + df.format(D));
+			bufferedWriterThrDisk.newLine();		
+			
+			bufferedWriterThrDisk.write("rispEffettiva = ySegnato / nSegnato = " + df.format(rispEffettiva));
+			bufferedWriterThrDisk.newLine();		
+			
+			bufferedWriterThrDisk.write("iglehartBasso, iglehartAlto = " + df.format(iglehartBasso) + ", " + df.format(iglehartAlto));
+			bufferedWriterThrDisk.newLine();
+			
+			bufferedWriterThrDisk.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		
+		}		
 	}
 }
