@@ -25,7 +25,7 @@ public class SimMain {
 	public static final Integer numeroOsservazioniPerThroughput = 5000;
 	public static final Integer lunghezzaArrayThroughput = 100;
 	public static final Double tempoServizioDisk = 0.033;
-	public static final Integer mode = 1;
+	public static final Integer mode = 2;
 	
 	//Per salvare i risultati
 	public static final String diskPath = "c:\\";
@@ -281,9 +281,9 @@ public class SimMain {
 				System.out.println("Osservazione (j): " + j);
 				System.out.println("Lunghezza run estratta (n): " + n);
 				
-					seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + h + estensioneSequenziatori);
-					seqStabile.simula(n, 0.0);
-					yj = seqStabile.getTempoMedioRispJob();
+				seqStabile = SimMain.caricaSequenziatore(SimMain.pathSeq + h + estensioneSequenziatori);
+				seqStabile.simula(n, 0.0);
+				yj = seqStabile.getTempoMedioRispJob() * n;
 				
 				arrayY[j] = yj;
 				sommaTuttiYj += yj;
