@@ -1,6 +1,17 @@
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <errno.h>
-#include <unistd.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
+#include <ftw.h>
+#include <stdio.h>
+#include <sys/stat.h>
 /*
 Legge n byte da un socket, 
 eseguendo un ciclo di letture fino a 

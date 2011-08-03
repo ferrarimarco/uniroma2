@@ -1,4 +1,21 @@
-#include "server_base.h"
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <errno.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
+#include <ftw.h>
+#include <sys/stat.h>
+
+#include "utils.c"
+#include "commands.c"
+
+#include "constants.h"
 
 //Per indirizzo del server
 struct sockaddr_in addr;
@@ -9,12 +26,13 @@ struct sockaddr_in cli_addr;
 //Prototipi
 void inizializzazionePadre(int *s , socklen_t *l, socklen_t *cl);
 void inizializzazioneFiglio(int *child, in_port_t client_port, in_addr_t client_address);
+void serviRichiesta(int sockfd, int sock_child, char *buff, int *data_amount);
 
 int main(int argc, char *argv[ ])
 {
 	int sockfd;
 	int sock_child;
-	int i;
+	int rec_data_amount;
 
 	socklen_t len;
 	socklen_t clen;
@@ -27,29 +45,18 @@ int main(int argc, char *argv[ ])
 	int clientaddr;
 	clientaddr = 0;
 
-
 	inizializzazionePadre(&sockfd, &len, &clen);
 
 	//Per entrare nel while
 	//NOTA: fork restituisce 0 al figlio, pid del figlio al padre
 	pid = 1;
 
-	printf("Server Ready!\n");
-
-	printf("PADRE: getpid = %d\n", getpid());
-	printf("PADRE: getppid = %d\n", getppid());
+	printf("Server init completed\n");
 
 	while(pid != 0){
 
-		printf("sono bloccato su recvfrom, chi sono (pid) = %d, ppid = %d\n", getpid(), getppid());
-
 		//Ricevo dati dal socket
-		if (recvfrom(sockfd, buff, MAXLINE, 0, (struct sockaddr *)&cli_addr, &clen) < 0) {
-			perror("errore in recvfrom");
-			exit(-1);
-		}
-
-		printf("ho passato recvfrom, chi sono (pid) = %d, ppid = %d\n", getpid(), getppid());
+		rec_data_amount = recvfrom(sockfd, buff, MAXLINE, 0, (struct sockaddr *)&cli_addr, &clen);
 
 		//Prendo indirizzo del client
 		client_ip = cli_addr.sin_addr.s_addr;
@@ -58,45 +65,13 @@ int main(int argc, char *argv[ ])
 		//network to host short
 		clientaddr = ntohs(cli_addr.sin_addr.s_addr);
 		
-		printf("creo figlio, chi sono (pid) = %d, ppid = %d\n", getpid(), getppid());
-		printf("variabile pid prima di fork = %d, chi sono (pid) = %d, ppid = %d\n", pid, getpid(), getppid());
-		
 		//Creo figlio
 		pid = fork();
-		printf("variabile pid dopo di fork = %d, chi sono (pid) = %d, ppid = %d\n", pid, getpid(), getppid());
 	}
 
-	printf("chi sono (pid) = %d, ppid = %d\n", getpid(), getppid());
-	
 	inizializzazioneFiglio(&sock_child, client_port, client_ip);
-	
-	printf("Figlio inizializzato. chi sono (pid) = %d, ppid = %d\n", getpid(), getppid());
 
-	//Chiudo socket del padre
-	if(close(sockfd) < 0){
-		perror("errore in socket");
-		exit(-1);
-	}
-
-	printf("Chiuso socket del padre. chi sono (pid) = %d, ppid = %d\n", getpid(), getppid());
-
-	//Test con time
-	time_t ticks;
-
-	ticks = time(NULL); /* legge l'orario usando la chiamata di sistema time */
-    
-	/* scrive in buff l'orario nel formato ottenuto da ctime; snprintf impedisce l'overflow del buffer. */
-    snprintf(buff, sizeof(buff), "%.24s\r\n", ctime(&ticks)); /* ctime trasforma la data e l’ora da binario in ASCII. \r\n per carriage return e line feed*/
-    
-	printf("Preparati dati per l'invio. chi sono (pid) = %d, ppid = %d\n", getpid(), getppid());
-
-	/* scrive sul socket il contenuto di buff */
-    if (sendto(sock_child, buff, strlen(buff), 0, (struct sockaddr *) &cli_addr, sizeof(cli_addr)) < 0) {
-      perror("errore in sendto");
-      exit(-1);
-    }
-	
-	printf("dati inviati, esco. chi sono (pid) = %d, ppid = %d\n", getpid(), getppid());
+	serviRichiesta(sockfd, sock_child, buff, &rec_data_amount);
 
 	exit(0);
 }
@@ -148,4 +123,17 @@ void inizializzazioneFiglio(int *child, in_port_t client_p, in_addr_t client_add
 	cli_addr.sin_port = client_p; 
 }
 
-void serviRichiesta(){}
+void serviRichiesta(int sockfd, int sock_child, char *buff, int *data_amount){
+
+	//Chiudo socket del padre
+	if(close(sockfd) < 0){
+		perror("errore in socket");
+		exit(-1);
+	}
+
+	int command;
+	command = -1;
+
+	command = seleziona_comando(buff, data_amount);
+	esegui_comando(buff, data_amount, command, sock_child, cli_addr);
+}
