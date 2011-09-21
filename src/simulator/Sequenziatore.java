@@ -134,6 +134,7 @@ public class Sequenziatore implements Serializable {
 		//Prendo il job corrente e libero il terminale
 		Job j = terminali[idCentro].getCurrentJob();
 		j.setTermExitTime(clock.getSimTime());
+		j.setJobClass(1);
 		
 		//Invio job uscente a cpu
 		if(cpu.isFree() && cpu.isQueueEmpty()){
