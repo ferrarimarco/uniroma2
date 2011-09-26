@@ -1,7 +1,10 @@
 #include "constants.h"
+#include <netinet/in.h>
 
 typedef struct {
     int seq_number;
-	char data[MAX_PK_SIZE];
+	unsigned char data[MAX_PK_SIZE];
+	int sock_child;
+	struct sockaddr_in cli_addr;
 } PACKET;
 

@@ -18,9 +18,6 @@
     <ClCompile Include="server.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="read_write.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="file_io.c">
       <Filter>Source Files</Filter>
     </ClCompile>
