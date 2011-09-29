@@ -41,7 +41,7 @@ void init_transmission(){
 	}
 }
 
-int set_sequence_number(){
+int get_sequence_number(){
 
 	if(seq_number_counter < WIN_DIMENSION - 1){
 		seq_number_counter++;
@@ -79,7 +79,7 @@ void *manage_packet(void *packet){
 
 	printf("Lock: mutex_seq_number\n");
 
-	int new_seq_number = set_sequence_number();
+	int new_seq_number = get_sequence_number();
 	
 	// Aggiungo numero di sequenza
 	pack->seq_number = htonl(new_seq_number);
@@ -88,11 +88,7 @@ void *manage_packet(void *packet){
 	
 	// Aggiungo pacchetto all'array dei pacchetti
 	window[new_seq_number] = *pack;
-
-	printf("Controllo di nuovo Seq number ottenuto: %u\n", pack->seq_number);
 		
-	printf("Unlock: mutex_seq_number\n");
-
 	pthread_mutex_unlock(&mutex_seq_number);
 
 	printf("Unlocked: mutex_seq_number\n");
@@ -195,25 +191,19 @@ void invia_stringa(char *buff, int sock_child, struct sockaddr_in cli_addr){
 
 			// Aggiungo dati
 			strncpy(pack.data, &buff[start], MAX_PK_DATA_SIZE - 1);
-			
+
 			// Inizializzo altri campi del pacchetto
 			pack.sock_child = sock_child;
 			pack.cli_addr = cli_addr;
 
-			printf("Add packet: da %u ", start);
-
-			// Incremento il contatore di posizione
-			start += MAX_PK_DATA_SIZE -1;	
+			int temp = start;
 			
-			printf("a %u\n", start);
+			// Incremento il contatore di posizione
+			start += MAX_PK_DATA_SIZE - 1;	
+
+			printf("Add packet: da %u a %u\n", temp, start);
 
 			add_packet(pack);
-			
-			usleep(5000);
-
 		}
 	}
-	
-	
-	pthread_exit(NULL);
 }
