@@ -68,10 +68,6 @@ int add_packet(PACKET pack){
 	}
 }
 
-void *manage_timeout(){
-
-}
-
 void *manage_packet(void *packet){
 
 	PACKET *pack = (PACKET *) packet;
@@ -133,7 +129,6 @@ void *manage_packet(void *packet){
 }
 
 void invia_pacchetto(PACKET *packet){
-
 	if (sendto(packet->sock_child, (char *) packet, sizeof(*packet), 0, (struct sockaddr *) &(packet->cli_addr), sizeof(packet->cli_addr)) < 0) {
       perror("errore in sendto");
       exit(-1);
