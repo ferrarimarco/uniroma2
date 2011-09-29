@@ -17,28 +17,26 @@ void com_get(char *buff, int *rec_data_amount, int sock_child, struct sockaddr_i
 void com_put();
 void com_list(int sock_child, struct sockaddr_in cli_addr);
 void com_time(int sock_child, struct sockaddr_in cli_addr);
+void com_ack(char *buff);
 
 int seleziona_comando(char *buff, int *rec_data_amount){
-
-	// aggiunge il carattere di terminazione
-	buff[*rec_data_amount] = 0;
 	
-	//PREVEDI CASO ACK
+	//SPEZZARE I DATI DA INVIARE IN PIU PARTI SE TROPPI!
 
-	if(buff[0] == 'G')
+	if(buff[0] == 'G') //GET
 		return 0;
-	else if(buff[0] == 'P')
+	else if(buff[0] == 'P') //PUT
 		return 1;
-	else if(buff[0] == 'L')
+	else if(buff[0] == 'L') //LIST
 		return 2;
-	else if(buff[0] == 'T')
+	else if(buff[0] == 'T')//TIME
 		return 3;
+	else if(buff[0] == 'A')//ACK
+		return 4;
 }
 
 void esegui_comando(char *buff, int *received_data_amount, int command, int sock_child, struct sockaddr_in cli_addr){
 	
-	printf("buffer comando: %s\n", buff);
-
 	switch(command) {
 		case 0:
 			com_get(buff, received_data_amount, sock_child, cli_addr);
@@ -51,6 +49,9 @@ void esegui_comando(char *buff, int *received_data_amount, int command, int sock
 			break;
 		case 3:
 			com_time(sock_child, cli_addr);
+			break;
+		case 4:
+			com_ack(buff);
 			break;
     };
 }
@@ -128,4 +129,11 @@ void com_list(int sock_child, struct sockaddr_in cli_addr){
 	length = lista_file(file_list);
 
 	invia_stringa(file_list, sock_child, cli_addr);
+}
+
+void com_ack(char *buff){
+
+	//INSERIRE NLTOHT per conversione int da net a host
+
+	manage_ack(buff[3]);
 }
