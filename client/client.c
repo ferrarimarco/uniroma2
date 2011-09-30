@@ -17,7 +17,7 @@ int main(int argc, char *argv[ ]) {
   unsigned char*  recvdata[MAXLINE];
   struct    sockaddr_in   servaddr;
 
-  if (argc != 2) { /* controlla numero degli argomenti */
+if (argc != 2) { /* controlla numero degli argomenti */
     fprintf(stderr, "utilizzo: daytime_clientUDP <indirizzo IP server>\n");
     exit(1);
   }
@@ -37,7 +37,7 @@ int main(int argc, char *argv[ ]) {
     exit(1);
   }
 
-  /* Invia al server il pacchetto di richiesta*/
+  /* Invia al server il pacchetto di richiesta
   if (sendto(sockfd, NULL, 0, 0, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
     perror("errore in sendto");
     exit(1);
@@ -45,7 +45,7 @@ int main(int argc, char *argv[ ]) {
 
   PACKET* pack;
   
-  /* Legge dal socket il pacchetto di risposta */
+  /* Legge dal socket il pacchetto di risposta 
   n = recvfrom(sockfd, (char*)pack, sizeof (*pack), 0 , (struct sockaddr*) &servaddr, &len);
   //n = recvfrom(sockfd, recvline, MAXLINE, 0 , (struct sockaddr*) &servaddr, sizeof(servaddr));
   if (n < 0) {
@@ -54,10 +54,16 @@ int main(int argc, char *argv[ ]) {
   }
   
    int a = pack->seq_number;
-   int b =htonl(a);
+   int b =ntohl(a);  */
+
+   PACKET* pack2;
+   
+   //pack2->seq_number = a;
+   unsigned char *ack= "ack 1";
+   strcpy(ack,pack2->data);
 
   /* Invio ACK */
-  if (sendto(sockfd, NULL, 0, 0, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
+  if (sendto(sockfd, (char*)pack2, sizeof (*pack2), 0, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
     perror("errore in sendto");
     exit(1);
   }
