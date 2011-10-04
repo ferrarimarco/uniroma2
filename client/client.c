@@ -37,15 +37,15 @@ if (argc != 2) { /* controlla numero degli argomenti */
     exit(1);
   }
 
-  /* Invia al server il pacchetto di richiesta
+  /* Invia al server il pacchetto di richiesta */
   if (sendto(sockfd, NULL, 0, 0, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
     perror("errore in sendto");
     exit(1);
   }
 
-  PACKET* pack;
+  PACKET *pack;
   
-  /* Legge dal socket il pacchetto di risposta 
+  /* Legge dal socket il pacchetto di risposta */
   n = recvfrom(sockfd, (char*)pack, sizeof (*pack), 0 , (struct sockaddr*) &servaddr, &len);
   //n = recvfrom(sockfd, recvline, MAXLINE, 0 , (struct sockaddr*) &servaddr, sizeof(servaddr));
   if (n < 0) {
@@ -54,21 +54,16 @@ if (argc != 2) { /* controlla numero degli argomenti */
   }
   
    int a = pack->seq_number;
-   int b =ntohl(a);  */
+   int b =ntohl(a);
 
    PACKET pack2;
    
-   //pack2->seq_number = a;
+   pack2.seq_number = a;
    unsigned char *ack;
-   ack = malloc (5);
-   ack = "ack 1";
-printf("1\n");
-   //pack2->data = calloc (strlen(ack),1); 
-printf("2\n");
-   memcpy(pack2.data,ack,5);
-printf("%s\n",pack2.data);
-	//strcpy(pack2->data, ack);
-
+   ack = malloc (10);
+   sprintf(ack,"ack %d\n",b);
+   strcpy(pack2.data,ack);
+     
 
   /* Invio ACK */
   if (sendto(sockfd, pack2.data, 5, 0, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
