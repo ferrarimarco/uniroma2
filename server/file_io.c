@@ -53,12 +53,12 @@ int lista_file(char *lista){
 	}
 }
 
-//NOTA: char ** è un puntatore ad un char *
-//Necessario per modificare il valore di buff
-void leggi_file(char *path, char **buff){
+
+int file_size(char *path){
 	
 	FILE *file;
 	long position;
+	int num_pacchetti;
 
 	file = fopen(path, "rb");
 
@@ -67,17 +67,35 @@ void leggi_file(char *path, char **buff){
 		exit(1);
 	}
 
-	//Calcolo le dimensioni del file
+	// Calcolo le dimensioni del file
 	fseek(file, 0, SEEK_END);
 	position = ftell(file);
-
-	//Reimposto la posizione all'inizio del file
+	
+	// Calcolo quanti pacchetti sono necessari
+	num_pacchetti = (int) position / (MAX_PK_DATA_SIZE - 1);
+	
+	if(position % (MAX_PK_DATA_SIZE - 1) > 0){
+		num_pacchetti++;
+	}
+	
+	// Reimposto la posizione all'inizio del file
 	fseek(file, 0, SEEK_SET);
 	
-	//Alloco la memoria per la lettura del file
-	*buff = (char *) malloc(position);
-
-	fread(*buff, position, 1, file);
-
+	// Chiudo file
 	fclose(file);
+	
+	return num_pacchetti;
+}
+
+// NOTA: char ** è un puntatore ad un char *
+// Necessario per modificare il valore di buff
+size_t leggi_file_position(FILE *file, unsigned char **buff){
+	
+	*buff = (char *) malloc(MAX_PK_DATA_SIZE);
+	
+	size_t i = fread(*buff, sizeof(char), MAX_PK_DATA_SIZE - 1, file);
+	
+	strcat(*buff, "\0");
+	
+	return i;
 }
