@@ -50,9 +50,6 @@ void esegui_comando(char *buff, int *received_data_amount, int command, int sock
 		case 3:
 			com_time(sock_child, cli_addr);
 			break;
-		case 4:
-			com_ack(buff);
-			break;
     };
 }
 
@@ -61,9 +58,6 @@ void com_get(char *buff, int *rec_data_amount, int sock_child, struct sockaddr_i
 	//Per path del file
 	char *file_name;
 	char delims[] = " ";
-
-	//Per memorizzare file
-	char *buffer_file;
 	char *path;
 
 	int i;
@@ -80,24 +74,16 @@ void com_get(char *buff, int *rec_data_amount, int sock_child, struct sockaddr_i
 
 		path = malloc(snprintf(NULL, 0, "%s%s", SERVER_SHARE_PATH, file_name) + 1);
 		sprintf(path, "%s%s", SERVER_SHARE_PATH, file_name);
-
-		leggi_file(path, &buffer_file);
-		invia_stringa(buffer_file, sock_child, cli_addr);
-
-		//Libero memoria
-		free(buffer_file);
-		free(path);
+		strcat(path, "\0");
+		
+		printf("PATH: %s\n", path);
+		
+		sender_window(path, sock_child, cli_addr);
 
 	}else{
 		printf("comando mal formato!");
 		//INVIARE PACCHETTO CONTENENTE STRINGA VUOTA (CONDIZIONE DI ERRORE)	
 	}
-
-	//Leggi file in buffer
-
-	//Invia file
-
-
 }
 
 void com_put(){}
@@ -128,12 +114,5 @@ void com_list(int sock_child, struct sockaddr_in cli_addr){
 
 	length = lista_file(file_list);
 
-	invia_stringa(file_list, sock_child, cli_addr);
-}
-
-void com_ack(char *buff){
-
-	//INSERIRE NLTOHT per conversione int da net a host
-
-	manage_ack(buff[3]);
+	//invia_stringa(file_list, sock_child, cli_addr);
 }

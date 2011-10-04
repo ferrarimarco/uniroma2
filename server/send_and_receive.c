@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <fcntl.h>
 
 #include <pthread.h>
 
@@ -15,24 +16,23 @@
 #include "constants.h"
 
 // Transmission management
-int seq_number_counter = -1;
-int slots_available;
-PACKET window[WIN_DIMENSION];
+int seq_number_counter;
 
 // Thread management
-int return_code_send_thread;
 pthread_mutex_t mutex_array[WIN_DIMENSION];
 pthread_cond_t  condition_array[WIN_DIMENSION];
-pthread_mutex_t mutex_seq_number = PTHREAD_MUTEX_INITIALIZER;
+pthread_t thread_array[WIN_DIMENSION];
+pthread_t waker_thread_array[WIN_DIMENSION];
 
 // Protoypes
-void *manage_packet(void *packet);
-void invia_pacchetto(PACKET *packet);
+void *manage_packet_thread_func(void *packet);
 
 void init_transmission(){
 	int i;
+	seq_number_counter = 0;
 
 	for(i = 0; i < WIN_DIMENSION; i++){
+		
 		pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 		pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 
@@ -41,169 +41,173 @@ void init_transmission(){
 	}
 }
 
-int get_sequence_number(){
-
-	if(seq_number_counter < WIN_DIMENSION - 1){
-		seq_number_counter++;
-		return seq_number_counter;
-	}else{
-		seq_number_counter = -1;
-		return WIN_DIMENSION - 1;
+void sender_window(char *command, int sock_child, struct sockaddr_in cli_addr){
+	
+	// Imposto socket non bloccanti
+	fcntl(sock_child, F_SETFL, O_NONBLOCK);
+	
+	// Per gestire finestra
+	PACKET window[WIN_DIMENSION];
+	int i;
+	
+	// Per gestire trasmissione
+	int transmission_complete = 0;
+	int window_base = 0;
+	int packet_number = 0;
+	int next_sequence_number = 0;
+	int needed_packets = file_size(command);
+	int cli_length = sizeof(cli_addr);
+	
+	// Per gestire lettura da file
+	FILE *file;
+	int nread = 0;
+	unsigned char *buffer_read_file;
+	unsigned char *temp;
+	
+	printf("SOCK CHILD: %u\n", sock_child);
+	printf("COMMAND: %s\n", command);
+	
+	//Inizializzo la finestra
+	for(i=0; i < WIN_DIMENSION ; i++){
+		PACKET packet = {0, 0, "0", sock_child, cli_addr};
+		window[i] = packet;
 	}
-}
-
-int add_packet(PACKET pack){
-
-	// Crea un thread per gestire il pacchetto
-	pthread_t send_thread;
-
-	return_code_send_thread = pthread_create(&send_thread, NULL, manage_packet, (void *) &pack);
 	
-	//PER DEBUG: così sono sicuro che i threads vengano eseguiti fino alla fine
-	//pthread_join(send_thread, NULL);
+	errno = 0;
 	
-	if (return_code_send_thread){
-		printf("ERROR; return code from pthread_create() is %d\n", return_code_send_thread);
-		exit(-1);
+	// Inizio lettura da file
+	file = fopen(command, "rb");
+
+	printf("fopen_errno: %s\n", strerror(errno));
+	
+	if(file == NULL){
+		puts("cannot open file.");
+		exit(1);
 	}
-}
 
-void *manage_packet(void *packet){
+	while(transmission_complete == 0){
 
-	PACKET *pack = (PACKET *) packet;
-	
-	// CONTROLLA se c'è spazio nella finestra. Attendi se necessario
-
-
-	pthread_mutex_lock(&mutex_seq_number);
-
-	printf("Lock: mutex_seq_number\n");
-
-	int new_seq_number = get_sequence_number();
-	
-	// Aggiungo numero di sequenza
-	pack->seq_number = htonl(new_seq_number);
-
-	printf("Seq number ottenuto: %u\n", new_seq_number);
-	
-	// Aggiungo pacchetto all'array dei pacchetti
-	window[new_seq_number] = *pack;
-		
-	pthread_mutex_unlock(&mutex_seq_number);
-
-	printf("Unlocked: mutex_seq_number\n");
-	
-	// Invia pacchetto
-	invia_pacchetto(pack);
-	
-	/*
-	// Aspetta ACK
-	for(;;){
-		// Lock mutex and then wait for signal to relase mutex
-		pthread_mutex_lock(&(mutex_array[pack->seq_number]));
-
-		// Wait for condition
-		pthread_cond_wait(&(condition_array[pack->seq_number]), &(mutex_array[pack->seq_number]));
-		
-		pthread_mutex_unlock(&(mutex_array[pack->seq_number]));
-
-	}*/
-
-
-	// Aspetta timeout
-
-	// Posso gestire queste attese in due modi: con join (creando un altro thread) oppure con condizione
-
-	// Ricevuto ACK libera slot finestra e resetta condizione
-
-	// Controllo se posso far avanzare la finestra
-
-	// Termina thread
-	printf("Termino thread!\n");
-
-	pthread_exit(NULL);
-}
-
-void invia_pacchetto(PACKET *packet){
-	if (sendto(packet->sock_child, (char *) packet, sizeof(*packet), 0, (struct sockaddr *) &(packet->cli_addr), sizeof(packet->cli_addr)) < 0) {
-      perror("errore in sendto");
-      exit(-1);
-    }
-
-	printf("Inviato pacchetto: %u\n", packet->seq_number);
-}
-
-void manage_ack(int seq_number_to_ack){
-
-	// Invia segnale di ACK ricevuto
-	/*
-	pthread_mutex_lock(&(mutex_array[seq_number_to_ack]));
-
-	pthread_cond_signal(&(condition_array[seq_number_to_ack]));
-
-	pthread_mutex_unlock(&(mutex_array[seq_number_to_ack]));
-
-	printf("Ricevuto ack: %u\n", seq_number_to_ack);
-	*/
-}
-
-void invia_stringa(char *buff, int sock_child, struct sockaddr_in cli_addr){
-
-	init_transmission();
-
-	// Controlla la dimensione dei dati da inviare
-	int length;
-	length = strlen(buff);
-	int num_pacchetti;
-
-	if(length < MAX_PK_DATA_SIZE){// Posso inviare direttamente
-		
-		PACKET pack;
-
-		// Aggiungo dati
-		strcpy(pack.data, buff);
-
-		// Inizializzo altri campi del pacchetto
-		pack.sock_child = sock_child;
-		pack.cli_addr = cli_addr;
-
-		// Aggiungo il pacchetto alla coda dei pacchetti da inviare
-		add_packet(pack);
-
-	}else{// Se troppo grande, spezza in più pacchetti
-
-		// Calcolo quanti pacchetti sono necessari
-		num_pacchetti = (int) length / (MAX_PK_DATA_SIZE - 1);
-		
-		if(length % (MAX_PK_DATA_SIZE - 1) > 0){
-			num_pacchetti++;			
-		}
-
-		// Preparo i pacchetti
-		int i;
-		int start;
-
-		start = 0;
-
-		for(i = 0; i < num_pacchetti; i++){
-
-			PACKET pack;
-
-			// Aggiungo dati
-			strncpy(pack.data, &buff[start], MAX_PK_DATA_SIZE - 1);
-
-			// Inizializzo altri campi del pacchetto
-			pack.sock_child = sock_child;
-			pack.cli_addr = cli_addr;
-
-			int temp = start;
+		while(window[packet_number % WIN_DIMENSION].status == 0 && transmission_complete == 0){ // Riempio la finestra e invio
 			
-			// Incremento il contatore di posizione
-			start += MAX_PK_DATA_SIZE - 1;	
+			
+			if(leggi_file_position(file, &buffer_read_file)){
+				
+				// Assegno numero di seq al pacchetto
+				window[packet_number % WIN_DIMENSION].seq_number = packet_number;
+				
+				printf("PRE window[packet_number % WIN_DIMENSION].sock_child: %i\n", window[packet_number % WIN_DIMENSION].sock_child);
+				
+				// Inserisco dati nel pacchetto
+				strcpy(window[packet_number % WIN_DIMENSION].data, buffer_read_file);
 
-			printf("Add packet: da %u a %u\n", temp, start);
-
-			add_packet(pack);
+				printf("POST window[packet_number % WIN_DIMENSION].sock_child: %i\n", window[packet_number % WIN_DIMENSION].sock_child);
+				
+				// Sleep prima di inviare				
+				//usleep(500);
+				
+				// Invio pacchetto
+				errno = 0;
+				int send_ret = sendto(window[packet_number % WIN_DIMENSION].sock_child, (char *) &(window[packet_number % WIN_DIMENSION]), sizeof(window[packet_number % WIN_DIMENSION]), 0, (struct sockaddr *) &((&(window[packet_number % WIN_DIMENSION]))->cli_addr), cli_length);
+				printf("sendto err: %s\n", strerror(errno));
+				
+				if(send_ret  == EAGAIN || send_ret ==  EWOULDBLOCK){
+					perror("Errore in sendto");
+					exit(1);
+				}else{
+					// Debug
+					printf("Pacchetto %u inviato\n", window[packet_number % WIN_DIMENSION].seq_number);
+					
+					// Imposto stato del pacchetto (1 = inviato ma non ancora riscontrato)
+					window[packet_number % WIN_DIMENSION].status = 1;
+					
+					// Creo thread per gestire eventuali ritrasmissioni
+					
+					// Argomento della funzione del thread
+					void* packet_pointer = &window[packet_number % WIN_DIMENSION];
+					/*
+					if(pthread_create(&thread_array[packet_number % WIN_DIMENSION], NULL, manage_packet_thread_func, packet_pointer) == EAGAIN){	
+						perror("errore in pthread_create");
+						exit(1);
+					}*/
+					
+					// Per far proseguire la spedizione
+					packet_number++;
+					
+					// Per assegnare il prossimo numero di sequenza
+					next_sequence_number++;
+					
+				}
+		
+			}else{ // Ho finito di leggere il file da inviare
+				break;
+			}
 		}
+		/*
+		while(window[window_base % WIN_DIMENSION].status != 2){ // Aspetto gli ACK
+			
+			if(window_base >= (needed_packets - 1)){ // Trasmissione completata
+				transmission_complete = 1;
+				break;
+			}
+			
+			// Per accogliere il pacchetto ricevuto
+			PACKET *rcv_pack;
+			rcv_pack = malloc(sizeof(*rcv_pack));
+			
+			int rec_from_res = 0;
+			int cli_length = sizeof(cli_addr);
+			
+			rec_from_res = recvfrom(sock_child, (char *) rcv_pack, sizeof(*rcv_pack), 0, (struct sockaddr *) &cli_addr, &cli_length);
+				
+			if(rec_from_res == EAGAIN || rec_from_res ==  EWOULDBLOCK) {
+				perror("errore in recvfrom");
+				exit(1);
+			}else{
+				
+				if(rcv_pack->seq_number >= window_base){ // Pacchetto ricevuto è nella finestra
+					
+					if(window[rcv_pack->seq_number % WIN_DIMENSION].status != 2){ // Pacchetto ricevuto non ancora riscontrato
+					
+						// Imposto status a 2 (pacchetto inviato e riscontrato
+						window[rcv_pack->seq_number % WIN_DIMENSION].status = 2;
+						
+						void* packet_pointer = &window[rcv_pack->seq_number % WIN_DIMENSION];
+						
+						/*
+						if (pthread_create(&waker_thread_array[rcv_pack->seq_number % WIN_DIMENSION], NULL, Observer, p) == EAGAIN){
+							perror("errore in pthread_create ");
+							exit(1);
+						}
+						
+						pthread_join(thread_array[rcv_pack->seq_number % WIN_DIMENSION], NULL);
+						pthread_join(waker_thread_array[rcv_pack->seq_number % WIN_DIMENSION], NULL);
+						*//*
+					}
+
+					if(window[window_base % WIN_DIMENSION].status == 2){ // Faccio avanzare la finestra
+						
+						while(window[window_base % WIN_DIMENSION].status != 2){
+							window[window_base % WIN_DIMENSION].status = 0;
+							window_base++;
+						} 
+				
+						break;
+					}
+		   
+				}
+			}
+		
+			if(window_base >= (needed_packets - 1)){ // Trasmissione completata
+				transmission_complete = 1;
+				break;
+			}		
+		}*/
 	}
+	
+	// Chiudo file
+	fclose(file);
+}
+
+void *manage_packet_thread_func(void *packet){
+	PACKET *p = (PACKET *) packet;
 }
