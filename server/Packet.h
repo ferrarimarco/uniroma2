@@ -5,7 +5,7 @@ typedef struct {
 	
 	int seq_number;
 	
-	// 0 = not transmitted, 1 = transmitted, 2 = transmitted and ACKed
+	// -1 = in buffer/window but empty, 0 = not in window (buffered only), 1 = not transmitted but in window, 2 = transmitted, 3 = transmitted and ACKed
 	int status;
 	
 	// To hold data
