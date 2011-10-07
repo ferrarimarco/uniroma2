@@ -464,7 +464,7 @@ void *ack_checker_thread_func(void *arg){
 		
 		rcv_pack = malloc(sizeof(*rcv_pack));
 		int rec_from_res = 0;
-		rec_from_res = recvfrom(sock, (char *) rcv_pack, sizeof(*rcv_pack), 0, (struct sockaddr *) &cli_addr, &cli_length);
+		rec_from_res = recvfrom(sock, (char *) rcv_pack, sizeof(*rcv_pack), 0, (struct sockaddr *) &cli_address, &cli_length);
 		
 		if(rec_from_res == EAGAIN || rec_from_res ==  EWOULDBLOCK) {
 			perror("errore in recvfrom");
