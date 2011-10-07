@@ -89,7 +89,7 @@ int file_size(char *path){
 
 // NOTA: char ** è un puntatore ad un char *
 // Necessario per modificare il valore di buff
-size_t leggi_file_position(FILE *file, unsigned char **buff){
+size_t leggi_file(FILE *file, unsigned char **buff){
 	
 	*buff = (char *) malloc(MAX_PK_DATA_SIZE);
 	
