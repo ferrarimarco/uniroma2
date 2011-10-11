@@ -2,10 +2,13 @@
 #define BACKLOG		10
 #define MAXLINE		1024
 
-#define BUFFER_READ_FILE_DIMENSION 16384
+#define BUFFER_FILE_DIMENSION 16384
 #define MAX_PK_DATA_SIZE 512
 
-#define WIN_DIMENSION 2
+#define WIN_DIMENSION 3
+
+// Timeout in msec
+#define TIMEOUT 5000
 
 #define LOSS_PROBABILITY 0
 
