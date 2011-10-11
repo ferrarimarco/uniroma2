@@ -93,9 +93,16 @@ size_t leggi_file(FILE *file, unsigned char **buff){
 	
 	*buff = (char *) malloc(MAX_PK_DATA_SIZE);
 	
-	size_t i = fread(*buff, sizeof(char), MAX_PK_DATA_SIZE - 1, file);
+	//size_t i = fread(*buff, sizeof(char), MAX_PK_DATA_SIZE - 1, file);
+	size_t i = fread(*buff, sizeof(char), MAX_PK_DATA_SIZE, file);
+	//strcat(*buff, "\0");
 	
-	strcat(*buff, "\0");
+	return i;
+}
+
+size_t scrivi_file(FILE *file, unsigned char *buff){
+	
+	size_t i = fwrite(buff, sizeof(char), MAX_PK_DATA_SIZE - 1, file);
 	
 	return i;
 }
