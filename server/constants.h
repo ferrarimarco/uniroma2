@@ -9,6 +9,6 @@
 
 #define LOSS_PROBABILITY 0
 
-#define SERVER_SHARE_PATH "/home/marco/share/"
+#define SERVER_SHARE_PATH "/home/ale/share/"
 
 #define FILES_ONLY 1
