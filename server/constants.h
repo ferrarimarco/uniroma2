@@ -8,9 +8,9 @@
 #define WIN_DIMENSION 3
 
 // Timeout in msec
-#define TIMEOUT 5000
+#define TIMEOUT 6000
 
-#define LOSS_PROBABILITY 0
+#define LOSS_PROBABILITY 0.8
 
 #define SERVER_SHARE_PATH "/home/marco/share/"
 

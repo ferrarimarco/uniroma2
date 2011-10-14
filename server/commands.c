@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "file_io.c"
-#include "send_and_receive.c"
+#include "send.c"
 
 
 void com_get(char *buff, int *rec_data_amount, int sock_child, struct sockaddr_in cli_addr);
