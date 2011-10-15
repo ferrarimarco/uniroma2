@@ -11,6 +11,8 @@ typedef struct {
 	// To know how much data to read in the data array
 	int data_size;
 	
+	int position_in_timeout_queue;
+	
 	// To hold data
 	unsigned char data[MAX_PK_DATA_SIZE];
 	
