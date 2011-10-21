@@ -13,12 +13,12 @@
 #include "send.c"
 
 
-void com_get(char *buff, int *rec_data_amount, int sock_child, struct sockaddr_in cli_addr);
+void com_get(char *buff, int sock_child, struct sockaddr_in cli_addr);
 void com_put();
 void com_list(int sock_child, struct sockaddr_in cli_addr);
 void com_time(int sock_child, struct sockaddr_in cli_addr);
 
-int seleziona_comando(char *buff, int *rec_data_amount){
+int seleziona_comando(char *buff){
 	
 	if(buff[0] == 'G') //GET
 		return 0;
@@ -28,11 +28,11 @@ int seleziona_comando(char *buff, int *rec_data_amount){
 		return 2;
 }
 
-void esegui_comando(char *buff, int *received_data_amount, int command, int sock_child, struct sockaddr_in cli_addr){
+void esegui_comando(char *buff, int command, int sock_child, struct sockaddr_in cli_addr){
 	
-	switch(command) {
+	switch(command){
 		case 0:
-			com_get(buff, received_data_amount, sock_child, cli_addr);
+			com_get(buff, sock_child, cli_addr);
 			break;
 		case 1:
 			com_put();
@@ -43,7 +43,7 @@ void esegui_comando(char *buff, int *received_data_amount, int command, int sock
     };
 }
 
-void com_get(char *buff, int *rec_data_amount, int sock_child, struct sockaddr_in cli_addr){
+void com_get(char *buff, int sock_child, struct sockaddr_in cli_addr){
 
 	//Per path del file
 	char *file_name;

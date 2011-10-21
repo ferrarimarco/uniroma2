@@ -24,18 +24,15 @@ struct sockaddr_in addr;
 struct sockaddr_in cli_addr;
 
 //Prototipi
-void inizializzazionePadre(int *s , socklen_t *l, socklen_t *cl);
+void inizializzazionePadre(int *s);
 void inizializzazioneFiglio(int *child, in_port_t client_port, in_addr_t client_address);
-void serviRichiesta(int sockfd, int sock_child, char *buff, int *data_amount);
+void serviRichiesta(int sockfd, int sock_child, char *buff);
 
-int main(int argc, char *argv[ ])
-{
+int main(int argc, char *argv[ ]){
 	int sockfd;
 	int sock_child;
 	int rec_data_amount;
 
-	socklen_t len;
-	socklen_t clen;
 	pid_t pid;
 	char buff[MAXLINE];
 
@@ -44,8 +41,10 @@ int main(int argc, char *argv[ ])
 	in_addr_t client_ip;
 	int clientaddr;
 	clientaddr = 0;
+	
+	int server_addr_length = sizeof(addr);
 
-	inizializzazionePadre(&sockfd, &len, &clen);
+	inizializzazionePadre(&sockfd);
 
 	//Per entrare nel while
 	//NOTA: fork restituisce 0 al figlio, pid del figlio al padre
@@ -56,7 +55,7 @@ int main(int argc, char *argv[ ])
 	while(pid != 0){
 
 		//Ricevo dati dal socket
-		rec_data_amount = recvfrom(sockfd, buff, MAXLINE, 0, (struct sockaddr *)&cli_addr, &clen);
+		recvfrom(sockfd, buff, MAXLINE, 0, (struct sockaddr *) &cli_addr, &server_addr_length);
 
 		//Prendo indirizzo del client
 		client_ip = cli_addr.sin_addr.s_addr;
@@ -71,15 +70,18 @@ int main(int argc, char *argv[ ])
 
 	inizializzazioneFiglio(&sock_child, client_port, client_ip);
 
-	serviRichiesta(sockfd, sock_child, buff, &rec_data_amount);
+	serviRichiesta(sockfd, sock_child, buff);
 
+	//Chiudo socket del figlio
+	if(close(sock_child) < 0){
+		perror("errore in socket");
+		exit(-1);
+	}
+	
 	exit(0);
 }
 
-void inizializzazionePadre(int *s , socklen_t *l, socklen_t *cl){
-
-	*l = sizeof(addr);
-	*cl = sizeof(cli_addr);
+void inizializzazionePadre(int *s){
 
 	//Creo socket
 	//AF_INET = IPv4
@@ -120,10 +122,10 @@ void inizializzazioneFiglio(int *child, in_port_t client_p, in_addr_t client_add
 	memset((void *) &cli_addr, 0, sizeof(cli_addr));
 	cli_addr.sin_family = AF_INET;
 	cli_addr.sin_addr.s_addr = client_add; 
-	cli_addr.sin_port = client_p; 
+	cli_addr.sin_port = client_p;
 }
 
-void serviRichiesta(int sockfd, int sock_child, char *buff, int *data_amount){
+void serviRichiesta(int sockfd, int sock_child, char *buff){
 
 	//Chiudo socket del padre
 	if(close(sockfd) < 0){
@@ -134,6 +136,6 @@ void serviRichiesta(int sockfd, int sock_child, char *buff, int *data_amount){
 	int command;
 	command = -1;
 
-	command = seleziona_comando(buff, data_amount);
-	esegui_comando(buff, data_amount, command, sock_child, cli_addr);
+	command = seleziona_comando(buff);
+	esegui_comando(buff, command, sock_child, cli_addr);
 }

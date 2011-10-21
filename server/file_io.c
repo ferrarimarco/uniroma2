@@ -16,7 +16,7 @@ int lista_file(char *lista){
 	char *temp;
 	insert_position = 0;
 
-	if (dir != NULL) {
+	if (dir != NULL){
 
 		/* print all the files and directories within directory */
 		while ((ent = readdir(dir)) != NULL) {
@@ -53,7 +53,6 @@ int lista_file(char *lista){
 	}
 }
 
-
 int file_size(char *path){
 	
 	FILE *file;
@@ -72,9 +71,9 @@ int file_size(char *path){
 	position = ftell(file);
 	
 	// Calcolo quanti pacchetti sono necessari
-	num_pacchetti = (int) position / (MAX_PK_DATA_SIZE - 1);
+	num_pacchetti = (int) position / (MAX_PK_DATA_SIZE);
 	
-	if(position % (MAX_PK_DATA_SIZE - 1) > 0){
+	if(position % (MAX_PK_DATA_SIZE) > 0){
 		num_pacchetti++;
 	}
 	
@@ -97,9 +96,9 @@ size_t leggi_file(FILE *file, unsigned char **buff){
 	return i;
 }
 
-size_t scrivi_file(FILE *file, unsigned char *buff){
+size_t scrivi_file(FILE *file, unsigned char *buff, int data_amount){
 	
-	size_t i = fwrite(buff, sizeof(char), MAX_PK_DATA_SIZE, file);
+	size_t i = fwrite(buff, sizeof(char), data_amount, file);
 	
 	return i;
 }

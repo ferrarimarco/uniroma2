@@ -10,8 +10,9 @@ typedef struct {
 	
 	// To know how much data to read in the data array
 	int data_size;
-	
-	int position_in_timeout_queue;
+
+	// Packets to check (to manage transmission end)
+	int packets_to_check;	
 	
 	// To hold data
 	unsigned char data[MAX_PK_DATA_SIZE];
@@ -21,6 +22,9 @@ typedef struct {
 	
 	// Destination address
 	struct sockaddr_in cli_addr;
+	
+	// Is the last packet?
+	int last_one;
 	
 } PACKET;
 

@@ -7,92 +7,129 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "Packet.h"
+#include "file_io.c"
+#include "receive.c"
 
 #define SERV_PORT 5193
 #define MAXLINE 1024
 
+// Per gestire il fork
+pid_t pid;
+
+//Per indirizzo del server
+struct sockaddr_in server_addr;
+
+// Buffer per lettura comando
+char *buff_comm;
+
+//Prototipi
+void inizializzazionePadre(int *socket_father);
+void inizializzazioneFiglio(int *socket_child);
+void serviRichiesta(int sock_father, int sock_child, char *buff);
+
 int main(int argc, char *argv[ ]){
 	
-	int sockfd, n;
-	char  recvline[MAXLINE + 1];
-	struct sockaddr_in servaddr;
+	int sock_f;
+	int sock_child;
+
+	inizializzazionePadre(&sock_f);
 	
-	if (argc < 3){/* controlla numero degli argomenti */
-		fprintf(stderr, "utilizzo: client <indirizzo IP server> <comando> [<path>]\n");
-		exit(1);
-	}
+	printf("Client init completed\n");
 	
-	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){/* crea il socket */
-		perror("errore in socket");
-		exit(1);
-	}
-	
-	memset((void *)&servaddr, 0, sizeof(servaddr)); /* azzera servaddr */
-	servaddr.sin_family = AF_INET; /* assegna il tipo di indirizzo */
-	servaddr.sin_port = htons(SERV_PORT); /* assegna la porta del server */
-	
-	/* assegna l'indirizzo del server prendendolo dalla riga di comando. L'indirizzo è una stringa da convertire in intero secondo network byte order. */
-	if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) <= 0){/* inet_pton (p=presentation) vale anche per indirizzi IPv6 */
-		fprintf(stderr, "errore in inet_pton per %s", argv[1]);
-		exit(1);
-	}
-	
-	char *buff_comm;
-	
-	buff_comm = (char *) malloc(MAX_PK_DATA_SIZE);
-	
-	strcat(buff_comm, argv[2]);
-	
-	strcat(buff_comm, " ");
-	
-	if(argc == 4){// Ho anche il nome del file
-		strcat(buff_comm, argv[3]);
-	}
-	
-	// Termino la stringa
-	strcat(buff_comm, " \0");
-	
-	printf("COMMAND: %s\n", buff_comm);
-	
-	/* Invia al server il pacchetto di richiesta*/
-	if (sendto(sockfd, buff_comm, MAX_PK_DATA_SIZE, 0, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0){
-		perror("errore in sendto");
-		exit(1);
-	}
-	
-	PACKET *pack;
-	pack = malloc(sizeof(*pack));
-	int clen = sizeof(servaddr);
-	
-	while(recvfrom(sockfd, (char *) pack, sizeof(*pack), 0, (struct sockaddr *) &servaddr, &clen) > 0){
+	while(pid != 0){
+
+		memset(buff_comm, ' ', sizeof(*buff_comm));
 		
-		//pack->seq_number = ntohl(pack->seq_number);
-		
-		char *buff_ack;
-		buff_ack = (char *) malloc(MAX_PK_DATA_SIZE);
-		strcat(buff_ack, "ACK");
-		sprintf(buff_ack, "%s%i", buff_ack, pack->seq_number);
-		strcat(buff_ack, "\0");
-		
-		//printf("SizeOfPacket: %u \n", sizeof(*pack));
-		printf("Seq number: %u \n", pack->seq_number);
-		//printf("Sock_child: %u \n", pack->sock_child);
-		//printf("Data: %s \n", pack->data);
-		
-		PACKET packet;
-		packet.seq_number = pack->seq_number;
-		packet.status = 2;
-		strcpy(packet.data, buff_ack);
-		packet.sock_child = sockfd;
-		packet.cli_addr = servaddr;
-		printf("buff_ack: %s\n", buff_ack);
-		if (sendto(sockfd, (char *) &packet, sizeof(packet), 0, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
-			perror("errore in sendto");
+		printf("Enter the IP address of the server: ");
+		gets(buff_comm);
+
+		/* assegna l'indirizzo del server prendendolo dalla riga di comando. L'indirizzo è una stringa da convertire in intero secondo network byte order. */
+		if (inet_pton(AF_INET, buff_comm, &server_addr.sin_addr) <= 0){/* inet_pton (p=presentation) vale anche per indirizzi IPv6 */
+			fprintf(stderr, "errore in inet_pton per %s\n", buff_comm);
 			exit(1);
 		}
 		
+		memset(buff_comm, ' ', sizeof(*buff_comm));
+
+		printf("Enter command: ");
+		gets(buff_comm);
+
+		//Creo figlio
+		pid = fork();
+	}
+
+	inizializzazioneFiglio(&sock_child);
+
+	serviRichiesta(sock_f, sock_child, buff_comm);
+	
+	//Chiudo socket del figlio
+	if(close(sock_child) < 0){
+		perror("errore in socket");
+		exit(-1);
 	}
 	
 	exit(0);
+}
+
+void inizializzazionePadre(int *socket_father){
+
+	buff_comm = (char *) malloc(MAX_PK_DATA_SIZE);
+
+	//Per entrare nel while del padre
+	//NOTA: fork restituisce 0 al figlio, pid del figlio al padre
+	pid = 1;	
+	
+	//Creo socket
+	//AF_INET = IPv4
+	//SOCK_DGRAM = servizio senza connessione
+	//0 = default protocol
+	if ((*socket_father = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { /* crea il socket */
+		perror("errore in socket");
+		exit(-1);
+	}
+
+	//struct per indirizzo di rete
+	memset((void *)&server_addr, 0, sizeof(server_addr));
+
+	server_addr.sin_family = AF_INET;
+	
+	//Numero di porta del server
+	//htons = host to network byte order short
+	server_addr.sin_port = htons(SERV_PORT);
+}
+
+void inizializzazioneFiglio(int *socket_child){
+	if ((*socket_child = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+		perror("errore in socket");
+		exit(1);
+	}
+}
+
+
+void serviRichiesta(int sock_father, int sock_child, char *buff){
+
+	//Chiudo socket del padre
+	if(close(sock_father) < 0){
+		perror("errore in socket");
+		exit(-1);
+	}
+
+	/* Invia al server il pacchetto di richiesta*/
+	if (sendto(sock_child, buff, MAX_PK_DATA_SIZE, 0, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0){
+		perror("errore in sendto");
+		exit(1);
+	}
+
+	char *temp;
+	temp = malloc(snprintf(NULL, 0, "%s", buff));
+	
+	strcpy(temp, buff + 4);
+
+	char *path;
+	
+	path = malloc(snprintf(NULL, 0, "%s%s", CLIENT_SAVE_PATH, temp) + 1);
+	sprintf(path, "%s%s", CLIENT_SAVE_PATH, temp);
+	strcat(path, "\0");	
+	
+	receive_data(path, sock_child, server_addr);
 }
