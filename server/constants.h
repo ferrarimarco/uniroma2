@@ -14,6 +14,9 @@
 #define LOSS_PROBABILITY 0.0
 
 #define SERVER_SHARE_PATH "/home/marco/share/"
+
+#define CLIENT_SHARE_PATH "/home/marco/client_share/"
 #define CLIENT_SAVE_PATH "/home/marco/save/"
 
 #define FILES_ONLY 1
+#define SENDER_LOG_FILE_PATH "/home/marco/log_file_send.txt"
