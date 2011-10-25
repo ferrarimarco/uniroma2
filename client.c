@@ -80,7 +80,7 @@ void inizializzazionePadre(int *socket_father){
 	//AF_INET = IPv4
 	//SOCK_DGRAM = servizio senza connessione
 	//0 = default protocol
-	if ((*socket_father = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { /* crea il socket */
+	if ((*socket_father = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		perror("errore in socket");
 		exit(-1);
 	}
@@ -115,4 +115,6 @@ void serviRichiesta(int sock_father, int sock_child, char *buff){
 
 	command = seleziona_comando(buff);
 	esegui_comando(buff, command, sock_child, server_addr);
+	
+	printf("\nComando eseguito\nEnter command: ");
 }
