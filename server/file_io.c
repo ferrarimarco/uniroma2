@@ -5,50 +5,38 @@
 #include <unistd.h>
 
 
+size_t scrivi_file(FILE *file, unsigned char *buff, int data_amount);
 
-int lista_file(char *lista){
+void lista_file(FILE *file){
 
 	DIR *dir;
 	struct dirent *ent;
 	dir = opendir(SERVER_SHARE_PATH);
-	int insert_position;
-	int i;
-	char *temp;
-	insert_position = 0;
+	unsigned int filename_length = 0;
+	unsigned char *temp;
 
 	if (dir != NULL){
-
-		/* print all the files and directories within directory */
-		while ((ent = readdir(dir)) != NULL) {
-
+		
+		// print all the files and directories within directory
+		while ((ent = readdir(dir)) != NULL){
+			
 			temp = ent->d_name;
-
-			//Inserisco caratteri nell'array
-			for(i = 0; i < strlen(temp); i++){
-				lista[i + insert_position] = temp[i];
+			filename_length = strlen(temp);
+			
+			if(temp[0] != '.'){
+				// Scrivo a capo
+				scrivi_file(file, "\n\0", 1);
+				
+				// Scrivo dati
+				scrivi_file(file, temp, filename_length);
 			}
-
-			//Aggiorno posizione
-			insert_position += strlen(temp);
-
-			//inserisco a capo
-			lista[insert_position] = '\n';
-
-			//Aggiorno posizione
-			insert_position++;
 		}
-
-		//Inserisco carattere di terminazione ed aggiorno posizione
-		lista[insert_position] = 0;
-		insert_position++;
-
+		
 		closedir(dir);
-
-		return strlen(lista);
-
+		
 	} else {
 		/* could not open directory */
-		perror("errore opendir");
+		perror("file_io - lista_file - Errore opendir");
 		exit(-1);
 	}
 }
@@ -59,10 +47,12 @@ int file_size(char *path){
 	long position;
 	int num_pacchetti;
 
+	errno = 0;
+	
 	file = fopen(path, "rb");
 
 	if( file == NULL ){
-		puts("cannot open file");
+		printf( "file_size - Error opening file: %s\n", strerror( errno ) );
 		exit(1);
 	}
 
