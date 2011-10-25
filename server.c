@@ -12,7 +12,6 @@
 #include <ftw.h>
 #include <sys/stat.h>
 
-#include "utils.c"
 #include "commands_server.c"
 
 #include "constants.h"
