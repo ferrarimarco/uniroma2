@@ -52,14 +52,14 @@ int available_window_space = WIN_DIMENSION;
 // Transmission management
 int sock;
 struct sockaddr_in cli_address;
-int cli_length = sizeof(cli_address);
+int cli_length_send = sizeof(cli_address);
 
 // Transmission window management
 int needed_packets;
-PACKET window[WIN_DIMENSION];
+PACKET window_send[WIN_DIMENSION];
 int next_sequence_number = 0;
 TIME_PACKET timeout_queue[WIN_DIMENSION];
-int packets_to_check = 0;
+int packets_to_check_send = 0;
 
 // File read management
 FILE *file;
@@ -80,7 +80,7 @@ void *timeout_watcher_thread_func(void *arg);
 
 void send_data(char *path, int sock_child, struct sockaddr_in cli_addr){
 	
-	logfff = fopen("/home/marco/log_file_send.txt", "w");
+	logfff = fopen(SENDER_LOG_FILE_PATH, "w");
 	
 	// Inizializzazione
 	sock = sock_child;
@@ -112,15 +112,15 @@ void *coordinator_thread_func(void *arg){
 	
 	pthread_mutex_unlock(&transm_complete_mutex);
 
-	printf("coord_func - Path: %s\n", path);
-	printf("coord_func - needed packets: %u\n", needed_packets);
+	fprintf(logfff, "coord_func - Path: %s\n", path);
+	fprintf(logfff, "coord_func - needed packets: %u\n", needed_packets);
 	
 	int i;
 	
 	// Inizializzo la finestra
 	for(i = 0; i < WIN_DIMENSION ; i++){
 		PACKET packet = {-1, -1, 0, WIN_DIMENSION, "0", sock, cli_address};
-		window[i] = packet;
+		window_send[i] = packet;
 	}	
 	
 	// Inizializzo il buffer di lettura
@@ -203,7 +203,7 @@ void *coordinator_thread_func(void *arg){
 		// Controllo se devo svegliare il thread che gestisce i timeout
 		pthread_mutex_lock(&timeout_queue_mutex);
 
-		if(packets_to_check > 0){
+		if(packets_to_check_send > 0){
 			pthread_cond_signal(&timeout_condition);
 		}
 		
@@ -350,21 +350,18 @@ void *sender_thread_func(void *arg){
 			pthread_mutex_lock(&window_mutex);
 
 			// Imposto stato del pacchetto (1 = non trasmesso ma in finestra)
-			window[window_position].status = 1;
-			//window[window_position].seq_number = next_sequence_number;
-			//window[window_position].data_size = buffer_read_file[buffer_position].data_size;
-
-			window[window_position].seq_number = htonl(next_sequence_number);
-			window[window_position].data_size = htonl(buffer_read_file[buffer_position].data_size);
+			window_send[window_position].status = 1;
+			window_send[window_position].seq_number = htonl(next_sequence_number);
+			window_send[window_position].data_size = htonl(buffer_read_file[buffer_position].data_size);
 
 			// Controllo se è l'ultimo pacchetto da inviare
 			if(next_sequence_number == needed_packets - 1){
-				window[window_position].last_one = htonl(1);
+				window_send[window_position].last_one = htonl(1);
 			}
 			
 			pthread_mutex_lock(&buffer_read_file_mutex);
 		
-			memcpy(window[window_position].data, buffer_read_file[buffer_position].data, sizeof(buffer_read_file[buffer_position].data));
+			memcpy(window_send[window_position].data, buffer_read_file[buffer_position].data, sizeof(buffer_read_file[buffer_position].data));
 			
 			// Imposto stato del pacchetto (1 = non trasmesso ma in finestra)
 			buffer_read_file[buffer_position].status = 1;
@@ -372,39 +369,39 @@ void *sender_thread_func(void *arg){
 			pthread_mutex_unlock(&buffer_read_file_mutex);
 
 			// Imposto stato del pacchetto (2 = inviato ma non ancora riscontrato)
-			window[window_position].status = 2;
+			window_send[window_position].status = 2;
 							
 			// Inserisco il pacchetto nella coda dei timeout
 			pthread_mutex_lock(&timeout_queue_mutex);
 
-			//timeout_queue[packets_to_check].seq_number = window[window_position].seq_number;
+			//timeout_queue[packets_to_check_send].seq_number = window_send[window_position].seq_number;
 			
 			// Per evitare la riconversione da network a host uso direttamente next_sequence_number
-			// invece di window[window_position].seq_number
-			timeout_queue[packets_to_check].seq_number = next_sequence_number;
+			// invece di window_send[window_position].seq_number
+			timeout_queue[packets_to_check_send].seq_number = next_sequence_number;
 			
-			timeout_queue[packets_to_check].timeout = time(NULL);
-			timeout_queue[packets_to_check].packet = window[window_position];
+			timeout_queue[packets_to_check_send].timeout = time(NULL);
+			timeout_queue[packets_to_check_send].packet = window_send[window_position];
 
-			packets_to_check++;
+			packets_to_check_send++;
 			
-			//window[window_position].packets_to_check = packets_to_check;
-			window[window_position].packets_to_check = htonl(packets_to_check);
+			//window_send[window_position].packets_to_check_send = packets_to_check_send;
+			window_send[window_position].packets_to_check = htonl(packets_to_check_send);
 			
-			fprintf(logfff, "sender - invio pacchetto %i\n", ntohl(window[window_position].seq_number));
+			fprintf(logfff, "sender - invio pacchetto %i\n", ntohl(window_send[window_position].seq_number));
 			
 			// Invio pacchetto
-			int send_ret = sendto(window[window_position].sock_child, (char *) &(window[window_position]), sizeof(window[window_position]), 0, (struct sockaddr *) &((&(window[window_position]))->cli_addr), cli_length);
+			int send_ret = sendto(window_send[window_position].sock_child, (char *) &(window_send[window_position]), sizeof(window_send[window_position]), 0, (struct sockaddr *) &((&(window_send[window_position]))->cli_addr), cli_length_send);
 			
 			if(send_ret  == EAGAIN || send_ret ==  EWOULDBLOCK){
 				perror("sender_thread_func - Errore in sendto");
 				exit(1);
 			}else{
-				fprintf(logfff, "sender_thread_func - Pacchetto %i inviato\n", ntohl(window[window_position].seq_number));
+				fprintf(logfff, "sender_thread_func - Pacchetto %i inviato\n", ntohl(window_send[window_position].seq_number));
 
 				int k;
 				for(k = 0; k < WIN_DIMENSION; k++){
-					fprintf(logfff, "sender_thread_func - window[%i] - seq_number: %i, status: %i\n", k, ntohl(window[k].seq_number), window[k].status);
+					fprintf(logfff, "sender_thread_func - window_send[%i] - seq_number: %i, status: %i\n", k, ntohl(window_send[k].seq_number), window_send[k].status);
 					
 				}
 
@@ -536,7 +533,7 @@ void *file_reader_thread_func(void *arg){
 				
 				int k;
 				for(k = 0; k < WIN_DIMENSION; k++){
-					fprintf(logfff, "sender_thread_func - buffer_read_file[%i] - seq_number: %i, status: %i\n", k, ntohl(window[k].seq_number), window[k].status);
+					fprintf(logfff, "sender_thread_func - buffer_read_file[%i] - seq_number: %i, status: %i\n", k, ntohl(window_send[k].seq_number), window_send[k].status);
 					
 				}
 				
@@ -570,7 +567,7 @@ void *file_reader_thread_func(void *arg){
 				
 				fprintf(logfff, "file_reader_thread_func - read complete!\n");
 				
-				printf("file_read: pacchetti letti: %i\n", packets_read);
+				fprintf(logfff, "file_read: pacchetti letti: %i\n", packets_read);
 				
 				pthread_mutex_unlock(&transm_complete_mutex);
 				
@@ -622,7 +619,7 @@ void *ack_checker_thread_func(void *arg){
 		if(!all_acked_ack_checker){
 		
 			rcv_pack = malloc(sizeof(*rcv_pack));
-			rec_from_res = recvfrom(sock, (char *) rcv_pack, sizeof(*rcv_pack), 0, (struct sockaddr *) &cli_address, &cli_length);
+			rec_from_res = recvfrom(sock, (char *) rcv_pack, sizeof(*rcv_pack), 0, (struct sockaddr *) &cli_address, &cli_length_send);
 
 			if(rec_from_res == EAGAIN || rec_from_res ==  EWOULDBLOCK){
 				perror("ack_checker_thread_func - Errore in recvfrom");
@@ -642,10 +639,10 @@ void *ack_checker_thread_func(void *arg){
 						
 						pthread_mutex_lock(&window_mutex);
 						
-						if(window[received_seq_number % WIN_DIMENSION].status != 3){// Pacchetto ricevuto non ancora riscontrato
+						if(window_send[received_seq_number % WIN_DIMENSION].status != 3){// Pacchetto ricevuto non ancora riscontrato
 					
 							// Imposto status a 3 (3 = pacchetto inviato e riscontrato)
-							window[received_seq_number % WIN_DIMENSION].status = 3;
+							window_send[received_seq_number % WIN_DIMENSION].status = 3;
 							
 							pthread_mutex_lock(&timeout_queue_mutex);
 							
@@ -658,9 +655,9 @@ void *ack_checker_thread_func(void *arg){
 									
 									memmove(timeout_queue + u, timeout_queue + u + 1, sizeof(timeout_queue) - (u + 1) * sizeof(timeout_queue[u]));
 									
-									timeout_queue[packets_to_check - 1].seq_number = -1;
+									timeout_queue[packets_to_check_send - 1].seq_number = -1;
 									
-									packets_to_check--;
+									packets_to_check_send--;
 									break;
 								}
 							}
@@ -668,11 +665,11 @@ void *ack_checker_thread_func(void *arg){
 							pthread_mutex_unlock(&timeout_queue_mutex);
 						}
 
-						if(window[window_base % WIN_DIMENSION].status == 3){// Faccio avanzare la finestra
+						if(window_send[window_base % WIN_DIMENSION].status == 3){// Faccio avanzare la finestra
 						
-							while(window[window_base % WIN_DIMENSION].status == 3){
+							while(window_send[window_base % WIN_DIMENSION].status == 3){
 								
-								window[window_base % WIN_DIMENSION].status = -1;
+								window_send[window_base % WIN_DIMENSION].status = -1;
 							
 								window_base++;
 								
@@ -699,12 +696,10 @@ void *ack_checker_thread_func(void *arg){
 			
 			pthread_mutex_lock(&transm_complete_mutex);
 			
-			if(window_base >= needed_packets){ // Trasmissione completata
+			if(window_base >= needed_packets){// Trasmissione completata
 				
 				all_acked = 1;
-				
-				pthread_mutex_unlock(&transm_complete_mutex);
-				
+
 				fprintf(logfff, "ack_checker_thread_func - All acked\n");
 				
 				// Invio segnale a coordinator_thread (all_acked è stato modificato)
@@ -766,7 +761,7 @@ void *timeout_watcher_thread_func(void *arg){
 		pthread_mutex_lock(&timeout_queue_mutex);
 		
 		// Aspetto se non ho pacchetti da controllare
-		while(packets_to_check == 0){
+		while(packets_to_check_send == 0){
 			
 			pthread_mutex_lock(&transm_complete_mutex);
 			
@@ -807,22 +802,22 @@ void *timeout_watcher_thread_func(void *arg){
 					fprintf(logfff, "timeout - timeout pacchetto %i scaduto. Reinvio\n", timeout_queue[0].seq_number);
 					
 					// Incremento la posizione fine della coda
-					if(packets_to_check > 1){
+					if(packets_to_check_send > 1){
 						temp = timeout_queue[0];
 						
 						memmove(timeout_queue, timeout_queue + 1, sizeof(timeout_queue) - sizeof(timeout_queue[0]));
 						
-						timeout_queue[packets_to_check - 1] = temp;
+						timeout_queue[packets_to_check_send - 1] = temp;
 					}
 					
 					// Aggiorno il timeout
-					timeout_queue[packets_to_check - 1].timeout = time(NULL);
+					timeout_queue[packets_to_check_send - 1].timeout = time(NULL);
 					
 					// Per reinviare
-					temp_pack = timeout_queue[packets_to_check - 1].packet;
+					temp_pack = timeout_queue[packets_to_check_send - 1].packet;
 
 					// Reinvio pacchetto
-					send_ret = sendto(temp_pack.sock_child, (char *) &(temp_pack), sizeof(temp_pack), 0, (struct sockaddr *) &(temp_pack.cli_addr), cli_length);
+					send_ret = sendto(temp_pack.sock_child, (char *) &(temp_pack), sizeof(temp_pack), 0, (struct sockaddr *) &(temp_pack.cli_addr), cli_length_send);
 
 					if(send_ret  == EAGAIN || send_ret ==  EWOULDBLOCK){
 						perror("timeout_watcher_thread_func - Errore in sendto");
@@ -845,7 +840,7 @@ void *timeout_watcher_thread_func(void *arg){
 		pthread_mutex_unlock(&transm_complete_mutex);
 	}
 	
-	fprintf(logfff, "timeout_watcher_thread - Termino\n");
+	printf("timeout_watcher_thread - Termino\n");
 	
 	// Termino thread
 	pthread_exit(NULL);	

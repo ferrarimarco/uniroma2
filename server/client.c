@@ -7,16 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "file_io.c"
-#include "receive.c"
-
-#define SERV_PORT 5193
-#define MAXLINE 1024
+#include "commands_client.c"
 
 // Per gestire il fork
 pid_t pid;
 
-//Per indirizzo del server
+// Per indirizzo del server
 struct sockaddr_in server_addr;
 
 // Buffer per lettura comando
@@ -36,20 +32,21 @@ int main(int argc, char *argv[ ]){
 	
 	printf("Client init completed\n");
 	
+	memset(buff_comm, ' ', sizeof(*buff_comm));
+	
+	printf("Enter the IP address of the server: ");
+	gets(buff_comm);
+
+	/* assegna l'indirizzo del server prendendolo dalla riga di comando. L'indirizzo è una stringa da convertire in intero secondo network byte order. */
+	if (inet_pton(AF_INET, buff_comm, &server_addr.sin_addr) <= 0){/* inet_pton (p=presentation) vale anche per indirizzi IPv6 */
+		fprintf(stderr, "errore in inet_pton per %s\n", buff_comm);
+		exit(1);
+	}
+	
+	memset(buff_comm, ' ', sizeof(*buff_comm));
+
+	
 	while(pid != 0){
-
-		memset(buff_comm, ' ', sizeof(*buff_comm));
-		
-		printf("Enter the IP address of the server: ");
-		gets(buff_comm);
-
-		/* assegna l'indirizzo del server prendendolo dalla riga di comando. L'indirizzo è una stringa da convertire in intero secondo network byte order. */
-		if (inet_pton(AF_INET, buff_comm, &server_addr.sin_addr) <= 0){/* inet_pton (p=presentation) vale anche per indirizzi IPv6 */
-			fprintf(stderr, "errore in inet_pton per %s\n", buff_comm);
-			exit(1);
-		}
-		
-		memset(buff_comm, ' ', sizeof(*buff_comm));
 
 		printf("Enter command: ");
 		gets(buff_comm);
@@ -88,7 +85,7 @@ void inizializzazionePadre(int *socket_father){
 		exit(-1);
 	}
 
-	//struct per indirizzo di rete
+	//struct per indirizzo di rete del server
 	memset((void *)&server_addr, 0, sizeof(server_addr));
 
 	server_addr.sin_family = AF_INET;
@@ -105,31 +102,17 @@ void inizializzazioneFiglio(int *socket_child){
 	}
 }
 
-
 void serviRichiesta(int sock_father, int sock_child, char *buff){
-
+	
 	//Chiudo socket del padre
 	if(close(sock_father) < 0){
 		perror("errore in socket");
 		exit(-1);
 	}
 
-	/* Invia al server il pacchetto di richiesta*/
-	if (sendto(sock_child, buff, MAX_PK_DATA_SIZE, 0, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0){
-		perror("errore in sendto");
-		exit(1);
-	}
+	int command;
+	command = -1;
 
-	char *temp;
-	temp = malloc(snprintf(NULL, 0, "%s", buff));
-	
-	strcpy(temp, buff + 4);
-
-	char *path;
-	
-	path = malloc(snprintf(NULL, 0, "%s%s", CLIENT_SAVE_PATH, temp) + 1);
-	sprintf(path, "%s%s", CLIENT_SAVE_PATH, temp);
-	strcat(path, "\0");	
-	
-	receive_data(path, sock_child, server_addr);
+	command = seleziona_comando(buff);
+	esegui_comando(buff, command, sock_child, server_addr);
 }

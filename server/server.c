@@ -13,7 +13,7 @@
 #include <sys/stat.h>
 
 #include "utils.c"
-#include "commands.c"
+#include "commands_server.c"
 
 #include "constants.h"
 
@@ -123,6 +123,23 @@ void inizializzazioneFiglio(int *child, in_port_t client_p, in_addr_t client_add
 	cli_addr.sin_family = AF_INET;
 	cli_addr.sin_addr.s_addr = client_add; 
 	cli_addr.sin_port = client_p;
+
+	//Numero di porta del server (figlio)
+	//htons = host to network byte order short
+	addr.sin_port = htons(0);
+
+	//Assegno indirizzo al socket
+	if (bind(*child, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+		perror("errore in bind");
+		exit(-1);
+	}
+	
+	/*
+	//Assegno indirizzo al socket
+	if (bind(*child, (struct sockaddr *) &cli_addr, sizeof(cli_addr)) < 0) {
+		perror("errore in bind");
+		exit(-1);
+	}*/
 }
 
 void serviRichiesta(int sockfd, int sock_child, char *buff){
@@ -132,7 +149,10 @@ void serviRichiesta(int sockfd, int sock_child, char *buff){
 		perror("errore in socket");
 		exit(-1);
 	}
-
+	
+	printf("server - comando ricevuto: %s, socket padre: %i, socket figlio: %i\n", buff, sockfd, sock_child);
+	
+	
 	int command;
 	command = -1;
 

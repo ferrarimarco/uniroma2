@@ -14,7 +14,7 @@
 
 #include <pthread.h>
 
-#include "Packet.h"
+//#include "Packet.h"
 #include "constants.h"
 
 // Threads
@@ -26,14 +26,14 @@ int all_received = 0;
 // Transmission management
 int sock;
 struct sockaddr_in cli_address;
-int cli_length = sizeof(cli_address);
-int packets_to_check = WIN_DIMENSION;
+int cli_length_receive = sizeof(cli_address);
+int packets_to_check_receive = WIN_DIMENSION;
 
 // Timeout per gestire la chiusura della connessione
 time_t timeout;
 
 // Transmission window management
-PACKET window[WIN_DIMENSION];
+PACKET window_receive[WIN_DIMENSION];
 int window_base = 0;
 
 // File write management
@@ -46,7 +46,10 @@ void *receiver_thread_func(void *arg);
 void receive_data(char *path, int sock_child, struct sockaddr_in cli_addr){
 
 	// Creo il file
-	file = fopen(path, "wb");
+	if(path != NULL)
+		file = fopen(path, "wb");
+	else
+		file = stdout;
 
 	if(file == NULL){
 		perror("Errore: impossibile aprire file");
@@ -58,7 +61,7 @@ void receive_data(char *path, int sock_child, struct sockaddr_in cli_addr){
 	// Inizializzo la finestra
 	for(i = 0; i < WIN_DIMENSION ; i++){
 		PACKET packet = {-1, -1, MAX_PK_DATA_SIZE, WIN_DIMENSION, "0", sock, cli_address};
-		window[i] = packet;
+		window_receive[i] = packet;
 	}
 
 	// Creo il thread per gestire la ricezione
@@ -88,12 +91,10 @@ void *receiver_thread_func(void *arg){
 
 	int received_seq_number = -1;
 	float rand_for_loss = 0.0;
-
+	int timeout_started = 0;
 	double diff_t = 0.0;
-	
-	int test_how_many_pk = 0;
-	
-	while(!all_received || packets_to_check > 0){
+
+	while(!all_received && packets_to_check_receive > 0){
 
 		rcv_pack = malloc(sizeof(*rcv_pack));
 
@@ -105,7 +106,7 @@ void *receiver_thread_func(void *arg){
 		rcv_pack->sock_child = sock;
 		rcv_pack->cli_addr = cli_address;
 		
-		rec_from_res = recvfrom(sock, (char *) rcv_pack, sizeof(*rcv_pack), 0, (struct sockaddr *) &cli_address, &cli_length);
+		rec_from_res = recvfrom(sock, (char *) rcv_pack, sizeof(*rcv_pack), 0, (struct sockaddr *) &cli_address, &cli_length_receive );
 
 		if(rec_from_res == EAGAIN || rec_from_res ==  EWOULDBLOCK){
 			perror("errore in recvfrom");
@@ -120,49 +121,46 @@ void *receiver_thread_func(void *arg){
 					received_seq_number = ntohl(rcv_pack->seq_number);
 
 				if(received_seq_number >= window_base){ // Pacchetto ricevuto in finestra
-					
-					//printf("PK %i è nella finestra\n", received_seq_number);
-					
-					if(window[received_seq_number % WIN_DIMENSION].status != 3){ // Pacchetto ricevuto non ancora riscontrato
-					
-						//printf("Riscontro PK %i\n", received_seq_number);
+	
+					if(window_receive[received_seq_number % WIN_DIMENSION].status != 3){ // Pacchetto ricevuto non ancora riscontrato
 
 						// Copio il pacchetto nella finestra di ricezione
-						window[received_seq_number % WIN_DIMENSION].seq_number = received_seq_number;
-						window[received_seq_number % WIN_DIMENSION].data_size = ntohl(rcv_pack->data_size);
-						window[received_seq_number % WIN_DIMENSION].status = 3;
-						window[received_seq_number % WIN_DIMENSION].last_one = ntohl(rcv_pack->last_one);
+						window_receive[received_seq_number % WIN_DIMENSION].seq_number = received_seq_number;
+						window_receive[received_seq_number % WIN_DIMENSION].data_size = ntohl(rcv_pack->data_size);
+						window_receive[received_seq_number % WIN_DIMENSION].status = 3;
+						window_receive[received_seq_number % WIN_DIMENSION].last_one = ntohl(rcv_pack->last_one);
 						
-						memcpy(&(window[received_seq_number % WIN_DIMENSION].data), rcv_pack->data, window[received_seq_number % WIN_DIMENSION].data_size * sizeof(char));
+						memcpy(&(window_receive[received_seq_number % WIN_DIMENSION].data), rcv_pack->data, window_receive[received_seq_number % WIN_DIMENSION].data_size * sizeof(char));
 					}
 
-					//printf("Base - window_base: %i - seq_number: %i, status: %i\n", window_base, window[window_base % WIN_DIMENSION].seq_number, window[window_base % WIN_DIMENSION].status);
+					if(window_receive[window_base % WIN_DIMENSION].status == 3){ // Faccio avanzare la finestra se necessario
 					
-					if(window[window_base % WIN_DIMENSION].status == 3){ // Faccio avanzare la finestra se necessario
-					
-						while(window[window_base % WIN_DIMENSION].status == 3){
+						while(window_receive[window_base % WIN_DIMENSION].status == 3){
 
 							// Scrivo su file
-							scrivi_file(file, window[window_base % WIN_DIMENSION].data, window[window_base % WIN_DIMENSION].data_size);
-							
-							test_how_many_pk++;
-							printf("Ho scritto dati del pk %i, Totale pk scritti: %i\n", window[window_base % WIN_DIMENSION].seq_number, test_how_many_pk);
-							
-							window[window_base % WIN_DIMENSION].status = -1;
+							scrivi_file(file, window_receive[window_base % WIN_DIMENSION].data, window_receive[window_base % WIN_DIMENSION].data_size);
+
+							window_receive[window_base % WIN_DIMENSION].status = -1;
 							
 							// Controllo se ho terminato la trasmissione
-							if(window[window_base % WIN_DIMENSION].last_one){// Ho terminato la trasmissione
-								printf("\nTutti ricevuti, imposto socket a non bloccante\n");
+							if(window_receive[window_base % WIN_DIMENSION].last_one){// Ho terminato la trasmissione
 								all_received = 1;
 								
-								// Chiudo file se ho finito di scrivere
-								fclose(file);
-								
-								// Imposto timeout per gestire la chiusura della connessione
-								timeout = time(NULL);
-								
-								// Imposto socket non bloccante
-								fcntl(sock, F_SETFL, O_NONBLOCK);
+								// Problema: questo non deve stare in if rcv.seq_number >= window_base
+								if(!timeout_started && all_received){
+									
+									// Chiudo file se ho finito di scrivere
+									fclose(file);
+									
+									// Imposto timeout per gestire la chiusura della connessione
+									timeout = time(NULL);
+									
+									// Imposto socket non bloccante
+									printf("\nTutti ricevuti, imposto socket a non bloccante\n");
+									fcntl(sock, F_SETFL, O_NONBLOCK);
+									
+									timeout_started = 1;
+								}
 							
 							}else{
 								window_base++;
@@ -171,50 +169,55 @@ void *receiver_thread_func(void *arg){
 					}
 				}
 				
-				packets_to_check = ntohl(rcv_pack->packets_to_check);
+				packets_to_check_receive = ntohl(rcv_pack->packets_to_check);
 				
 				// Invio ACK
-				char *buff_ack;
-				buff_ack = (char *) malloc(MAX_PK_DATA_SIZE);
-				strcat(buff_ack, "ACK");
-				sprintf(buff_ack, "%s%i", buff_ack, received_seq_number);
-				strcat(buff_ack, "\0");
+				if(received_seq_number != -1){
+					
+					char *buff_ack;
+					buff_ack = (char *) malloc(MAX_PK_DATA_SIZE);
+					strcat(buff_ack, "ACK");
+					sprintf(buff_ack, "%s%i", buff_ack, received_seq_number);
+					strcat(buff_ack, "\0");
 
-				PACKET snd_pack;
-				snd_pack.seq_number = htonl(received_seq_number);
-				snd_pack.status = 2;
-				strcpy(snd_pack.data, buff_ack);
-				snd_pack.sock_child = sock;
-				snd_pack.cli_addr = cli_address;
-
-				
-				if(snd_pack.seq_number != -1){
+					PACKET snd_pack;
+					snd_pack.seq_number = htonl(received_seq_number);
+					snd_pack.status = 2;
+					strcpy(snd_pack.data, buff_ack);
+					snd_pack.sock_child = sock;
+					snd_pack.cli_addr = cli_address;
+					
+					if(timeout_started){// Aggiorno il timeout se è già partito
+						timeout = time(NULL);
+					}
+					
 					//printf("Invio ACK - seq_number: %i, data: %s\n", snd_pack.seq_number, snd_pack.data);
-					if (sendto(sock, (char *) &snd_pack, sizeof(snd_pack), 0, (struct sockaddr *) &cli_address, cli_length) < 0) {
+					if (sendto(sock, (char *) &snd_pack, sizeof(snd_pack), 0, (struct sockaddr *) &cli_address, cli_length_receive ) < 0) {
 						perror("errore in sendto");
 						exit(1);
 					}
 				}
 				
 			}else{// Scarto pacchetto per loss prob
-				if(rcv_pack->seq_number != -1)
-					printf("Scarto PK%i per loss prob. rand_for_loss: %f\n", received_seq_number, rand_for_loss);				
+				if(rcv_pack->seq_number != -1){
+					received_seq_number = ntohl(rcv_pack->seq_number);
+					printf("Scarto PK%i per loss prob. rand_for_loss: %f\n", received_seq_number, rand_for_loss);
+				}
 			}
 		}
-		
-		
-		
-		// Se non arriva nulla, packets to check = 0		
-		diff_t = difftime(time(NULL), timeout);
-		
-		// Conversione in msec
-		diff_t = diff_t * 1000;
 
-		// Aspetto per un tempo pari al doppio del timeout
-		if(diff_t >= 3 * TIMEOUT){// Tempo scaduto
+		if(timeout_started){
+			diff_t = difftime(time(NULL), timeout);
 			
-			// Per uscire dal while
-			packets_to_check = 0;
+			// Conversione in msec
+			diff_t = diff_t * 1000;
+
+			// Aspetto per un tempo pari al triplo del timeout
+			if(diff_t >= 3 * TIMEOUT){// Tempo scaduto
+				
+				// Per uscire dal while
+				packets_to_check_receive = 0;
+			}
 		}
 	}
 
