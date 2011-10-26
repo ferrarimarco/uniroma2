@@ -99,7 +99,4 @@ void serviRichiesta_client(int sock_child, char *buff){
 
 	command = seleziona_comando(buff);
 	esegui_comando(buff, command, sock_child, server_addr);
-	
-	if(command != -1)
-		printf("\nComando eseguito\nEnter command: ");
 }
