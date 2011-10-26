@@ -77,6 +77,7 @@ void com_get(char *buff, int sock_child, struct sockaddr_in sender_addr){
 		
 		receive_data(path, sock_child, sender_addr);
 	
+		printf("\nComando eseguito\nEnter command: ");
 	}else{
 		printf("Comando mal formato!\n");
 	}
@@ -123,6 +124,8 @@ void com_put(char *buff, int sock_child, struct sockaddr_in receiver_addr){
 		
 		send_data(path, sock_child, child_server_addr);
 		
+		printf("\nComando eseguito\nEnter command: ");
+		
 	}else{
 		printf("comando mal formato!");
 	}
@@ -141,6 +144,10 @@ void com_list(char *buff, int sock_child, struct sockaddr_in sender_addr){
 		}
 		
 		receive_data(NULL, sock_child, sender_addr);
+		
+		printf("\nComando eseguito\nEnter command: ");
+	}else{
+		printf("comando mal formato!");
 	}
 	
 }
