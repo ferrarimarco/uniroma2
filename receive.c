@@ -14,7 +14,6 @@
 
 #include <pthread.h>
 
-//#include "Packet.h"
 #include "constants.h"
 
 // Threads
@@ -39,17 +38,26 @@ int window_base = 0;
 // File write management
 FILE *file;
 PACKET buffer_write_file[BUFFER_FILE_DIMENSION];
+char *path_receiver;
+
+// File log receiver
+FILE *logfile_rec;
 
 // Prototypes
 void *receiver_thread_func(void *arg);
 
 void receive_data(char *path, int sock_child, struct sockaddr_in cli_addr){
 
+	if(LOG_TO_TEXT_FILE)
+		logfff = fopen(RECEIVER_LOG_FILE_PATH, "w");
+	
 	// Creo il file
 	if(path != NULL)
 		file = fopen(path, "wb");
 	else
 		file = stdout;
+	
+	path_receiver = path;
 
 	if(file == NULL){
 		perror("Errore: impossibile aprire file");
@@ -105,6 +113,8 @@ void *receiver_thread_func(void *arg){
 		rcv_pack->packets_to_check = WIN_DIMENSION;
 		rcv_pack->sock_child = sock;
 		rcv_pack->cli_addr = cli_address;
+		rcv_pack->last_one = 0;
+		rcv_pack->error_packet = 0;
 		
 		rec_from_res = recvfrom(sock, (char *) rcv_pack, sizeof(*rcv_pack), 0, (struct sockaddr *) &cli_address, &cli_length_receive );
 
@@ -129,6 +139,7 @@ void *receiver_thread_func(void *arg){
 						window_receive[received_seq_number % WIN_DIMENSION].data_size = ntohl(rcv_pack->data_size);
 						window_receive[received_seq_number % WIN_DIMENSION].status = 3;
 						window_receive[received_seq_number % WIN_DIMENSION].last_one = ntohl(rcv_pack->last_one);
+						window_receive[received_seq_number % WIN_DIMENSION].error_packet = ntohl(rcv_pack->error_packet);
 						
 						memcpy(&(window_receive[received_seq_number % WIN_DIMENSION].data), rcv_pack->data, window_receive[received_seq_number % WIN_DIMENSION].data_size * sizeof(char));
 					}
@@ -138,7 +149,8 @@ void *receiver_thread_func(void *arg){
 						while(window_receive[window_base % WIN_DIMENSION].status == 3){
 
 							// Scrivo su file
-							scrivi_file(file, window_receive[window_base % WIN_DIMENSION].data, window_receive[window_base % WIN_DIMENSION].data_size);
+							if(!(window_receive[window_base % WIN_DIMENSION].error_packet))
+								scrivi_file(file, window_receive[window_base % WIN_DIMENSION].data, window_receive[window_base % WIN_DIMENSION].data_size);
 
 							window_receive[window_base % WIN_DIMENSION].status = -1;
 							
@@ -152,11 +164,23 @@ void *receiver_thread_func(void *arg){
 									// Chiudo file se ho finito di scrivere
 									fclose(file);
 									
+									// Rimouvo il file se inesistente
+									if(!(window_receive[window_base % WIN_DIMENSION].error_packet)){
+										remove(path_receiver);
+										
+										printf("File inesistente sul server.\n");
+										/*
+										if(LOG_TO_TEXT_FILE)
+											fprintf(logfile_rec, "File inesistente sul server.\n");
+										*/
+									}
+									
 									// Imposto timeout per gestire la chiusura della connessione
 									timeout = time(NULL);
 									
 									// Imposto socket non bloccante
 									printf("\nTutti ricevuti, imposto socket a non bloccante\n");
+									
 									fcntl(sock, F_SETFL, O_NONBLOCK);
 									
 									timeout_started = 1;
@@ -218,7 +242,7 @@ void *receiver_thread_func(void *arg){
 			diff_t = diff_t * 1000;
 
 			// Aspetto per un tempo pari al triplo del timeout e fino ad avere un solo pacchetto da riscontrare
-			if(diff_t >= 3 * TIMEOUT && packets_to_check_receive == 1){// Tempo scaduto
+			if(diff_t >= 10 * TIMEOUT && packets_to_check_receive == 1){// Tempo scaduto
 				
 				// Per uscire dal while
 				packets_to_check_receive = 0;

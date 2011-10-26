@@ -26,13 +26,9 @@ pthread_t ack_checker_thread;
 pthread_t timeout_watcher_thread;
 
 // Conditions
-pthread_cond_t coordinate_condition = PTHREAD_COND_INITIALIZER;
 pthread_cond_t send_condition = PTHREAD_COND_INITIALIZER;
 pthread_cond_t file_read_condition = PTHREAD_COND_INITIALIZER;
 pthread_cond_t timeout_condition = PTHREAD_COND_INITIALIZER;
-
-// Mutexes
-pthread_mutex_t coordinate_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // Data Mutexes
 pthread_mutex_t transm_complete_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -66,7 +62,7 @@ FILE *file;
 unsigned char *temp_read_file;
 PACKET buffer_read_file[BUFFER_FILE_DIMENSION];
 
-// logfff
+// File log sender
 FILE *logfff;
 
 // Prototypes
@@ -115,7 +111,7 @@ void *coordinator_thread_func(void *arg){
 
 	if(LOG_TO_TEXT_FILE){
 		fprintf(logfff, "coord_func - Path: %s\n", path);
-		fprintf(logfff, "coord_func - needed packets: %u\n", needed_packets);
+		fprintf(logfff, "coord_func - needed packets: %i\n", needed_packets);
 	}
 	
 	int i;
@@ -163,21 +159,26 @@ void *coordinator_thread_func(void *arg){
 	
 	while(transm_complete_coord != 1){
 		
+		printf("blocco tcm\n");
+		
 		// Controllo se devo eseguire il while di nuovo
 		pthread_mutex_lock(&transm_complete_mutex);
-				
+		
 		transm_complete_coord = transmission_complete;
-				
+
 		// Controllo se ho completato la trasmissione
 		if(file_read_complete && all_acked){
 			transmission_complete = 1;
+
 			if(LOG_TO_TEXT_FILE){
 				fprintf(logfff, "coord_func - trasmissione completata\n");
 			}
 		}
 		
 		pthread_mutex_unlock(&transm_complete_mutex);
-				
+		
+		printf("sblocco tcm\n");
+		printf("blocco absm\n");
 		// Controllo se devo svegliare il thread che riempie il buffer
 		pthread_mutex_lock(&available_buffer_space_mutex);
 		
@@ -186,7 +187,8 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&available_buffer_space_mutex);
-		
+		printf("sblocco absm\n");
+		printf("blocco awsm\n");
 		// Controllo se devo svegliare il thread che invia i pacchetti
 		pthread_mutex_lock(&available_window_space_mutex);
 		
@@ -195,7 +197,9 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&available_window_space_mutex);
-		
+
+		printf("sblocco awsm\n");
+		printf("blocco absm2\n");
 		// Controllo se devo svegliare il thread che invia i pacchetti
 		pthread_mutex_lock(&available_buffer_space_mutex);
 		
@@ -204,7 +208,8 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&available_buffer_space_mutex);
-		
+		printf("sblocco absm2\n");
+		printf("blocco tqm\n");
 		// Controllo se devo svegliare il thread che gestisce i timeout
 		pthread_mutex_lock(&timeout_queue_mutex);
 
@@ -213,39 +218,29 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&timeout_queue_mutex);
-		
-		// Attendo sulla condizione coordinate_condition, in attesa che cambino uno tra:
-		// Controllo fine trasmissione: file_read_complete, all_acked
-		
-		/*
-		if(!transm_complete_coord){
-			pthread_mutex_lock(&coordinate_mutex);
-
-			pthread_cond_wait(&coordinate_condition, &coordinate_mutex);
-
-			pthread_mutex_unlock(&coordinate_mutex);
-		}*/
+		printf("sblocco tqm\n");
 	}
-	
-	pthread_cond_signal(&send_condition);
-	
-	printf("Attendo sender_thread\n");
+
+	printf("attendo sender\n");
 	pthread_join(sender_thread, NULL);
-	printf("Terminato sender_thread\n");
+	printf("sender ok\n");
 	
-	printf("Attendo file_reader_thread\n");
+	printf("attendo file reader\n");
 	pthread_join(file_reader_thread, NULL);
-	printf("Terminato file_reader_thread\n");
+	printf("sender ok\n");
 	
-	printf("Attendo ack_checker_thread\n");
+	printf("attendo ack_checker_thread\n");
 	pthread_join(ack_checker_thread, NULL);
-	printf("Terminato ack_checker_thread\n");
+	printf("ack_checker_thread ok\n");
 	
-	printf("Attendo timeout_watcher_thread\n");
+	printf("attendo timeout_watcher_thread\n");
 	pthread_join(timeout_watcher_thread, NULL);
-	printf("Terminato timeout_watcher_thread\n");
+	printf("timeout_watcher_thread ok\n");
 	
-	printf("coordinator_thread_func - Termino\n");
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfff, "coordinator_thread_func - Richiesta servita: GET %s\n", path);
+	
+	printf("coordinator_thread_func - Richiesta servita: GET %s\n", path);
 	
 	// Termino thread
 	pthread_exit(NULL);
@@ -273,8 +268,12 @@ void *sender_thread_func(void *arg){
 		
 		// Controllo se ho completato la trasmissione
 		if(transm_complete_sender){// Trasmissione completata: sblocco il mutex ed esco dal while
-		      pthread_mutex_unlock(&transm_complete_mutex);
-		      break;
+			pthread_mutex_unlock(&transm_complete_mutex);
+			
+			fprintf(logfff, "sender_thread_func - Termino\n");
+					
+			// Termino thread
+			pthread_exit(NULL);
 		}
 		
 		pthread_mutex_unlock(&transm_complete_mutex);
@@ -310,7 +309,11 @@ void *sender_thread_func(void *arg){
 			// Controllo se ho completato la trasmissione
 			if(transm_complete_sender){
 				pthread_mutex_unlock(&transm_complete_mutex);
-				break;
+				
+				fprintf(logfff, "sender_thread_func - Termino\n");
+				
+				// Termino thread
+				pthread_exit(NULL);
 			}
 			
 			pthread_mutex_unlock(&transm_complete_mutex);
@@ -324,7 +327,12 @@ void *sender_thread_func(void *arg){
 
 				if(all_acked){
 					pthread_mutex_unlock(&transm_complete_mutex);
-					break;
+					pthread_mutex_unlock(&available_buffer_space_mutex);
+				
+					fprintf(logfff, "sender_thread_func - Termino\n");
+					
+					// Termino thread
+					pthread_exit(NULL);
 				}
 				
 				pthread_mutex_unlock(&transm_complete_mutex);
@@ -354,7 +362,11 @@ void *sender_thread_func(void *arg){
 				}
 				
 				pthread_mutex_unlock(&transm_complete_mutex);
-				break;
+				
+				fprintf(logfff, "sender_thread_func - Termino\n");
+				
+				// Termino thread
+				pthread_exit(NULL);
 			}
 			
 			pthread_mutex_unlock(&transm_complete_mutex);
@@ -368,7 +380,7 @@ void *sender_thread_func(void *arg){
 			window_send[window_position].data_size = htonl(buffer_read_file[buffer_position].data_size);
 
 			// Controllo se è l'ultimo pacchetto da inviare
-			if(next_sequence_number == needed_packets - 1){
+			if(next_sequence_number == needed_packets - 1 || needed_packets == -1){
 				window_send[window_position].last_one = htonl(1);
 			}
 			
@@ -436,12 +448,7 @@ void *sender_thread_func(void *arg){
 				if(LOG_TO_TEXT_FILE)
 					fprintf(logfff, "sender - spazio libero nella finestra: %i\n", available_window_space);
 					
-				pthread_mutex_unlock(&available_window_space_mutex);
-				
-				// Invio segnale a coordinator_thread (available_window_space è stato modificato)
-				pthread_mutex_lock(&coordinate_mutex);
-				pthread_cond_signal(&coordinate_condition);
-				pthread_mutex_unlock(&coordinate_mutex);		
+				pthread_mutex_unlock(&available_window_space_mutex);		
 				
 				// Incremento available_buffer_space di uno
 				pthread_mutex_lock(&available_buffer_space_mutex);
@@ -451,16 +458,11 @@ void *sender_thread_func(void *arg){
 					fprintf(logfff, "sender - spazio libero nel buffer: %i\n", available_buffer_space);
 
 				pthread_mutex_unlock(&available_buffer_space_mutex);
-
-				// Invio segnale a coordinator_thread (available_buffer_space è stato modificato)
-				pthread_mutex_lock(&coordinate_mutex);
-				pthread_cond_signal(&coordinate_condition);
-				pthread_mutex_unlock(&coordinate_mutex);
 			}
 		}
 	}
 	
-	printf("sender_thread_func - Termino\n");
+	fprintf(logfff, "sender_thread_func - Termino\n");
 	
 	// Termino thread
 	pthread_exit(NULL);
@@ -483,9 +485,46 @@ void *file_reader_thread_func(void *arg){
 	// Inizio lettura da file
 	file = fopen(path, "rb");
 	
-	if(file == NULL){
-		perror("Errore: impossibile aprire file");
-		exit(1);
+	if(file == NULL){// Errore sull'apertura del file
+		fprintf(logfff, "Errore: impossibile aprire file\n");
+
+		// Inserisco i dati nel pacchetto
+		pthread_mutex_lock(&buffer_read_file_mutex);
+		
+		buffer_read_file[0].error_packet = 1;
+		
+		// Imposto stato del pacchetto (0 = non nella finestra ma solo nel buffer)
+		buffer_read_file[0].status = 0;
+		buffer_read_file[0].data_size = 0;
+		
+		pthread_mutex_unlock(&buffer_read_file_mutex);
+		
+		// Decremento available_buffer_space di uno
+		pthread_mutex_lock(&available_buffer_space_mutex);
+
+		available_buffer_space--;
+
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "file reader - spazio libero nel buffer: %i\n", available_buffer_space);
+		
+		pthread_mutex_unlock(&available_buffer_space_mutex);
+
+		pthread_mutex_lock(&transm_complete_mutex);
+
+		file_read_complete = 1;
+		
+		if(LOG_TO_TEXT_FILE){
+			fprintf(logfff, "file_reader_thread_func - read complete!\n");
+		
+			fprintf(logfff, "file_read: pacchetti letti: %i\n", packets_read);
+		}
+		
+		pthread_mutex_unlock(&transm_complete_mutex);
+		
+		fprintf(logfff, "file_reader_thread - termino!\n");
+		
+		// Termino thread
+		pthread_exit(NULL);
 	}
 		
 	while(transm_complete_file_reader != 1){
@@ -499,8 +538,16 @@ void *file_reader_thread_func(void *arg){
 		
 		// Controllo se ho completato la trasmissione
 		if(transm_complete_file_reader){
-		      pthread_mutex_unlock(&transm_complete_mutex);
-		      break;
+			
+			pthread_mutex_unlock(&transm_complete_mutex);
+			
+			// Chiudo file se ho finito di leggere
+			fclose(file);
+				
+			fprintf(logfff, "file_reader_thread - termino!\n");
+				
+			// Termino thread
+			pthread_exit(NULL);
 		}
 		
 		pthread_mutex_unlock(&transm_complete_mutex);
@@ -529,8 +576,16 @@ void *file_reader_thread_func(void *arg){
 		
 		// Controllo se ho completato la trasmissione
 		if(transm_complete_file_reader){
-		      pthread_mutex_unlock(&transm_complete_mutex);
-		      break;
+			
+			pthread_mutex_unlock(&transm_complete_mutex);
+			
+			// Chiudo file se ho finito di leggere
+			fclose(file);
+				
+			fprintf(logfff, "file_reader_thread_func - ho finito di leggere, termino!\n");
+				
+			// Termino thread
+			pthread_exit(NULL);
 		}
 
 		file_read_complete_reader = file_read_complete;
@@ -576,13 +631,6 @@ void *file_reader_thread_func(void *arg){
 					fprintf(logfff, "file reader - spazio libero nel buffer: %i\n", available_buffer_space);
 				
 				pthread_mutex_unlock(&available_buffer_space_mutex);
-
-				// Invio segnale a coordinator_thread (available_buffer_space è stato modificato)
-				pthread_mutex_lock(&coordinate_mutex);
-
-				pthread_cond_signal(&coordinate_condition);
-				
-				pthread_mutex_unlock(&coordinate_mutex);
 				
 				packets_read++;
 				
@@ -599,26 +647,16 @@ void *file_reader_thread_func(void *arg){
 				
 				pthread_mutex_unlock(&transm_complete_mutex);
 				
-				// Invio segnale a coordinator_thread (file_read_complete è stato modificato)
-				pthread_mutex_lock(&coordinate_mutex);
-
-				pthread_cond_signal(&coordinate_condition);
+				// Chiudo file se ho finito di leggere
+				fclose(file);
 				
-				pthread_mutex_unlock(&coordinate_mutex);	
+				fprintf(logfff, "file_reader_thread_func - ho finito di leggere, termino!\n");
+				
+				// Termino thread
+				pthread_exit(NULL);
 			}
-			
-			
-		}		
+		}
 	}
-	
-	// Chiudo file se ho finito di leggere
-	fclose(file);
-	
-	
-	printf("file_reader_thread_func - ho finito di leggere, termino!\n");
-	
-	// Termino thread
-	pthread_exit(NULL);	
 }
 
 void *ack_checker_thread_func(void *arg){
@@ -711,11 +749,6 @@ void *ack_checker_thread_func(void *arg){
 								if(LOG_TO_TEXT_FILE)
 									fprintf(logfff, "acker - riscontrata base\n");
 							}
-							
-							// Invio segnale a coordinator_thread (available_window_space è stato modificato)
-							pthread_mutex_lock(&coordinate_mutex);
-							pthread_cond_signal(&coordinate_condition);
-							pthread_mutex_unlock(&coordinate_mutex);
 						}
 						
 						pthread_mutex_unlock(&window_mutex);
@@ -726,32 +759,20 @@ void *ack_checker_thread_func(void *arg){
 						fprintf(logfff, "ack_checker_thread_func - Scarto ACK%i per loss prob. rand_for_loss: %f\n", received_seq_number, rand_for_loss);
 				}
 			}
-			
-			pthread_mutex_lock(&transm_complete_mutex);
-			
+					
 			if(window_base >= needed_packets){// Trasmissione completata
-				
+				pthread_mutex_lock(&transm_complete_mutex);
 				all_acked = 1;
+				pthread_mutex_unlock(&transm_complete_mutex);
 				
 				if(LOG_TO_TEXT_FILE)
-					fprintf(logfff, "ack_checker_thread_func - All acked\n");
-				
-				// Invio segnale a coordinator_thread (all_acked è stato modificato)
-				pthread_mutex_lock(&coordinate_mutex);
-				pthread_cond_signal(&coordinate_condition);
-				pthread_mutex_unlock(&coordinate_mutex);				
-				
-				break;
+					fprintf(logfff, "ack_checker_thread_func - All acked, termino\n");				
+
+				// Termino thread
+				pthread_exit(NULL);
 			}
-			
-			pthread_mutex_unlock(&transm_complete_mutex);
 		}
 	}
-	
-	printf("ack_checker_thread_func - Termino\n");
-	
-	// Termino thread
-	pthread_exit(NULL);
 }
 
 void *timeout_watcher_thread_func(void *arg){
@@ -802,7 +823,12 @@ void *timeout_watcher_thread_func(void *arg){
 			// Controllo se ho completato la trasmissione
 			if(all_acked){
 				pthread_mutex_unlock(&transm_complete_mutex);
-				break;
+				pthread_mutex_unlock(&timeout_queue_mutex);
+				
+				fprintf(logfff, "timeout_watcher_thread - Termino\n");
+			
+				// Termino thread
+				pthread_exit(NULL);
 			}
 			
 			pthread_mutex_unlock(&transm_complete_mutex);
@@ -818,7 +844,12 @@ void *timeout_watcher_thread_func(void *arg){
 		// Controllo se ho completato la trasmissione
 		if(all_acked){
 			pthread_mutex_unlock(&transm_complete_mutex);
-			break;
+			pthread_mutex_unlock(&timeout_queue_mutex);
+			
+			fprintf(logfff, "timeout_watcher_thread - Termino\n");
+			
+			// Termino thread
+			pthread_exit(NULL);
 		}
 		
 		pthread_mutex_unlock(&transm_complete_mutex);
@@ -870,15 +901,15 @@ void *timeout_watcher_thread_func(void *arg){
 		
 		// Controllo se ho completato la trasmissione
 		if(all_acked){
+			
 			pthread_mutex_unlock(&transm_complete_mutex);
-			break;
+			
+			fprintf(logfff, "timeout_watcher_thread - Termino\n");
+			
+			// Termino thread
+			pthread_exit(NULL);
 		}
 		
 		pthread_mutex_unlock(&transm_complete_mutex);
-	}
-	
-	printf("timeout_watcher_thread - Termino\n");
-	
-	// Termino thread
-	pthread_exit(NULL);	
+	}	
 }
