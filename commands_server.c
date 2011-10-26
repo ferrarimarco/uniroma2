@@ -50,8 +50,6 @@ void com_get(char *buff, int sock_child, struct sockaddr_in receiver_addr){
 	char delims[] = " ";
 	char *path;
 
-	int i;
-
 	//Mi muovo fino all'inizio del nome file
 	file_name = strtok(buff, delims);
 	file_name = strtok(NULL, delims);

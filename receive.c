@@ -201,19 +201,24 @@ void *receiver_thread_func(void *arg){
 			}else{// Scarto pacchetto per loss prob
 				if(rcv_pack->seq_number != -1){
 					received_seq_number = ntohl(rcv_pack->seq_number);
-					printf("Scarto PK%i per loss prob. rand_for_loss: %f\n", received_seq_number, rand_for_loss);
+					//printf("Scarto PK%i per loss prob. rand_for_loss: %f\n", received_seq_number, rand_for_loss);
 				}
 			}
 		}
 
+		if(rcv_pack->seq_number != -1){
+			received_seq_number = ntohl(rcv_pack->seq_number);
+		}
+		
 		if(timeout_started){
+		
 			diff_t = difftime(time(NULL), timeout);
 			
 			// Conversione in msec
 			diff_t = diff_t * 1000;
 
-			// Aspetto per un tempo pari al triplo del timeout
-			if(diff_t >= 3 * TIMEOUT){// Tempo scaduto
+			// Aspetto per un tempo pari al triplo del timeout e fino ad avere un solo pacchetto da riscontrare
+			if(diff_t >= 3 * TIMEOUT && packets_to_check_receive == 1){// Tempo scaduto
 				
 				// Per uscire dal while
 				packets_to_check_receive = 0;

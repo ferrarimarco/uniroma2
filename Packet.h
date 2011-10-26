@@ -26,5 +26,8 @@ typedef struct {
 	// Is the last packet?
 	int last_one;
 	
+	// Error condition (wrong command)
+	int error_packet;
+	
 } PACKET;
 

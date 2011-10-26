@@ -19,21 +19,20 @@ struct sockaddr_in server_addr;
 char *buff_comm;
 
 //Prototipi
-void inizializzazionePadre(int *socket_father);
+void inizializzazionePadre_client();
 void inizializzazioneFiglio(int *socket_child);
-void serviRichiesta(int sock_father, int sock_child, char *buff);
+void serviRichiesta_client(int sock_child, char *buff);
 
 int main(int argc, char *argv[ ]){
 	
-	int sock_f;
 	int sock_child;
 
-	inizializzazionePadre(&sock_f);
+	inizializzazionePadre_client();
 	
 	printf("Client init completed\n");
 	
 	memset(buff_comm, ' ', sizeof(*buff_comm));
-	
+		
 	printf("Enter the IP address of the server: ");
 	gets(buff_comm);
 
@@ -57,7 +56,7 @@ int main(int argc, char *argv[ ]){
 
 	inizializzazioneFiglio(&sock_child);
 
-	serviRichiesta(sock_f, sock_child, buff_comm);
+	serviRichiesta_client(sock_child, buff_comm);
 	
 	//Chiudo socket del figlio
 	if(close(sock_child) < 0){
@@ -68,22 +67,13 @@ int main(int argc, char *argv[ ]){
 	exit(0);
 }
 
-void inizializzazionePadre(int *socket_father){
+void inizializzazionePadre_client(){
 
 	buff_comm = (char *) malloc(MAX_PK_DATA_SIZE);
 
 	//Per entrare nel while del padre
 	//NOTA: fork restituisce 0 al figlio, pid del figlio al padre
-	pid = 1;	
-	
-	//Creo socket
-	//AF_INET = IPv4
-	//SOCK_DGRAM = servizio senza connessione
-	//0 = default protocol
-	if ((*socket_father = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-		perror("errore in socket");
-		exit(-1);
-	}
+	pid = 1;
 
 	//struct per indirizzo di rete del server
 	memset((void *)&server_addr, 0, sizeof(server_addr));
@@ -102,13 +92,7 @@ void inizializzazioneFiglio(int *socket_child){
 	}
 }
 
-void serviRichiesta(int sock_father, int sock_child, char *buff){
-	
-	//Chiudo socket del padre
-	if(close(sock_father) < 0){
-		perror("errore in socket");
-		exit(-1);
-	}
+void serviRichiesta_client(int sock_child, char *buff){
 
 	int command;
 	command = -1;
@@ -116,5 +100,6 @@ void serviRichiesta(int sock_father, int sock_child, char *buff){
 	command = seleziona_comando(buff);
 	esegui_comando(buff, command, sock_child, server_addr);
 	
-	printf("\nComando eseguito\nEnter command: ");
+	if(command != -1)
+		printf("\nComando eseguito\nEnter command: ");
 }

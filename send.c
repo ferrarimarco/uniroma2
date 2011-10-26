@@ -78,13 +78,14 @@ void *timeout_watcher_thread_func(void *arg);
 
 
 
-void send_data(char *path, int sock_child, struct sockaddr_in cli_addr){
+void send_data(char *path, int sock_child, struct sockaddr_in receiver_addr){
 	
-	logfff = fopen(SENDER_LOG_FILE_PATH, "w");
+	if(LOG_TO_TEXT_FILE)
+		logfff = fopen(SENDER_LOG_FILE_PATH, "w");
 	
 	// Inizializzazione
 	sock = sock_child;
-	cli_address = cli_addr;
+	cli_address = receiver_addr;
 	
 	// Thread coordinatore
 	void *path_pointer = (void *) path;
@@ -112,8 +113,10 @@ void *coordinator_thread_func(void *arg){
 	
 	pthread_mutex_unlock(&transm_complete_mutex);
 
-	fprintf(logfff, "coord_func - Path: %s\n", path);
-	fprintf(logfff, "coord_func - needed packets: %u\n", needed_packets);
+	if(LOG_TO_TEXT_FILE){
+		fprintf(logfff, "coord_func - Path: %s\n", path);
+		fprintf(logfff, "coord_func - needed packets: %u\n", needed_packets);
+	}
 	
 	int i;
 	
@@ -168,7 +171,9 @@ void *coordinator_thread_func(void *arg){
 		// Controllo se ho completato la trasmissione
 		if(file_read_complete && all_acked){
 			transmission_complete = 1;
-			printf("coord_func - trasmissione completata\n");
+			if(LOG_TO_TEXT_FILE){
+				fprintf(logfff, "coord_func - trasmissione completata\n");
+			}
 		}
 		
 		pthread_mutex_unlock(&transm_complete_mutex);
@@ -286,9 +291,11 @@ void *sender_thread_func(void *arg){
 			pthread_mutex_lock(&available_window_space_mutex);
 
 			while(available_window_space == 0){
-				test_sender++;
-				if(test_sender < 100){
-					fprintf(logfff, "sender - finestra piena. aws: %i\n", available_window_space);
+				if(LOG_TO_TEXT_FILE){
+					test_sender++;
+					if(test_sender < 100){
+						fprintf(logfff, "sender - finestra piena. aws: %i\n", available_window_space);
+					}
 				}
 				
 				pthread_cond_wait(&send_condition, &available_window_space_mutex);
@@ -322,9 +329,11 @@ void *sender_thread_func(void *arg){
 				
 				pthread_mutex_unlock(&transm_complete_mutex);
 				
-				test_sender++;
-				if(test_sender < 100){
-					fprintf(logfff, "sender - buffer vuoto. abs: %i\n", available_buffer_space);
+				if(LOG_TO_TEXT_FILE){
+					test_sender++;
+					if(test_sender < 100){
+						fprintf(logfff, "sender - buffer vuoto. abs: %i\n", available_buffer_space);
+					}
 				}
 
 				pthread_cond_wait(&send_condition, &available_buffer_space_mutex);
@@ -339,7 +348,11 @@ void *sender_thread_func(void *arg){
 			
 			// Controllo se ho completato la trasmissione
 			if(all_acked){
-				fprintf(logfff, "sender - all acked\n");
+			
+				if(LOG_TO_TEXT_FILE){
+					fprintf(logfff, "sender - all acked\n");
+				}
+				
 				pthread_mutex_unlock(&transm_complete_mutex);
 				break;
 			}
@@ -374,8 +387,6 @@ void *sender_thread_func(void *arg){
 			// Inserisco il pacchetto nella coda dei timeout
 			pthread_mutex_lock(&timeout_queue_mutex);
 
-			//timeout_queue[packets_to_check_send].seq_number = window_send[window_position].seq_number;
-			
 			// Per evitare la riconversione da network a host uso direttamente next_sequence_number
 			// invece di window_send[window_position].seq_number
 			timeout_queue[packets_to_check_send].seq_number = next_sequence_number;
@@ -388,7 +399,8 @@ void *sender_thread_func(void *arg){
 			//window_send[window_position].packets_to_check_send = packets_to_check_send;
 			window_send[window_position].packets_to_check = htonl(packets_to_check_send);
 			
-			fprintf(logfff, "sender - invio pacchetto %i\n", ntohl(window_send[window_position].seq_number));
+			if(LOG_TO_TEXT_FILE)
+				fprintf(logfff, "sender - invio pacchetto %i\n", ntohl(window_send[window_position].seq_number));
 			
 			// Invio pacchetto
 			int send_ret = sendto(window_send[window_position].sock_child, (char *) &(window_send[window_position]), sizeof(window_send[window_position]), 0, (struct sockaddr *) &((&(window_send[window_position]))->cli_addr), cli_length_send);
@@ -397,18 +409,19 @@ void *sender_thread_func(void *arg){
 				perror("sender_thread_func - Errore in sendto");
 				exit(1);
 			}else{
-				fprintf(logfff, "sender_thread_func - Pacchetto %i inviato\n", ntohl(window_send[window_position].seq_number));
+				if(LOG_TO_TEXT_FILE){
+					fprintf(logfff, "sender_thread_func - Pacchetto %i inviato\n", ntohl(window_send[window_position].seq_number));
 
-				int k;
-				for(k = 0; k < WIN_DIMENSION; k++){
-					fprintf(logfff, "sender_thread_func - window_send[%i] - seq_number: %i, status: %i\n", k, ntohl(window_send[k].seq_number), window_send[k].status);
-					
+					int k;
+					for(k = 0; k < WIN_DIMENSION; k++){
+						fprintf(logfff, "sender_thread_func - window_send[%i] - seq_number: %i, status: %i\n", k, ntohl(window_send[k].seq_number), window_send[k].status);
+						
+					}
+
+					for(k = 0; k < WIN_DIMENSION; k++){
+						fprintf(logfff, "sender_thread_func - tq[%i] - seq_number: %i\n", k, timeout_queue[k].seq_number);	
+					}
 				}
-
-				for(k = 0; k < WIN_DIMENSION; k++){
-					fprintf(logfff, "sender_thread_func - tq[%i] - seq_number: %i\n", k, timeout_queue[k].seq_number);	
-				}
-
 				pthread_mutex_unlock(&timeout_queue_mutex);
 				
 				pthread_mutex_unlock(&window_mutex);
@@ -419,7 +432,10 @@ void *sender_thread_func(void *arg){
 				// Decremento available_window_space di uno
 				pthread_mutex_lock(&available_window_space_mutex);
 				available_window_space--;
-				fprintf(logfff, "sender - spazio libero nella finestra: %i\n", available_window_space);
+				
+				if(LOG_TO_TEXT_FILE)
+					fprintf(logfff, "sender - spazio libero nella finestra: %i\n", available_window_space);
+					
 				pthread_mutex_unlock(&available_window_space_mutex);
 				
 				// Invio segnale a coordinator_thread (available_window_space è stato modificato)
@@ -430,7 +446,9 @@ void *sender_thread_func(void *arg){
 				// Incremento available_buffer_space di uno
 				pthread_mutex_lock(&available_buffer_space_mutex);
 				available_buffer_space++;
-				fprintf(logfff, "sender - spazio libero nel buffer: %i\n", available_buffer_space);
+				
+				if(LOG_TO_TEXT_FILE)
+					fprintf(logfff, "sender - spazio libero nel buffer: %i\n", available_buffer_space);
 
 				pthread_mutex_unlock(&available_buffer_space_mutex);
 
@@ -491,11 +509,15 @@ void *file_reader_thread_func(void *arg){
 		pthread_mutex_lock(&available_buffer_space_mutex);
 		
 		while(available_buffer_space == 0 && !file_read_complete_reader){
-			test_file_reader++;
 			
-			if(test_file_reader < 100){
-				fprintf(logfff, "file reader - buffer pieno. abs: %i\n", available_buffer_space);
+			if(LOG_TO_TEXT_FILE){
+				test_file_reader++;
+				
+				if(test_file_reader < 100){
+					fprintf(logfff, "file reader - buffer pieno. abs: %i\n", available_buffer_space);
+				}
 			}
+			
 			pthread_cond_wait(&file_read_condition, &available_buffer_space_mutex);
 		}
 		
@@ -519,7 +541,8 @@ void *file_reader_thread_func(void *arg){
 
 			if(file_read_amount = leggi_file(file, &temp_read_file)){// Ho letto dati	
 				
-				fprintf(logfff, "file reader - inserisco pacchetto nel buffer\n");
+				if(LOG_TO_TEXT_FILE)
+					fprintf(logfff, "file reader - inserisco pacchetto nel buffer\n");
 				
 				// Inserisco i dati nel pacchetto
 				pthread_mutex_lock(&buffer_read_file_mutex);
@@ -531,10 +554,12 @@ void *file_reader_thread_func(void *arg){
 				
 				buffer_read_file[buffer_position].data_size = file_read_amount;
 				
-				int k;
-				for(k = 0; k < WIN_DIMENSION; k++){
-					fprintf(logfff, "sender_thread_func - buffer_read_file[%i] - seq_number: %i, status: %i\n", k, ntohl(window_send[k].seq_number), window_send[k].status);
-					
+				if(LOG_TO_TEXT_FILE){
+					int k;
+					for(k = 0; k < WIN_DIMENSION; k++){
+						fprintf(logfff, "sender_thread_func - buffer_read_file[%i] - seq_number: %i, status: %i\n", k, ntohl(window_send[k].seq_number), window_send[k].status);
+						
+					}
 				}
 				
 				pthread_mutex_unlock(&buffer_read_file_mutex);
@@ -547,7 +572,8 @@ void *file_reader_thread_func(void *arg){
 
 				available_buffer_space--;
 
-				fprintf(logfff, "file reader - spazio libero nel buffer: %i\n", available_buffer_space);
+				if(LOG_TO_TEXT_FILE)
+					fprintf(logfff, "file reader - spazio libero nel buffer: %i\n", available_buffer_space);
 				
 				pthread_mutex_unlock(&available_buffer_space_mutex);
 
@@ -565,9 +591,11 @@ void *file_reader_thread_func(void *arg){
 
 				file_read_complete = 1;
 				
-				fprintf(logfff, "file_reader_thread_func - read complete!\n");
+				if(LOG_TO_TEXT_FILE){
+					fprintf(logfff, "file_reader_thread_func - read complete!\n");
 				
-				fprintf(logfff, "file_read: pacchetti letti: %i\n", packets_read);
+					fprintf(logfff, "file_read: pacchetti letti: %i\n", packets_read);
+				}
 				
 				pthread_mutex_unlock(&transm_complete_mutex);
 				
@@ -586,7 +614,8 @@ void *file_reader_thread_func(void *arg){
 	// Chiudo file se ho finito di leggere
 	fclose(file);
 	
-	fprintf(logfff, "file_reader_thread_func - ho finito di leggere, termino!\n");
+	
+	printf("file_reader_thread_func - ho finito di leggere, termino!\n");
 	
 	// Termino thread
 	pthread_exit(NULL);	
@@ -628,7 +657,8 @@ void *ack_checker_thread_func(void *arg){
 
 				received_seq_number = ntohl(rcv_pack->seq_number);
 				
-				fprintf(logfff, "ack_checker_thread_func - Ricevuto ACK%i\n", received_seq_number);
+				if(LOG_TO_TEXT_FILE)
+					fprintf(logfff, "ack_checker_thread_func - Ricevuto ACK%i\n", received_seq_number);
 			
 				rand_for_loss = (float) (rand() % 10) / 10;
 				
@@ -651,7 +681,8 @@ void *ack_checker_thread_func(void *arg){
 							for(u = 0; u < WIN_DIMENSION; u++){
 								if(timeout_queue[u].seq_number == received_seq_number){
 									
-									fprintf(logfff, "acker - riscontrato pk %i\n", received_seq_number);
+									if(LOG_TO_TEXT_FILE)
+										fprintf(logfff, "acker - riscontrato pk %i\n", received_seq_number);
 									
 									memmove(timeout_queue + u, timeout_queue + u + 1, sizeof(timeout_queue) - (u + 1) * sizeof(timeout_queue[u]));
 									
@@ -677,7 +708,8 @@ void *ack_checker_thread_func(void *arg){
 								available_window_space++;
 								pthread_mutex_unlock(&available_window_space_mutex);
 								
-								fprintf(logfff, "acker - riscontrata base\n");
+								if(LOG_TO_TEXT_FILE)
+									fprintf(logfff, "acker - riscontrata base\n");
 							}
 							
 							// Invio segnale a coordinator_thread (available_window_space è stato modificato)
@@ -690,7 +722,8 @@ void *ack_checker_thread_func(void *arg){
 					}
 					
 				}else{// Scarto pacchetto per loss prob
-					fprintf(logfff, "ack_checker_thread_func - Scarto ACK%i per loss prob. rand_for_loss: %f\n", received_seq_number, rand_for_loss);
+					if(LOG_TO_TEXT_FILE)
+						fprintf(logfff, "ack_checker_thread_func - Scarto ACK%i per loss prob. rand_for_loss: %f\n", received_seq_number, rand_for_loss);
 				}
 			}
 			
@@ -699,8 +732,9 @@ void *ack_checker_thread_func(void *arg){
 			if(window_base >= needed_packets){// Trasmissione completata
 				
 				all_acked = 1;
-
-				fprintf(logfff, "ack_checker_thread_func - All acked\n");
+				
+				if(LOG_TO_TEXT_FILE)
+					fprintf(logfff, "ack_checker_thread_func - All acked\n");
 				
 				// Invio segnale a coordinator_thread (all_acked è stato modificato)
 				pthread_mutex_lock(&coordinate_mutex);
@@ -714,7 +748,7 @@ void *ack_checker_thread_func(void *arg){
 		}
 	}
 	
-	fprintf(logfff, "ack_checker_thread_func - Termino\n");
+	printf("ack_checker_thread_func - Termino\n");
 	
 	// Termino thread
 	pthread_exit(NULL);
@@ -772,7 +806,9 @@ void *timeout_watcher_thread_func(void *arg){
 			}
 			
 			pthread_mutex_unlock(&transm_complete_mutex);
-			fprintf(logfff, "file reader - wait su condizione: window empty\n");
+			
+			if(LOG_TO_TEXT_FILE)
+				fprintf(logfff, "file reader - wait su condizione: window empty\n");
 
 			pthread_cond_wait(&timeout_condition, &timeout_queue_mutex);
 		}
@@ -799,7 +835,8 @@ void *timeout_watcher_thread_func(void *arg){
 				diff_t = diff_t * 1000;
 
 				if(diff_t >= TIMEOUT){// Timeout scaduto
-					fprintf(logfff, "timeout - timeout pacchetto %i scaduto. Reinvio\n", timeout_queue[0].seq_number);
+					if(LOG_TO_TEXT_FILE)
+						fprintf(logfff, "timeout - timeout pacchetto %i scaduto. Reinvio\n", timeout_queue[0].seq_number);
 					
 					// Incremento la posizione fine della coda
 					if(packets_to_check_send > 1){

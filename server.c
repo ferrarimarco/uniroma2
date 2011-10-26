@@ -25,7 +25,7 @@ struct sockaddr_in cli_addr;
 //Prototipi
 void inizializzazionePadre(int *s);
 void inizializzazioneFiglio(int *child, in_port_t client_port, in_addr_t client_address);
-void serviRichiesta(int sockfd, int sock_child, char *buff);
+void serviRichiesta_server(int sockfd, int sock_child, char *buff);
 
 int main(int argc, char *argv[ ]){
 	int sockfd;
@@ -69,7 +69,7 @@ int main(int argc, char *argv[ ]){
 
 	inizializzazioneFiglio(&sock_child, client_port, client_ip);
 
-	serviRichiesta(sockfd, sock_child, buff);
+	serviRichiesta_server(sockfd, sock_child, buff);
 
 	//Chiudo socket del figlio
 	if(close(sock_child) < 0){
@@ -141,7 +141,7 @@ void inizializzazioneFiglio(int *child, in_port_t client_p, in_addr_t client_add
 	}*/
 }
 
-void serviRichiesta(int sockfd, int sock_child, char *buff){
+void serviRichiesta_server(int sockfd, int sock_child, char *buff){
 
 	//Chiudo socket del padre
 	if(close(sockfd) < 0){

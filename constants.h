@@ -3,13 +3,13 @@
 
 #define MAX_PK_DATA_SIZE 512
 
-#define BUFFER_FILE_DIMENSION 16834
-#define WIN_DIMENSION 2
+#define BUFFER_FILE_DIMENSION 30000
+#define WIN_DIMENSION 20000
 
 // Timeout in msec
 #define TIMEOUT 300
 
-#define LOSS_PROBABILITY 0.0
+#define LOSS_PROBABILITY 0.2
 
 #define SERVER_SHARE_PATH "/home/marco/share/"
 
@@ -18,3 +18,5 @@
 
 #define FILES_ONLY 1
 #define SENDER_LOG_FILE_PATH "/home/marco/log_file_send.txt"
+
+#define LOG_TO_TEXT_FILE 0
