@@ -149,7 +149,7 @@ void serviRichiesta_server(int sockfd, int sock_child, char *buff){
 		exit(-1);
 	}
 	
-	printf("server - comando ricevuto: %s, socket padre: %i, socket figlio: %i\n", buff, sockfd, sock_child);
+	printf("server - comando ricevuto: %s\n", buff);
 	
 	
 	int command;
