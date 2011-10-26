@@ -18,5 +18,6 @@
 
 #define FILES_ONLY 1
 #define SENDER_LOG_FILE_PATH "/home/marco/log_file_send.txt"
+#define RECEIVER_LOG_FILE_PATH "/home/marco/log_file_receive.txt"
 
-#define LOG_TO_TEXT_FILE 0
+#define LOG_TO_TEXT_FILE 1
