@@ -158,9 +158,7 @@ void *coordinator_thread_func(void *arg){
 	int transm_complete_coord = 0;
 	
 	while(transm_complete_coord != 1){
-		
-		printf("blocco tcm\n");
-		
+
 		// Controllo se devo eseguire il while di nuovo
 		pthread_mutex_lock(&transm_complete_mutex);
 		
@@ -176,9 +174,7 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&transm_complete_mutex);
-		
-		printf("sblocco tcm\n");
-		printf("blocco absm\n");
+
 		// Controllo se devo svegliare il thread che riempie il buffer
 		pthread_mutex_lock(&available_buffer_space_mutex);
 		
@@ -187,8 +183,7 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&available_buffer_space_mutex);
-		printf("sblocco absm\n");
-		printf("blocco awsm\n");
+
 		// Controllo se devo svegliare il thread che invia i pacchetti
 		pthread_mutex_lock(&available_window_space_mutex);
 		
@@ -198,8 +193,6 @@ void *coordinator_thread_func(void *arg){
 		
 		pthread_mutex_unlock(&available_window_space_mutex);
 
-		printf("sblocco awsm\n");
-		printf("blocco absm2\n");
 		// Controllo se devo svegliare il thread che invia i pacchetti
 		pthread_mutex_lock(&available_buffer_space_mutex);
 		
@@ -208,8 +201,7 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&available_buffer_space_mutex);
-		printf("sblocco absm2\n");
-		printf("blocco tqm\n");
+
 		// Controllo se devo svegliare il thread che gestisce i timeout
 		pthread_mutex_lock(&timeout_queue_mutex);
 
@@ -218,24 +210,12 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&timeout_queue_mutex);
-		printf("sblocco tqm\n");
 	}
 
-	printf("attendo sender\n");
 	pthread_join(sender_thread, NULL);
-	printf("sender ok\n");
-	
-	printf("attendo file reader\n");
 	pthread_join(file_reader_thread, NULL);
-	printf("sender ok\n");
-	
-	printf("attendo ack_checker_thread\n");
 	pthread_join(ack_checker_thread, NULL);
-	printf("ack_checker_thread ok\n");
-	
-	printf("attendo timeout_watcher_thread\n");
 	pthread_join(timeout_watcher_thread, NULL);
-	printf("timeout_watcher_thread ok\n");
 	
 	if(LOG_TO_TEXT_FILE)
 		fprintf(logfff, "coordinator_thread_func - Richiesta servita: GET %s\n", path);

@@ -20,4 +20,4 @@
 #define SENDER_LOG_FILE_PATH "/home/marco/log_file_send.txt"
 #define RECEIVER_LOG_FILE_PATH "/home/marco/log_file_receive.txt"
 
-#define LOG_TO_TEXT_FILE 1
+#define LOG_TO_TEXT_FILE 0
