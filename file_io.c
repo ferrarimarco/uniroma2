@@ -53,7 +53,7 @@ int file_size(char *path){
 
 	if( file == NULL ){
 		printf( "file_size - Error opening file: %s\n", strerror( errno ) );
-		exit(1);
+		return -1;
 	}
 
 	// Calcolo le dimensioni del file
