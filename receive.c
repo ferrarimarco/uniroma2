@@ -59,6 +59,8 @@ void receive_data(char *path, int sock_child, struct sockaddr_in cli_addr){
 	
 	path_receiver = path;
 
+	printf("Receiver path: %s\n", path_receiver);
+	
 	if(file == NULL){
 		perror("Errore: impossibile aprire file");
 		exit(1);
@@ -72,8 +74,7 @@ void receive_data(char *path, int sock_child, struct sockaddr_in cli_addr){
 		window_receive[i] = packet;
 	}
 	
-	if(LOG_TO_TEXT_FILE)
-		fprintf(logfile_rec, "receive_data: inizializzazione completata\n");
+	printf("receive_data: inizializzazione completata\n");
 	
 	// Creo il thread per gestire la ricezione
 	if(pthread_create(&receiver_thread, NULL, receiver_thread_func, NULL) == EAGAIN){
@@ -119,18 +120,26 @@ void *receiver_thread_func(void *arg){
 		rcv_pack->last_one = 0;
 		rcv_pack->error_packet = 0;
 		
+		//printf("mi blocco sulla rcvfrom\n");
+		
 		rec_from_res = recvfrom(sock, (char *) rcv_pack, sizeof(*rcv_pack), 0, (struct sockaddr *) &cli_address, &cli_length_receive );
 
+		//printf("ho ricevuto qualcosa\n");
+		
 		if(rec_from_res == EAGAIN || rec_from_res ==  EWOULDBLOCK){
 			perror("errore in recvfrom");
 			exit(1);
 		}else{
+			
+			if(rcv_pack->seq_number != -1){
+				received_seq_number = ntohl(rcv_pack->seq_number);
+			}else{
+				received_seq_number = -1;
+			}
+		
 			rand_for_loss = (float) (rand() % 10) / 10;
 			
-			if(rand_for_loss <= (1 - LOSS_PROBABILITY)){
-				
-				if(rcv_pack->seq_number != -1)
-					received_seq_number = ntohl(rcv_pack->seq_number);
+			if(rand_for_loss <= (1 - LOSS_PROBABILITY) && received_seq_number != -1){
 
 				if(received_seq_number >= window_base){ // Pacchetto ricevuto in finestra
 					
@@ -160,16 +169,17 @@ void *receiver_thread_func(void *arg){
 							
 							// Controllo se ho terminato la trasmissione
 							if(window_receive[window_base % WIN_DIMENSION].last_one){// Ho terminato la trasmissione
+								
 								all_received = 1;
 								
-								// Problema: questo non deve stare in if rcv.seq_number >= window_base
 								if(!timeout_started && all_received){
 									
 									// Chiudo file se ho finito di scrivere
-									fclose(file);
+									if(path_receiver != NULL)
+										fclose(file);
 									
 									// Rimouvo il file se inesistente
-									if(!(window_receive[window_base % WIN_DIMENSION].error_packet)){
+									if(window_receive[window_base % WIN_DIMENSION].error_packet){
 										remove(path_receiver);
 										
 										printf("File inesistente sul server.\n");
@@ -197,36 +207,32 @@ void *receiver_thread_func(void *arg){
 					}
 				}
 				
+				// Invio ACK
+					
 				packets_to_check_receive = ntohl(rcv_pack->packets_to_check);
 				
-				// Invio ACK
-				if(received_seq_number != -1){
-					
-					char *buff_ack;
-					buff_ack = (char *) malloc(MAX_PK_DATA_SIZE);
-					strcat(buff_ack, "ACK");
-					sprintf(buff_ack, "%s%i", buff_ack, received_seq_number);
-					strcat(buff_ack, "\0");
+				char *buff_ack;
+				buff_ack = (char *) malloc(MAX_PK_DATA_SIZE);
+				strcat(buff_ack, "ACK");
+				sprintf(buff_ack, "%s%i", buff_ack, received_seq_number);
+				strcat(buff_ack, "\0");
 
-					PACKET snd_pack;
-					snd_pack.seq_number = htonl(received_seq_number);
-					snd_pack.status = 2;
-					strcpy(snd_pack.data, buff_ack);
-					snd_pack.sock_child = sock;
-					snd_pack.cli_addr = cli_address;
-					
-					if(timeout_started){// Aggiorno il timeout se è già partito
-						timeout = time(NULL);
-					}
-					
-					
-					
-					printf("Invio ACK - seq_number: %i, data: %s\n", snd_pack.seq_number, snd_pack.data);
-					
-					if (sendto(sock, (char *) &snd_pack, sizeof(snd_pack), 0, (struct sockaddr *) &cli_address, cli_length_receive ) < 0) {
-						perror("errore in sendto");
-						exit(1);
-					}
+				PACKET snd_pack;
+				snd_pack.seq_number = htonl(received_seq_number);
+				snd_pack.status = 2;
+				strcpy(snd_pack.data, buff_ack);
+				snd_pack.sock_child = sock;
+				snd_pack.cli_addr = cli_address;
+				
+				if(timeout_started){// Aggiorno il timeout se è già partito
+					timeout = time(NULL);
+				}
+				
+				printf("Invio ACK - seq_number: %i, data: %s\n", received_seq_number, snd_pack.data);
+				
+				if (sendto(sock, (char *) &snd_pack, sizeof(snd_pack), 0, (struct sockaddr *) &cli_address, cli_length_receive ) < 0) {
+					perror("errore in sendto");
+					exit(1);
 				}
 				
 			}else{// Scarto pacchetto per loss prob
