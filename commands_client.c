@@ -76,7 +76,7 @@ void com_get(char *buff, int sock_child, struct sockaddr_in sender_addr){
 		strcat(path, "\0");
 		
 		receive_data(path, sock_child, sender_addr);
-	
+		
 		printf("\nComando eseguito\nEnter command: ");
 	}else{
 		printf("Comando mal formato!\n");

@@ -71,7 +71,10 @@ void receive_data(char *path, int sock_child, struct sockaddr_in cli_addr){
 		PACKET packet = {-1, -1, MAX_PK_DATA_SIZE, WIN_DIMENSION, "0", sock, cli_address};
 		window_receive[i] = packet;
 	}
-
+	
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfile_rec, "receive_data: inizializzazione completata\n");
+	
 	// Creo il thread per gestire la ricezione
 	if(pthread_create(&receiver_thread, NULL, receiver_thread_func, NULL) == EAGAIN){
 		perror("Errore (pthread_create): sender_thread");
@@ -122,7 +125,6 @@ void *receiver_thread_func(void *arg){
 			perror("errore in recvfrom");
 			exit(1);
 		}else{
-		
 			rand_for_loss = (float) (rand() % 10) / 10;
 			
 			if(rand_for_loss <= (1 - LOSS_PROBABILITY)){
@@ -131,7 +133,9 @@ void *receiver_thread_func(void *arg){
 					received_seq_number = ntohl(rcv_pack->seq_number);
 
 				if(received_seq_number >= window_base){ // Pacchetto ricevuto in finestra
-	
+					
+					printf("ricevuto pacchetto: %i\n", received_seq_number);
+					
 					if(window_receive[received_seq_number % WIN_DIMENSION].status != 3){ // Pacchetto ricevuto non ancora riscontrato
 
 						// Copio il pacchetto nella finestra di ricezione
@@ -169,10 +173,10 @@ void *receiver_thread_func(void *arg){
 										remove(path_receiver);
 										
 										printf("File inesistente sul server.\n");
-										/*
+										
 										if(LOG_TO_TEXT_FILE)
 											fprintf(logfile_rec, "File inesistente sul server.\n");
-										*/
+										
 									}
 									
 									// Imposto timeout per gestire la chiusura della connessione
@@ -215,7 +219,10 @@ void *receiver_thread_func(void *arg){
 						timeout = time(NULL);
 					}
 					
-					//printf("Invio ACK - seq_number: %i, data: %s\n", snd_pack.seq_number, snd_pack.data);
+					
+					
+					printf("Invio ACK - seq_number: %i, data: %s\n", snd_pack.seq_number, snd_pack.data);
+					
 					if (sendto(sock, (char *) &snd_pack, sizeof(snd_pack), 0, (struct sockaddr *) &cli_address, cli_length_receive ) < 0) {
 						perror("errore in sendto");
 						exit(1);
@@ -225,7 +232,10 @@ void *receiver_thread_func(void *arg){
 			}else{// Scarto pacchetto per loss prob
 				if(rcv_pack->seq_number != -1){
 					received_seq_number = ntohl(rcv_pack->seq_number);
-					//printf("Scarto PK%i per loss prob. rand_for_loss: %f\n", received_seq_number, rand_for_loss);
+					
+					if(LOG_TO_TEXT_FILE)
+						fprintf(logfile_rec, "Scarto PK%i per loss prob. rand_for_loss: %f\n", received_seq_number, rand_for_loss);
+			
 				}
 			}
 		}

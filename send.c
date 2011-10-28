@@ -403,16 +403,6 @@ void *sender_thread_func(void *arg){
 			}else{
 				if(LOG_TO_TEXT_FILE){
 					fprintf(logfff, "sender_thread_func - Pacchetto %i inviato\n", ntohl(window_send[window_position].seq_number));
-
-					int k;
-					for(k = 0; k < WIN_DIMENSION; k++){
-						fprintf(logfff, "sender_thread_func - window_send[%i] - seq_number: %i, status: %i\n", k, ntohl(window_send[k].seq_number), window_send[k].status);
-						
-					}
-
-					for(k = 0; k < WIN_DIMENSION; k++){
-						fprintf(logfff, "sender_thread_func - tq[%i] - seq_number: %i\n", k, timeout_queue[k].seq_number);	
-					}
 				}
 				pthread_mutex_unlock(&timeout_queue_mutex);
 				
@@ -588,14 +578,6 @@ void *file_reader_thread_func(void *arg){
 				buffer_read_file[buffer_position].status = 0;
 				
 				buffer_read_file[buffer_position].data_size = file_read_amount;
-				
-				if(LOG_TO_TEXT_FILE){
-					int k;
-					for(k = 0; k < WIN_DIMENSION; k++){
-						fprintf(logfff, "sender_thread_func - buffer_read_file[%i] - seq_number: %i, status: %i\n", k, ntohl(window_send[k].seq_number), window_send[k].status);
-						
-					}
-				}
 				
 				pthread_mutex_unlock(&buffer_read_file_mutex);
 				
