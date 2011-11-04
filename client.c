@@ -98,5 +98,5 @@ void serviRichiesta_client(int sock_child, char *buff){
 	command = -1;
 
 	command = seleziona_comando(buff);
-	esegui_comando(buff, command, sock_child, server_addr);
+	esegui_comando(buff, command, sock_child, &server_addr);
 }

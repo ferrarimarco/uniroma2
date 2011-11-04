@@ -19,21 +19,17 @@
 // Threads
 pthread_t receiver_thread;
 
-// Thread coordination
-int all_received = 0;
-
 // Transmission management
 int sock;
-struct sockaddr_in cli_address;
-int cli_length_receive = sizeof(cli_address);
-int packets_to_check_receive = WIN_DIMENSION;
+struct sockaddr_in *cli_address;
+int cli_length_receive = sizeof(*cli_address);
+int command_mode_receiver = 0;
 
 // Timeout per gestire la chiusura della connessione
 time_t timeout;
 
 // Transmission window management
 PACKET window_receive[WIN_DIMENSION];
-int window_base = 0;
 
 // File write management
 FILE *file;
@@ -46,33 +42,42 @@ FILE *logfile_rec;
 // Prototypes
 void *receiver_thread_func(void *arg);
 
-void receive_data(char *path, int sock_child, struct sockaddr_in cli_addr){
+void receive_data(char *path, int sock_child, struct sockaddr_in *cli_addr, int is_command){
 
 	if(LOG_TO_TEXT_FILE)
 		logfff = fopen(RECEIVER_LOG_FILE_PATH, "w");
 	
 	// Creo il file
-	if(path != NULL)
-		file = fopen(path, "wb");
-	else
-		file = stdout;
+	if(!is_command){
+		if(path != NULL)
+			file = fopen(path, "wb");
+		else
+			file = stdout;
+	}
 	
 	path_receiver = path;
-
-	printf("Receiver path: %s\n", path_receiver);
 	
-	if(file == NULL){
+	command_mode_receiver = is_command;
+
+	if(file == NULL && !is_command){
 		perror("Errore: impossibile aprire file");
 		exit(1);
 	}
 
 	int i;
-
+	
+	// Inizializzazione
+	sock = sock_child;
+	cli_address = cli_addr;
+	
 	// Inizializzo la finestra
 	for(i = 0; i < WIN_DIMENSION ; i++){
-		PACKET packet = {-1, -1, MAX_PK_DATA_SIZE, WIN_DIMENSION, "0", sock, cli_address};
+		PACKET packet = {-1, -1, MAX_PK_DATA_SIZE, WIN_DIMENSION, "0", sock, *cli_address, 0, 0, 0};
 		window_receive[i] = packet;
 	}
+
+	// Inizializzo seme per rand
+	srand(time(0));
 	
 	printf("receive_data: inizializzazione completata\n");
 	
@@ -81,13 +86,6 @@ void receive_data(char *path, int sock_child, struct sockaddr_in cli_addr){
 		perror("Errore (pthread_create): sender_thread");
 		exit(1);
 	}
-
-	// Inizializzazione
-	sock = sock_child;
-	cli_address = cli_addr;
-
-	// Inizializzo seme per rand
-	srand(time(0));
 	
 	// Join su thread coordintatore
 	pthread_join(receiver_thread, NULL);
@@ -100,11 +98,17 @@ void *receiver_thread_func(void *arg){
 	PACKET *rcv_pack;
 
 	int rec_from_res = 0;
-
+	int all_received = 0;
 	int received_seq_number = -1;
 	float rand_for_loss = 0.0;
 	int timeout_started = 0;
 	double diff_t = 0.0;
+	int window_base = 0;
+	int packets_to_check_receive = WIN_DIMENSION;
+	
+	int socket_options = 0;
+	socket_options = fcntl(sock,F_GETFL);
+	socket_options = socket_options & (~O_NONBLOCK);
 
 	while(!all_received && packets_to_check_receive > 0){
 
@@ -116,14 +120,17 @@ void *receiver_thread_func(void *arg){
 		rcv_pack->data_size = MAX_PK_DATA_SIZE;
 		rcv_pack->packets_to_check = WIN_DIMENSION;
 		rcv_pack->sock_child = sock;
-		rcv_pack->cli_addr = cli_address;
+		rcv_pack->cli_addr = *cli_address;
 		rcv_pack->last_one = 0;
 		rcv_pack->error_packet = 0;
+		rcv_pack->command_packet = 0;
 		
 		//printf("mi blocco sulla rcvfrom\n");
 		
-		rec_from_res = recvfrom(sock, (char *) rcv_pack, sizeof(*rcv_pack), 0, (struct sockaddr *) &cli_address, &cli_length_receive );
-
+		rec_from_res = recvfrom(sock, (char *) rcv_pack, sizeof(*rcv_pack), 0, (struct sockaddr *) cli_address, &cli_length_receive );
+		
+		//printf("send_data - Indirizzo ricevente udp://%s:%u\n", inet_ntoa(cli_address->sin_addr), ntohs(cli_address->sin_port));
+		
 		//printf("ho ricevuto qualcosa\n");
 		
 		if(rec_from_res == EAGAIN || rec_from_res ==  EWOULDBLOCK){
@@ -135,6 +142,7 @@ void *receiver_thread_func(void *arg){
 				received_seq_number = ntohl(rcv_pack->seq_number);
 			}else{
 				received_seq_number = -1;
+				//printf("scarto pk, seq_number è -1\n");
 			}
 		
 			rand_for_loss = (float) (rand() % 10) / 10;
@@ -143,7 +151,7 @@ void *receiver_thread_func(void *arg){
 
 				if(received_seq_number >= window_base){ // Pacchetto ricevuto in finestra
 					
-					printf("ricevuto pacchetto: %i\n", received_seq_number);
+					//printf("ricevuto pacchetto: %i\n", received_seq_number);
 					
 					if(window_receive[received_seq_number % WIN_DIMENSION].status != 3){ // Pacchetto ricevuto non ancora riscontrato
 
@@ -153,18 +161,41 @@ void *receiver_thread_func(void *arg){
 						window_receive[received_seq_number % WIN_DIMENSION].status = 3;
 						window_receive[received_seq_number % WIN_DIMENSION].last_one = ntohl(rcv_pack->last_one);
 						window_receive[received_seq_number % WIN_DIMENSION].error_packet = ntohl(rcv_pack->error_packet);
+						window_receive[received_seq_number % WIN_DIMENSION].command_packet = ntohl(rcv_pack->command_packet);
+						
+						//printf("ntohl(rcv_pack->command_packet): %i\n", ntohl(rcv_pack->command_packet));
+						
+						//printf("command 1: %i\n", window_receive[received_seq_number % WIN_DIMENSION].command_packet);
 						
 						memcpy(&(window_receive[received_seq_number % WIN_DIMENSION].data), rcv_pack->data, window_receive[received_seq_number % WIN_DIMENSION].data_size * sizeof(char));
+						
+						//printf("ho copiato il pk rcv, command 2: %i\n", window_receive[received_seq_number % WIN_DIMENSION].command_packet);
 					}
 
 					if(window_receive[window_base % WIN_DIMENSION].status == 3){ // Faccio avanzare la finestra se necessario
-					
+						
+						//printf("status base = 3\n");
+							
 						while(window_receive[window_base % WIN_DIMENSION].status == 3){
-
-							// Scrivo su file
-							if(!(window_receive[window_base % WIN_DIMENSION].error_packet))
+							//printf("avanza finestra\n");
+							
+							// Scrivo su file stream
+							if(!(window_receive[window_base % WIN_DIMENSION].error_packet) && !(window_receive[window_base % WIN_DIMENSION].command_packet)){
+								//printf("sono nell if\n");
+								
 								scrivi_file(file, window_receive[window_base % WIN_DIMENSION].data, window_receive[window_base % WIN_DIMENSION].data_size);
-
+							}
+							
+							//printf("dopo stream\n");
+							
+							if(window_receive[window_base % WIN_DIMENSION].command_packet){
+								//printf("copio stringa\n");
+								
+								strcpy(path_receiver, (char *) &window_receive[window_base % WIN_DIMENSION].data);
+							}
+							
+							//printf("ho copiato stringa\n");
+							
 							window_receive[window_base % WIN_DIMENSION].status = -1;
 							
 							// Controllo se ho terminato la trasmissione
@@ -175,7 +206,7 @@ void *receiver_thread_func(void *arg){
 								if(!timeout_started && all_received){
 									
 									// Chiudo file se ho finito di scrivere
-									if(path_receiver != NULL)
+									if(path_receiver != NULL && !command_mode_receiver)
 										fclose(file);
 									
 									// Rimouvo il file se inesistente
@@ -195,7 +226,9 @@ void *receiver_thread_func(void *arg){
 									// Imposto socket non bloccante
 									printf("\nTutti ricevuti, imposto socket a non bloccante\n");
 									
-									fcntl(sock, F_SETFL, O_NONBLOCK);
+									//fcntl(sock, F_SETFL, O_NONBLOCK);
+									socket_options = fcntl(sock,F_GETFL);
+									socket_options = (socket_options | O_NONBLOCK);
 									
 									timeout_started = 1;
 								}
@@ -222,15 +255,15 @@ void *receiver_thread_func(void *arg){
 				snd_pack.status = 2;
 				strcpy(snd_pack.data, buff_ack);
 				snd_pack.sock_child = sock;
-				snd_pack.cli_addr = cli_address;
+				snd_pack.cli_addr = *cli_address;
 				
 				if(timeout_started){// Aggiorno il timeout se è già partito
 					timeout = time(NULL);
 				}
 				
-				printf("Invio ACK - seq_number: %i, data: %s\n", received_seq_number, snd_pack.data);
+				//printf("Invio ACK - seq_number: %i, data: %s\n", received_seq_number, snd_pack.data);
 				
-				if (sendto(sock, (char *) &snd_pack, sizeof(snd_pack), 0, (struct sockaddr *) &cli_address, cli_length_receive ) < 0) {
+				if (sendto(sock, (char *) &snd_pack, sizeof(snd_pack), 0, (struct sockaddr *) cli_address, cli_length_receive) < 0) {
 					perror("errore in sendto");
 					exit(1);
 				}
