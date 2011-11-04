@@ -52,7 +52,7 @@ int file_size(char *path){
 	file = fopen(path, "rb");
 
 	if( file == NULL ){
-		printf( "file_size - Error opening file: %s\n", strerror( errno ) );
+		printf("file_size - Error opening file: %s\n", strerror(errno));
 		return -1;
 	}
 
