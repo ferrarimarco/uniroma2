@@ -81,13 +81,13 @@ void com_put(char *buff, int sock_child, struct sockaddr_in sender_addr){
 	sprintf(path, "%s%s", SERVER_SHARE_PATH, temp);
 	strcat(path, "\0");
 	
-	//send_data(path, sock_child, &sender_addr, 1);
-	
+	send_data(path, sock_child, &sender_addr, 1);
+	/*
 	// Invia al client un pacchetto per comunicare l'indirizzo del server figlio
 	if (sendto(sock_child, NULL, 0, 0, (struct sockaddr *) &sender_addr, sizeof(sender_addr)) < 0){
 		perror("errore in sendto");
 		exit(1);
-	}
+	}*/
 	
 	receive_data(path, sock_child, &sender_addr, 0);
 	

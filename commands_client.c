@@ -123,10 +123,10 @@ void com_put(char *buff, int sock_child, struct sockaddr_in *receiver_addr){
 		int child_server_addr_length = sizeof(child_server_addr);
 		
 		// Aspetto risposta per sapere l'indirizzo e la porta del server figlio
-		//receive_data(ricezione, sock_child, &child_server_addr, 1);
-		recvfrom(sock_child, ricezione, MAX_PK_DATA_SIZE, 0, (struct sockaddr *) &child_server_addr, &child_server_addr_length);
+		receive_data(ricezione, sock_child, &child_server_addr, 1);
+		printf("put client - Indirizzo server figlio udp://%s:%u\n", inet_ntoa(child_server_addr.sin_addr), ntohs(child_server_addr.sin_port));
+		//recvfrom(sock_child, ricezione, MAX_PK_DATA_SIZE, 0, (struct sockaddr *) &child_server_addr, &child_server_addr_length);
 
-		
 		send_data(path, sock_child, &child_server_addr, 0);
 		
 		printf("\nComando eseguito\nEnter command: ");
