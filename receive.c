@@ -45,7 +45,7 @@ void *receiver_thread_func(void *arg);
 void receive_data(char *path, int sock_child, struct sockaddr_in *cli_addr, int is_command){
 
 	if(LOG_TO_TEXT_FILE)
-		logfff = fopen(RECEIVER_LOG_FILE_PATH, "w");
+		logfile_rec = fopen(RECEIVER_LOG_FILE_PATH, "w");
 	
 	// Creo il file
 	if(!is_command){
@@ -81,8 +81,14 @@ void receive_data(char *path, int sock_child, struct sockaddr_in *cli_addr, int 
 	
 	printf("receive_data: inizializzazione completata\n");
 	
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfile_rec, "receive_data: inizializzazione completata\n");
+	
 	// Creo il thread per gestire la ricezione
 	if(pthread_create(&receiver_thread, NULL, receiver_thread_func, NULL) == EAGAIN){
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfile_rec, "Errore (pthread_create): sender_thread");
+		
 		perror("Errore (pthread_create): sender_thread");
 		exit(1);
 	}
@@ -125,13 +131,13 @@ void *receiver_thread_func(void *arg){
 		rcv_pack->error_packet = 0;
 		rcv_pack->command_packet = 0;
 		
-		//printf("mi blocco sulla rcvfrom\n");
+		printf("mi blocco sulla rcvfrom\n");
 		
 		rec_from_res = recvfrom(sock, (char *) rcv_pack, sizeof(*rcv_pack), 0, (struct sockaddr *) cli_address, &cli_length_receive );
 		
-		//printf("send_data - Indirizzo ricevente udp://%s:%u\n", inet_ntoa(cli_address->sin_addr), ntohs(cli_address->sin_port));
+		printf("ho ricevuto qualcosa\n");
 		
-		//printf("ho ricevuto qualcosa\n");
+		printf("send_data - Indirizzo mittente udp://%s:%u\n", inet_ntoa(cli_address->sin_addr), ntohs(cli_address->sin_port));
 		
 		if(rec_from_res == EAGAIN || rec_from_res ==  EWOULDBLOCK){
 			perror("errore in recvfrom");
@@ -142,16 +148,18 @@ void *receiver_thread_func(void *arg){
 				received_seq_number = ntohl(rcv_pack->seq_number);
 			}else{
 				received_seq_number = -1;
-				//printf("scarto pk, seq_number è -1\n");
+				printf("scarto pk, seq_number è -1\n");
 			}
 		
 			rand_for_loss = (float) (rand() % 10) / 10;
+			
+			printf("rand_for_loss: %f\n");
 			
 			if(rand_for_loss <= (1 - LOSS_PROBABILITY) && received_seq_number != -1){
 
 				if(received_seq_number >= window_base){ // Pacchetto ricevuto in finestra
 					
-					//printf("ricevuto pacchetto: %i\n", received_seq_number);
+					printf("ricevuto pacchetto: %i\n", received_seq_number);
 					
 					if(window_receive[received_seq_number % WIN_DIMENSION].status != 3){ // Pacchetto ricevuto non ancora riscontrato
 
@@ -163,38 +171,38 @@ void *receiver_thread_func(void *arg){
 						window_receive[received_seq_number % WIN_DIMENSION].error_packet = ntohl(rcv_pack->error_packet);
 						window_receive[received_seq_number % WIN_DIMENSION].command_packet = ntohl(rcv_pack->command_packet);
 						
-						//printf("ntohl(rcv_pack->command_packet): %i\n", ntohl(rcv_pack->command_packet));
+						printf("ntohl(rcv_pack->command_packet): %i\n", ntohl(rcv_pack->command_packet));
 						
-						//printf("command 1: %i\n", window_receive[received_seq_number % WIN_DIMENSION].command_packet);
+						printf("command 1: %i\n", window_receive[received_seq_number % WIN_DIMENSION].command_packet);
 						
 						memcpy(&(window_receive[received_seq_number % WIN_DIMENSION].data), rcv_pack->data, window_receive[received_seq_number % WIN_DIMENSION].data_size * sizeof(char));
 						
-						//printf("ho copiato il pk rcv, command 2: %i\n", window_receive[received_seq_number % WIN_DIMENSION].command_packet);
+						printf("ho copiato il pk rcv, command 2: %i\n", window_receive[received_seq_number % WIN_DIMENSION].command_packet);
 					}
 
 					if(window_receive[window_base % WIN_DIMENSION].status == 3){ // Faccio avanzare la finestra se necessario
 						
-						//printf("status base = 3\n");
+						printf("status base = 3\n");
 							
 						while(window_receive[window_base % WIN_DIMENSION].status == 3){
-							//printf("avanza finestra\n");
+							printf("avanza finestra\n");
 							
 							// Scrivo su file stream
 							if(!(window_receive[window_base % WIN_DIMENSION].error_packet) && !(window_receive[window_base % WIN_DIMENSION].command_packet)){
-								//printf("sono nell if\n");
+								printf("sono nell if\n");
 								
 								scrivi_file(file, window_receive[window_base % WIN_DIMENSION].data, window_receive[window_base % WIN_DIMENSION].data_size);
 							}
 							
-							//printf("dopo stream\n");
+							printf("dopo stream\n");
 							
 							if(window_receive[window_base % WIN_DIMENSION].command_packet){
-								//printf("copio stringa\n");
+								printf("copio stringa\n");
 								
 								strcpy(path_receiver, (char *) &window_receive[window_base % WIN_DIMENSION].data);
 							}
 							
-							//printf("ho copiato stringa\n");
+							printf("ho copiato stringa\n");
 							
 							window_receive[window_base % WIN_DIMENSION].status = -1;
 							
@@ -261,7 +269,7 @@ void *receiver_thread_func(void *arg){
 					timeout = time(NULL);
 				}
 				
-				//printf("Invio ACK - seq_number: %i, data: %s\n", received_seq_number, snd_pack.data);
+				printf("Invio ACK - seq_number: %i, data: %s\n", received_seq_number, snd_pack.data);
 				
 				if (sendto(sock, (char *) &snd_pack, sizeof(snd_pack), 0, (struct sockaddr *) cli_address, cli_length_receive) < 0) {
 					perror("errore in sendto");
@@ -269,18 +277,16 @@ void *receiver_thread_func(void *arg){
 				}
 				
 			}else{// Scarto pacchetto per loss prob
-				if(rcv_pack->seq_number != -1){
-					received_seq_number = ntohl(rcv_pack->seq_number);
+				if(received_seq_number != -1){
+					printf("scarto PK %i per loss_prob\n", received_seq_number);
 					
 					if(LOG_TO_TEXT_FILE)
 						fprintf(logfile_rec, "Scarto PK%i per loss prob. rand_for_loss: %f\n", received_seq_number, rand_for_loss);
-			
+				
+					printf("ho scritto su log pk scartato\n");
+				
 				}
 			}
-		}
-
-		if(rcv_pack->seq_number != -1){
-			received_seq_number = ntohl(rcv_pack->seq_number);
 		}
 		
 		if(timeout_started){
@@ -293,13 +299,15 @@ void *receiver_thread_func(void *arg){
 			// Aspetto per un tempo pari al triplo del timeout e fino ad avere un solo pacchetto da riscontrare
 			if(diff_t >= 10 * TIMEOUT && packets_to_check_receive == 1){// Tempo scaduto
 				
-				// Per uscire dal while
-				packets_to_check_receive = 0;
+				printf("receiver_thread_func - Termino (timeout)\n");
+
+				// Termino thread
+				pthread_exit(NULL);
 			}
 		}
 	}
 
-	printf("receiver_thread_func - Termino\n");
+	printf("receiver_thread_func - Termino (fuori while)\n");
 
 	// Termino thread
 	pthread_exit(NULL);

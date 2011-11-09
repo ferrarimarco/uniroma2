@@ -9,7 +9,7 @@
 // Timeout in msec
 #define TIMEOUT 300
 
-#define LOSS_PROBABILITY 0.0
+#define LOSS_PROBABILITY 0.2
 
 #define SERVER_SHARE_PATH "/home/marco/share/"
 

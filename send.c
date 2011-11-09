@@ -74,7 +74,7 @@ void *ack_checker_thread_func(void *arg);
 void *timeout_watcher_thread_func(void *arg);
 
 int debug = 0;
-int debug_timeout_watcher = 1;
+int debug_timeout_watcher = 0;
 
 void send_data(char *path, int sock_child, struct sockaddr_in *receiver_addr, int is_command){
 	
@@ -94,12 +94,19 @@ void send_data(char *path, int sock_child, struct sockaddr_in *receiver_addr, in
 
 	sock = sock_child;
 	cli_address = receiver_addr;
-	printf("send_data - Indirizzo ricevente udp://%s:%u\n", inet_ntoa(receiver_addr->sin_addr), ntohs(receiver_addr->sin_port));
+	
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfff, "send_data - Indirizzo ricevente udp://%s:%u\n", inet_ntoa(receiver_addr->sin_addr), ntohs(receiver_addr->sin_port));
+	
 	cli_length_send = sizeof(*cli_address);
 	
 	// Per gestire comandi
 	command_mode = is_command;
 
+	// Inizializzo seme per rand
+	srand(time(0));
+	
+	
 	int i;
 	
 	// Inizializzo la finestra
@@ -132,16 +139,13 @@ void send_data(char *path, int sock_child, struct sockaddr_in *receiver_addr, in
 	}
 	
 	// Thread coordinatore
-	void *path_pointer = (void *) path;
+	void *path_pointer = (void *) path;	
 	
 	if(pthread_create(&coordinator_thread, NULL, coordinator_thread_func, path_pointer) == EAGAIN){	
 		perror("Errore (pthread_create): coordinator_thread");
 		exit(1);
 	}
 
-	// Inizializzo seme per rand
-	srand(time(0));
-	
 	// Join su thread coordintatore
 	pthread_join(coordinator_thread, NULL);
 }
@@ -175,9 +179,10 @@ void *coordinator_thread_func(void *arg){
 	int transm_complete_coord = 0;
 	
 	while(transm_complete_coord != 1){
-		if(debug)
-		printf("blocco tcm\n");
-		
+		/*
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "blocco tcm\n");
+		*/
 		// Controllo se devo eseguire il while di nuovo
 		pthread_mutex_lock(&transm_complete_mutex);
 		
@@ -193,13 +198,13 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&transm_complete_mutex);
+		/*
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "sblocco tcm\n");
 		
-		if(debug)
-		printf("sblocco tcm\n");
-		
-		if(debug)
-		printf("blocco absm\n");
-
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "blocco absm\n");
+		*/
 		// Controllo se devo svegliare il thread che riempie il buffer
 		pthread_mutex_lock(&available_buffer_space_mutex);
 		
@@ -208,13 +213,13 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&available_buffer_space_mutex);
+		/*
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "sblocco absm\n");
 		
-		if(debug)
-		printf("sblocco absm\n");
-		
-		if(debug)
-		printf("blocco awsm\n");
-		
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "blocco awsm\n");
+		*/
 		// Controllo se devo svegliare il thread che invia i pacchetti
 		pthread_mutex_lock(&available_window_space_mutex);
 		
@@ -223,13 +228,13 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&available_window_space_mutex);
+		/*
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "sblocco awsm\n");
 		
-		if(debug)
-		printf("sblocco awsm\n");
-		
-		if(debug)
-		printf("blocco absm\n");
-
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "blocco absm\n");
+		*/
 		// Controllo se devo svegliare il thread che invia i pacchetti
 		pthread_mutex_lock(&available_buffer_space_mutex);
 		
@@ -238,13 +243,13 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&available_buffer_space_mutex);
+		/*
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "sblocco absm\n");
 		
-		if(debug)
-		printf("sblocco absm\n");
-		
-		if(debug)
-		printf("blocco tqm\n");
-		
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "blocco tqm\n");
+		*/
 		// Controllo se devo svegliare il thread che gestisce i timeout
 		pthread_mutex_lock(&timeout_queue_mutex);
 
@@ -253,36 +258,63 @@ void *coordinator_thread_func(void *arg){
 		}
 		
 		pthread_mutex_unlock(&timeout_queue_mutex);
-		
-		if(debug)
-		printf("sblocco tqm\n");
+		/*
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "sblocco tqm\n");
+		*/
 	}
-
-
+	
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfff, "sender\n");
+	
 	printf("sender\n");
 	pthread_join(sender_thread, NULL);
 	printf("sender ok\n");
 	
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfff, "sender ok\n");	
+	
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfff, "file_reader_thread\n");
 	printf("file_reader_thread\n");
 	pthread_join(file_reader_thread, NULL);
 	printf("file reader ok\n");
 	
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfff, "file reader ok\n");
+	
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfff, "ack checker\n");
+			
 	printf("ack checker\n");
 	pthread_join(ack_checker_thread, NULL);
 	printf("ack checker ok\n");
+
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfff, "ack checker ok\n");
 	
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfff, "timeout, provo a segnalare\n");
+			
 	printf("timeout, provo a segnalare\n");
 	pthread_cond_signal(&timeout_condition);
 	pthread_join(timeout_watcher_thread, NULL);
 	printf("timeout ok\n");
-	
+
 	if(LOG_TO_TEXT_FILE)
-		fprintf(logfff, "coordinator_thread_func - Richiesta servita: GET %s\n", path);
-	
-	if(!command_mode)
+		fprintf(logfff, "timeout ok\n");
+
+	if(!command_mode){
 		printf("coordinator_thread_func - Richiesta servita: GET %s\n", path);
-	else
+	
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "coordinator_thread_func - Richiesta servita: GET %s\n", path);
+	}else{
 		printf("coordinator_thread_func - Richiesta servita: trasferito comando %s\n", path);
+		
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "coordinator_thread_func - Richiesta servita: trasferito comando %s\n", path);
+	}
 	
 	// Termino thread
 	pthread_exit(NULL);
@@ -608,8 +640,9 @@ void *file_reader_thread_func(void *arg){
 
 			// Chiudo file se ho finito di leggere
 			fclose(file);
-				
-			fprintf(logfff, "file_reader_thread_func - ho finito di leggere, termino!\n");
+			
+			if(LOG_TO_TEXT_FILE)
+				fprintf(logfff, "file_reader_thread_func - ho finito di leggere, termino!\n");
 				
 			// Termino thread
 			pthread_exit(NULL);
@@ -665,7 +698,8 @@ void *file_reader_thread_func(void *arg){
 				// Chiudo file se ho finito di leggere
 				fclose(file);
 				
-				fprintf(logfff, "file_reader_thread_func - ho finito di leggere, termino!\n");
+				if(LOG_TO_TEXT_FILE)
+					fprintf(logfff, "file_reader_thread_func - ho finito di leggere, termino!\n");
 				
 				// Termino thread
 				pthread_exit(NULL);
@@ -728,9 +762,7 @@ void *ack_checker_thread_func(void *arg){
 							
 							for(u = 0; u < WIN_DIMENSION; u++){
 								if(timeout_queue[u].seq_number == received_seq_number){
-									
-									printf("acker - riscontrato PK %i\n", received_seq_number);
-									
+
 									if(LOG_TO_TEXT_FILE)
 										fprintf(logfff, "acker - riscontrato pk %i\n", received_seq_number);
 									
@@ -759,7 +791,7 @@ void *ack_checker_thread_func(void *arg){
 								pthread_mutex_unlock(&available_window_space_mutex);
 								
 								if(LOG_TO_TEXT_FILE)
-									fprintf(logfff, "acker - riscontrata base\n");
+									fprintf(logfff, "ack_checker_thread_func - riscontrata base\n");
 							}
 						}
 						
@@ -775,7 +807,8 @@ void *ack_checker_thread_func(void *arg){
 			if(window_base >= needed_packets){// Trasmissione completata
 				pthread_mutex_lock(&transm_complete_mutex);
 				all_acked = 1;
-				printf("acker: impost all_acked a %i\n", all_acked);
+				if(LOG_TO_TEXT_FILE)
+					fprintf(logfff, "ack_checker_thread_func: impost all_acked a %i\n", all_acked);
 				pthread_mutex_unlock(&transm_complete_mutex);
 				
 				if(LOG_TO_TEXT_FILE)
@@ -809,112 +842,124 @@ void *timeout_watcher_thread_func(void *arg){
 	pthread_mutex_unlock(&mut);
 	*/
 	
+	int test_timeout_watcher = 0;
+	
 	while(!all_acked_timeout_watcher){
-		
-		if(debug_timeout_watcher)
-		printf("Timeout: blocco tcm\n");
-		
+		/*
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "Timeout: blocco tcm\n");
+		*/
 		// Controllo se devo eseguire il while di nuovo
 		pthread_mutex_lock(&transm_complete_mutex);
 
 		all_acked_timeout_watcher = all_acked;
-		
-		printf("timeout: all_acked 1 = %i\n", all_acked);
-		
+		/*
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "timeout: all_acked 1 = %i\n", all_acked);
+		*/
 		// Controllo se ho completato la trasmissione
 		if(all_acked){
 			pthread_mutex_unlock(&transm_complete_mutex);
 			
 			fprintf(logfff, "timeout_watcher_thread - Termino\n");
-			printf("timeout: termino 1\n");
 			// Termino thread
 			pthread_exit(NULL);
 		}
 		
 		pthread_mutex_unlock(&transm_complete_mutex);
+		/*
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "Timeout: sblocco tcm\n");
 		
-		if(debug_timeout_watcher)
-		printf("Timeout: sblocco tcm\n");
-		
-		if(debug_timeout_watcher)
-		printf("Timeout: blocco tqm\n");
-		
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "Timeout: blocco tqm\n");
+		*/
 		pthread_mutex_lock(&timeout_queue_mutex);
 		
 		// Aspetto se non ho pacchetti da controllare
 		while(packets_to_check_send == 0){
-			
-			if(debug_timeout_watcher)
-			printf("Timeout: blocco tcm2\n");
-			
+			/*
+			if(LOG_TO_TEXT_FILE)
+				fprintf(logfff, "Timeout: blocco tcm2\n");
+			*/
 			pthread_mutex_lock(&transm_complete_mutex);
 			
 			all_acked_timeout_watcher = all_acked;
-			
-			printf("timeout: all_acked 2 = %i\n", all_acked);
-			
+			/*
+			if(LOG_TO_TEXT_FILE)
+				fprintf(logfff, "timeout: all_acked 2 = %i\n", all_acked);
+			*/
 			// Controllo se ho completato la trasmissione
 			if(all_acked){
 				pthread_mutex_unlock(&transm_complete_mutex);
 				
-				if(debug_timeout_watcher)
-				printf("Timeout: sblocco tcm2\n");
-				
+				/*
+				if(LOG_TO_TEXT_FILE)
+					fprintf(logfff, "Timeout: sblocco tcm2\n");
+				*/
 				pthread_mutex_unlock(&timeout_queue_mutex);
+				/*
+				if(LOG_TO_TEXT_FILE)
+					fprintf(logfff, "Timeout: sblocco tqm\n");
+				*/
+				if(LOG_TO_TEXT_FILE)
+					fprintf(logfff, "timeout_watcher_thread - Termino 2\n");
 				
-				if(debug_timeout_watcher)
-				printf("Timeout: sblocco tqm\n");
-				
-				fprintf(logfff, "timeout_watcher_thread - Termino\n");
-				printf("timeout: termino 2\n");
 				// Termino thread
 				pthread_exit(NULL);
 			}
 			
 			pthread_mutex_unlock(&transm_complete_mutex);
 			
-			if(debug_timeout_watcher)
-			printf("Timeout: sblocco tqm\n");
-			
+			/*
 			if(LOG_TO_TEXT_FILE)
+				fprintf(logfff, "Timeout: sblocco tqm\n");
+			*/
+			if(LOG_TO_TEXT_FILE && test_timeout_watcher < 100)
 				fprintf(logfff, "file reader - wait su condizione: window empty\n");
 
+			test_timeout_watcher++;
+			
 			pthread_cond_wait(&timeout_condition, &timeout_queue_mutex);
 		}
 		
-		if(debug_timeout_watcher)
-		printf("Timeout: sblocco tcm3\n");
+		test_timeout_watcher = 0;
 		
+		/*
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "Timeout: sblocco tcm3\n");
+		*/
 		pthread_mutex_lock(&transm_complete_mutex);
 		
 		all_acked_timeout_watcher = all_acked;
-		
-		printf("acker: all_acked 3 = %i\n", all_acked);
-
+		/*
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "acker: all_acked 3 = %i\n", all_acked);
+		*/
 		// Controllo se ho completato la trasmissione
 		if(all_acked){
 			pthread_mutex_unlock(&transm_complete_mutex);
-			
-			if(debug_timeout_watcher)
-			printf("Timeout: sblocco tcm3\n");
-			
+			/*
+			if(LOG_TO_TEXT_FILE)
+				fprintf(logfff, "Timeout: sblocco tcm3\n");
+			*/
 			pthread_mutex_unlock(&timeout_queue_mutex);
-			
-			if(debug_timeout_watcher)
-			printf("Timeout: sblocco tqm\n");
-			
-			fprintf(logfff, "timeout_watcher_thread - Termino\n");
-			printf("timeout: termino 3\n");
+			/*
+			if(LOG_TO_TEXT_FILE)
+				fprintf(logfff, "Timeout: sblocco tqm\n");
+			*/
+			if(LOG_TO_TEXT_FILE)
+				fprintf(logfff, "timeout_watcher_thread - Termino 3\n");
 			
 			// Termino thread
 			pthread_exit(NULL);
 		}
 		
 		pthread_mutex_unlock(&transm_complete_mutex);
-		
-		if(debug_timeout_watcher)
-		printf("Timeout: sblocco tcm3\n");
-
+		/*
+		if(LOG_TO_TEXT_FILE)
+				fprintf(logfff, "Timeout: sblocco tcm3\n");
+		*/
 		if(!all_acked_timeout_watcher){
 			
 			if(timeout_queue[0].seq_number != -1){// Primo pacchetto a scadere non riscontrato
@@ -927,9 +972,10 @@ void *timeout_watcher_thread_func(void *arg){
 				diff_t = diff_t * 1000;
 
 				if(diff_t >= TIMEOUT){// Timeout scaduto
+					/*
 					if(LOG_TO_TEXT_FILE)
 						fprintf(logfff, "timeout - timeout pacchetto %i scaduto. Reinvio\n", timeout_queue[0].seq_number);
-					
+					*/
 					// Incremento la posizione fine della coda
 					if(packets_to_check_send > 1){
 						temp = timeout_queue[0];
@@ -957,27 +1003,30 @@ void *timeout_watcher_thread_func(void *arg){
 			
 			pthread_mutex_unlock(&timeout_queue_mutex);
 			
-			if(debug_timeout_watcher)
-			printf("Timeout: sblocco tqm\n");
+			/*
+			if(LOG_TO_TEXT_FILE)
+				fprintf(logfff, "Timeout: sblocco tqm\n");
+			*/
 		}
 	}
 	
-	printf("timeout: sono uscito dal while\n");
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfff, "timeout: sono uscito dal while\n");
 	
 	// Controllo se devo eseguire il while di nuovo
 	pthread_mutex_lock(&transm_complete_mutex);
 
 	all_acked_timeout_watcher = all_acked;
 	
-	printf("acker: all_acked 4 = %i\n", all_acked);
+	if(LOG_TO_TEXT_FILE)
+		fprintf(logfff, "acker: all_acked 4 = %i\n", all_acked);
 	
 	// Controllo se ho completato la trasmissione
 	if(all_acked){
 		pthread_mutex_unlock(&transm_complete_mutex);
-		
-		printf("timeout: termino 4\n");
-		
-		fprintf(logfff, "timeout_watcher_thread - Termino\n");
+
+		if(LOG_TO_TEXT_FILE)
+			fprintf(logfff, "timeout_watcher_thread - Termino 4\n");
 		
 		// Termino thread
 		pthread_exit(NULL);
