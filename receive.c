@@ -72,7 +72,7 @@ void receive_data(char *path, int sock_child, struct sockaddr_in *cli_addr, int 
 	
 	// Inizializzo la finestra
 	for(i = 0; i < WIN_DIMENSION ; i++){
-		PACKET packet = {-1, -1, MAX_PK_DATA_SIZE, WIN_DIMENSION, "0", sock, *cli_address, 0, 0, 0};
+		PACKET packet = {-1, -1, MAX_PK_DATA_SIZE, WIN_DIMENSION, "0", sock, *cli_address, 0, 0, 0, 0};
 		window_receive[i] = packet;
 	}
 
@@ -130,6 +130,7 @@ void *receiver_thread_func(void *arg){
 		rcv_pack->last_one = 0;
 		rcv_pack->error_packet = 0;
 		rcv_pack->command_packet = 0;
+		rcv_pack->resended = 0;
 		
 		printf("mi blocco sulla rcvfrom\n");
 		
@@ -170,6 +171,7 @@ void *receiver_thread_func(void *arg){
 						window_receive[received_seq_number % WIN_DIMENSION].last_one = ntohl(rcv_pack->last_one);
 						window_receive[received_seq_number % WIN_DIMENSION].error_packet = ntohl(rcv_pack->error_packet);
 						window_receive[received_seq_number % WIN_DIMENSION].command_packet = ntohl(rcv_pack->command_packet);
+						window_receive[received_seq_number % WIN_DIMENSION].resended = ntohl(rcv_pack->resended);
 						
 						printf("ntohl(rcv_pack->command_packet): %i\n", ntohl(rcv_pack->command_packet));
 						
@@ -264,6 +266,7 @@ void *receiver_thread_func(void *arg){
 				strcpy(snd_pack.data, buff_ack);
 				snd_pack.sock_child = sock;
 				snd_pack.cli_addr = *cli_address;
+				snd_pack.resended = ntohl(rcv_pack->resended);
 				
 				if(timeout_started){// Aggiorno il timeout se è già partito
 					timeout = time(NULL);
