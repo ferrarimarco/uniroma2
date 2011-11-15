@@ -9,7 +9,7 @@
 // Timeout in msec
 #define TIMEOUT 300
 
-#define LOSS_PROBABILITY 0.2
+#define LOSS_PROBABILITY 0.4
 
 #define SERVER_SHARE_PATH "/home/marco/share/"
 
@@ -20,4 +20,5 @@
 #define SENDER_LOG_FILE_PATH "/home/marco/log_file_send.txt"
 #define RECEIVER_LOG_FILE_PATH "/home/marco/log_file_receive.txt"
 
+// 0 = disabled, 1 = major events, 2 = more detail
 #define LOG_TO_TEXT_FILE 1
