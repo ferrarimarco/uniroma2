@@ -37,7 +37,7 @@ int main(int argc, char *argv[ ]){
 	gets(buff_comm);
 
 	/* assegna l'indirizzo del server prendendolo dalla riga di comando. L'indirizzo è una stringa da convertire in intero secondo network byte order. */
-	if (inet_pton(AF_INET, buff_comm, &server_addr.sin_addr) <= 0){/* inet_pton (p=presentation) vale anche per indirizzi IPv6 */
+	if (inet_pton(AF_INET, buff_comm, &server_addr.sin_addr) <= 0){
 		fprintf(stderr, "errore in inet_pton per %s\n", buff_comm);
 		exit(1);
 	}
