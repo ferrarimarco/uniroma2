@@ -32,5 +32,8 @@ typedef struct {
 	// To send command
 	int command_packet;
 	
+	// Numero di rispedizioni
+	int resended;
+	
 } PACKET;
 
