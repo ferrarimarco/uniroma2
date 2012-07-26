@@ -2,10 +2,8 @@ package controller;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 public class POP3RequestHandler implements RequestHandler {
@@ -18,6 +16,9 @@ public class POP3RequestHandler implements RequestHandler {
 	private Socket socket;
 	
 	private POP3Status status;
+	
+	private final String endline = "\r\n";
+	private final String terminationOctet = ".\r\n";
 	
 	public POP3RequestHandler() {
 		status = this.getStatus();
@@ -41,16 +42,14 @@ public class POP3RequestHandler implements RequestHandler {
 			status = this.getStatus();
 			
 			if(status.equals(POP3Status.GREETINGS)){
-				sendMessage(this.okStatusIndicator() + " POP3 server ready to roll!");
+				sendLine(POP3StatusIndicator.OK + " POP3 server ready to roll!", false, false);
 				this.setStatus(POP3Status.AUTHORIZATION);
 			}
-						
+			
 			while ((message = reader.readLine()) != null) {
 				
 				System.out.println("server riceve: " + message);
-				sendMessage(this.okStatusIndicator() + " Capabilities follow.");
-				sendMessage("TOP");
-				sendMessage("USER");
+				sendLine(POP3StatusIndicator.OK + " Capabilities follow.", false, false);
 			}
 
 		} catch (IOException e) {
@@ -58,16 +57,27 @@ public class POP3RequestHandler implements RequestHandler {
 		}
 	}
 	
-	private void sendMessage(String msg) {
+	private void sendLine(String msg, boolean multiLine, boolean lastLine) {
+		
 		try {
-			msg += "\r\n";
+			
+			msg += endline;
 			
 			writer.write(msg.getBytes());
 			writer.flush();
+			
 			System.out.println("server invia:" + msg);
+			
 			for(int i = 0; i < msg.getBytes().length; i++){
 				System.out.println(String.format("0x%02X", msg.getBytes()[i]));
 			}
+			
+			if(multiLine && lastLine){
+				writer.write(terminationOctet.getBytes());
+				writer.flush();
+				System.out.println("Invio il carattere di terminazione.");
+			}
+			
 			System.out.println("----------");
 			
 		} catch (IOException ioException) {
@@ -76,7 +86,7 @@ public class POP3RequestHandler implements RequestHandler {
 	}
 	
 	public void stop(){
-		// Closing connection
+		// Close connection
 		try {
 			reader.close();
 			writer.close();
@@ -84,6 +94,21 @@ public class POP3RequestHandler implements RequestHandler {
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
+	}
+	
+	private void handleCommand(String command){
+		switch(command){
+			case "CAPA":
+				CAPACommand();
+				break;
+			case "capa":
+				CAPACommand();
+				break;
+		}		
+	}
+	
+	private void CAPACommand(){
+		
 	}
 	
 	private POP3Status getStatus(){
@@ -110,13 +135,4 @@ public class POP3RequestHandler implements RequestHandler {
 		
 		this.status = status;
 	}
-	
-	private String okStatusIndicator(){
-		return "+OK";
-	}
-	
-	private String errorStatusIndicator(){
-		return "-ERR";
-	}
-
 }
