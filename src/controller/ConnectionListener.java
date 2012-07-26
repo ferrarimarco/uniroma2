@@ -4,21 +4,22 @@ import java.net.*;
 
 public class ConnectionListener {
 
-	ServerSocket providerSocket;
-	Socket connection;
+	private ServerSocket serverSocket;
+	private Socket connection;
 	
-	BufferedWriter writer;
-	BufferedReader reader;
-	
-	String message;
-	
-	RequestHandler requestHandler;
+	private RequestHandler requestHandler;
 
-	ConnectionListener(int portNumber, int backlog, RequestHandler requestHandler) {
+	// Un thread per ogni richiesta
+	// Listener tiene traccia dei thread ed a quale client stanno parlando
+	// Listener inoltra le richieste del client al thread corretto
+	// Thread termina quando riceve comando POP3 che chiude sessione
+	// Devo registrare nel DB lo stato della connessione, così tutti i nodi diventano idempotenti.
+	// Ciascun nodo deve completamente rispondere ad una richiesta del client.
+	
+	public ConnectionListener(int portNumber, int backlog, RequestHandler requestHandler) {
 		
 		try {
-			// 1. creating a server socket
-			providerSocket = new ServerSocket(110, 10);
+			serverSocket = new ServerSocket(110, 10);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -27,54 +28,24 @@ public class ConnectionListener {
 		this.requestHandler = requestHandler;
 	}
 
-	void run() {
+	public void run() {
 		try {
 			
-			// 2. Wait for connection
+			// Wait for connection
 			System.out.println("Waiting for connection");
 
-			connection = providerSocket.accept();
+			connection = serverSocket.accept();
 
-			System.out.println("Connection received from " + connection.getInetAddress().getHostName());
-
-			// 3. get Input and Output streams
-			writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
-			writer.flush();
-			
-			reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			
-			sendMessage("Connection successful");
-			
-			// 4. The two parts communicate via the input and output streams
-			while ((message = reader.readLine()) != null) {
-				
-				System.out.println("server riceve: " + message);
-				
-			}
+			requestHandler.handleRequest(connection);
 
 		} catch (IOException ioException) {
-			
-			ioException.printStackTrace();
-			
+			ioException.printStackTrace();			
 		}
 	}
 
-	void sendMessage(String msg) {
+	public void stop(){
 		try {
-			writer.write(msg);
-			writer.flush();
-			System.out.println("server invia: " + msg);
-		} catch (IOException ioException) {
-			ioException.printStackTrace();
-		}
-	}
-	
-	void stop(){
-		// 4: Closing connection
-		try {
-			reader.close();
-			writer.close();
-			providerSocket.close();
+			serverSocket.close();
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
