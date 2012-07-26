@@ -8,13 +8,6 @@ public class ConnectionListener {
 	private Socket connection;
 	
 	private RequestHandler requestHandler;
-
-	// Un thread per ogni richiesta
-	// Listener tiene traccia dei thread ed a quale client stanno parlando
-	// Listener inoltra le richieste del client al thread corretto
-	// Thread termina quando riceve comando POP3 che chiude sessione
-	// Devo registrare nel DB lo stato della connessione, così tutti i nodi diventano idempotenti.
-	// Ciascun nodo deve completamente rispondere ad una richiesta del client.
 	
 	public ConnectionListener(int portNumber, int backlog, RequestHandler requestHandler) {
 		
