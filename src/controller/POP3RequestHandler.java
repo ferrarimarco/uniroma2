@@ -16,7 +16,7 @@ public class POP3RequestHandler implements RequestHandler {
 	private POP3Status status;
 	
 	private final String endline = "\r\n";
-	private final String terminationOctet = ".\r\n";
+	private final String terminationOctet = ".";
 	
 	public POP3RequestHandler() {
 		status = this.getStatus();
@@ -75,7 +75,7 @@ public class POP3RequestHandler implements RequestHandler {
 			}
 			
 			if(multiLine && lastLine){
-				writer.write(terminationOctet.getBytes());
+				writer.write((terminationOctet + endline).getBytes());
 				writer.flush();
 				System.out.println("Invio il carattere di terminazione.");
 			}
