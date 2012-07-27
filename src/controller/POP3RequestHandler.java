@@ -11,8 +11,6 @@ public class POP3RequestHandler implements RequestHandler {
 	private BufferedOutputStream writer;
 	private BufferedReader reader;
 	
-	private String message;
-	
 	private Socket socket;
 	
 	private POP3Status status;
@@ -43,12 +41,16 @@ public class POP3RequestHandler implements RequestHandler {
 			
 			if(status.equals(POP3Status.GREETINGS)){
 				sendLine(POP3StatusIndicator.OK + " POP3 server ready to roll!", false, false);
-				this.setStatus(POP3Status.AUTHORIZATION);
+				setStatus(POP3Status.AUTHORIZATION);
 			}
 			
-			while ((message = reader.readLine()) != null) {
+			String command = "";
+			
+			while ((command = reader.readLine()) != null) {
 				
-				System.out.println("server riceve: " + message);
+				System.out.println("server riceve: " + command);
+				handleCommand(command);
+				
 				sendLine(POP3StatusIndicator.OK + " Capabilities follow.", false, false);
 			}
 
@@ -98,17 +100,55 @@ public class POP3RequestHandler implements RequestHandler {
 	
 	private void handleCommand(String command){
 		switch(command){
-			case "CAPA":
-				CAPACommand();
-				break;
-			case "capa":
-				CAPACommand();
-				break;
+		case "QUIT":
+			QUITCommand();
+			break;
+		case "quit":
+			QUITCommand();
+			break;
+		case "CAPA":
+			CAPACommand();
+			break;
+		case "capa":
+			CAPACommand();
+			break;
+		default:
+			sendResponse(POP3StatusIndicator.ERR, "Command is not supported");
+			break;
 		}		
 	}
 	
-	private void CAPACommand(){
+	private void sendResponse(POP3StatusIndicator statusIndicator, String response){
 		
+		if (response.length() > 0) {
+			sendLine(statusIndicator.toString() + " " + response, false, false);
+		}else{
+			sendLine(statusIndicator.toString(), false, false);
+		}
+	}
+	
+	private void QUITCommand(){
+		
+		// Check POP3 Session status
+		if(status.equals(POP3Status.GREETINGS)){
+			sendResponse(POP3StatusIndicator.ERR, "");
+		}
+		
+		sendResponse(POP3StatusIndicator.OK, "Closing session");
+		
+		if(status.equals(POP3Status.TRANSACTION)){
+			setStatus(POP3Status.UPDATE);
+		}
+		
+		// Release resources
+		stop();
+		
+		// TODO: unlock mailbox
+		
+	}
+
+	private void CAPACommand(){
+		System.out.println("RICEVUTO CAPA");
 	}
 	
 	private POP3Status getStatus(){
@@ -127,8 +167,7 @@ public class POP3RequestHandler implements RequestHandler {
 		
 		return POP3Status.UNKNOWN;
 	}
-	
-	// Write in DB?
+
 	private void setStatus(POP3Status status){
 
 		// TODO: Write status in DB
