@@ -147,10 +147,21 @@ public class POP3RequestHandler implements RequestHandler {
 	}
 
 	private void CAPACommand(){
-		// TODO: write implementation
-		System.out.println("RICEVUTO CAPA");
+		// Get the state of the POP3 session
+		status = this.getStatus();
+
+		if(status.equals(POP3Status.GREETINGS)){
+			sendLine(POP3StatusIndicator.ERR + " POP3 server is in GREETINGS status", false, false);
+
+			return;
+		}else{
+			sendLine(POP3StatusIndicator.OK + " Capabilities follow.", false, false);
+		}
+
+		// TODO: Send capabilities
+		//sendLine(msg, true, false);
 	}
-	
+
 	private POP3Status getStatus(){
 		
 		// TODO: Get status from DB (this code is just a placeholder for DB access)
