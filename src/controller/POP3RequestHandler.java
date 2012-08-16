@@ -16,7 +16,6 @@ public class POP3RequestHandler implements RequestHandler {
 	private POP3Status status;
 	
 	private final String endline = "\r\n";
-
 	private final String terminationOctet = ".";
 	
 	public POP3RequestHandler() {
