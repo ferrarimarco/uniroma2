@@ -19,9 +19,9 @@ public class POP3RequestHandler implements RequestHandler {
 	
 	private final String endline = "\r\n";
 	private final String terminationOctet = ".\r\n";
-	
+
 	public POP3RequestHandler() {
-		status = this.getStatus();
+		status = POP3Status.UNKNOWN;
 	}
 	
 	@Override
@@ -38,20 +38,21 @@ public class POP3RequestHandler implements RequestHandler {
 
 			reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 			
-			// Get the state of the POP3 session
+			// Get the status of the POP3 session
 			status = this.getStatus();
-			
+
 			if(status.equals(POP3Status.GREETINGS)){
 				sendLine(POP3StatusIndicator.OK + " POP3 server ready to roll!", false, false);
 				this.setStatus(POP3Status.AUTHORIZATION);
 			}
 			
 			while ((message = reader.readLine()) != null) {
-				
-				System.out.println("server riceve: " + message);
-				sendLine(POP3StatusIndicator.OK + " Capabilities follow.", false, false);
+				System.out.println("server riceve:" + message);
+				handleCommand(message);
 			}
 
+			stop();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -68,9 +69,11 @@ public class POP3RequestHandler implements RequestHandler {
 			
 			System.out.println("server invia:" + msg);
 			
+			/* DEBUG: PRINT EXA CHAR VALUES
 			for(int i = 0; i < msg.getBytes().length; i++){
 				System.out.println(String.format("0x%02X", msg.getBytes()[i]));
 			}
+			*/
 			
 			if(multiLine && lastLine){
 				writer.write(terminationOctet.getBytes());
@@ -104,31 +107,49 @@ public class POP3RequestHandler implements RequestHandler {
 			case "capa":
 				CAPACommand();
 				break;
+			case "QUIT":
+				QUITCommand();
+				break;
+			case "quit":
+				QUITCommand();
+				break;
 		}		
 	}
-	
+
 	private void CAPACommand(){
 		
+		// Get the state of the POP3 session
+		status = this.getStatus();
+		
+		if(status.equals(POP3Status.GREETINGS)){
+			sendLine(POP3StatusIndicator.ERR + " POP3 server is in GREETINGS status", false, false);
+			
+			return;
+		}else{
+			sendLine(POP3StatusIndicator.OK + " Capabilities follow.", false, false);
+		}
+		
+		// Send capabilities
+		//sendLine(msg, true, false);
+		
+	}
+	
+	
+	private void QUITCommand() {
+
+		sendLine(POP3StatusIndicator.OK + " POP3 server quits!", false, false);
 	}
 	
 	private POP3Status getStatus(){
 		
-		// TODO: Get status from DB (status = greetings for debug purposes)
-		String status = "greetings";
-		
-		switch(status){
-			case "greetings":
-				return POP3Status.GREETINGS;
-			case "authorization":
-				return POP3Status.AUTHORIZATION;
-			case "transaction":
-				return POP3Status.TRANSACTION;			
+		// TODO: Get status from DB (this code is just a placeholder for DB access)
+		if(status.equals(POP3Status.UNKNOWN)){
+			return POP3Status.GREETINGS;
+		}else{
+			return status;
 		}
-		
-		return POP3Status.UNKNOWN;
 	}
 	
-	// Write in DB?
 	private void setStatus(POP3Status status){
 
 		// TODO: Write status in DB
