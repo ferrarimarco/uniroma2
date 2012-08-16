@@ -11,15 +11,14 @@ public class POP3RequestHandler implements RequestHandler {
 	private BufferedOutputStream writer;
 	private BufferedReader reader;
 	
-	private String message;
-	
 	private Socket socket;
 	
 	private POP3Status status;
 	
 	private final String endline = "\r\n";
-	private final String terminationOctet = ".\r\n";
 
+	private final String terminationOctet = ".";
+	
 	public POP3RequestHandler() {
 		status = POP3Status.UNKNOWN;
 	}
@@ -42,9 +41,11 @@ public class POP3RequestHandler implements RequestHandler {
 			status = this.getStatus();
 
 			if(status.equals(POP3Status.GREETINGS)){
-				sendLine(POP3StatusIndicator.OK + " POP3 server ready to roll!", false, false);
-				this.setStatus(POP3Status.AUTHORIZATION);
+				sendResponse(POP3StatusIndicator.OK, "POP3 server ready to roll!");
+				setStatus(POP3Status.AUTHORIZATION);
 			}
+			
+			String message = "";
 			
 			while ((message = reader.readLine()) != null) {
 				System.out.println("server riceve:" + message);
@@ -76,7 +77,7 @@ public class POP3RequestHandler implements RequestHandler {
 			*/
 			
 			if(multiLine && lastLine){
-				writer.write(terminationOctet.getBytes());
+				writer.write((terminationOctet + endline).getBytes());
 				writer.flush();
 				System.out.println("Invio il carattere di terminazione.");
 			}
@@ -85,6 +86,15 @@ public class POP3RequestHandler implements RequestHandler {
 			
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
+		}
+	}
+	
+	private void sendResponse(POP3StatusIndicator statusIndicator, String response){
+		
+		if (response.length() > 0) {
+			sendLine(statusIndicator.toString() + " " + response, false, false);
+		}else{
+			sendLine(statusIndicator.toString(), false, false);
 		}
 	}
 	
@@ -113,43 +123,45 @@ public class POP3RequestHandler implements RequestHandler {
 			case "quit":
 				QUITCommand();
 				break;
-		}		
+			default:
+				sendResponse(POP3StatusIndicator.ERR, "Command is not supported");
+				break;	
+		}
+	}
+
+	private void QUITCommand(){
+
+		// TODO: unlock mailbox
+
+		// Get the status of the POP3 session
+		status = this.getStatus();
+
+		if(status.equals(POP3Status.GREETINGS)){
+			sendResponse(POP3StatusIndicator.ERR, "POP3 server is in GREETINGS status");
+		}else{
+			sendResponse(POP3StatusIndicator.OK, "Closing session");
+
+			if(status.equals(POP3Status.TRANSACTION)){
+				setStatus(POP3Status.UPDATE);
+			}
+		}
 	}
 
 	private void CAPACommand(){
-		
-		// Get the state of the POP3 session
-		status = this.getStatus();
-		
-		if(status.equals(POP3Status.GREETINGS)){
-			sendLine(POP3StatusIndicator.ERR + " POP3 server is in GREETINGS status", false, false);
-			
-			return;
-		}else{
-			sendLine(POP3StatusIndicator.OK + " Capabilities follow.", false, false);
-		}
-		
-		// Send capabilities
-		//sendLine(msg, true, false);
-		
-	}
-	
-	
-	private void QUITCommand() {
-
-		sendLine(POP3StatusIndicator.OK + " POP3 server quits!", false, false);
+		// TODO: write implementation
+		System.out.println("RICEVUTO CAPA");
 	}
 	
 	private POP3Status getStatus(){
 		
 		// TODO: Get status from DB (this code is just a placeholder for DB access)
 		if(status.equals(POP3Status.UNKNOWN)){
-			return POP3Status.GREETINGS;
-		}else{
-			return status;
+			setStatus(POP3Status.GREETINGS);
 		}
+		
+		return status;
 	}
-	
+
 	private void setStatus(POP3Status status){
 
 		// TODO: Write status in DB
