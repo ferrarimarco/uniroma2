@@ -45,13 +45,28 @@ public class POP3RequestHandler implements RequestHandler {
 			}
 			
 			String message = "";
+			String command = "";
+			String argument = "";
+			String [] commandElements;
 			
 			while ((message = reader.readLine()) != null) {
 				System.out.println("server riceve:" + message);
-				handleCommand(message);
+				
+				commandElements = message.split("\\s+");
+				
+				command = commandElements[0];
+				
+				if(commandElements.length > 1){
+					argument = commandElements[1];
+				}
+				
+				System.out.println(java.util.Arrays.toString(commandElements));
+				
+				handleCommand(command, argument);
 			}
 
 			stop();
+			status = POP3Status.UNKNOWN;
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -108,7 +123,7 @@ public class POP3RequestHandler implements RequestHandler {
 		}
 	}
 	
-	private void handleCommand(String command){
+	private void handleCommand(String command, String argument){
 		switch(command){
 			case "CAPA":
 				CAPACommand();
@@ -122,12 +137,20 @@ public class POP3RequestHandler implements RequestHandler {
 			case "quit":
 				QUITCommand();
 				break;
+			case "USER":
+				USERCommand(argument);
+			case "user":
+				USERCommand(argument);
 			default:
 				sendResponse(POP3StatusIndicator.ERR, "Command is not supported");
 				break;	
 		}
 	}
 
+	private void USERCommand(String argument){
+		// TODO: write implementation
+	}
+	
 	private void QUITCommand(){
 
 		// TODO: unlock mailbox
