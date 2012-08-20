@@ -7,40 +7,36 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 public class POP3RequestHandler implements RequestHandler {
-
-	private BufferedOutputStream writer;
-	private BufferedReader reader;
 	
-	private Socket socket;
+	// This variable is needed only because we don't have db access, yet
+	private POP3Status status = POP3Status.UNKNOWN;
 	
-	private POP3Status status;
-	
-	private final String endline = "\r\n";
-	private final String terminationOctet = ".";
+	private POP3CommandHandler pop3CommandHandler;
+	private POP3CommunicationHandler pop3CommunicationHandler;
 	
 	public POP3RequestHandler() {
-		status = POP3Status.UNKNOWN;
+		pop3CommandHandler = new POP3CommandHandler();
+		pop3CommunicationHandler = new POP3CommunicationHandler();
 	}
 	
 	@Override
 	public void handleRequest(Socket socket) {
 
-		this.socket = socket;
-
 		System.out.println("Connection received from " + socket.getInetAddress().getHostName());
-
+		
+		BufferedOutputStream writer;
+		BufferedReader reader;
+		
 		try {
 			// Get Input and Output streams
-			writer = new BufferedOutputStream(this.socket.getOutputStream());
+			writer = new BufferedOutputStream(socket.getOutputStream());
 			writer.flush();
 
-			reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			
-			// Get the status of the POP3 session
-			status = this.getStatus();
-
-			if(status.equals(POP3Status.GREETINGS)){
-				sendResponse(POP3StatusIndicator.OK, "POP3 server ready to roll!");
+			// Check the status of the POP3 session
+			if(getStatus().equals(POP3Status.GREETINGS)){
+				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "POP3 server ready to roll!");
 				setStatus(POP3Status.AUTHORIZATION);
 			}
 			
@@ -60,59 +56,23 @@ public class POP3RequestHandler implements RequestHandler {
 					argument = commandElements[1];
 				}
 				
+				// DEBUG
 				System.out.println(java.util.Arrays.toString(commandElements));
 				
-				handleCommand(command, argument);
+				handleCommand(writer, command, argument);
 			}
 
-			stop();
-			status = POP3Status.UNKNOWN;
+			// Done handling command
+			stop(reader, writer, socket);
+			setStatus(POP3Status.UNKNOWN);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private void sendLine(String msg, boolean multiLine, boolean lastLine) {
-		
-		try {
-			
-			msg += endline;
-			
-			writer.write(msg.getBytes());
-			writer.flush();
-			
-			System.out.println("server invia:" + msg);
-			
-			/* DEBUG: PRINT EXA CHAR VALUES
-			for(int i = 0; i < msg.getBytes().length; i++){
-				System.out.println(String.format("0x%02X", msg.getBytes()[i]));
-			}
-			*/
-			
-			if(multiLine && lastLine){
-				writer.write((terminationOctet + endline).getBytes());
-				writer.flush();
-				System.out.println("Invio il carattere di terminazione.");
-			}
-			
-			System.out.println("----------");
-			
-		} catch (IOException ioException) {
-			ioException.printStackTrace();
-		}
-	}
-	
-	private void sendResponse(POP3StatusIndicator statusIndicator, String response){
-		
-		if (response.length() > 0) {
-			sendLine(statusIndicator.toString() + " " + response, false, false);
-		}else{
-			sendLine(statusIndicator.toString(), false, false);
-		}
-	}
-	
-	public void stop(){
+	private void stop(BufferedReader reader, BufferedOutputStream writer, Socket socket){
+
 		// Close connection
 		try {
 			reader.close();
@@ -123,66 +83,35 @@ public class POP3RequestHandler implements RequestHandler {
 		}
 	}
 	
-	private void handleCommand(String command, String argument){
+	private void handleCommand(BufferedOutputStream writer, String command, String argument){
+		
+		// To hold the POP3Status to eventually set after the command
+		POP3Status resultingStatus = POP3Status.UNKNOWN;
+		
 		switch(command){
 			case "CAPA":
-				CAPACommand();
+				resultingStatus = pop3CommandHandler.CAPACommand(writer, getStatus());
 				break;
 			case "capa":
-				CAPACommand();
+				resultingStatus = pop3CommandHandler.CAPACommand(writer, getStatus());
 				break;
 			case "QUIT":
-				QUITCommand();
+				resultingStatus = pop3CommandHandler.QUITCommand(writer, getStatus());
 				break;
 			case "quit":
-				QUITCommand();
+				resultingStatus = pop3CommandHandler.QUITCommand(writer, getStatus());
 				break;
 			case "USER":
-				USERCommand(argument);
+				resultingStatus = pop3CommandHandler.USERCommand(writer, getStatus(), argument);
 			case "user":
-				USERCommand(argument);
+				resultingStatus = pop3CommandHandler.USERCommand(writer, getStatus(), argument);
 			default:
-				sendResponse(POP3StatusIndicator.ERR, "Command is not supported");
+				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Command is not supported");
 				break;	
 		}
-	}
-
-	private void USERCommand(String argument){
-		// TODO: write implementation
-	}
-	
-	private void QUITCommand(){
-
-		// TODO: unlock mailbox
-
-		// Get the status of the POP3 session
-		status = this.getStatus();
-
-		if(status.equals(POP3Status.GREETINGS)){
-			sendResponse(POP3StatusIndicator.ERR, "POP3 server is in GREETINGS status");
-		}else{
-			sendResponse(POP3StatusIndicator.OK, "Closing session");
-
-			if(status.equals(POP3Status.TRANSACTION)){
-				setStatus(POP3Status.UPDATE);
-			}
-		}
-	}
-
-	private void CAPACommand(){
-		// Get the state of the POP3 session
-		status = this.getStatus();
-
-		if(status.equals(POP3Status.GREETINGS)){
-			sendLine(POP3StatusIndicator.ERR + " POP3 server is in GREETINGS status", false, false);
-
-			return;
-		}else{
-			sendLine(POP3StatusIndicator.OK + " Capabilities follow.", false, false);
-		}
-
-		// TODO: Send capabilities
-		//sendLine(msg, true, false);
+		
+		// Set the status after the command according to the POP3 protocol specification
+		setStatus(resultingStatus);
 	}
 
 	private POP3Status getStatus(){
@@ -198,6 +127,7 @@ public class POP3RequestHandler implements RequestHandler {
 	private void setStatus(POP3Status status){
 
 		// TODO: Write status in DB
+		// TODO: read the status and write only if different?
 		
 		this.status = status;
 	}
