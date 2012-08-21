@@ -62,8 +62,8 @@ public class POP3RequestHandler implements RequestHandler {
 				handleCommand(writer, command, argument);
 			}
 
-			// Done handling command
-			stop(reader, writer, socket);
+			// TODO: Done handling command
+			//stop(reader, writer, socket);
 			setStatus(POP3Status.UNKNOWN);
 			
 		} catch (IOException e) {
