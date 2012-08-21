@@ -11,15 +11,57 @@ public class POP3CommandHandler {
 	}
 	
 	public POP3Status USERCommand(BufferedOutputStream writer, POP3Status status, String argument){
-		// TODO: write implementation
 		
+		// Check the status of the POP3 session
+		if(!status.equals(POP3Status.AUTHORIZATION)){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in AUTHORIZATION status.");
+			return status;
+		}
+		
+		// Check the previous command: USER is available only in AUTH status, after the POP3 server greeting or after an unsuccessful USER or PASS command
+		// TODO: get the previous command from DB. Valid ones are: empty, USER (failed), PASS (failed). Other possibilities must send an error and return the current session status
+		
+		// Check the argument
+		if(argument.isEmpty() || argument == null){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing name");
+			return status;
+		}
+		
+		// TODO: search for the username supplied as "argument" in DB
+		// TODO: if not found, send an error and return the current status
+		// TODO: if found send OK and wait for the PASS command only. Then record the transaction in DB (last command: USER, output: OK, arg: argument)		
+		
+		// TODO: check this return statement
+		return status;
+	}
+	
+	public POP3Status PASSCommand(BufferedOutputStream writer, POP3Status status, String argument){
+		
+		// Check the status of the POP3 session
+		if(!status.equals(POP3Status.AUTHORIZATION)){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in AUTHORIZATION status.");
+			return status;
+		}
+		
+		// Check the previous command: PASS is available only in AUTH status, after a successful USER command
+		// TODO: get the previous command from DB. Valid ones are: USER (passed). Other possibilities must send an error and return the current session status
+		
+		// Check the argument
+		if(argument.isEmpty() || argument == null){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing name");
+			return status;
+		}
+		
+		// TODO: try to match the current password with the username sent with the previous USER command (DB)
+		// TODO: if they don't match, send an error and return the current status
+		// TODO: if they match send OK and change status to TRANSACTION. Then record the transaction in DB (last command: PASS, output: OK, arg: argument)
+		
+		// TODO: check this return statement
 		return status;
 	}
 	
 	public POP3Status QUITCommand(BufferedOutputStream writer, POP3Status status){
-
-		// TODO: unlock mailbox
-
+		
 		if(status.equals(POP3Status.GREETINGS)){
 			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "POP3 server is in GREETINGS status");
 		}else{
@@ -29,6 +71,8 @@ public class POP3CommandHandler {
 				return POP3Status.UPDATE;
 			}
 		}
+		
+		// TODO: unlock mailbox
 		
 		return status;
 	}

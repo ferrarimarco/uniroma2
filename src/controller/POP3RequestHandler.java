@@ -103,8 +103,16 @@ public class POP3RequestHandler implements RequestHandler {
 				break;
 			case "USER":
 				resultingStatus = pop3CommandHandler.USERCommand(writer, getStatus(), argument);
+				break;
 			case "user":
 				resultingStatus = pop3CommandHandler.USERCommand(writer, getStatus(), argument);
+				break;
+			case "PASS":
+				resultingStatus = pop3CommandHandler.PASSCommand(writer, getStatus(), argument);
+				break;
+			case "pass":
+				resultingStatus = pop3CommandHandler.PASSCommand(writer, getStatus(), argument);
+				break;
 			default:
 				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Command is not supported");
 				break;	
