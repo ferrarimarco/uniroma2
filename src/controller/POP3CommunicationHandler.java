@@ -12,6 +12,8 @@ public class POP3CommunicationHandler {
 		
 	}
 	
+	// TODO: handle a multiline message automatically
+	
 	public void sendLine(BufferedOutputStream writer, String msg, boolean multiLine, boolean lastLine) {
 		
 		try {
