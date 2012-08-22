@@ -1,6 +1,8 @@
 package controller;
 
 import java.io.BufferedOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class POP3CommandHandler {
 	
@@ -10,12 +12,12 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler = new POP3CommunicationHandler();
 	}
 	
-	public POP3Status USERCommand(BufferedOutputStream writer, POP3Status status, String argument){
+	public void USERCommand(BufferedOutputStream writer, POP3Status status, String argument){
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3Status.AUTHORIZATION)){
 			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in AUTHORIZATION status.");
-			return status;
+			return;
 		}
 		
 		// Check the previous command: USER is available only in AUTH status, after the POP3 server greeting or after an unsuccessful USER or PASS command
@@ -24,15 +26,12 @@ public class POP3CommandHandler {
 		// Check the argument
 		if(argument.isEmpty() || argument == null){
 			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing name");
-			return status;
+			return;
 		}
 		
 		// TODO: search for the username supplied as "argument" in DB
 		// TODO: if not found, send an error and return the current status
 		// TODO: if found send OK and wait for the PASS command only. Then record the transaction in DB (last command: USER, output: OK, arg: argument)		
-		
-		// TODO: check this return statement
-		return status;
 	}
 	
 	public POP3Status PASSCommand(BufferedOutputStream writer, POP3Status status, String argument){
@@ -73,29 +72,97 @@ public class POP3CommandHandler {
 		}
 		
 		// TODO: unlock mailbox
+		// TODO: delete marked messages
 		
 		return status;
 	}
 
-	public POP3Status CAPACommand(BufferedOutputStream writer, POP3Status status){
+	public void CAPACommand(BufferedOutputStream writer, POP3Status status){
 
 		if(status.equals(POP3Status.GREETINGS)){
-			pop3CommunicationHandler.sendLine(writer, POP3StatusIndicator.ERR + " POP3 server is in GREETINGS status", false, false);
+			pop3CommunicationHandler.sendLine(writer, POP3StatusIndicator.ERR + " This command is not available only in GREETINGS status", false, false);
 		}else{
 			pop3CommunicationHandler.sendLine(writer, POP3StatusIndicator.OK + " Capabilities follow.", false, false);
 		}
 		
 		// TODO: Send capabilities
 		//sendLine(msg, true, false);
-		
-		return status;
 	}
 	
-	public POP3Status unsupportedCommand(BufferedOutputStream writer, POP3Status status){
+	public void STATCommand(BufferedOutputStream writer, POP3Status status){
+		
+		// Check the status of the POP3 session
+		if(!status.equals(POP3Status.TRANSACTION)){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+		}
+		
+		int messages = 0;
+		int dimension = 0;
+		
+		// Get the maildrop info about the user from DB
+		// TODO: get # of messages and dimension for each message from DB
+		
+		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, messages + " " + dimension);
+	}
+	
+	public void LISTCommand(BufferedOutputStream writer, POP3Status status, String argument){
+		
+		// Check the status of the POP3 session
+		if(!status.equals(POP3Status.TRANSACTION)){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			return;
+		}
+		
+		// Check the argument
+		if(argument.isEmpty() || argument == null){
+			
+			// Get information about all the messages in the maildrop
+			List<String> messages = new ArrayList<String>();
+			//TODO: read info from DB
+			
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, messages.size() + " messages");
+			
+			// Send response
+			if(messages.size() > 0){
+				for(int i = 0; i < messages.size(); i++){
+					if(i < messages.size() - 1){
+						int dimension = 0;
+						// TODO: compute the dimension of the i-nth message
+						
+						pop3CommunicationHandler.sendLine(writer, i + " " + dimension, true, false);
+					}else{// Last line of the response
+						int dimension = 0;
+						// TODO: compute the dimension of the i-nth message
+						
+						pop3CommunicationHandler.sendLine(writer, i + " " + dimension, true, true);
+					}
+				}
+			}else{// No messages in the maildrop
+				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "");
+				pop3CommunicationHandler.sendLine(writer, "", true, true);
+			}
+
+			
+		}else{
+			
+			// Check if such message exists
+			// TODO: check for such message in DB
+			
+			
+			// Get the dimension of the message
+			int dimension = 0;
+			// TODO: compute the exact dimension of the message
+			
+			// Send the response
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, argument + " " + dimension);			
+		}
+	}
+	
+	public void unsupportedCommand(BufferedOutputStream writer, POP3Status status){
 		
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Command is not supported");
 		
-		return status;
+		return;
 	}
 	
 	public POP3Status sendGreetings(BufferedOutputStream writer, POP3Status status){

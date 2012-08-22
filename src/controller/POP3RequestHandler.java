@@ -88,24 +88,31 @@ public class POP3RequestHandler implements RequestHandler {
 		
 		switch(command.toUpperCase()){
 			case "CAPA":
-				resultingStatus = pop3CommandHandler.CAPACommand(writer, getStatus());
+				pop3CommandHandler.CAPACommand(writer, getStatus());
 				break;
 			case "QUIT":
 				resultingStatus = pop3CommandHandler.QUITCommand(writer, getStatus());
 				break;
 			case "USER":
-				resultingStatus = pop3CommandHandler.USERCommand(writer, getStatus(), argument);
+				pop3CommandHandler.USERCommand(writer, getStatus(), argument);
 				break;
 			case "PASS":
 				resultingStatus = pop3CommandHandler.PASSCommand(writer, getStatus(), argument);
 				break;
+			case "STAT":
+				pop3CommandHandler.STATCommand(writer, getStatus());
+				break;
+			case "LIST":
+				break;
 			default:
-				resultingStatus = pop3CommandHandler.unsupportedCommand(writer, getStatus());
+				pop3CommandHandler.unsupportedCommand(writer, getStatus());
 				break;
 		}
 		
 		// Set the status after the command according to the POP3 protocol specification
-		setStatus(resultingStatus);
+		if(resultingStatus != POP3Status.UNKNOWN){
+			setStatus(resultingStatus);
+		}
 	}
 
 	private POP3Status getStatus(){
