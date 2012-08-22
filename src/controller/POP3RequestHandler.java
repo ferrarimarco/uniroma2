@@ -103,6 +103,13 @@ public class POP3RequestHandler implements RequestHandler {
 				pop3CommandHandler.STATCommand(writer, getStatus());
 				break;
 			case "LIST":
+				pop3CommandHandler.LISTCommand(writer, getStatus(), argument);
+				break;
+			case "DELE":
+				pop3CommandHandler.DELECommand(writer, getStatus(), argument);
+				break;
+			case "NOOP":
+				pop3CommandHandler.NOOPCommand(writer, getStatus());
 				break;
 			default:
 				pop3CommandHandler.unsupportedCommand(writer, getStatus());

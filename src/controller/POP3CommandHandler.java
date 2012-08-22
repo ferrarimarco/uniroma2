@@ -158,6 +158,41 @@ public class POP3CommandHandler {
 		}
 	}
 	
+	public void DELECommand(BufferedOutputStream writer, POP3Status status, String argument){
+		
+		// Check the status of the POP3 session
+		if(!status.equals(POP3Status.TRANSACTION)){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			return;
+		}
+		
+		// Check the argument
+		if(argument.isEmpty() || argument == null){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing command argument.");
+			return;
+		}
+		
+		// Search for such a message
+		// TODO: search for the message
+		
+		// Mark the message, if found for deletion. If there is no such message, send a negative response and return.
+		// TODO: mark the message for deletion
+		
+		// Send positive response
+		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Message marked for deletion.");
+	}
+	
+	public void NOOPCommand(BufferedOutputStream writer, POP3Status status){
+		
+		// Check the status of the POP3 session
+		if(!status.equals(POP3Status.TRANSACTION)){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			return;
+		}
+		
+		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "NOOP command received.");
+	}
+	
 	public void unsupportedCommand(BufferedOutputStream writer, POP3Status status){
 		
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Command is not supported");
