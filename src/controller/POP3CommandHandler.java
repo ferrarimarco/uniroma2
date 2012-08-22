@@ -193,6 +193,20 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "NOOP command received.");
 	}
 	
+	public void RSETCommand(BufferedOutputStream writer, POP3Status status){
+		
+		// Check the status of the POP3 session
+		if(!status.equals(POP3Status.TRANSACTION)){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			return;
+		}
+		
+		// Unmarks every messaged marked for deletion
+		// TODO: search for such messages in the DB and unmark each one
+		
+		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Maildrop reset completed.");
+	}
+	
 	public void unsupportedCommand(BufferedOutputStream writer, POP3Status status){
 		
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Command is not supported");

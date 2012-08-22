@@ -111,6 +111,9 @@ public class POP3RequestHandler implements RequestHandler {
 			case "NOOP":
 				pop3CommandHandler.NOOPCommand(writer, getStatus());
 				break;
+			case "RSET":
+				pop3CommandHandler.RSETCommand(writer, getStatus());
+				break;
 			default:
 				pop3CommandHandler.unsupportedCommand(writer, getStatus());
 				break;
