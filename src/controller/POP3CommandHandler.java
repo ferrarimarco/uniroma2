@@ -90,4 +90,18 @@ public class POP3CommandHandler {
 		
 		return status;
 	}
+	
+	public POP3Status unsupportedCommand(BufferedOutputStream writer, POP3Status status){
+		
+		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Command is not supported");
+		
+		return status;
+	}
+	
+	public POP3Status sendGreetings(BufferedOutputStream writer, POP3Status status){
+		
+		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "POP3 server ready to roll!");
+		
+		return POP3Status.AUTHORIZATION;		
+	}
 }

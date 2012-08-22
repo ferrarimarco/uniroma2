@@ -12,11 +12,9 @@ public class POP3RequestHandler implements RequestHandler {
 	private POP3Status status = POP3Status.UNKNOWN;
 	
 	private POP3CommandHandler pop3CommandHandler;
-	private POP3CommunicationHandler pop3CommunicationHandler;
 	
 	public POP3RequestHandler() {
 		pop3CommandHandler = new POP3CommandHandler();
-		pop3CommunicationHandler = new POP3CommunicationHandler();
 	}
 	
 	@Override
@@ -36,8 +34,8 @@ public class POP3RequestHandler implements RequestHandler {
 			
 			// Check the status of the POP3 session
 			if(getStatus().equals(POP3Status.GREETINGS)){
-				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "POP3 server ready to roll!");
-				setStatus(POP3Status.AUTHORIZATION);
+				POP3Status resultingStatus = pop3CommandHandler.sendGreetings(writer, getStatus());
+				setStatus(resultingStatus);
 			}
 			
 			String message = "";
@@ -88,34 +86,22 @@ public class POP3RequestHandler implements RequestHandler {
 		// To hold the POP3Status to eventually set after the command
 		POP3Status resultingStatus = POP3Status.UNKNOWN;
 		
-		switch(command){
+		switch(command.toUpperCase()){
 			case "CAPA":
-				resultingStatus = pop3CommandHandler.CAPACommand(writer, getStatus());
-				break;
-			case "capa":
 				resultingStatus = pop3CommandHandler.CAPACommand(writer, getStatus());
 				break;
 			case "QUIT":
 				resultingStatus = pop3CommandHandler.QUITCommand(writer, getStatus());
 				break;
-			case "quit":
-				resultingStatus = pop3CommandHandler.QUITCommand(writer, getStatus());
-				break;
 			case "USER":
-				resultingStatus = pop3CommandHandler.USERCommand(writer, getStatus(), argument);
-				break;
-			case "user":
 				resultingStatus = pop3CommandHandler.USERCommand(writer, getStatus(), argument);
 				break;
 			case "PASS":
 				resultingStatus = pop3CommandHandler.PASSCommand(writer, getStatus(), argument);
 				break;
-			case "pass":
-				resultingStatus = pop3CommandHandler.PASSCommand(writer, getStatus(), argument);
-				break;
 			default:
-				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Command is not supported");
-				break;	
+				resultingStatus = pop3CommandHandler.unsupportedCommand(writer, getStatus());
+				break;
 		}
 		
 		// Set the status after the command according to the POP3 protocol specification
