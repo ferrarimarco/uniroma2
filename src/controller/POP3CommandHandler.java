@@ -25,7 +25,7 @@ public class POP3CommandHandler {
 		
 		// Check the argument
 		if(argument.isEmpty() || argument == null){
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing name");
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing command argument");
 			return;
 		}
 		
@@ -47,7 +47,7 @@ public class POP3CommandHandler {
 		
 		// Check the argument
 		if(argument.isEmpty() || argument == null){
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing name");
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing command argument");
 			return status;
 		}
 		
@@ -156,6 +156,29 @@ public class POP3CommandHandler {
 			// Send the response
 			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, argument + " " + dimension);			
 		}
+	}
+	
+	public void RETRCommand(BufferedOutputStream writer, POP3Status status, String argument){
+		// Check the status of the POP3 session
+		if(!status.equals(POP3Status.TRANSACTION)){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			return;
+		}
+		
+		// Check the argument
+		if(argument.isEmpty() || argument == null){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing command argument");
+			return;
+		}
+		
+		// Check if the specified message exists
+		// TODO: check the message identified by the argument in the DB
+		// TODO: send an error if the message does not exists and return
+		
+		// Send the message in the multiline response
+		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "message follows");
+		
+		// TODO: send the message contents
 	}
 	
 	public void DELECommand(BufferedOutputStream writer, POP3Status status, String argument){
