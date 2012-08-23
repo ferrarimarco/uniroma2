@@ -41,6 +41,7 @@ public class POP3RequestHandler implements RequestHandler {
 			String message = "";
 			String command = "";
 			String argument = "";
+			String secondArgument = "";
 			String [] commandElements;
 			
 			while ((message = reader.readLine()) != null) {
@@ -54,10 +55,15 @@ public class POP3RequestHandler implements RequestHandler {
 					argument = commandElements[1];
 				}
 				
+				// Check if there is a second argument
+				if(commandElements.length > 2){
+					secondArgument = commandElements[2];
+				}
+				
 				// DEBUG
 				System.out.println(java.util.Arrays.toString(commandElements));
 				
-				handleCommand(writer, command, argument);
+				handleCommand(writer, command, argument, secondArgument);
 			}
 
 			// TODO: Done handling command
@@ -81,7 +87,7 @@ public class POP3RequestHandler implements RequestHandler {
 		}
 	}
 	
-	private void handleCommand(BufferedOutputStream writer, String command, String argument){
+	private void handleCommand(BufferedOutputStream writer, String command, String argument, String secondArgument){
 		
 		// To hold the POP3Status to eventually set after the command
 		POP3Status resultingStatus = POP3Status.UNKNOWN;
@@ -116,6 +122,9 @@ public class POP3RequestHandler implements RequestHandler {
 				break;
 			case "RSET":
 				pop3CommandHandler.RSETCommand(writer, getStatus());
+				break;
+			case "TOP":
+				pop3CommandHandler.TOPCommand(writer, getStatus(), argument, secondArgument);
 				break;
 			default:
 				pop3CommandHandler.unsupportedCommand(writer, getStatus());

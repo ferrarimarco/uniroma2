@@ -205,6 +205,30 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Message marked for deletion.");
 	}
 	
+	public void TOPCommand(BufferedOutputStream writer, POP3Status status, String argument, String secondArgument){
+		
+		// Check the status of the POP3 session
+		if(!status.equals(POP3Status.TRANSACTION)){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			return;
+		}
+		
+		// Check the argument
+		if(argument.isEmpty() || argument == null || secondArgument.isEmpty() || secondArgument == null){
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing command argument.");
+			return;
+		}
+		
+		// Check if the specified message exists
+		// TODO: check the message identified by the argument in the DB
+		// TODO: send an error if the message does not exists and return
+		
+		// Send the message in the multiline response
+		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "top of message follows");
+		
+		// TODO: send the message contents
+	}
+	
 	public void NOOPCommand(BufferedOutputStream writer, POP3Status status){
 		
 		// Check the status of the POP3 session
