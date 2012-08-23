@@ -107,6 +107,7 @@ public class POP3RequestHandler implements RequestHandler {
 				break;
 			case "RETR":
 				pop3CommandHandler.RETRCommand(writer, getStatus(), argument);
+				break;
 			case "DELE":
 				pop3CommandHandler.DELECommand(writer, getStatus(), argument);
 				break;
