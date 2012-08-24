@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 import controller.RequestHandler;
-import controller.pop3.POP3SessionStatus;
 
 public class SMTPRequestHandler implements RequestHandler {
 
