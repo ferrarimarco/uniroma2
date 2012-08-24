@@ -11,7 +11,7 @@ import controller.RequestHandler;
 public class POP3RequestHandler implements RequestHandler {
 	
 	// This variable is needed only because we don't have db access, yet
-	private POP3Status status = POP3Status.UNKNOWN;
+	private POP3SessionStatus status = POP3SessionStatus.UNKNOWN;
 	
 	private POP3CommandHandler pop3CommandHandler;
 	
@@ -35,9 +35,9 @@ public class POP3RequestHandler implements RequestHandler {
 			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			
 			// Check the status of the POP3 session
-			if(getStatus().equals(POP3Status.GREETINGS)){
+			if(getStatus().equals(POP3SessionStatus.GREETINGS)){
 				pop3CommandHandler.sendGreetings(writer);
-				setStatus(POP3Status.AUTHORIZATION);
+				setStatus(POP3SessionStatus.AUTHORIZATION);
 			}
 			
 			String message = "";
@@ -91,7 +91,7 @@ public class POP3RequestHandler implements RequestHandler {
 	private void handleCommand(BufferedOutputStream writer, String command, String argument, String secondArgument){
 		
 		// To hold the POP3Status to eventually set after the command
-		POP3Status resultingStatus = POP3Status.UNKNOWN;
+		POP3SessionStatus resultingStatus = POP3SessionStatus.UNKNOWN;
 		
 		switch(command.toUpperCase()){
 			case "CAPA":
@@ -128,27 +128,27 @@ public class POP3RequestHandler implements RequestHandler {
 				pop3CommandHandler.TOPCommand(writer, getStatus(), argument, secondArgument);
 				break;
 			default:
-				pop3CommandHandler.unsupportedCommand(writer, getStatus());
+				pop3CommandHandler.unsupportedCommand(writer);
 				break;
 		}
 		
 		// Set the status after the command according to the POP3 protocol specification
-		if(resultingStatus != POP3Status.UNKNOWN){
+		if(resultingStatus != POP3SessionStatus.UNKNOWN){
 			setStatus(resultingStatus);
 		}
 	}
 
-	private POP3Status getStatus(){
+	private POP3SessionStatus getStatus(){
 		
 		// TODO: Get status from DB (this code is just a placeholder for DB access)
-		if(status.equals(POP3Status.UNKNOWN)){
-			setStatus(POP3Status.GREETINGS);
+		if(status.equals(POP3SessionStatus.UNKNOWN)){
+			setStatus(POP3SessionStatus.GREETINGS);
 		}
 		
 		return status;
 	}
 
-	private void setStatus(POP3Status status){
+	private void setStatus(POP3SessionStatus status){
 
 		// TODO: Write status in DB
 		// TODO: read the status and write only if different?
