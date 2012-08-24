@@ -1,4 +1,4 @@
-package controller;
+package controller.pop3;
 
 public enum POP3Status {
 	GREETINGS, AUTHORIZATION, TRANSACTION, UPDATE, UNKNOWN;

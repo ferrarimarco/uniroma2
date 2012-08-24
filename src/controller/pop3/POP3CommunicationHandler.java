@@ -1,4 +1,4 @@
-package controller;
+package controller.pop3;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
