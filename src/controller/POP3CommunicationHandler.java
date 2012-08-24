@@ -2,27 +2,27 @@ package controller;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 public class POP3CommunicationHandler {
 
 	private final String endline = "\r\n";
 	private final String terminationOctet = ".";
 	
-	private final int maxLineLength = 0;
-	
-	public POP3CommunicationHandler(){
-		
-	}
-	
 	// TODO: handle a multiline message automatically
-	// TODO: handle the termination octet in the message
-	
-	public void sendListAsMultiLineResponse(){
+
+	public void sendListAsMultiLineResponse(BufferedOutputStream writer, List<String> list){
 		
-	}
-	
-	public void sendStringAsMultiLineResponse(){
-		
+		if(list.size() > 0){
+			for(int i = 0; i < list.size(); i++){
+				// Check if sending the last line
+				if(i < list.size() - 1){
+					sendLine(writer, list.get(i), true, false);
+				}else{// Send last line
+					sendLine(writer, list.get(i), true, true);
+				}
+			}
+		}		
 	}
 	
 	public void sendLine(BufferedOutputStream writer, String msg, boolean multiLine, boolean lastLine) {
@@ -30,6 +30,13 @@ public class POP3CommunicationHandler {
 		try {
 			
 			msg += endline;
+			
+			// Check if the line starts with the termination octet.
+			if(multiLine && msg.startsWith(terminationOctet)){
+				
+				// Byte-stuff according to POP3 protocol specification
+				msg = terminationOctet + msg;
+			}			
 			
 			writer.write(msg.getBytes());
 			writer.flush();
