@@ -255,16 +255,10 @@ public class POP3CommandHandler {
 	}
 	
 	public void unsupportedCommand(BufferedOutputStream writer, POP3Status status){
-		
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Command is not supported");
-		
-		return;
 	}
 	
-	public POP3Status sendGreetings(BufferedOutputStream writer, POP3Status status){
-		
+	public void sendGreetings(BufferedOutputStream writer){
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "POP3 server ready to roll!");
-		
-		return POP3Status.AUTHORIZATION;		
 	}
 }

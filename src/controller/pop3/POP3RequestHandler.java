@@ -19,7 +19,6 @@ public class POP3RequestHandler implements RequestHandler {
 		pop3CommandHandler = new POP3CommandHandler();
 	}
 	
-	@Override
 	public void handleRequest(Socket socket) {
 
 		System.out.println("Connection received from " + socket.getInetAddress().getHostName());
@@ -36,8 +35,8 @@ public class POP3RequestHandler implements RequestHandler {
 			
 			// Check the status of the POP3 session
 			if(getStatus().equals(POP3Status.GREETINGS)){
-				POP3Status resultingStatus = pop3CommandHandler.sendGreetings(writer, getStatus());
-				setStatus(resultingStatus);
+				pop3CommandHandler.sendGreetings(writer);
+				setStatus(POP3Status.AUTHORIZATION);
 			}
 			
 			String message = "";
@@ -63,14 +62,13 @@ public class POP3RequestHandler implements RequestHandler {
 				}
 				
 				// DEBUG
-				System.out.println(java.util.Arrays.toString(commandElements));
+				//System.out.println(java.util.Arrays.toString(commandElements));
 				
 				handleCommand(writer, command, argument, secondArgument);
 			}
 
 			// TODO: Done handling command
 			//stop(reader, writer, socket);
-			setStatus(POP3Status.UNKNOWN);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -139,7 +137,7 @@ public class POP3RequestHandler implements RequestHandler {
 		}
 	}
 
-	private POP3Status getStatus(){
+	protected POP3Status getStatus(){
 		
 		// TODO: Get status from DB (this code is just a placeholder for DB access)
 		if(status.equals(POP3Status.UNKNOWN)){
@@ -149,7 +147,7 @@ public class POP3RequestHandler implements RequestHandler {
 		return status;
 	}
 
-	private void setStatus(POP3Status status){
+	protected void setStatus(POP3Status status){
 
 		// TODO: Write status in DB
 		// TODO: read the status and write only if different?
