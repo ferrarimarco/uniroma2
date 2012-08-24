@@ -19,6 +19,7 @@ public class POP3RequestHandler implements RequestHandler {
 		pop3CommandHandler = new POP3CommandHandler();
 	}
 	
+	@Override
 	public void handleRequest(Socket socket) {
 
 		System.out.println("Connection received from " + socket.getInetAddress().getHostName());
@@ -137,7 +138,7 @@ public class POP3RequestHandler implements RequestHandler {
 		}
 	}
 
-	protected POP3Status getStatus(){
+	private POP3Status getStatus(){
 		
 		// TODO: Get status from DB (this code is just a placeholder for DB access)
 		if(status.equals(POP3Status.UNKNOWN)){
@@ -147,7 +148,7 @@ public class POP3RequestHandler implements RequestHandler {
 		return status;
 	}
 
-	protected void setStatus(POP3Status status){
+	private void setStatus(POP3Status status){
 
 		// TODO: Write status in DB
 		// TODO: read the status and write only if different?
