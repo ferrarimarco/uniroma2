@@ -12,11 +12,11 @@ public class SMTPCommandHandler {
 	}
 	
 	public void unsupportedCommand(BufferedOutputStream writer){
-		smtpCommunicationHandler.sendResponse(writer, SMTPCode.ERR, "Command is not supported");
+		smtpCommunicationHandler.sendResponse(writer, SMTPCode.UNSUPPORTED_COMMAND, "Command is not supported");
 	}
 	
 	public void sendGreetings(BufferedOutputStream writer){
-		smtpCommunicationHandler.sendResponse(writer, SMTPCode.OK, "SMTP server ready to roll!");
+		smtpCommunicationHandler.sendResponse(writer, SMTPCode.GREETINGS, "SMTP server ready to roll!");
 	}
 	
 }

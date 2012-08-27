@@ -81,6 +81,18 @@ public class SMTPRequestHandler implements RequestHandler {
 		SMTPSessionStatus resultingStatus = SMTPSessionStatus.UNKNOWN;
 		
 		switch(command.toUpperCase()){
+		case "EHLO":
+			break;
+		case "HELO":
+			break;
+		case "MAIL":
+			break;
+		case "RCPT":
+			break;
+		case "DATA":
+			break;
+		case "QUIT":
+			break;
 		default:
 			smtpCommandHandler.unsupportedCommand(writer);
 			break;
