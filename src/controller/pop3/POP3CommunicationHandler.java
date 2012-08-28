@@ -52,10 +52,8 @@ public class POP3CommunicationHandler {
 			if(multiLine && lastLine){
 				writer.write((terminationOctet + endline).getBytes());
 				writer.flush();
-				System.out.println("Invio il carattere di terminazione.");
+				System.out.println("Server invia il carattere di terminazione.");
 			}
-			
-			System.out.println("----------");
 			
 		} catch (IOException ioException) {
 			ioException.printStackTrace();

@@ -80,9 +80,24 @@ public class POP3CommandHandler {
 	public void CAPACommand(BufferedOutputStream writer, POP3SessionStatus status){
 
 		if(status.equals(POP3SessionStatus.GREETINGS)){
-			pop3CommunicationHandler.sendLine(writer, POP3StatusIndicator.ERR + " This command is not available only in GREETINGS status", false, false);
+			pop3CommunicationHandler.sendLine(writer, POP3StatusIndicator.ERR + " This command is not available in GREETINGS status", false, false);
 		}else{
 			pop3CommunicationHandler.sendLine(writer, POP3StatusIndicator.OK + " Capabilities follow.", false, false);
+			
+			List<String> capabilities = new ArrayList<String>();
+			capabilities.add("CAPA");
+			capabilities.add("USER");
+			capabilities.add("PASS");
+			capabilities.add("QUIT");
+			capabilities.add("STAT");
+			capabilities.add("LIST");
+			capabilities.add("RETR");
+			capabilities.add("DELE");
+			capabilities.add("TOP");
+			capabilities.add("NOOP");
+			capabilities.add("RSET");
+			
+			pop3CommunicationHandler.sendListAsMultiLineResponse(writer, capabilities);
 		}
 		
 		// TODO: Send capabilities
