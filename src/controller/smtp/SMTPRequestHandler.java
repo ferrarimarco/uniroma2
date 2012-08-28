@@ -21,7 +21,8 @@ public class SMTPRequestHandler implements RequestHandler {
 	
 	@Override
 	public void handleRequest(Socket socket) {
-		System.out.println("Connection received from " + socket.getInetAddress().getHostName());
+		
+		System.out.println("SMTP Connection received from " + socket.getInetAddress().getHostName());
 		
 		BufferedOutputStream writer;
 		BufferedReader reader;

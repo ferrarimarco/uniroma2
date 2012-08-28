@@ -14,7 +14,6 @@ public class ConnectionListener {
 		
 		try {
 			serverSocket = new ServerSocket(portNumber, backlog);
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -26,7 +25,7 @@ public class ConnectionListener {
 		try {
 			
 			// Wait for connection
-			System.out.println("Waiting for connection");
+			System.out.println("Waiting for connection on port " + serverSocket.getLocalPort());
 
 			connection = serverSocket.accept();
 

@@ -13,18 +13,12 @@ public class POP3RequestHandler implements RequestHandler {
 	// This variable is needed only because we don't have db access, yet
 	private POP3SessionStatus status = POP3SessionStatus.UNKNOWN;
 	
-	private POP3CommandHandler pop3CommandHandler;
-	
-	public POP3RequestHandler() {
-		pop3CommandHandler = new POP3CommandHandler();
-	}
-	
 	@Override
 	public void handleRequest(Socket socket) {
-
-		System.out.println("Host Name " + socket.getInetAddress().getHostName());
-		System.out.println("Host Address " + socket.getInetAddress().getHostAddress());
-		System.out.println("Canonical Host name " + socket.getInetAddress().getCanonicalHostName());
+		
+		POP3CommandHandler pop3CommandHandler = new POP3CommandHandler();
+		
+		System.out.println("POP3 Connection received from " + socket.getInetAddress().getHostName());
 		
 		BufferedOutputStream writer;
 		BufferedReader reader;
@@ -67,7 +61,7 @@ public class POP3RequestHandler implements RequestHandler {
 				// DEBUG
 				//System.out.println(java.util.Arrays.toString(commandElements));
 				
-				handleCommand(writer, command, argument, secondArgument);
+				handleCommand(pop3CommandHandler, writer, command, argument, secondArgument);
 			}
 
 			// TODO: Done handling command
@@ -90,7 +84,7 @@ public class POP3RequestHandler implements RequestHandler {
 		}
 	}
 	
-	private void handleCommand(BufferedOutputStream writer, String command, String argument, String secondArgument){
+	private void handleCommand(POP3CommandHandler pop3CommandHandler, BufferedOutputStream writer, String command, String argument, String secondArgument){
 		
 		// To hold the POP3Status to eventually set after the command
 		POP3SessionStatus resultingStatus = POP3SessionStatus.UNKNOWN;
