@@ -13,14 +13,10 @@ public class SMTPRequestHandler implements RequestHandler {
 	// This variable is needed only because we don't have db access, yet
 	private SMTPSessionStatus status = SMTPSessionStatus.UNKNOWN;
 	
-	private SMTPCommandHandler smtpCommandHandler;
-	
-	public SMTPRequestHandler(){
-		smtpCommandHandler = new SMTPCommandHandler();
-	}
-	
 	@Override
 	public void handleRequest(Socket socket) {
+		
+		SMTPCommandHandler smtpCommandHandler = new SMTPCommandHandler();
 		
 		System.out.println("SMTP Connection received from " + socket.getInetAddress().getHostName());
 		
@@ -65,7 +61,7 @@ public class SMTPRequestHandler implements RequestHandler {
 				// DEBUG
 				//System.out.println(java.util.Arrays.toString(commandElements));
 				
-				handleCommand(writer, command, argument, secondArgument);
+				handleCommand(smtpCommandHandler, writer, command, argument, secondArgument);
 			}
 
 			// TODO: Done handling command
@@ -76,7 +72,7 @@ public class SMTPRequestHandler implements RequestHandler {
 		}
 	}
 	
-	private void handleCommand(BufferedOutputStream writer, String command, String argument, String secondArgument){
+	private void handleCommand(SMTPCommandHandler smtpCommandHandler, BufferedOutputStream writer, String command, String argument, String secondArgument){
 		
 		// To hold the POP3Status to eventually set after the command
 		SMTPSessionStatus resultingStatus = SMTPSessionStatus.UNKNOWN;
