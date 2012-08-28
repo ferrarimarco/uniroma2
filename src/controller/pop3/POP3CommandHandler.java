@@ -99,9 +99,6 @@ public class POP3CommandHandler {
 			
 			pop3CommunicationHandler.sendListAsMultiLineResponse(writer, capabilities);
 		}
-		
-		// TODO: Send capabilities
-		//sendLine(msg, true, false);
 	}
 	
 	public void STATCommand(BufferedOutputStream writer, POP3SessionStatus status){
