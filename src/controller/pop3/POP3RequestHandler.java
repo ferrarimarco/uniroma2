@@ -73,8 +73,6 @@ public class POP3RequestHandler implements RequestHandler {
 	}
 	
 	private void stop(BufferedReader reader, BufferedOutputStream writer){
-
-		// Close connection
 		try {
 			reader.close();
 			writer.close();
