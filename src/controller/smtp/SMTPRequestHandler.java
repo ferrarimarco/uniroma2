@@ -46,7 +46,7 @@ public class SMTPRequestHandler implements RequestHandler {
 			String [] commandElements;
 			
 			while ((message = reader.readLine()) != null) {
-				System.out.println("server riceve:" + message);
+				System.out.println("SMTP server riceve:" + message);
 				
 				commandElements = message.split("\\s+");
 				

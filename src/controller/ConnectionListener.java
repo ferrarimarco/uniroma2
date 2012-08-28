@@ -13,7 +13,7 @@ public class ConnectionListener {
 	public ConnectionListener(int portNumber, int backlog, RequestHandler requestHandler) {
 		
 		try {
-			serverSocket = new ServerSocket(110, 10);
+			serverSocket = new ServerSocket(portNumber, backlog);
 			
 		} catch (IOException e) {
 			e.printStackTrace();

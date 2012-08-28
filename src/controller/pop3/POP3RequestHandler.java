@@ -22,7 +22,9 @@ public class POP3RequestHandler implements RequestHandler {
 	@Override
 	public void handleRequest(Socket socket) {
 
-		System.out.println("Connection received from " + socket.getInetAddress().getHostName());
+		System.out.println("Host Name " + socket.getInetAddress().getHostName());
+		System.out.println("Host Address " + socket.getInetAddress().getHostAddress());
+		System.out.println("Canonical Host name " + socket.getInetAddress().getCanonicalHostName());
 		
 		BufferedOutputStream writer;
 		BufferedReader reader;
@@ -47,7 +49,7 @@ public class POP3RequestHandler implements RequestHandler {
 			String [] commandElements;
 			
 			while ((message = reader.readLine()) != null) {
-				System.out.println("server riceve:" + message);
+				System.out.println("POP3 server riceve:" + message);
 				
 				commandElements = message.split("\\s+");
 				
