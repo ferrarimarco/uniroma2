@@ -30,6 +30,8 @@ public class ConnectionListener {
 			connection = serverSocket.accept();
 
 			requestHandler.handleRequest(connection);
+			
+			connection.close();
 
 		} catch (IOException ioException) {
 			ioException.printStackTrace();			

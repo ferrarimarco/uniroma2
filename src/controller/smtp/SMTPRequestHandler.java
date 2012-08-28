@@ -65,7 +65,7 @@ public class SMTPRequestHandler implements RequestHandler {
 			}
 
 			// TODO: Done handling command
-			//stop(reader, writer, socket);
+			stop(reader, writer);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -98,6 +98,17 @@ public class SMTPRequestHandler implements RequestHandler {
 		// Set the status after the command according to the POP3 protocol specification
 		if(resultingStatus != SMTPSessionStatus.UNKNOWN){
 			setStatus(resultingStatus);
+		}
+	}
+	
+	private void stop(BufferedReader reader, BufferedOutputStream writer){
+
+		// Close connection
+		try {
+			reader.close();
+			writer.close();
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
 		}
 	}
 	

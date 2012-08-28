@@ -65,20 +65,19 @@ public class POP3RequestHandler implements RequestHandler {
 			}
 
 			// TODO: Done handling command
-			//stop(reader, writer, socket);
+			stop(reader, writer);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private void stop(BufferedReader reader, BufferedOutputStream writer, Socket socket){
+	private void stop(BufferedReader reader, BufferedOutputStream writer){
 
 		// Close connection
 		try {
 			reader.close();
 			writer.close();
-			socket.close();
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
