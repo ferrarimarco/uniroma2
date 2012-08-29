@@ -10,7 +10,7 @@ import controller.RequestHandler;
 
 public class POP3RequestHandler implements RequestHandler {
 	
-	// This variable is needed only because we don't have db access, yet
+	// TODO: This variable is needed only because we don't have db access, yet
 	private POP3SessionStatus status = POP3SessionStatus.UNKNOWN;
 	
 	@Override
@@ -19,6 +19,9 @@ public class POP3RequestHandler implements RequestHandler {
 		POP3CommandHandler pop3CommandHandler = new POP3CommandHandler();
 		
 		System.out.println("POP3 Connection received from " + socket.getInetAddress().getHostName());
+		
+		// TODO: This variable is needed only because we don't have db access, yet
+		status = POP3SessionStatus.UNKNOWN;
 		
 		BufferedOutputStream writer;
 		BufferedReader reader;
@@ -76,6 +79,7 @@ public class POP3RequestHandler implements RequestHandler {
 		try {
 			reader.close();
 			writer.close();
+			
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}

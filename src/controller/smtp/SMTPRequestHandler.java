@@ -23,6 +23,9 @@ public class SMTPRequestHandler implements RequestHandler {
 		BufferedOutputStream writer;
 		BufferedReader reader;
 		
+		// TODO: This variable is needed only because we don't have db access, yet
+		status = SMTPSessionStatus.UNKNOWN;		
+		
 		try {
 			// Get Input and Output streams
 			writer = new BufferedOutputStream(socket.getOutputStream());
