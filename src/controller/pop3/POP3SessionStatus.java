@@ -7,13 +7,13 @@ public enum POP3SessionStatus {
 		
 		value = value.toLowerCase();
 		
-		if(value.equals(GREETINGS)){
+		if(value.equals(GREETINGS.toString())){
 			return GREETINGS;
-		}else if(value.equals(AUTHORIZATION)){
+		}else if(value.equals(AUTHORIZATION.toString())){
 			return AUTHORIZATION;
-		}else if(value.equals(TRANSACTION)){
+		}else if(value.equals(TRANSACTION.toString())){
 			return TRANSACTION;
-		}else if(value.equals(UPDATE)){
+		}else if(value.equals(UPDATE.toString())){
 			return UPDATE;
 		}else{
 			return UNKNOWN;
