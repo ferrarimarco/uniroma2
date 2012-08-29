@@ -7,21 +7,25 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 import controller.RequestHandler;
+import controller.persistance.PersistanceManager;
+import controller.persistance.StorageLocation;
+import controller.persistance.StorageManager;
 
 public class POP3RequestHandler implements RequestHandler {
-	
-	// TODO: This variable is needed only because we don't have db access, yet
-	private POP3SessionStatus status = POP3SessionStatus.UNKNOWN;
-	
+
 	@Override
 	public void handleRequest(Socket socket) {
 		
 		POP3CommandHandler pop3CommandHandler = new POP3CommandHandler();
 		
-		System.out.println("POP3 Connection received from " + socket.getInetAddress().getHostName());
+		PersistanceManager storageManager = new StorageManager();
 		
-		// TODO: This variable is needed only because we don't have db access, yet
-		status = POP3SessionStatus.UNKNOWN;
+		// Store client ID
+		String clientId = socket.getInetAddress().getHostName();
+		storeClientId(storageManager, clientId);
+		
+		// TODO: DEBUG
+		System.out.println("POP3 Connection received from " + socket.getInetAddress().getHostName());
 		
 		BufferedOutputStream writer;
 		BufferedReader reader;
@@ -34,9 +38,9 @@ public class POP3RequestHandler implements RequestHandler {
 			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			
 			// Check the status of the POP3 session
-			if(getStatus().equals(POP3SessionStatus.GREETINGS)){
-				pop3CommandHandler.sendGreetings(writer);
-				setStatus(POP3SessionStatus.AUTHORIZATION);
+			if(getStatus(storageManager, clientId).equals(POP3SessionStatus.GREETINGS)){
+				pop3CommandHandler.sendGreetings(writer, storageManager, clientId);
+				setStatus(storageManager, POP3SessionStatus.AUTHORIZATION, clientId);
 			}
 			
 			String message = "";
@@ -61,13 +65,13 @@ public class POP3RequestHandler implements RequestHandler {
 					secondArgument = commandElements[2];
 				}
 				
-				// DEBUG
+				// TODO: DEBUG
 				//System.out.println(java.util.Arrays.toString(commandElements));
 				
-				handleCommand(pop3CommandHandler, writer, command, argument, secondArgument);
+				handleCommand(pop3CommandHandler, writer, command, argument, secondArgument, storageManager, clientId);
 			}
 
-			// TODO: Done handling command
+			// Done handling the command
 			stop(reader, writer);
 			
 		} catch (IOException e) {
@@ -85,44 +89,44 @@ public class POP3RequestHandler implements RequestHandler {
 		}
 	}
 	
-	private void handleCommand(POP3CommandHandler pop3CommandHandler, BufferedOutputStream writer, String command, String argument, String secondArgument){
+	private void handleCommand(POP3CommandHandler pop3CommandHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManger, String clientId){
 		
 		// To hold the POP3Status to eventually set after the command
 		POP3SessionStatus resultingStatus = POP3SessionStatus.UNKNOWN;
 		
 		switch(command.toUpperCase()){
 			case "CAPA":
-				pop3CommandHandler.CAPACommand(writer, getStatus());
+				pop3CommandHandler.CAPACommand(writer, getStatus(persistanceManger, clientId), persistanceManger, clientId);
 				break;
 			case "QUIT":
-				resultingStatus = pop3CommandHandler.QUITCommand(writer, getStatus());
+				resultingStatus = pop3CommandHandler.QUITCommand(writer, getStatus(persistanceManger, clientId), persistanceManger, clientId);
 				break;
 			case "USER":
-				pop3CommandHandler.USERCommand(writer, getStatus(), argument);
+				pop3CommandHandler.USERCommand(writer, getStatus(persistanceManger, clientId), argument, persistanceManger, clientId);
 				break;
 			case "PASS":
-				resultingStatus = pop3CommandHandler.PASSCommand(writer, getStatus(), argument);
+				resultingStatus = pop3CommandHandler.PASSCommand(writer, getStatus(persistanceManger, clientId), argument, persistanceManger, clientId);
 				break;
 			case "STAT":
-				pop3CommandHandler.STATCommand(writer, getStatus());
+				pop3CommandHandler.STATCommand(writer, getStatus(persistanceManger, clientId), persistanceManger, clientId);
 				break;
 			case "LIST":
-				pop3CommandHandler.LISTCommand(writer, getStatus(), argument);
+				pop3CommandHandler.LISTCommand(writer, getStatus(persistanceManger, clientId), argument, persistanceManger, clientId);
 				break;
 			case "RETR":
-				pop3CommandHandler.RETRCommand(writer, getStatus(), argument);
+				pop3CommandHandler.RETRCommand(writer, getStatus(persistanceManger, clientId), argument, persistanceManger, clientId);
 				break;
 			case "DELE":
-				pop3CommandHandler.DELECommand(writer, getStatus(), argument);
+				pop3CommandHandler.DELECommand(writer, getStatus(persistanceManger, clientId), argument, persistanceManger, clientId);
 				break;
 			case "NOOP":
-				pop3CommandHandler.NOOPCommand(writer, getStatus());
+				pop3CommandHandler.NOOPCommand(writer, getStatus(persistanceManger, clientId), persistanceManger, clientId);
 				break;
 			case "RSET":
-				pop3CommandHandler.RSETCommand(writer, getStatus());
+				pop3CommandHandler.RSETCommand(writer, getStatus(persistanceManger, clientId), persistanceManger, clientId);
 				break;
 			case "TOP":
-				pop3CommandHandler.TOPCommand(writer, getStatus(), argument, secondArgument);
+				pop3CommandHandler.TOPCommand(writer, getStatus(persistanceManger, clientId), argument, secondArgument, persistanceManger, clientId);
 				break;
 			default:
 				pop3CommandHandler.unsupportedCommand(writer);
@@ -131,25 +135,29 @@ public class POP3RequestHandler implements RequestHandler {
 		
 		// Set the status after the command according to the POP3 protocol specification
 		if(resultingStatus != POP3SessionStatus.UNKNOWN){
-			setStatus(resultingStatus);
+			setStatus(persistanceManger, resultingStatus, clientId);
 		}
 	}
 
-	private POP3SessionStatus getStatus(){
+	private POP3SessionStatus getStatus(PersistanceManager persistanceManger, String clientId){
 		
-		// TODO: Get status from DB (this code is just a placeholder for DB access)
-		if(status.equals(POP3SessionStatus.UNKNOWN)){
-			setStatus(POP3SessionStatus.GREETINGS);
-		}
-		
-		return status;
+		return POP3SessionStatus.parseStatus(persistanceManger.read(StorageLocation.POP3_STATUS, clientId));
 	}
 
-	private void setStatus(POP3SessionStatus status){
+	private void setStatus(PersistanceManager persistanceManger, POP3SessionStatus status, String clientId){
 
-		// TODO: Write status in DB
-		// TODO: read the status and write only if different?
+		POP3SessionStatus currentStatus = getStatus(persistanceManger, clientId);
 		
-		this.status = status;
+		if(!currentStatus.equals(status)){
+			persistanceManger.update(StorageLocation.POP3_STATUS, clientId, status.toString());
+		}
+	}
+	
+	private void storeClientId(PersistanceManager persistanceManager, String clientId){
+		
+		// Search for clientId
+		if(persistanceManager.read(StorageLocation.CLIENT_ID, clientId).length() == 0){// If no such entry found, create one
+			persistanceManager.create(StorageLocation.POP3_STATUS, clientId, POP3SessionStatus.GREETINGS.toString());
+		}
 	}
 }

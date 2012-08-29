@@ -4,6 +4,8 @@ import java.io.BufferedOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import controller.persistance.PersistanceManager;
+
 public class POP3CommandHandler {
 	
 	private POP3CommunicationHandler pop3CommunicationHandler;
@@ -12,7 +14,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler = new POP3CommunicationHandler();
 	}
 	
-	public void USERCommand(BufferedOutputStream writer, POP3SessionStatus status, String argument){
+	public void USERCommand(BufferedOutputStream writer, POP3SessionStatus status, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.AUTHORIZATION)){
@@ -34,7 +36,7 @@ public class POP3CommandHandler {
 		// TODO: if found send OK and wait for the PASS command only. Then record the transaction in DB (last command: USER, output: OK, arg: argument)		
 	}
 	
-	public POP3SessionStatus PASSCommand(BufferedOutputStream writer, POP3SessionStatus status, String argument){
+	public POP3SessionStatus PASSCommand(BufferedOutputStream writer, POP3SessionStatus status, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.AUTHORIZATION)){
@@ -59,7 +61,7 @@ public class POP3CommandHandler {
 		return status;
 	}
 	
-	public POP3SessionStatus QUITCommand(BufferedOutputStream writer, POP3SessionStatus status){
+	public POP3SessionStatus QUITCommand(BufferedOutputStream writer, POP3SessionStatus status, PersistanceManager persistanceManager, String clientId){
 		
 		if(status.equals(POP3SessionStatus.GREETINGS)){
 			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "POP3 server is in GREETINGS status");
@@ -77,7 +79,7 @@ public class POP3CommandHandler {
 		return status;
 	}
 
-	public void CAPACommand(BufferedOutputStream writer, POP3SessionStatus status){
+	public void CAPACommand(BufferedOutputStream writer, POP3SessionStatus status, PersistanceManager persistanceManager, String clientId){
 
 		if(status.equals(POP3SessionStatus.GREETINGS)){
 			pop3CommunicationHandler.sendLine(writer, POP3StatusIndicator.ERR + " This command is not available in GREETINGS status", false, false);
@@ -101,7 +103,7 @@ public class POP3CommandHandler {
 		}
 	}
 	
-	public void STATCommand(BufferedOutputStream writer, POP3SessionStatus status){
+	public void STATCommand(BufferedOutputStream writer, POP3SessionStatus status, PersistanceManager persistanceManager, String clientId){
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
@@ -117,7 +119,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, messages + " " + dimension);
 	}
 	
-	public void LISTCommand(BufferedOutputStream writer, POP3SessionStatus status, String argument){
+	public void LISTCommand(BufferedOutputStream writer, POP3SessionStatus status, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
@@ -170,7 +172,7 @@ public class POP3CommandHandler {
 		}
 	}
 	
-	public void RETRCommand(BufferedOutputStream writer, POP3SessionStatus status, String argument){
+	public void RETRCommand(BufferedOutputStream writer, POP3SessionStatus status, String argument, PersistanceManager persistanceManager, String clientId){
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
 			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
@@ -193,7 +195,7 @@ public class POP3CommandHandler {
 		// TODO: send the message contents
 	}
 	
-	public void DELECommand(BufferedOutputStream writer, POP3SessionStatus status, String argument){
+	public void DELECommand(BufferedOutputStream writer, POP3SessionStatus status, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
@@ -217,7 +219,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Message marked for deletion.");
 	}
 	
-	public void TOPCommand(BufferedOutputStream writer, POP3SessionStatus status, String argument, String secondArgument){
+	public void TOPCommand(BufferedOutputStream writer, POP3SessionStatus status, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
@@ -241,7 +243,7 @@ public class POP3CommandHandler {
 		// TODO: send the message contents
 	}
 	
-	public void NOOPCommand(BufferedOutputStream writer, POP3SessionStatus status){
+	public void NOOPCommand(BufferedOutputStream writer, POP3SessionStatus status, PersistanceManager persistanceManager, String clientId){
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
@@ -252,7 +254,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "NOOP command received.");
 	}
 	
-	public void RSETCommand(BufferedOutputStream writer, POP3SessionStatus status){
+	public void RSETCommand(BufferedOutputStream writer, POP3SessionStatus status, PersistanceManager persistanceManager, String clientId){
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
@@ -270,7 +272,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Command is not supported");
 	}
 	
-	public void sendGreetings(BufferedOutputStream writer){
+	public void sendGreetings(BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "POP3 server ready to roll!");
 	}
 }
