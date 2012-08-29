@@ -5,7 +5,6 @@ import controller.smtp.SMTPRequestHandler;
 
 public class Index {
 
-
 	public static void main(String[] args) {
 
 		RequestHandler pop3RequestHandler = new POP3RequestHandler();
