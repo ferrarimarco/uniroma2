@@ -17,6 +17,7 @@ public class POP3RequestHandler implements RequestHandler {
 	public void handleRequest(Socket socket) {
 		
 		POP3CommandHandler pop3CommandHandler = new POP3CommandHandler();
+		POP3CommunicationHandler pop3CommunicationHandler = new POP3CommunicationHandler();
 		
 		PersistanceManager storageManager = new StorageManager();
 		
@@ -39,7 +40,7 @@ public class POP3RequestHandler implements RequestHandler {
 			
 			// Check the status of the POP3 session
 			if(getStatus(storageManager, clientId).equals(POP3SessionStatus.GREETINGS)){
-				pop3CommandHandler.sendGreetings(writer, storageManager, clientId);
+				pop3CommandHandler.sendGreetings(pop3CommunicationHandler, writer, storageManager, clientId);
 				setStatus(storageManager, POP3SessionStatus.AUTHORIZATION, clientId);
 			}
 			
@@ -68,7 +69,7 @@ public class POP3RequestHandler implements RequestHandler {
 				// TODO: DEBUG
 				//System.out.println(java.util.Arrays.toString(commandElements));
 				
-				handleCommand(pop3CommandHandler, writer, command, argument, secondArgument, storageManager, clientId);
+				handleCommand(pop3CommunicationHandler, pop3CommandHandler, writer, command, argument, secondArgument, storageManager, clientId);
 			}
 
 			// Done handling the command
@@ -89,7 +90,7 @@ public class POP3RequestHandler implements RequestHandler {
 		}
 	}
 	
-	private void handleCommand(POP3CommandHandler pop3CommandHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
+	private void handleCommand(POP3CommunicationHandler pop3CommunicationHandler, POP3CommandHandler pop3CommandHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
 		
 		// To hold the POP3Status to eventually set after the command
 		POP3SessionStatus resultingStatus = POP3SessionStatus.UNKNOWN;
@@ -97,29 +98,29 @@ public class POP3RequestHandler implements RequestHandler {
 		POP3Command pop3Command = POP3Command.parseCommand(command);
 		
 		if(pop3Command.equals(POP3Command.CAPA)){
-			pop3CommandHandler.CAPACommand(writer, getStatus(persistanceManager, clientId), persistanceManager, clientId);
+			pop3CommandHandler.CAPACommand(pop3CommunicationHandler, writer, getStatus(persistanceManager, clientId), persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.QUIT)){
-			resultingStatus = pop3CommandHandler.QUITCommand(writer, getStatus(persistanceManager, clientId), persistanceManager, clientId);
+			resultingStatus = pop3CommandHandler.QUITCommand(pop3CommunicationHandler, writer, getStatus(persistanceManager, clientId), persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.USER)){
-			pop3CommandHandler.USERCommand(writer, getStatus(persistanceManager, clientId), argument, persistanceManager, clientId);
+			pop3CommandHandler.USERCommand(pop3CommunicationHandler, writer, getStatus(persistanceManager, clientId), argument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.PASS)){
-			resultingStatus = pop3CommandHandler.PASSCommand(writer, getStatus(persistanceManager, clientId), argument, persistanceManager, clientId);
+			resultingStatus = pop3CommandHandler.PASSCommand(pop3CommunicationHandler, writer, getStatus(persistanceManager, clientId), argument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.STAT)){
-			pop3CommandHandler.STATCommand(writer, getStatus(persistanceManager, clientId), persistanceManager, clientId);
+			pop3CommandHandler.STATCommand(pop3CommunicationHandler, writer, getStatus(persistanceManager, clientId), persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.LIST)){
-			pop3CommandHandler.LISTCommand(writer, getStatus(persistanceManager, clientId), argument, persistanceManager, clientId);
+			pop3CommandHandler.LISTCommand(pop3CommunicationHandler, writer, getStatus(persistanceManager, clientId), argument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.RETR)){
-			pop3CommandHandler.RETRCommand(writer, getStatus(persistanceManager, clientId), argument, persistanceManager, clientId);
+			pop3CommandHandler.RETRCommand(pop3CommunicationHandler, writer, getStatus(persistanceManager, clientId), argument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.DELE)){
-			pop3CommandHandler.DELECommand(writer, getStatus(persistanceManager, clientId), argument, persistanceManager, clientId);
+			pop3CommandHandler.DELECommand(pop3CommunicationHandler, writer, getStatus(persistanceManager, clientId), argument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.NOOP)){
-			pop3CommandHandler.NOOPCommand(writer, getStatus(persistanceManager, clientId), persistanceManager, clientId);
+			pop3CommandHandler.NOOPCommand(pop3CommunicationHandler, writer, getStatus(persistanceManager, clientId), persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.RSET)){
-			pop3CommandHandler.RSETCommand(writer, getStatus(persistanceManager, clientId), persistanceManager, clientId);
+			pop3CommandHandler.RSETCommand(pop3CommunicationHandler, writer, getStatus(persistanceManager, clientId), persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.TOP)){
-			pop3CommandHandler.TOPCommand(writer, getStatus(persistanceManager, clientId), argument, secondArgument, persistanceManager, clientId);
+			pop3CommandHandler.TOPCommand(pop3CommunicationHandler, writer, getStatus(persistanceManager, clientId), argument, secondArgument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.UNSUPPORTED)){
-			pop3CommandHandler.unsupportedCommand(persistanceManager, clientId, writer);
+			pop3CommandHandler.unsupportedCommand(pop3CommunicationHandler, persistanceManager, clientId, writer);
 		}
 		
 		// Set the status after the command according to the POP3 protocol specification
