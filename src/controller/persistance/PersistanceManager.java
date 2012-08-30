@@ -9,4 +9,6 @@ public interface PersistanceManager {
 	void update(StorageLocation location, String id, String value);
 	
 	void delete(StorageLocation location, String id);
+	
+	boolean isPresent(StorageLocation location, String id);
 }

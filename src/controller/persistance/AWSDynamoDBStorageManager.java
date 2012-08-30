@@ -30,4 +30,10 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 
 	}
 
+	@Override
+	public boolean isPresent(StorageLocation location, String id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
