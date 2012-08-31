@@ -9,12 +9,19 @@ import java.util.Map;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.dynamodb.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodb.model.AttributeAction;
 import com.amazonaws.services.dynamodb.model.AttributeValue;
+import com.amazonaws.services.dynamodb.model.AttributeValueUpdate;
+import com.amazonaws.services.dynamodb.model.DeleteItemRequest;
+import com.amazonaws.services.dynamodb.model.DeleteItemResult;
 import com.amazonaws.services.dynamodb.model.GetItemRequest;
 import com.amazonaws.services.dynamodb.model.GetItemResult;
 import com.amazonaws.services.dynamodb.model.Key;
 import com.amazonaws.services.dynamodb.model.PutItemRequest;
 import com.amazonaws.services.dynamodb.model.PutItemResult;
+import com.amazonaws.services.dynamodb.model.ReturnValue;
+import com.amazonaws.services.dynamodb.model.UpdateItemRequest;
+import com.amazonaws.services.dynamodb.model.UpdateItemResult;
 
 public class AWSDynamoDBStorageManager implements PersistanceManager {
 
@@ -63,14 +70,39 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 
 	@Override
 	public void update(StorageLocation location, FieldName fieldName, String keyValue, String newValue) {
-		// TODO Auto-generated method stub
+		
+		AmazonDynamoDBClient client = getClient();
+		
+		Map<String, AttributeValueUpdate> updateItems = new HashMap<String, AttributeValueUpdate>();
+		Key key = new Key().withHashKeyElement(new AttributeValue().withS(keyValue));
+
+		// Update the attribute
+		updateItems.put(fieldName.toString(), new AttributeValueUpdate().withAction(AttributeAction.PUT)
+				.withValue(new AttributeValue(newValue)));
+
+		UpdateItemRequest updateItemRequest = new UpdateItemRequest().withTableName(location.toString())
+				  .withKey(key).withReturnValues(ReturnValue.ALL_NEW)
+				  .withAttributeUpdates(updateItems);
+		
+		UpdateItemResult result = client.updateItem(updateItemRequest);
+		
+		System.out.println("Result: " + result);
 
 	}
 
 	@Override
 	public void delete(StorageLocation location, FieldName fieldName, String keyValue) {
-		// TODO Auto-generated method stub
+		
+		AmazonDynamoDBClient client = getClient();
+		
+		DeleteItemRequest deleteItemRequest = new DeleteItemRequest()
+		.withTableName(location.toString())
+		.withKey(new Key().withHashKeyElement(new AttributeValue().withS(keyValue)));
+		
+		DeleteItemResult result = client.deleteItem(deleteItemRequest);
 
+		System.out.println("Result: " + result);
+		
 	}
 
 	@Override
