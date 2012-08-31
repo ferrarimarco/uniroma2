@@ -1,14 +1,16 @@
 package controller.persistance;
 
+import java.util.List;
+
 public interface PersistanceManager {
 
-	void create(StorageLocation location, String id, String value);
+	void create(StorageLocation location, List<FieldName> fieldNames, String ...values);
 	
-	String read(StorageLocation location, String id);
+	String read(StorageLocation location, FieldName fieldName, String keyValue);
 	
-	void update(StorageLocation location, String id, String value);
+	void update(StorageLocation location, FieldName fieldName, String keyValue, String newValue);
 	
-	void delete(StorageLocation location, String id);
+	void delete(StorageLocation location, FieldName fieldName, String keyValue);
 	
-	boolean isPresent(StorageLocation location, String id);
+	boolean isPresent(StorageLocation location, FieldName fieldName, String keyValue);
 }

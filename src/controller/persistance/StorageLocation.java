@@ -1,11 +1,20 @@
 package controller.persistance;
 
 public enum StorageLocation {
-	POP3_STATUS, POP3_CLIENT_ID, POP3_PREVIOUS_COMMAND, POP3_PREVIOUS_COMMAND_RESULT, POP3_PREVIOUS_COMMAND_FIRST_ARGUMENT, POP3_PREVIOUS_COMMAND_SECOND_ARGUMENT, 
-	POP3_USER_NAME, POP3_USER_PASSWORD;
+	POP3_SESSIONS, POP3_USERS, POP3_PASSWORDS, POP3_MAILDROPS;
 	
 	@Override
 	public String toString(){
-		return super.toString().toLowerCase();
+		if(this.equals(POP3_SESSIONS)){
+			return "pop3sessions_claudiani_ferrari";
+		}else if(this.equals(POP3_USERS) || this.equals(POP3_PASSWORDS)){
+			return "pop3users_claudiani_ferrari";
+		}else if(this.equals(POP3_MAILDROPS)){
+			return "pop3maildrops_claudiani_ferrari";
+		}else{
+			// TODO: check this return statement
+			// This should never occur
+			return "";			
+		}
 	}
 }

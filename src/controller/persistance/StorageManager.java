@@ -1,40 +1,40 @@
 package controller.persistance;
 
+import java.util.List;
+
 public class StorageManager implements PersistanceManager {
 	
 	@Override
-	public void create(StorageLocation location, String id, String value) {
+	public void create(StorageLocation location, List<FieldName> fieldNames, String ...values) {
 		// TODO: handle creation if the record is already there
 
 		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
 
-		awsDynamoDBStorageManager.create(location, id, value);
+		awsDynamoDBStorageManager.create(location, fieldNames, values);
 	}
 
 	@Override
-	public String read(StorageLocation location, String id) {
+	public String read(StorageLocation location, FieldName fieldName, String keyValue) {
 		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
 
-		// TODO: if not found return an empty ("") string
-
-		return awsDynamoDBStorageManager.read(location, id);
+		return awsDynamoDBStorageManager.read(location, fieldName, keyValue);
 	}
 
 	@Override
-	public void update(StorageLocation location, String id, String value) {
+	public void update(StorageLocation location, FieldName fieldName, String keyValue, String newValue) {
 
 		// TODO: handle creation if the record does not exists
 
 		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
 
-		awsDynamoDBStorageManager.update(location, id, value);
+		awsDynamoDBStorageManager.update(location, fieldName, keyValue, newValue);
 	}
 
 	@Override
-	public void delete(StorageLocation location, String id) {
+	public void delete(StorageLocation location, FieldName fieldName, String keyValue) {
 		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
 
-		awsDynamoDBStorageManager.delete(location, id);
+		awsDynamoDBStorageManager.delete(location, fieldName, keyValue);
 	}
 
 	private AWSDynamoDBStorageManager getAWSDynamoDBStorageManager() {
@@ -42,15 +42,11 @@ public class StorageManager implements PersistanceManager {
 	}
 
 	@Override
-	public boolean isPresent(StorageLocation location, String id) {
+	public boolean isPresent(StorageLocation location, FieldName fieldName, String keyValue) {
 
-		String result = read(location, id);
-
-		if (result.isEmpty()) {
-			return false;
-		} else {
-			return true;
-		}
+		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
+		
+		return awsDynamoDBStorageManager.isPresent(location, fieldName, keyValue);
 	}
 
 }
