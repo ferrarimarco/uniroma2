@@ -10,7 +10,9 @@ public interface PersistanceManager {
 	
 	void update(StorageLocation location, FieldName fieldName, String keyValue, String newValue);
 	
-	void delete(StorageLocation location, FieldName fieldName, String keyValue);
+	void delete(StorageLocation location, String keyValue);
 	
 	boolean isPresent(StorageLocation location, FieldName fieldName, String keyValue);
+	
+	void scanAndDeletePop3Messages(String keyUserName);
 }

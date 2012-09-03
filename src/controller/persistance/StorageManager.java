@@ -28,10 +28,10 @@ public class StorageManager implements PersistanceManager {
 	}
 
 	@Override
-	public void delete(StorageLocation location, FieldName fieldName, String keyValue) {
+	public void delete(StorageLocation location, String keyValue) {
 		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
 
-		awsDynamoDBStorageManager.delete(location, fieldName, keyValue);
+		awsDynamoDBStorageManager.delete(location, keyValue);
 	}
 
 	private AWSDynamoDBStorageManager getAWSDynamoDBStorageManager() {
@@ -44,6 +44,14 @@ public class StorageManager implements PersistanceManager {
 		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
 		
 		return awsDynamoDBStorageManager.isPresent(location, fieldName, keyValue);
+	}
+
+	@Override
+	public void scanAndDeletePop3Messages(String keyUserName) {
+		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
+		
+		awsDynamoDBStorageManager.scanAndDeletePop3Messages(keyUserName);
+		
 	}
 
 }

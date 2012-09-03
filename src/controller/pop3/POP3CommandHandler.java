@@ -89,6 +89,9 @@ public class POP3CommandHandler {
 			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Wrong password for user " + userName);		
 		}
 		
+		// Store the authenticated user name
+		persistanceManager.update(StorageLocation.POP3_SESSIONS, FieldName.POP3_SESSION_USER_NAME, clientId, userName);
+		
 		setLastCommandWithOneArgument(persistanceManager, clientId, POP3Command.PASS, POP3StatusIndicator.OK, argument);
 		
 		setStatus(persistanceManager, POP3SessionStatus.TRANSACTION, clientId);
@@ -116,9 +119,12 @@ public class POP3CommandHandler {
 		}
 		
 		// TODO: unlock mailbox
-		// TODO: delete marked messages
-		// TODO: delete session data from db
-
+		
+		String userName = getClientUserName(persistanceManager, clientId);
+		
+		persistanceManager.scanAndDeletePop3Messages(userName);
+		
+		persistanceManager.delete(StorageLocation.POP3_SESSIONS, clientId);
 	}
 
 	public void CAPACommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
@@ -220,10 +226,10 @@ public class POP3CommandHandler {
 			// Check if such message exists
 			// TODO: check for such message in DB
 			
-			
 			// Get the dimension of the message
 			int dimension = 0;
-			// TODO: compute the exact dimension of the message
+			
+			// TODO: compute the exact dimension of the message or store the dimension in DB? (better to store in DB)
 			
 			// Send the response
 			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, argument + " " + dimension);			
@@ -390,6 +396,10 @@ public class POP3CommandHandler {
 		}else{
 			return POP3StatusIndicator.parseStatusIndicator(result);
 		}
+	}
+	
+	private String getClientUserName(PersistanceManager persistanceManager, String clientId){
+		return persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_SESSION_USER_NAME, clientId);
 	}
 	
 	private void setLastCommand(PersistanceManager persistanceManager, String clientId, POP3Command pop3Command, POP3StatusIndicator pop3StatusIndicator){
