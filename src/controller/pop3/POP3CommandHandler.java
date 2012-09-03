@@ -168,14 +168,23 @@ public class POP3CommandHandler {
 		}
 		
 		int messages = 0;
-		int dimension = 0;
+		int totalDimension = 0;
+		
+		String userName = getClientUserName(persistanceManager, clientId);
 		
 		// Get the maildrop info about the user from DB
-		// TODO: get # of messages and dimension for each message from DB
+		List<String> messageDimension = persistanceManager.scanForMessageDimensions(userName);
+		
+		messages = messageDimension.size();
+		
+		// Compute total size
+		for(int i = 0; i < messageDimension.size(); i++){
+			totalDimension += Integer.parseInt(messageDimension.get(i));
+		}
 		
 		setLastCommand(persistanceManager, clientId, POP3Command.STAT, POP3StatusIndicator.OK);
 		
-		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, messages + " " + dimension);
+		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, messages + " " + totalDimension);
 	}
 	
 	public void LISTCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){

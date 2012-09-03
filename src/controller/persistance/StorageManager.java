@@ -47,11 +47,19 @@ public class StorageManager implements PersistanceManager {
 	}
 
 	@Override
-	public void scanAndDeletePop3Messages(String keyUserName) {
+	public void scanAndDeletePop3Messages(String userName) {
 		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
 		
-		awsDynamoDBStorageManager.scanAndDeletePop3Messages(keyUserName);
+		awsDynamoDBStorageManager.scanAndDeletePop3Messages(userName);
 		
+	}
+
+	@Override
+	public List<String> scanForMessageDimensions(String userName) {
+		
+		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
+		
+		return awsDynamoDBStorageManager.scanForMessageDimensions(userName);
 	}
 
 }

@@ -1,6 +1,7 @@
 package controller.persistance;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -132,11 +133,11 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 	}
 	
 	@Override
-	public void scanAndDeletePop3Messages(String keyUserName){
+	public void scanAndDeletePop3Messages(String userName){
 		
 		Condition userNameCondition = new Condition()
 		.withComparisonOperator(ComparisonOperator.EQ)
-	    .withAttributeValueList(new AttributeValue().withS(keyUserName));
+	    .withAttributeValueList(new AttributeValue().withS(userName));
 		
 		Condition messageToDeleteCondition = new Condition()
 		.withComparisonOperator(ComparisonOperator.EQ)
@@ -155,8 +156,40 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 		ScanResult result = getClient().scan(scanRequest);
 		
 		for (Map<String, AttributeValue> item : result.getItems()) {
-			delete(StorageLocation.POP3_MAILDROPS, item.get(FieldName.POP3_MESSAGE_UID).getS());
+			delete(StorageLocation.POP3_MAILDROPS, item.get(FieldName.POP3_MESSAGE_UID.toString()).getS());
 		}
+	}
+	
+	@Override
+	public List<String> scanForMessageDimensions(String userName){
+		
+		Condition userNameCondition = new Condition()
+		.withComparisonOperator(ComparisonOperator.EQ)
+	    .withAttributeValueList(new AttributeValue().withS(userName));
+		
+		Condition messageToDeleteCondition = new Condition()
+		.withComparisonOperator(ComparisonOperator.EQ)
+	    .withAttributeValueList(new AttributeValue().withS(POP3MessageDeletion.NO.toString()));
+		
+		Map<String, Condition> conditions = new HashMap<String, Condition>();
+		
+		conditions.put(FieldName.POP3_MESSAGE_TO.toString(), userNameCondition);
+		conditions.put(FieldName.POP3_MESSAGE_TO_DELETE.toString(), messageToDeleteCondition);
+		
+		ScanRequest scanRequest = new ScanRequest()
+		.withTableName(StorageLocation.POP3_MAILDROPS.toString())
+	    .withScanFilter(conditions)
+	    .withAttributesToGet(Arrays.asList(FieldName.POP3_MESSAGE_DIMENSION.toString()));
+		
+		ScanResult result = getClient().scan(scanRequest);
+		
+		List<String> messageDimensions = new ArrayList<String>();
+		
+		for (Map<String, AttributeValue> item : result.getItems()) {
+			messageDimensions.add(item.get(FieldName.POP3_MESSAGE_DIMENSION.toString()).getS());
+		}
+		
+		return messageDimensions;
 	}
 
 }
