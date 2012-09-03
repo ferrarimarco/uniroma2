@@ -6,7 +6,6 @@ public class StorageManager implements PersistanceManager {
 	
 	@Override
 	public void create(StorageLocation location, List<FieldName> fieldNames, String ...values) {
-		// TODO: handle creation if the record is already there
 
 		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
 
@@ -22,8 +21,6 @@ public class StorageManager implements PersistanceManager {
 
 	@Override
 	public void update(StorageLocation location, FieldName fieldName, String keyValue, String newValue) {
-
-		// TODO: handle creation if the record does not exists
 
 		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
 
