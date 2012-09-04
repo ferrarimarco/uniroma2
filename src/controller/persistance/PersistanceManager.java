@@ -14,7 +14,9 @@ public interface PersistanceManager {
 	
 	boolean isPresent(StorageLocation location, FieldName fieldName, String keyValue);
 	
-	void scanAndDeletePop3Messages(String userName);
+	void scanAndDeletePop3Messages(String clientId);
 	
-	List<String> scanForMessageDimensions(String userName);
+	List<String> scanForMessageDimensions(String ClientId);
+	
+	List<String> getMessageUIDs(String ClientId);
 }

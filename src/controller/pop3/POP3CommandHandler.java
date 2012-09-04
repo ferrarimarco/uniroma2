@@ -120,9 +120,7 @@ public class POP3CommandHandler {
 		
 		// TODO: unlock mailbox
 		
-		String userName = getClientUserName(persistanceManager, clientId);
-		
-		persistanceManager.scanAndDeletePop3Messages(userName);
+		persistanceManager.scanAndDeletePop3Messages(clientId);
 		
 		persistanceManager.delete(StorageLocation.POP3_SESSIONS, clientId);
 	}
@@ -170,10 +168,8 @@ public class POP3CommandHandler {
 		int messages = 0;
 		int totalDimension = 0;
 		
-		String userName = getClientUserName(persistanceManager, clientId);
-		
-		// Get the maildrop info about the user from DB
-		List<String> messageDimension = persistanceManager.scanForMessageDimensions(userName);
+		// Get maildrop info about the user from DB
+		List<String> messageDimension = persistanceManager.scanForMessageDimensions(clientId);
 		
 		messages = messageDimension.size();
 		
@@ -189,6 +185,8 @@ public class POP3CommandHandler {
 	
 	public void LISTCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
 		
+		// TODO: check if the order of the elements is consistent
+		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		// Check the status of the POP3 session
@@ -202,26 +200,20 @@ public class POP3CommandHandler {
 		if(argument.isEmpty()){
 			
 			// Get information about all the messages in the maildrop
-			List<String> messages = new ArrayList<String>();
-			//TODO: read info from DB
 			
 			setLastCommand(persistanceManager, clientId, POP3Command.LIST, POP3StatusIndicator.OK);
 			
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, messages.size() + " messages");
+			List<String> messageDimensions = persistanceManager.scanForMessageDimensions(clientId);
+			
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, messageDimensions.size() + " messages");
 			
 			// Send response
-			if(messages.size() > 0){
-				for(int i = 0; i < messages.size(); i++){
-					if(i < messages.size() - 1){
-						int dimension = 0;
-						// TODO: compute the dimension of the i-nth message
-						
-						pop3CommunicationHandler.sendLine(writer, i + " " + dimension, true, false);
-					}else{// Last line of the response
-						int dimension = 0;
-						// TODO: compute the dimension of the i-nth message
-						
-						pop3CommunicationHandler.sendLine(writer, i + " " + dimension, true, true);
+			if(messageDimensions.size() > 0){
+				for(int i = 0; i < messageDimensions.size(); i++){
+					if(i < messageDimensions.size() - 1){						
+						pop3CommunicationHandler.sendLine(writer, i + " " + messageDimensions.get(i), true, false);
+					}else{// Last line of the response						
+						pop3CommunicationHandler.sendLine(writer, i + " " + messageDimensions.get(i), true, true);
 					}
 				}
 			}else{// No messages in the maildrop
@@ -231,17 +223,19 @@ public class POP3CommandHandler {
 
 			
 		}else{
+
+			List<String> messageDimensions = persistanceManager.scanForMessageDimensions(clientId);
 			
 			// Check if such message exists
-			// TODO: check for such message in DB
+			if(Integer.parseInt(argument) >= messageDimensions.size()){
+				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "no such message");
+			}	
 			
 			// Get the dimension of the message
-			int dimension = 0;
-			
-			// TODO: compute the exact dimension of the message or store the dimension in DB? (better to store in DB)
-			
+			int dimension = Integer.parseInt(messageDimensions.get(Integer.parseInt(argument)));
+
 			// Send the response
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, argument + " " + dimension);			
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, argument + " " + dimension);		
 		}
 	}
 	
@@ -405,10 +399,6 @@ public class POP3CommandHandler {
 		}else{
 			return POP3StatusIndicator.parseStatusIndicator(result);
 		}
-	}
-	
-	private String getClientUserName(PersistanceManager persistanceManager, String clientId){
-		return persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_SESSION_USER_NAME, clientId);
 	}
 	
 	private void setLastCommand(PersistanceManager persistanceManager, String clientId, POP3Command pop3Command, POP3StatusIndicator pop3StatusIndicator){

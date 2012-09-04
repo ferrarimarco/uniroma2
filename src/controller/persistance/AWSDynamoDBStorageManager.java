@@ -63,7 +63,7 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 	public String read(StorageLocation location, FieldName fieldName, String keyValue) {
 
 		GetItemRequest getItemRequest = new GetItemRequest().withTableName(location.toString())
-				.withKey(new Key().withHashKeyElement(new AttributeValue().withN(keyValue)))
+				.withKey(new Key().withHashKeyElement(new AttributeValue().withS(keyValue)))
 				.withAttributesToGet(Arrays.asList(fieldName.toString()));
 
 		GetItemResult result = getClient().getItem(getItemRequest);
@@ -133,7 +133,9 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 	}
 	
 	@Override
-	public void scanAndDeletePop3Messages(String userName){
+	public void scanAndDeletePop3Messages(String clientId){
+		
+		String userName = getClientUserName(clientId);
 		
 		Condition userNameCondition = new Condition()
 		.withComparisonOperator(ComparisonOperator.EQ)
@@ -161,7 +163,9 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 	}
 	
 	@Override
-	public List<String> scanForMessageDimensions(String userName){
+	public List<String> scanForMessageDimensions(String clientId){
+		
+		String userName = getClientUserName(clientId);
 		
 		Condition userNameCondition = new Condition()
 		.withComparisonOperator(ComparisonOperator.EQ)
@@ -192,4 +196,41 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 		return messageDimensions;
 	}
 
+	@Override
+	public List<String> getMessageUIDs(String clientId) {
+		
+		String userName = getClientUserName(clientId);
+		
+		Condition userNameCondition = new Condition()
+		.withComparisonOperator(ComparisonOperator.EQ)
+	    .withAttributeValueList(new AttributeValue().withS(userName));
+		
+		Condition messageToDeleteCondition = new Condition()
+		.withComparisonOperator(ComparisonOperator.EQ)
+	    .withAttributeValueList(new AttributeValue().withS(POP3MessageDeletion.NO.toString()));
+		
+		Map<String, Condition> conditions = new HashMap<String, Condition>();
+		
+		conditions.put(FieldName.POP3_MESSAGE_TO.toString(), userNameCondition);
+		conditions.put(FieldName.POP3_MESSAGE_TO_DELETE.toString(), messageToDeleteCondition);
+		
+		ScanRequest scanRequest = new ScanRequest()
+		.withTableName(StorageLocation.POP3_MAILDROPS.toString())
+	    .withScanFilter(conditions)
+	    .withAttributesToGet(Arrays.asList(FieldName.POP3_MESSAGE_UID.toString()));
+		
+		ScanResult result = getClient().scan(scanRequest);
+		
+		List<String> messageUIDs = new ArrayList<String>();
+		
+		for (Map<String, AttributeValue> item : result.getItems()) {
+			messageUIDs.add(item.get(FieldName.POP3_MESSAGE_UID.toString()).getS());
+		}
+		
+		return messageUIDs;
+	}
+	
+	private String getClientUserName(String clientId){
+		return read(StorageLocation.POP3_SESSIONS, FieldName.POP3_SESSION_USER_NAME, clientId);
+	}
 }
