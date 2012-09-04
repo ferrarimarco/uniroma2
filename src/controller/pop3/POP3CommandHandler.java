@@ -79,7 +79,7 @@ public class POP3CommandHandler {
 			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing command argument");
 		}
 		
-		// TODO: hash the password
+		// TODO: hash the password?
 		// Get the password for the current user name
 		String userName = getPreviousCommandFirstArgument(persistanceManager, clientId);
 		String password = persistanceManager.read(StorageLocation.POP3_PASSWORDS, FieldName.POP3_USER_PASSWORD, userName);
@@ -110,10 +110,7 @@ public class POP3CommandHandler {
 			
 			setLastCommand(persistanceManager, clientId, POP3Command.QUIT, POP3StatusIndicator.OK);
 			
-			// TODO: check what to do if in AUTH status 
-			if(status.equals(POP3SessionStatus.TRANSACTION)){
-				setStatus(persistanceManager, POP3SessionStatus.UPDATE, clientId);
-			}
+			setStatus(persistanceManager, POP3SessionStatus.UPDATE, clientId);
 			
 			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Closing session");
 		}
@@ -399,8 +396,59 @@ public class POP3CommandHandler {
 	}
 	
 	public void UIDLCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId) {
-		// TODO Auto-generated method stub
+		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
+		// Check the status of the POP3 session
+		if(!status.equals(POP3SessionStatus.TRANSACTION)){
+			setLastCommand(persistanceManager, clientId, POP3Command.UIDL, POP3StatusIndicator.ERR);
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			return;
+		}
+		
+		// Check the argument
+		if(argument.isEmpty()){
+			
+			setLastCommand(persistanceManager, clientId, POP3Command.LIST, POP3StatusIndicator.OK);
+			
+			// Get information about all the messages in the maildrop
+			List<String> uids = persistanceManager.getMessageUIDs(clientId);
+			
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "");
+			
+			// Send response			
+			if(uids.size() > 0){
+				
+				// Add message number
+				for(int i = 0; i < uids.size(); i++){
+					uids.set(i, i + " " + uids.get(i));
+				}
+				
+				pop3CommunicationHandler.sendListAsMultiLineResponse(writer, uids);
+
+			}else{// No messages in the maildrop
+				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "");
+				pop3CommunicationHandler.sendLine(writer, "", true, true);
+			}
+			
+		}else{
+			
+			setLastCommandWithOneArgument(persistanceManager, clientId, POP3Command.UIDL, POP3StatusIndicator.OK, argument);
+
+			List<String> uids = persistanceManager.getMessageUIDs(clientId);
+			
+			// Check if such message exists
+			if(Integer.parseInt(argument) >= uids.size() || Integer.parseInt(argument) < 0){
+				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "no such message");
+			}	
+			
+			// Get the UID of the message
+			String messageUid = uids.get(Integer.parseInt(argument));
+
+			String response = argument.toString() + " " + messageUid;
+			
+			// Send the response
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, argument + " " + response);		
+		}
 	}
 	
 	public void unsupportedCommand(POP3CommunicationHandler pop3CommunicationHandler, PersistanceManager persistanceManager, String clientId, BufferedOutputStream writer){
