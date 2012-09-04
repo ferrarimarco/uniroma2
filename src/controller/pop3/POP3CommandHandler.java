@@ -128,14 +128,16 @@ public class POP3CommandHandler {
 		
 		if(status.equals(POP3SessionStatus.GREETINGS)){
 			setLastCommand(persistanceManager, clientId, POP3Command.CAPA, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendLine(writer, POP3StatusIndicator.ERR + " This command is not available in GREETINGS status", false, false);
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is not available in GREETINGS status");
 		}else{
 			
 			setLastCommand(persistanceManager, clientId, POP3Command.CAPA, POP3StatusIndicator.OK);
 			
-			pop3CommunicationHandler.sendLine(writer, POP3StatusIndicator.OK + " Capabilities follow.", false, false);
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Capabilities follow.");
 			
 			List<String> capabilities = new ArrayList<String>();
+			
+			// TODO: get command list from POP3Commands enum (like POP3Fields)
 			capabilities.add("CAPA");
 			capabilities.add("USER");
 			capabilities.add("PASS");
@@ -210,7 +212,7 @@ public class POP3CommandHandler {
 
 			}else{// No messages in the maildrop
 				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "");
-				pop3CommunicationHandler.sendLine(writer, "", true, true);
+				pop3CommunicationHandler.sendBlankLineMultilineEnd(writer);
 			}
 			
 		}else{
@@ -427,7 +429,7 @@ public class POP3CommandHandler {
 
 			}else{// No messages in the maildrop
 				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "");
-				pop3CommunicationHandler.sendLine(writer, "", true, true);
+				pop3CommunicationHandler.sendBlankLineMultilineEnd(writer);
 			}
 			
 		}else{

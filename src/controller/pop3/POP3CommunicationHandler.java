@@ -9,12 +9,32 @@ public class POP3CommunicationHandler {
 	private final String endline = "\r\n";
 	private final String terminationOctet = ".";
 	
-	// TODO: set this value
-	private final int maxCharsPerLine = 0;
+	// 512 - 2 (for endline)
+	private final int maxCharsPerLine = 510;
 
 	public void sendString(BufferedOutputStream writer, String string){
 		
-		// TODO: handle a multiline message automatically		
+		if(string.length() <= maxCharsPerLine){// String fits one line
+			sendLine(writer, string, false, false);
+		}else{// Need more than one line
+			
+			// Compute how many lines are needed
+			int lines = 0;
+			
+			lines = string.length() / (maxCharsPerLine);
+			if(string.length() % (maxCharsPerLine) > 0){
+				lines++;
+			}
+			
+			for(int i = 0; i < lines; i++){
+				// TODO: check this count!
+				if(i == lines - 2){
+					sendString(writer, string.substring(i * maxCharsPerLine, i * maxCharsPerLine + maxCharsPerLine));
+				}else{
+					sendString(writer, string.substring(i * maxCharsPerLine, string.length()));
+				}
+			}
+		}		
 	}
 	
 	public void sendTOPResponse(String header, String body, int lines){
@@ -35,7 +55,7 @@ public class POP3CommunicationHandler {
 		}
 	}
 	
-	public void sendLine(BufferedOutputStream writer, String msg, boolean multiLine, boolean lastLine) {
+	private void sendLine(BufferedOutputStream writer, String msg, boolean multiLine, boolean lastLine) {
 		
 		try {
 			
@@ -68,6 +88,10 @@ public class POP3CommunicationHandler {
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
+	}
+	
+	public void sendBlankLineMultilineEnd(BufferedOutputStream writer){
+		sendLine(writer, "", true, true);
 	}
 	
 	public void sendResponse(BufferedOutputStream writer, POP3StatusIndicator statusIndicator, String response){
