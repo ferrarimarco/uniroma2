@@ -199,30 +199,26 @@ public class POP3CommandHandler {
 		// Check the argument
 		if(argument.isEmpty()){
 			
-			// Get information about all the messages in the maildrop
-			
 			setLastCommand(persistanceManager, clientId, POP3Command.LIST, POP3StatusIndicator.OK);
 			
+			// Get information about all the messages in the maildrop
 			List<String> messageDimensions = persistanceManager.scanForMessageDimensions(clientId);
 			
 			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, messageDimensions.size() + " messages");
 			
-			// Send response
+			// Send response			
 			if(messageDimensions.size() > 0){
-				for(int i = 0; i < messageDimensions.size(); i++){
-					if(i < messageDimensions.size() - 1){						
-						pop3CommunicationHandler.sendLine(writer, i + " " + messageDimensions.get(i), true, false);
-					}else{// Last line of the response						
-						pop3CommunicationHandler.sendLine(writer, i + " " + messageDimensions.get(i), true, true);
-					}
-				}
+				
+				pop3CommunicationHandler.sendListAsMultiLineResponse(writer, messageDimensions);
+
 			}else{// No messages in the maildrop
 				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "");
 				pop3CommunicationHandler.sendLine(writer, "", true, true);
 			}
-
 			
 		}else{
+			
+			setLastCommandWithOneArgument(persistanceManager, clientId, POP3Command.LIST, POP3StatusIndicator.OK, argument);
 
 			List<String> messageDimensions = persistanceManager.scanForMessageDimensions(clientId);
 			
@@ -257,15 +253,26 @@ public class POP3CommandHandler {
 			return;
 		}
 		
+		// Get UIDs for all the messages
+		List<String> uids = persistanceManager.getMessageUIDs(clientId);
+		
+		int messageNumber = Integer.parseInt(argument);
+		
 		// Check if the specified message exists
-		// TODO: check the message identified by the argument in the DB
-		// TODO: send an error if the message does not exists and return
+		if(messageNumber >= uids.size()){
+			setLastCommand(persistanceManager, clientId, POP3Command.RETR, POP3StatusIndicator.ERR);
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "no such message");
+			return;	
+		}
+		
+		// Get message data
+		String message = persistanceManager.read(StorageLocation.POP3_MAILDROPS, FieldName.POP3_MESSAGE_DATA, uids.get(messageNumber));
 		
 		// Send the message in the multiline response
-		setLastCommand(persistanceManager, clientId, POP3Command.RETR, POP3StatusIndicator.OK);
+		setLastCommandWithOneArgument(persistanceManager, clientId, POP3Command.RETR, POP3StatusIndicator.OK, argument);
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "message follows");
 		
-		// TODO: send the message contents
+		pop3CommunicationHandler.sendString(writer, message);
 	}
 	
 	public void DELECommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
@@ -286,14 +293,23 @@ public class POP3CommandHandler {
 			return;
 		}
 		
-		// Search for such a message
-		// TODO: search for the message
+		// Get UIDs for all the messages
+		List<String> uids = persistanceManager.getMessageUIDs(clientId);
 		
-		// Mark the message, if found for deletion. If there is no such message, send a negative response and return.
-		// TODO: mark the message for deletion
+		int messageNumber = Integer.parseInt(argument);
 		
+		// Check if the specified message exists
+		if(messageNumber >= uids.size()){
+			setLastCommand(persistanceManager, clientId, POP3Command.RETR, POP3StatusIndicator.ERR);
+			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "no such message");
+			return;	
+		}
+		
+		// Mark the message for deletion
+		persistanceManager.update(StorageLocation.POP3_MAILDROPS, FieldName.POP3_MESSAGE_TO_DELETE, uids.get(messageNumber), POP3MessageDeletion.YES.toString());
+
 		// Send positive response
-		setLastCommand(persistanceManager, clientId, POP3Command.DELE, POP3StatusIndicator.OK);
+		setLastCommandWithOneArgument(persistanceManager, clientId, POP3Command.DELE, POP3StatusIndicator.OK, argument);
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Message marked for deletion.");
 	}
 	
@@ -357,6 +373,11 @@ public class POP3CommandHandler {
 		
 		setLastCommand(persistanceManager, clientId, POP3Command.RSET, POP3StatusIndicator.OK);
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Maildrop reset completed.");
+	}
+	
+	public void UIDLCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	public void unsupportedCommand(POP3CommunicationHandler pop3CommunicationHandler, PersistanceManager persistanceManager, String clientId, BufferedOutputStream writer){

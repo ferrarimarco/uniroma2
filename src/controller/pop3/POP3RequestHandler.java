@@ -110,6 +110,8 @@ public class POP3RequestHandler implements RequestHandler {
 			pop3CommandHandler.RSETCommand(pop3CommunicationHandler, writer, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.TOP)){
 			pop3CommandHandler.TOPCommand(pop3CommunicationHandler, writer, argument, secondArgument, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.UIDL)){
+			pop3CommandHandler.UIDLCommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.UNSUPPORTED)){
 			pop3CommandHandler.unsupportedCommand(pop3CommunicationHandler, persistanceManager, clientId, writer);
 		}

@@ -1,7 +1,7 @@
 package controller.pop3;
 
 public enum POP3Command {
-	CAPA, QUIT, USER, PASS, STAT, LIST, RETR, DELE, NOOP, RSET, TOP, UNSUPPORTED, EMPTY;
+	CAPA, QUIT, USER, PASS, STAT, LIST, RETR, DELE, NOOP, RSET, TOP, UIDL, UNSUPPORTED, EMPTY;
 	
 	public static POP3Command parseCommand(String value){
 		

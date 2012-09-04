@@ -8,9 +8,12 @@ public class POP3CommunicationHandler {
 
 	private final String endline = "\r\n";
 	private final String terminationOctet = ".";
-	
-	// TODO: handle a multiline message automatically
 
+	public void sendString(BufferedOutputStream writer, String string){
+		
+		// TODO: handle a multiline message automatically		
+	}
+	
 	public void sendListAsMultiLineResponse(BufferedOutputStream writer, List<String> list){
 		
 		if(list.size() > 0){
