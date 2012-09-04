@@ -8,10 +8,17 @@ public class POP3CommunicationHandler {
 
 	private final String endline = "\r\n";
 	private final String terminationOctet = ".";
+	
+	// TODO: set this value
+	private final int maxCharsPerLine = 0;
 
 	public void sendString(BufferedOutputStream writer, String string){
 		
 		// TODO: handle a multiline message automatically		
+	}
+	
+	public void sendTOPResponse(String header, String body, int lines){
+		// TODO: Cut the message according to the number of lines requested
 	}
 	
 	public void sendListAsMultiLineResponse(BufferedOutputStream writer, List<String> list){
@@ -25,7 +32,7 @@ public class POP3CommunicationHandler {
 					sendLine(writer, list.get(i), true, true);
 				}
 			}
-		}		
+		}
 	}
 	
 	public void sendLine(BufferedOutputStream writer, String msg, boolean multiLine, boolean lastLine) {
