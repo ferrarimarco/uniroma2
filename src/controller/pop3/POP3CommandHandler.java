@@ -449,7 +449,13 @@ public class POP3CommandHandler {
 		// Store client ID in DB
 		if(!persistanceManager.isPresent(StorageLocation.POP3_SESSIONS, FieldName.POP3_SESSION_ID, clientId)){
 			
-			persistanceManager.create(StorageLocation.POP3_SESSIONS, FieldName.getPOP3StatusTableFieldNames(), POP3SessionStatus.GREETINGS.toString());
+			persistanceManager.create(StorageLocation.POP3_SESSIONS, FieldName.getPOP3StatusTableFieldNames(), 
+					clientId,
+					POP3SessionStatus.GREETINGS.toString(),
+					POP3Command.EMPTY.toString(),
+					POP3StatusIndicator.UNKNOWN.toString(),
+					POP3Command.EMPTY.toString(),
+					POP3Command.EMPTY.toString());
 			setStatus(persistanceManager, POP3SessionStatus.AUTHORIZATION, clientId);
 		}
 		
@@ -486,8 +492,8 @@ public class POP3CommandHandler {
 		persistanceManager.update(StorageLocation.POP3_SESSIONS, FieldName.POP3_LAST_COMMAND_RESULT, clientId, pop3StatusIndicator.toString());
 		
 		// Clean the argument fields
-		persistanceManager.update(StorageLocation.POP3_SESSIONS, FieldName.POP3_LAST_COMMAND_FIRST_ARGUMENT, clientId, "");
-		persistanceManager.update(StorageLocation.POP3_SESSIONS, FieldName.POP3_LAST_COMMAND_SECOND_ARGUMENT, clientId, "");
+		persistanceManager.update(StorageLocation.POP3_SESSIONS, FieldName.POP3_LAST_COMMAND_FIRST_ARGUMENT, clientId, POP3Command.EMPTY.toString());
+		persistanceManager.update(StorageLocation.POP3_SESSIONS, FieldName.POP3_LAST_COMMAND_SECOND_ARGUMENT, clientId, POP3Command.EMPTY.toString());
 	}
 	
 	private void setLastCommandWithOneArgument(PersistanceManager persistanceManager, String clientId, POP3Command pop3Command, POP3StatusIndicator pop3StatusIndicator, String argument){
@@ -496,7 +502,7 @@ public class POP3CommandHandler {
 		persistanceManager.update(StorageLocation.POP3_SESSIONS, FieldName.POP3_LAST_COMMAND_FIRST_ARGUMENT, clientId, argument);
 
 		// Clean the second argument field
-		persistanceManager.update(StorageLocation.POP3_SESSIONS, FieldName.POP3_LAST_COMMAND_SECOND_ARGUMENT, clientId, "");
+		persistanceManager.update(StorageLocation.POP3_SESSIONS, FieldName.POP3_LAST_COMMAND_SECOND_ARGUMENT, clientId, POP3Command.EMPTY.toString());
 		
 	}
 	

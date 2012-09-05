@@ -37,9 +37,7 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 		AWSCredentials credentials;
 		AmazonDynamoDBClient dynamoDB = null;
 		try {
-			credentials = new PropertiesCredentials(
-					AWSDynamoDBStorageManager.class
-							.getResourceAsStream("AwsCredentials.properties"));
+			credentials = new PropertiesCredentials(AWSDynamoDBStorageManager.class.getResourceAsStream("AwsCredentials.properties"));
 			dynamoDB = new AmazonDynamoDBClient(credentials);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -55,8 +53,6 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 		
 		PutItemRequest putItemRequest = new PutItemRequest(location.toString(), item);
 		PutItemResult putItemResult = getClient().putItem(putItemRequest);
-		
-		System.out.println("Result: " + putItemResult);
 	}
 
 	@Override
@@ -68,7 +64,7 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 
 		GetItemResult result = getClient().getItem(getItemRequest);
 
-		if(result.getItem().get(fieldName.toString()).getS() == null){
+		if(result.getItem() == null){
 			return "";
 		}else{
 			return result.getItem().get(fieldName.toString()).getS();
@@ -90,9 +86,6 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 				  .withAttributeUpdates(updateItems);
 		
 		UpdateItemResult result = getClient().updateItem(updateItemRequest);
-		
-		System.out.println("Result: " + result);
-
 	}
 
 	@Override
@@ -102,10 +95,7 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 		.withTableName(location.toString())
 		.withKey(new Key().withHashKeyElement(new AttributeValue().withS(keyValue)));
 		
-		DeleteItemResult result = getClient().deleteItem(deleteItemRequest);
-
-		System.out.println("Result: " + result);
-		
+		DeleteItemResult result = getClient().deleteItem(deleteItemRequest);		
 	}
 
 	@Override
@@ -121,9 +111,10 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 	}
 
 	private Map<String, AttributeValue> newItem(List<FieldName> fieldNames, String ...values) {
+		
 		Map<String, AttributeValue> item = new HashMap<String, AttributeValue>(fieldNames.size());
 		
-		// TODO: check if filedNames and values have the same size
+		// TODO: check if filedNames and values have the same size		
 		
 		for(int i = 0; i < fieldNames.size(); i++){
 			item.put(fieldNames.get(i).toString(), new AttributeValue(values[i]));

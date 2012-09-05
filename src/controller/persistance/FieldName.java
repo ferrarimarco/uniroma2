@@ -12,8 +12,6 @@ public enum FieldName {
 	@Override
 	public String toString(){
 		return super.toString().toLowerCase();
-
-		// TODO: change the tostring to match field names in dynamo
 	}
 	
 	public static List<FieldName> getPOP3StatusTableFieldNames(){
