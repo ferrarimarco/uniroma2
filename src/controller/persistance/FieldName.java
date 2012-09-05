@@ -16,8 +16,6 @@ public enum FieldName {
 		// TODO: change the tostring to match field names in dynamo
 	}
 	
-	
-	
 	public static List<FieldName> getPOP3StatusTableFieldNames(){
 		
 		List<FieldName> pop3StatusFieldNames = new ArrayList<FieldName>();
