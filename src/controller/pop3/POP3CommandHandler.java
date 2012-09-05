@@ -1,7 +1,6 @@
 package controller.pop3;
 
 import java.io.BufferedOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import controller.persistance.FieldName;
@@ -135,20 +134,7 @@ public class POP3CommandHandler {
 			
 			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Capabilities follow.");
 			
-			List<String> capabilities = new ArrayList<String>();
-			
-			// TODO: get command list from POP3Commands enum (like POP3Fields)
-			capabilities.add("CAPA");
-			capabilities.add("USER");
-			capabilities.add("PASS");
-			capabilities.add("QUIT");
-			capabilities.add("STAT");
-			capabilities.add("LIST");
-			capabilities.add("RETR");
-			capabilities.add("DELE");
-			capabilities.add("TOP");
-			capabilities.add("NOOP");
-			capabilities.add("RSET");
+			List<String> capabilities = POP3Command.getPOP3CapaCommands();
 			
 			pop3CommunicationHandler.sendListAsMultiLineResponse(writer, capabilities);
 		}

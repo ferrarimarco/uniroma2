@@ -1,5 +1,8 @@
 package controller.pop3;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum POP3Command {
 	CAPA, QUIT, USER, PASS, STAT, LIST, RETR, DELE, NOOP, RSET, TOP, UIDL, UNSUPPORTED, EMPTY;
 	
@@ -37,5 +40,25 @@ public enum POP3Command {
 	@Override
 	public String toString(){
 		return super.toString().toUpperCase();
+	}
+	
+	public static List<String> getPOP3CapaCommands(){
+		
+		List<String> pop3CapaCommands = new ArrayList<String>();
+		
+		pop3CapaCommands.add(CAPA.toString());
+		pop3CapaCommands.add(USER.toString());
+		pop3CapaCommands.add(PASS.toString());
+		pop3CapaCommands.add(QUIT.toString());
+		pop3CapaCommands.add(STAT.toString());
+		pop3CapaCommands.add(LIST.toString());
+		pop3CapaCommands.add(RETR.toString());
+		pop3CapaCommands.add(DELE.toString());
+		pop3CapaCommands.add(TOP.toString());
+		pop3CapaCommands.add(NOOP.toString());
+		pop3CapaCommands.add(RSET.toString());
+		pop3CapaCommands.add(UIDL.toString());
+		
+		return pop3CapaCommands;
 	}
 }
