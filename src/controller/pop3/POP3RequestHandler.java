@@ -11,7 +11,7 @@ import controller.persistance.PersistanceManager;
 import controller.persistance.StorageManager;
 
 public class POP3RequestHandler implements RequestHandler {
-
+	
 	@Override
 	public void handleRequest(Socket socket) {
 		
@@ -20,20 +20,21 @@ public class POP3RequestHandler implements RequestHandler {
 		
 		PersistanceManager storageManager = new StorageManager();
 		
-		String clientId = socket.getInetAddress().getHostName();
+		// TODO: the client uses multiple ports!!! so the port section may change!!!!
+		
+		String clientId = socket.getInetAddress().getHostAddress();
+		// Temp solution: comment the port. This will not work if multiple users share the same public ip
+		//clientId += ":" + socket.getPort();
 		
 		// TODO: DEBUG
-		System.out.println("POP3 Connection received from " + socket.getInetAddress().getHostName());
-		
-		BufferedOutputStream writer;
-		BufferedReader reader;
+		System.out.println("POP3 Connection received from " + clientId);
 		
 		try {
 			// Get Input and Output streams
-			writer = new BufferedOutputStream(socket.getOutputStream());
+			BufferedOutputStream writer = new BufferedOutputStream(socket.getOutputStream());
 			writer.flush();
 
-			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			
 			// Send greetings (if necessary)
 			pop3CommandHandler.sendGreetings(pop3CommunicationHandler, writer, storageManager, clientId);
@@ -45,7 +46,7 @@ public class POP3RequestHandler implements RequestHandler {
 			String [] commandElements;
 			
 			while ((message = reader.readLine()) != null) {
-				System.out.println("POP3 server riceve:" + message);
+				System.out.println("POP3 server riceve: " + message);
 				
 				commandElements = message.split("\\s+");
 				
@@ -78,7 +79,6 @@ public class POP3RequestHandler implements RequestHandler {
 		try {
 			reader.close();
 			writer.close();
-			
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}

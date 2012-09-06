@@ -16,7 +16,7 @@ public class SMTPCommunicationHandler {
 			writer.write(msg.getBytes());
 			writer.flush();
 			
-			System.out.println("server invia:" + msg);
+			System.out.println("SMTP server invia:" + msg);
 			
 			/* DEBUG: PRINT EXA CHAR VALUES
 			for(int i = 0; i < msg.getBytes().length; i++){

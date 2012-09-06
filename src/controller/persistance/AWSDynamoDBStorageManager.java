@@ -16,34 +16,33 @@ import com.amazonaws.services.dynamodb.model.AttributeValueUpdate;
 import com.amazonaws.services.dynamodb.model.ComparisonOperator;
 import com.amazonaws.services.dynamodb.model.Condition;
 import com.amazonaws.services.dynamodb.model.DeleteItemRequest;
-import com.amazonaws.services.dynamodb.model.DeleteItemResult;
 import com.amazonaws.services.dynamodb.model.GetItemRequest;
 import com.amazonaws.services.dynamodb.model.GetItemResult;
 import com.amazonaws.services.dynamodb.model.Key;
 import com.amazonaws.services.dynamodb.model.PutItemRequest;
-import com.amazonaws.services.dynamodb.model.PutItemResult;
 import com.amazonaws.services.dynamodb.model.ReturnValue;
 import com.amazonaws.services.dynamodb.model.ScanRequest;
 import com.amazonaws.services.dynamodb.model.ScanResult;
 import com.amazonaws.services.dynamodb.model.UpdateItemRequest;
-import com.amazonaws.services.dynamodb.model.UpdateItemResult;
 
 import controller.pop3.POP3MessageDeletion;
 
 public class AWSDynamoDBStorageManager implements PersistanceManager {
 
-	private AmazonDynamoDBClient getClient() {
-		
+	private AmazonDynamoDBClient client;
+	
+	public AWSDynamoDBStorageManager(){
 		AWSCredentials credentials;
-		AmazonDynamoDBClient dynamoDB = null;
 		try {
 			credentials = new PropertiesCredentials(AWSDynamoDBStorageManager.class.getResourceAsStream("AwsCredentials.properties"));
-			dynamoDB = new AmazonDynamoDBClient(credentials);
+			client = new AmazonDynamoDBClient(credentials);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		return dynamoDB;
+	}
+	
+	private AmazonDynamoDBClient getClient() {
+		return client;
 	}
 
 	@Override
@@ -52,7 +51,7 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 		Map<String, AttributeValue> item = newItem(fieldNames, values);
 		
 		PutItemRequest putItemRequest = new PutItemRequest(location.toString(), item);
-		PutItemResult putItemResult = getClient().putItem(putItemRequest);
+		getClient().putItem(putItemRequest);
 	}
 
 	@Override
@@ -71,21 +70,28 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 		}
 	}
 
+	// TODO: make the update multi field to avoid multiple queries
+	
 	@Override
-	public void update(StorageLocation location, FieldName fieldName, String keyValue, String newValue) {
+	public void update(StorageLocation location, String keyValue, List<FieldName> fieldNames, String ...values) {
 		
 		Map<String, AttributeValueUpdate> updateItems = new HashMap<String, AttributeValueUpdate>();
 		Key key = new Key().withHashKeyElement(new AttributeValue().withS(keyValue));
 
-		// Update the attribute
-		updateItems.put(fieldName.toString(), new AttributeValueUpdate().withAction(AttributeAction.PUT)
-				.withValue(new AttributeValue(newValue)));
+		// TODO: check if filedNames and values have the same size		
 
+		for(int i = 0; i < fieldNames.size(); i++){
+			updateItems.put(fieldNames.get(i).toString(), new AttributeValueUpdate()
+			.withAction(AttributeAction.PUT)
+			.withValue(new AttributeValue(values[i])));
+		}
+
+		// Update the attributes
 		UpdateItemRequest updateItemRequest = new UpdateItemRequest().withTableName(location.toString())
 				  .withKey(key).withReturnValues(ReturnValue.ALL_NEW)
 				  .withAttributeUpdates(updateItems);
 		
-		UpdateItemResult result = getClient().updateItem(updateItemRequest);
+		getClient().updateItem(updateItemRequest);
 	}
 
 	@Override
@@ -95,7 +101,7 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 		.withTableName(location.toString())
 		.withKey(new Key().withHashKeyElement(new AttributeValue().withS(keyValue)));
 		
-		DeleteItemResult result = getClient().deleteItem(deleteItemRequest);		
+		getClient().deleteItem(deleteItemRequest);		
 	}
 
 	@Override
@@ -112,21 +118,26 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 
 	private Map<String, AttributeValue> newItem(List<FieldName> fieldNames, String ...values) {
 		
-		Map<String, AttributeValue> item = new HashMap<String, AttributeValue>(fieldNames.size());
+		Map<String, AttributeValue> items = new HashMap<String, AttributeValue>(fieldNames.size());
 		
 		// TODO: check if filedNames and values have the same size		
 		
 		for(int i = 0; i < fieldNames.size(); i++){
-			item.put(fieldNames.get(i).toString(), new AttributeValue(values[i]));
+			items.put(fieldNames.get(i).toString(), new AttributeValue(values[i]));
 		}
 		
-		return item;
+		return items;
 	}
 	
 	@Override
 	public void scanAndDeletePop3Messages(String clientId){
 		
 		String userName = getClientUserName(clientId);
+		
+		// User is not authenticated
+		if(userName.isEmpty()){
+			return;
+		}
 		
 		Condition userNameCondition = new Condition()
 		.withComparisonOperator(ComparisonOperator.EQ)

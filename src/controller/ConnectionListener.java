@@ -4,35 +4,48 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ConnectionListener {
+import controller.pop3.POP3RequestHandler;
+import controller.smtp.SMTPRequestHandler;
+
+public class ConnectionListener implements Runnable {
 
 	private ServerSocket serverSocket;
-	private Socket connection;
+	private static final int POP3_PORT = 110;
+	private static final int SMTP_PORT = 25;
 	
-	private RequestHandler requestHandler;
-	
-	public ConnectionListener(int portNumber, int backlog, RequestHandler requestHandler) {
+	public ConnectionListener(int portNumber, int backlog) {
 		
 		try {
 			serverSocket = new ServerSocket(portNumber, backlog);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		this.requestHandler = requestHandler;
 	}
 
+	@Override
 	public void run() {
 		try {
 			
 			// Wait for connection
 			System.out.println("Waiting for connection on port " + serverSocket.getLocalPort());
 
-			connection = serverSocket.accept();
-
-			requestHandler.handleRequest(connection);
+			RequestHandler requestHandler = null;
 			
-			connection.close();
+			if(serverSocket.getLocalPort() == POP3_PORT){
+				requestHandler = new POP3RequestHandler();
+			}else if(serverSocket.getLocalPort() == SMTP_PORT){
+				requestHandler = new SMTPRequestHandler();
+			}
+			
+			Socket connection;
+			
+			while(true){
+				connection = serverSocket.accept();
+
+				requestHandler.handleRequest(connection);
+
+				connection.close();
+			}
 
 		} catch (IOException ioException) {
 			ioException.printStackTrace();			

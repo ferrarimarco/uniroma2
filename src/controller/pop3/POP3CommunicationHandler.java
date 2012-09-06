@@ -59,6 +59,8 @@ public class POP3CommunicationHandler {
 		
 		try {
 			
+			System.out.println("POP3 server invia:" + msg);
+			
 			msg += endline;
 			
 			// Check if the line starts with the termination octet.
@@ -69,10 +71,7 @@ public class POP3CommunicationHandler {
 			}			
 			
 			writer.write(msg.getBytes());
-			writer.flush();
-			
-			System.out.println("server invia:" + msg);
-			
+
 			/* DEBUG: PRINT EXA CHAR VALUES
 			for(int i = 0; i < msg.getBytes().length; i++){
 				System.out.println(String.format("0x%02X", msg.getBytes()[i]));
@@ -81,9 +80,11 @@ public class POP3CommunicationHandler {
 			
 			if(multiLine && lastLine){
 				writer.write((terminationOctet + endline).getBytes());
-				writer.flush();
+				
 				System.out.println("Server invia il carattere di terminazione.");
 			}
+			
+			writer.flush();
 			
 		} catch (IOException ioException) {
 			ioException.printStackTrace();

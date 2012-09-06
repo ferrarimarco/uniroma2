@@ -20,11 +20,11 @@ public class StorageManager implements PersistanceManager {
 	}
 
 	@Override
-	public void update(StorageLocation location, FieldName fieldName, String keyValue, String newValue) {
+	public void update(StorageLocation location, String keyValue, List<FieldName> fieldNames, String ...values) {
 
 		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
 
-		awsDynamoDBStorageManager.update(location, fieldName, keyValue, newValue);
+		awsDynamoDBStorageManager.update(location, keyValue, fieldNames, values);
 	}
 
 	@Override

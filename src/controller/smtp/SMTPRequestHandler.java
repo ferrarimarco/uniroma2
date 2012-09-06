@@ -18,7 +18,11 @@ public class SMTPRequestHandler implements RequestHandler {
 		
 		SMTPCommandHandler smtpCommandHandler = new SMTPCommandHandler();
 		
-		System.out.println("SMTP Connection received from " + socket.getInetAddress().getHostName());
+		String clientId = socket.getInetAddress().getHostAddress();
+		clientId += ":" + socket.getPort();
+		
+		// TODO: DEBUG
+		System.out.println("SMTP Connection received from " + clientId);
 		
 		BufferedOutputStream writer;
 		BufferedReader reader;

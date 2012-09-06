@@ -8,7 +8,7 @@ public interface PersistanceManager {
 	
 	String read(StorageLocation location, FieldName fieldName, String keyValue);
 	
-	void update(StorageLocation location, FieldName fieldName, String keyValue, String newValue);
+	void update(StorageLocation location, String keyValue, List<FieldName> fieldNames, String ...values);
 	
 	void delete(StorageLocation location, String keyValue);
 	
