@@ -1,7 +1,9 @@
 package controller.persistance;
 
 public enum StorageLocation {
-	POP3_SESSIONS, POP3_USERS, POP3_PASSWORDS, POP3_MAILDROPS;
+	POP3_SESSIONS, POP3_USERS, POP3_PASSWORDS, POP3_MAILDROPS,
+	
+	SMTP_SESSIONS;
 	
 	@Override
 	public String toString(){
