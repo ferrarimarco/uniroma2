@@ -7,11 +7,10 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 import controller.AbstractRequestHandler;
-import controller.RequestHandler;
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageManager;
 
-public class SMTPRequestHandler extends AbstractRequestHandler implements RequestHandler {
+public class SMTPRequestHandler extends AbstractRequestHandler {
 
 	@Override
 	public void handleRequest(Socket socket) {
