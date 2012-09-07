@@ -19,6 +19,7 @@ public class POP3CommunicationHandler implements CommunicationHandler {
 		sendStringWithLinesLimit(writer, string, Integer.MAX_VALUE);
 	}
 	
+	@Override
 	public void sendStringWithLinesLimit(BufferedOutputStream writer, String string, int linesLimit){
 		
 		if(string.length() <= maxCharsPerLine){// String fits one line
