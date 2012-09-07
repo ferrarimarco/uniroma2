@@ -334,13 +334,16 @@ public class POP3CommandHandler {
 		String messageHeader = persistanceManager.read(StorageLocation.POP3_MAILDROPS, FieldName.POP3_MESSAGE_HEADER, uids.get(messageNumber));
 		String message = persistanceManager.read(StorageLocation.POP3_MAILDROPS, FieldName.POP3_MESSAGE_DATA, uids.get(messageNumber));
 		
+		// TODO: check if this is correct. Perhaps there is something that terminates the header (a blank line?)
+		String toSend = messageHeader + message;
+		
 		int lines = Integer.parseInt(secondArgument);
 		
 		// Send the message in the multiline response
 		setLastCommand(persistanceManager, clientId, POP3Command.TOP, POP3StatusIndicator.OK);
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "top of message follows");
 		
-		pop3CommunicationHandler.sendTOPResponse(messageHeader, message, lines);
+		pop3CommunicationHandler.sendTOPResponse(writer, toSend, lines);
 	}
 	
 	public void NOOPCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){

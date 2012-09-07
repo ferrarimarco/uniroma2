@@ -14,6 +14,11 @@ public class POP3CommunicationHandler {
 
 	public void sendString(BufferedOutputStream writer, String string){
 		
+		sendStringWithLinesLimit(writer, string, Integer.MAX_VALUE);
+	}
+	
+	private void sendStringWithLinesLimit(BufferedOutputStream writer, String string, int linesLimit){
+		
 		if(string.length() <= maxCharsPerLine){// String fits one line
 			sendLine(writer, string, false, false);
 		}else{// Need more than one line
@@ -26,6 +31,11 @@ public class POP3CommunicationHandler {
 				lines++;
 			}
 			
+			// Check if the message fits in the lines limit specified
+			if(linesLimit < lines){
+				lines = linesLimit;
+			}
+			
 			for(int i = 0; i < lines; i++){
 				// TODO: check this count!
 				if(i == lines - 2){
@@ -34,11 +44,12 @@ public class POP3CommunicationHandler {
 					sendString(writer, string.substring(i * maxCharsPerLine, string.length()));
 				}
 			}
-		}		
+		}
+		
 	}
 	
-	public void sendTOPResponse(String header, String body, int lines){
-		// TODO: Cut the message according to the number of lines requested
+	public void sendTOPResponse(BufferedOutputStream writer, String string, int lines){
+		sendStringWithLinesLimit(writer, string, lines);
 	}
 	
 	public void sendListAsMultiLineResponse(BufferedOutputStream writer, List<String> list){
