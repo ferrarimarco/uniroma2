@@ -3,53 +3,56 @@ package controller.pop3;
 import java.io.BufferedOutputStream;
 import java.util.List;
 
+import controller.CommandHandler;
+import controller.CommunicationHandler;
 import controller.persistance.FieldName;
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageLocation;
 
-public class POP3CommandHandler {
+public class POP3CommandHandler implements CommandHandler {
 	
-	public void handleCommand(POP3CommunicationHandler pop3CommunicationHandler, POP3CommandHandler pop3CommandHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
+	@Override
+	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
 		
 		POP3Command pop3Command = POP3Command.parseCommand(command);
 		
 		if(pop3Command.equals(POP3Command.CAPA)){
-			pop3CommandHandler.CAPACommand(pop3CommunicationHandler, writer, persistanceManager, clientId);
+			CAPACommand(communicationHandler, writer, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.QUIT)){
-			pop3CommandHandler.QUITCommand(pop3CommunicationHandler, writer, persistanceManager, clientId);
+			QUITCommand(communicationHandler, writer, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.USER)){
-			pop3CommandHandler.USERCommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
+			USERCommand(communicationHandler, writer, argument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.PASS)){
-			pop3CommandHandler.PASSCommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
+			PASSCommand(communicationHandler, writer, argument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.STAT)){
-			pop3CommandHandler.STATCommand(pop3CommunicationHandler, writer, persistanceManager, clientId);
+			STATCommand(communicationHandler, writer, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.LIST)){
-			pop3CommandHandler.LISTCommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
+			LISTCommand(communicationHandler, writer, argument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.RETR)){
-			pop3CommandHandler.RETRCommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
+			RETRCommand(communicationHandler, writer, argument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.DELE)){
-			pop3CommandHandler.DELECommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
+			DELECommand(communicationHandler, writer, argument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.NOOP)){
-			pop3CommandHandler.NOOPCommand(pop3CommunicationHandler, writer, persistanceManager, clientId);
+			NOOPCommand(communicationHandler, writer, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.RSET)){
-			pop3CommandHandler.RSETCommand(pop3CommunicationHandler, writer, persistanceManager, clientId);
+			RSETCommand(communicationHandler, writer, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.TOP)){
-			pop3CommandHandler.TOPCommand(pop3CommunicationHandler, writer, argument, secondArgument, persistanceManager, clientId);
+			TOPCommand(communicationHandler, writer, argument, secondArgument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.UIDL)){
-			pop3CommandHandler.UIDLCommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
+			UIDLCommand(communicationHandler, writer, argument, persistanceManager, clientId);
 		}else if(pop3Command.equals(POP3Command.UNSUPPORTED)){
-			pop3CommandHandler.unsupportedCommand(pop3CommunicationHandler, persistanceManager, clientId, writer);
+			unsupportedCommand(communicationHandler, persistanceManager, clientId, writer);
 		}
 	}
 	
-	private void USERCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
+	private void USERCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		// Check the status of the POP3 session: USER is available only in AUTH status
 		if(!status.equals(POP3SessionStatus.AUTHORIZATION)){
 			setLastCommand(persistanceManager, clientId, POP3Command.USER, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in AUTHORIZATION status.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in AUTHORIZATION status.");
 			return;
 		}
 		
@@ -59,7 +62,7 @@ public class POP3CommandHandler {
 		
 		if(previousCommand.equals(POP3Command.USER) && previousCommandResult.equals(POP3StatusIndicator.OK)){
 			setLastCommand(persistanceManager, clientId, POP3Command.USER, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Invalid command sequence. PASS expected. You have to start over.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "Invalid command sequence. PASS expected. You have to start over.");
 			
 			return;
 		}
@@ -67,28 +70,28 @@ public class POP3CommandHandler {
 		// Check the argument
 		if(argument.isEmpty()){
 			setLastCommand(persistanceManager, clientId, POP3Command.USER, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing command argument.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "Missing command argument.");
 			return;
 		}
 		
 		if(!persistanceManager.isPresent(StorageLocation.POP3_USERS, FieldName.POP3_USER_NAME, argument)){
 			setLastCommand(persistanceManager, clientId, POP3Command.USER, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "There is no such user.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "There is no such user.");
 			return;
 		}
 				
 		setLastCommandWithOneArgument(persistanceManager, clientId, POP3Command.USER, POP3StatusIndicator.OK, argument);
-		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "User " + argument + " found.");	
+		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "User " + argument + " found.");	
 	}
 	
-	private void PASSCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
+	private void PASSCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		// Check the status of the POP3 session: PASS is available only in AUTH status
 		if(!status.equals(POP3SessionStatus.AUTHORIZATION)){
 			setLastCommand(persistanceManager, clientId, POP3Command.PASS, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in AUTHORIZATION status.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in AUTHORIZATION status.");
 			return;
 		}
 		
@@ -98,14 +101,14 @@ public class POP3CommandHandler {
 		
 		if(!previousCommand.equals(POP3Command.USER) && !previousCommandResult.equals(POP3StatusIndicator.OK)){
 			setLastCommand(persistanceManager, clientId, POP3Command.PASS, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Invalid sequence. USER not selected. You have to start over.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "Invalid sequence. USER not selected. You have to start over.");
 			return;
 		}
 		
 		// Check the argument
 		if(argument.isEmpty()){
 			setLastCommand(persistanceManager, clientId, POP3Command.PASS, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing command argument");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "Missing command argument");
 			return;
 		}
 		
@@ -116,7 +119,7 @@ public class POP3CommandHandler {
 		
 		if(!password.equals(argument)){// Wrong password
 			setLastCommand(persistanceManager, clientId, POP3Command.PASS, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Wrong password for user " + userName);
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "Wrong password for user " + userName);
 			return;
 		}
 		
@@ -128,21 +131,21 @@ public class POP3CommandHandler {
 		
 		setStatus(persistanceManager, POP3SessionStatus.TRANSACTION, clientId);
 		
-		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Authentication successful.");
+		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "Authentication successful.");
 	}
 	
-	private void QUITCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
+	private void QUITCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		if(status.equals(POP3SessionStatus.GREETINGS)){
 			setLastCommand(persistanceManager, clientId, POP3Command.QUIT, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "POP3 server is in GREETINGS status");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "POP3 server is in GREETINGS status");
 			return;
 		}else{
 			setLastCommand(persistanceManager, clientId, POP3Command.QUIT, POP3StatusIndicator.OK);
 			setStatus(persistanceManager, POP3SessionStatus.UPDATE, clientId);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Closing session");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "Closing session");
 		}
 		
 		// TODO: unlock mailbox
@@ -152,30 +155,30 @@ public class POP3CommandHandler {
 		persistanceManager.delete(StorageLocation.POP3_SESSIONS, clientId);
 	}
 
-	private void CAPACommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
+	private void CAPACommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
 
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		if(status.equals(POP3SessionStatus.GREETINGS)){
 			setLastCommand(persistanceManager, clientId, POP3Command.CAPA, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is not available in GREETINGS status");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is not available in GREETINGS status");
 			return;
 		}else{
 			setLastCommand(persistanceManager, clientId, POP3Command.CAPA, POP3StatusIndicator.OK);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Capabilities follow.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "Capabilities follow.");
 			List<String> capabilities = POP3Command.getPOP3CapaCommands();
-			pop3CommunicationHandler.sendListAsMultiLineResponse(writer, capabilities);
+			communicationHandler.sendListAsMultiLineResponse(writer, capabilities);
 		}
 	}
 	
-	private void STATCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
+	private void STATCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
 			setLastCommand(persistanceManager, clientId, POP3Command.STAT, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in TRANSACTION status.");
 		}
 		
 		int messages = 0;
@@ -193,10 +196,10 @@ public class POP3CommandHandler {
 		
 		setLastCommand(persistanceManager, clientId, POP3Command.STAT, POP3StatusIndicator.OK);
 		
-		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, messages + " " + totalDimension);
+		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), messages + " " + totalDimension);
 	}
 	
-	private void LISTCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
+	private void LISTCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		// TODO: check if the order of the elements is consistent
 		
@@ -205,7 +208,7 @@ public class POP3CommandHandler {
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
 			setLastCommand(persistanceManager, clientId, POP3Command.LIST, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in TRANSACTION status.");
 			return;
 		}
 		
@@ -217,16 +220,16 @@ public class POP3CommandHandler {
 			// Get information about all the messages in the maildrop
 			List<String> messageDimensions = persistanceManager.scanForMessageDimensions(clientId);
 			
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, messageDimensions.size() + " messages");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), messageDimensions.size() + " messages");
 			
 			// Send response			
 			if(messageDimensions.size() > 0){
 				
-				pop3CommunicationHandler.sendListAsMultiLineResponse(writer, messageDimensions);
+				communicationHandler.sendListAsMultiLineResponse(writer, messageDimensions);
 
 			}else{// No messages in the maildrop
-				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "");
-				pop3CommunicationHandler.sendBlankLineMultilineEnd(writer);
+				communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "");
+				communicationHandler.sendBlankLineMultilineEnd(writer);
 			}
 			
 		}else{
@@ -237,7 +240,7 @@ public class POP3CommandHandler {
 			
 			// Check if such message exists
 			if(Integer.parseInt(argument) >= messageDimensions.size() || Integer.parseInt(argument) < 0){
-				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "no such message");
+				communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
 				return;
 			}	
 			
@@ -245,25 +248,25 @@ public class POP3CommandHandler {
 			int dimension = Integer.parseInt(messageDimensions.get(Integer.parseInt(argument)));
 
 			// Send the response
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, argument + " " + dimension);		
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), argument + " " + dimension);		
 		}
 	}
 	
-	private void RETRCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
+	private void RETRCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
 			setLastCommand(persistanceManager, clientId, POP3Command.RETR, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in TRANSACTION status.");
 			return;
 		}
 		
 		// Check the argument
 		if(argument.isEmpty() || Integer.parseInt(argument) < 0){
 			setLastCommand(persistanceManager, clientId, POP3Command.RETR, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing command argument");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "Missing command argument");
 			return;
 		}
 		
@@ -275,7 +278,7 @@ public class POP3CommandHandler {
 		// Check if the specified message exists
 		if(messageNumber >= uids.size()){
 			setLastCommand(persistanceManager, clientId, POP3Command.RETR, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "no such message");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
 			return;	
 		}
 		
@@ -285,29 +288,29 @@ public class POP3CommandHandler {
 		
 		// Send the message in the multiline response
 		setLastCommandWithOneArgument(persistanceManager, clientId, POP3Command.RETR, POP3StatusIndicator.OK, argument);
-		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "message follows");
+		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "message follows");
 		
 		// TODO: check if this is correct. Perhaps there is something that terminates the header (a blank line?)
 		String toSend = messageHeader + message;
 		
-		pop3CommunicationHandler.sendString(writer, toSend);
+		communicationHandler.sendString(writer, toSend);
 	}
 	
-	private void DELECommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
+	private void DELECommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
 			setLastCommand(persistanceManager, clientId, POP3Command.DELE, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in TRANSACTION status.");
 			return;
 		}
 		
 		// Check the argument
 		if(argument.isEmpty() || Integer.parseInt(argument) < 0){
 			setLastCommand(persistanceManager, clientId, POP3Command.DELE, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing command argument.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "Missing command argument.");
 			return;
 		}
 		
@@ -319,7 +322,7 @@ public class POP3CommandHandler {
 		// Check if the specified message exists
 		if(messageNumber >= uids.size()){
 			setLastCommand(persistanceManager, clientId, POP3Command.RETR, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "no such message");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
 			return;	
 		}
 		
@@ -330,24 +333,24 @@ public class POP3CommandHandler {
 
 		// Send positive response
 		setLastCommandWithOneArgument(persistanceManager, clientId, POP3Command.DELE, POP3StatusIndicator.OK, argument);
-		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Message marked for deletion.");
+		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "Message marked for deletion.");
 	}
 	
-	private void TOPCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
+	private void TOPCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
 			setLastCommand(persistanceManager, clientId, POP3Command.TOP, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in TRANSACTION status.");
 			return;
 		}
 		
 		// Check the argument
 		if(argument.isEmpty() || secondArgument.isEmpty() || Integer.parseInt(secondArgument) < 0){
 			setLastCommand(persistanceManager, clientId, POP3Command.TOP, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Missing command argument.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "Missing command argument.");
 			return;
 		}
 		
@@ -359,7 +362,7 @@ public class POP3CommandHandler {
 		// Check if the specified message exists
 		if(messageNumber >= uids.size()){
 			setLastCommand(persistanceManager, clientId, POP3Command.RETR, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "no such message");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
 			return;	
 		}
 		
@@ -374,34 +377,34 @@ public class POP3CommandHandler {
 		
 		// Send the message in the multiline response
 		setLastCommand(persistanceManager, clientId, POP3Command.TOP, POP3StatusIndicator.OK);
-		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "top of message follows");
+		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "top of message follows");
 		
-		pop3CommunicationHandler.sendTOPResponse(writer, toSend, lines);
+		communicationHandler.sendStringWithLinesLimit(writer, toSend, lines);
 	}
 	
-	private void NOOPCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
+	private void NOOPCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
 			setLastCommand(persistanceManager, clientId, POP3Command.NOOP, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in TRANSACTION status.");
 			return;
 		}
 		
 		setLastCommand(persistanceManager, clientId, POP3Command.NOOP, POP3StatusIndicator.OK);
-		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "NOOP command received.");
+		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "NOOP command received.");
 	}
 	
-	private void RSETCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
+	private void RSETCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
 			setLastCommand(persistanceManager, clientId, POP3Command.RSET, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in TRANSACTION status.");
 			return;
 		}
 		
@@ -416,16 +419,16 @@ public class POP3CommandHandler {
 		}
 
 		setLastCommand(persistanceManager, clientId, POP3Command.RSET, POP3StatusIndicator.OK);
-		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Maildrop reset completed.");
+		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "Maildrop reset completed.");
 	}
 	
-	private void UIDLCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId) {
+	private void UIDLCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId) {
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		// Check the status of the POP3 session
 		if(!status.equals(POP3SessionStatus.TRANSACTION)){
 			setLastCommand(persistanceManager, clientId, POP3Command.UIDL, POP3StatusIndicator.ERR);
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "This command is available only in TRANSACTION status.");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in TRANSACTION status.");
 			return;
 		}
 		
@@ -437,7 +440,7 @@ public class POP3CommandHandler {
 			// Get information about all the messages in the maildrop
 			List<String> uids = persistanceManager.getMessageUIDs(clientId);
 			
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "");
 			
 			// Send response			
 			if(uids.size() > 0){
@@ -447,11 +450,11 @@ public class POP3CommandHandler {
 					uids.set(i, i + " " + uids.get(i));
 				}
 				
-				pop3CommunicationHandler.sendListAsMultiLineResponse(writer, uids);
+				communicationHandler.sendListAsMultiLineResponse(writer, uids);
 
 			}else{// No messages in the maildrop
-				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "");
-				pop3CommunicationHandler.sendBlankLineMultilineEnd(writer);
+				communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "");
+				communicationHandler.sendBlankLineMultilineEnd(writer);
 			}
 			
 		}else{
@@ -462,7 +465,7 @@ public class POP3CommandHandler {
 			
 			// Check if such message exists
 			if(Integer.parseInt(argument) >= uids.size() || Integer.parseInt(argument) < 0){
-				pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "no such message");
+				communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
 				return;
 			}	
 			
@@ -472,16 +475,17 @@ public class POP3CommandHandler {
 			String response = argument.toString() + " " + messageUid;
 			
 			// Send the response
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, argument + " " + response);		
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), argument + " " + response);		
 		}
 	}
 	
-	private void unsupportedCommand(POP3CommunicationHandler pop3CommunicationHandler, PersistanceManager persistanceManager, String clientId, BufferedOutputStream writer){
+	private void unsupportedCommand(CommunicationHandler communicationHandler, PersistanceManager persistanceManager, String clientId, BufferedOutputStream writer){
 		setLastCommand(persistanceManager, clientId, POP3Command.UNSUPPORTED, POP3StatusIndicator.ERR);
-		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Command is not supported");
+		communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "Command is not supported");
 	}
 	
-	public void sendGreetings(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
+	@Override
+	public void sendGreetings(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
 		
 		// Store client ID in DB
 		if(!persistanceManager.isPresent(StorageLocation.POP3_SESSIONS, FieldName.POP3_SESSION_ID, clientId)){
@@ -497,7 +501,7 @@ public class POP3CommandHandler {
 					POP3Command.EMPTY.toString(),
 					POP3Command.EMPTY.toString());
 
-			pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "POP3 server ready to roll!");
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "POP3 server ready to roll!");
 		}
 	}
 	

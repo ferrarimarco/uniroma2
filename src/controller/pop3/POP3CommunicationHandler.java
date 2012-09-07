@@ -4,7 +4,9 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-public class POP3CommunicationHandler {
+import controller.CommunicationHandler;
+
+public class POP3CommunicationHandler implements CommunicationHandler {
 
 	private final String endline = "\r\n";
 	private final String terminationOctet = ".";
@@ -12,12 +14,12 @@ public class POP3CommunicationHandler {
 	// 512 - 2 (for endline)
 	private final int maxCharsPerLine = 510;
 
+	@Override
 	public void sendString(BufferedOutputStream writer, String string){
-		
 		sendStringWithLinesLimit(writer, string, Integer.MAX_VALUE);
 	}
 	
-	private void sendStringWithLinesLimit(BufferedOutputStream writer, String string, int linesLimit){
+	public void sendStringWithLinesLimit(BufferedOutputStream writer, String string, int linesLimit){
 		
 		if(string.length() <= maxCharsPerLine){// String fits one line
 			sendLine(writer, string, false, false);
@@ -45,13 +47,9 @@ public class POP3CommunicationHandler {
 				}
 			}
 		}
-		
 	}
 	
-	public void sendTOPResponse(BufferedOutputStream writer, String string, int lines){
-		sendStringWithLinesLimit(writer, string, lines);
-	}
-	
+	@Override
 	public void sendListAsMultiLineResponse(BufferedOutputStream writer, List<String> list){
 		
 		if(list.size() > 0){
@@ -102,16 +100,18 @@ public class POP3CommunicationHandler {
 		}
 	}
 	
+	@Override
 	public void sendBlankLineMultilineEnd(BufferedOutputStream writer){
 		sendLine(writer, "", true, true);
 	}
 	
-	public void sendResponse(BufferedOutputStream writer, POP3StatusIndicator statusIndicator, String response){
+	@Override
+	public void sendResponse(BufferedOutputStream writer, String statusIndicator, String response){
 		
 		if (response.length() > 0) {
-			sendLine(writer, statusIndicator.toString() + " " + response, false, false);
+			sendLine(writer, statusIndicator + " " + response, false, false);
 		}else{
-			sendLine(writer, statusIndicator.toString(), false, false);
+			sendLine(writer, statusIndicator, false, false);
 		}
 	}
 	

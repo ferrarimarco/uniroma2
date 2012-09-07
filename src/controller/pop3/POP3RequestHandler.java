@@ -65,7 +65,7 @@ public class POP3RequestHandler extends AbstractRequestHandler implements Reques
 				// TODO: DEBUG
 				//System.out.println(java.util.Arrays.toString(commandElements));
 				
-				pop3CommandHandler.handleCommand(pop3CommunicationHandler, pop3CommandHandler, writer, command, argument, secondArgument, storageManager, clientId);
+				pop3CommandHandler.handleCommand(pop3CommunicationHandler, writer, command, argument, secondArgument, storageManager, clientId);
 			}
 
 			// Done handling the command
