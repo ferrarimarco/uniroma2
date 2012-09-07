@@ -6,42 +6,39 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
+import controller.AbstractRequestHandler;
 import controller.RequestHandler;
+import controller.persistance.PersistanceManager;
+import controller.persistance.StorageManager;
 
-public class SMTPRequestHandler implements RequestHandler {
+public class SMTPRequestHandler extends AbstractRequestHandler implements RequestHandler {
 
-	// This variable is needed only because we don't have db access, yet
-	private SMTPSessionStatus status = SMTPSessionStatus.UNKNOWN;
-	
 	@Override
 	public void handleRequest(Socket socket) {
 		
 		SMTPCommandHandler smtpCommandHandler = new SMTPCommandHandler();
+		SMTPCommunicationHandler smtpCommunicationHandler = new SMTPCommunicationHandler();
+		
+		PersistanceManager storageManager = new StorageManager();
+		
+		// TODO: the client uses multiple ports!!! so the port section may change!!!!
 		
 		String clientId = socket.getInetAddress().getHostAddress();
-		clientId += ":" + socket.getPort();
+		// Temp solution: comment the port. This will not work if multiple users share the same public ip
+		//clientId += ":" + socket.getPort();
 		
 		// TODO: DEBUG
 		System.out.println("SMTP Connection received from " + clientId);
-		
-		BufferedOutputStream writer;
-		BufferedReader reader;
-		
-		// TODO: This variable is needed only because we don't have db access, yet
-		status = SMTPSessionStatus.UNKNOWN;		
-		
+
 		try {
 			// Get Input and Output streams
-			writer = new BufferedOutputStream(socket.getOutputStream());
+			BufferedOutputStream writer = new BufferedOutputStream(socket.getOutputStream());
 			writer.flush();
 
-			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			
-			// Check the status of the POP3 session
-			if(getStatus().equals(SMTPSessionStatus.GREETINGS)){
-				smtpCommandHandler.sendGreetings(writer);
-				setStatus(SMTPSessionStatus.TRANSACTION);
-			}
+			// Send greetings if necessary
+			smtpCommandHandler.sendGreetings(smtpCommunicationHandler, writer, storageManager, clientId);
 			
 			String message = "";
 			String command = "";
@@ -65,13 +62,13 @@ public class SMTPRequestHandler implements RequestHandler {
 					secondArgument = commandElements[2];
 				}
 				
-				// DEBUG
+				// TODO: DEBUG
 				//System.out.println(java.util.Arrays.toString(commandElements));
 				
-				handleCommand(smtpCommandHandler, writer, command, argument, secondArgument);
+				handleCommand(smtpCommunicationHandler, smtpCommandHandler, writer, command, argument, secondArgument, storageManager, clientId);
 			}
 
-			// TODO: Done handling command
+			// Done handling command
 			stop(reader, writer);
 			
 		} catch (IOException e) {
@@ -79,11 +76,9 @@ public class SMTPRequestHandler implements RequestHandler {
 		}
 	}
 	
-	private void handleCommand(SMTPCommandHandler smtpCommandHandler, BufferedOutputStream writer, String command, String argument, String secondArgument){
-		
-		// To hold the POP3Status to eventually set after the command
-		SMTPSessionStatus resultingStatus = SMTPSessionStatus.UNKNOWN;
-		
+	private void handleCommand(SMTPCommunicationHandler smtpCommunicationHandler, SMTPCommandHandler smtpCommandHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
+
+		// TODO: change to IF with SMTPCommand enum
 		switch(command.toUpperCase()){
 		case "EHLO":
 			break;
@@ -101,38 +96,5 @@ public class SMTPRequestHandler implements RequestHandler {
 			smtpCommandHandler.unsupportedCommand(writer);
 			break;
 		}
-		
-		// Set the status after the command according to the POP3 protocol specification
-		if(resultingStatus != SMTPSessionStatus.UNKNOWN){
-			setStatus(resultingStatus);
-		}
 	}
-	
-	private void stop(BufferedReader reader, BufferedOutputStream writer){
-		try {
-			reader.close();
-			writer.close();
-		} catch (IOException ioException) {
-			ioException.printStackTrace();
-		}
-	}
-	
-	private SMTPSessionStatus getStatus(){
-		
-		// TODO: Get status from DB (this code is just a placeholder for DB access)
-		if(status.equals(SMTPSessionStatus.UNKNOWN)){
-			setStatus(SMTPSessionStatus.GREETINGS);
-		}
-		
-		return status;
-	}
-	
-	private void setStatus(SMTPSessionStatus status){
-		
-		// TODO: Write status in DB
-		// TODO: read the status and write only if different?
-		
-		this.status = status;
-	}
-
 }

@@ -6,11 +6,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
+import controller.AbstractRequestHandler;
 import controller.RequestHandler;
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageManager;
 
-public class POP3RequestHandler implements RequestHandler {
+public class POP3RequestHandler extends AbstractRequestHandler implements RequestHandler {
 	
 	@Override
 	public void handleRequest(Socket socket) {
@@ -72,15 +73,6 @@ public class POP3RequestHandler implements RequestHandler {
 			
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-	
-	private void stop(BufferedReader reader, BufferedOutputStream writer){
-		try {
-			reader.close();
-			writer.close();
-		} catch (IOException ioException) {
-			ioException.printStackTrace();
 		}
 	}
 	
