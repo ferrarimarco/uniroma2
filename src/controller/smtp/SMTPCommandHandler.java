@@ -8,8 +8,6 @@ import controller.persistance.FieldName;
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageLocation;
 
-//TODO: extend AbstractCommandHandler
-
 public class SMTPCommandHandler extends AbstractCommandHandler {
 	
 	@Override
@@ -36,6 +34,9 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	}
 	
 	private void unsupportedCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer){
+		
+		// TODO: save as last command unsupported
+		
 		communicationHandler.sendResponse(writer, SMTPCode.UNSUPPORTED_COMMAND.toString(), "Command is not supported");
 	}
 	
