@@ -4,9 +4,9 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import controller.CommunicationHandler;
+import controller.AbstractCommunicationHandler;
 
-public class POP3CommunicationHandler implements CommunicationHandler {
+public class POP3CommunicationHandler extends AbstractCommunicationHandler {
 
 	private final String endline = "\r\n";
 	private final String terminationOctet = ".";

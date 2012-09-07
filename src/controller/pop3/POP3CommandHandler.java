@@ -3,13 +3,15 @@ package controller.pop3;
 import java.io.BufferedOutputStream;
 import java.util.List;
 
-import controller.CommandHandler;
+import controller.AbstractCommandHandler;
 import controller.CommunicationHandler;
 import controller.persistance.FieldName;
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageLocation;
 
-public class POP3CommandHandler implements CommandHandler {
+// TODO: extend AbstractCommandHandler
+
+public class POP3CommandHandler extends AbstractCommandHandler {
 	
 	@Override
 	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){

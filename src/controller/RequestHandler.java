@@ -4,5 +4,5 @@ import java.net.Socket;
 
 public interface RequestHandler {
 
-	void handleRequest(Socket socket);
+	void handleRequest(Socket socket, CommandHandler commandHandler, CommunicationHandler communicationHandler);
 }

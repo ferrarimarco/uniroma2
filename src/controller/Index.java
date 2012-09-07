@@ -10,7 +10,7 @@ public class Index {
 		Thread pop3Thread = new Thread(pop3Server);
 		pop3Thread.start();
 		
-		Thread smtpThread = new Thread(smtpServer);
-		smtpThread.start();
+		//Thread smtpThread = new Thread(smtpServer);
+		//smtpThread.start();
 	}
 }
