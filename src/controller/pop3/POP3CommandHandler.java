@@ -9,7 +9,40 @@ import controller.persistance.StorageLocation;
 
 public class POP3CommandHandler {
 	
-	public void USERCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
+	public void handleCommand(POP3CommunicationHandler pop3CommunicationHandler, POP3CommandHandler pop3CommandHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
+		
+		POP3Command pop3Command = POP3Command.parseCommand(command);
+		
+		if(pop3Command.equals(POP3Command.CAPA)){
+			pop3CommandHandler.CAPACommand(pop3CommunicationHandler, writer, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.QUIT)){
+			pop3CommandHandler.QUITCommand(pop3CommunicationHandler, writer, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.USER)){
+			pop3CommandHandler.USERCommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.PASS)){
+			pop3CommandHandler.PASSCommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.STAT)){
+			pop3CommandHandler.STATCommand(pop3CommunicationHandler, writer, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.LIST)){
+			pop3CommandHandler.LISTCommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.RETR)){
+			pop3CommandHandler.RETRCommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.DELE)){
+			pop3CommandHandler.DELECommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.NOOP)){
+			pop3CommandHandler.NOOPCommand(pop3CommunicationHandler, writer, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.RSET)){
+			pop3CommandHandler.RSETCommand(pop3CommunicationHandler, writer, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.TOP)){
+			pop3CommandHandler.TOPCommand(pop3CommunicationHandler, writer, argument, secondArgument, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.UIDL)){
+			pop3CommandHandler.UIDLCommand(pop3CommunicationHandler, writer, argument, persistanceManager, clientId);
+		}else if(pop3Command.equals(POP3Command.UNSUPPORTED)){
+			pop3CommandHandler.unsupportedCommand(pop3CommunicationHandler, persistanceManager, clientId, writer);
+		}
+	}
+	
+	private void USERCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
@@ -48,7 +81,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "User " + argument + " found.");	
 	}
 	
-	public void PASSCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
+	private void PASSCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
@@ -98,7 +131,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Authentication successful.");
 	}
 	
-	public void QUITCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
+	private void QUITCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
@@ -119,7 +152,7 @@ public class POP3CommandHandler {
 		persistanceManager.delete(StorageLocation.POP3_SESSIONS, clientId);
 	}
 
-	public void CAPACommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
+	private void CAPACommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
 
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
@@ -135,7 +168,7 @@ public class POP3CommandHandler {
 		}
 	}
 	
-	public void STATCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
+	private void STATCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
@@ -163,7 +196,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, messages + " " + totalDimension);
 	}
 	
-	public void LISTCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
+	private void LISTCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		// TODO: check if the order of the elements is consistent
 		
@@ -216,7 +249,7 @@ public class POP3CommandHandler {
 		}
 	}
 	
-	public void RETRCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
+	private void RETRCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
@@ -260,7 +293,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendString(writer, toSend);
 	}
 	
-	public void DELECommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
+	private void DELECommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
@@ -300,7 +333,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Message marked for deletion.");
 	}
 	
-	public void TOPCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
+	private void TOPCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
@@ -346,7 +379,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendTOPResponse(writer, toSend, lines);
 	}
 	
-	public void NOOPCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
+	private void NOOPCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
@@ -361,7 +394,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "NOOP command received.");
 	}
 	
-	public void RSETCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
+	private void RSETCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId){
 		
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
@@ -386,7 +419,7 @@ public class POP3CommandHandler {
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.OK, "Maildrop reset completed.");
 	}
 	
-	public void UIDLCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId) {
+	private void UIDLCommand(POP3CommunicationHandler pop3CommunicationHandler, BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId) {
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 		
 		// Check the status of the POP3 session
@@ -443,7 +476,7 @@ public class POP3CommandHandler {
 		}
 	}
 	
-	public void unsupportedCommand(POP3CommunicationHandler pop3CommunicationHandler, PersistanceManager persistanceManager, String clientId, BufferedOutputStream writer){
+	private void unsupportedCommand(POP3CommunicationHandler pop3CommunicationHandler, PersistanceManager persistanceManager, String clientId, BufferedOutputStream writer){
 		setLastCommand(persistanceManager, clientId, POP3Command.UNSUPPORTED, POP3StatusIndicator.ERR);
 		pop3CommunicationHandler.sendResponse(writer, POP3StatusIndicator.ERR, "Command is not supported");
 	}
