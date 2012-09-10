@@ -8,8 +8,6 @@ import controller.AbstractCommunicationHandler;
 
 public class SMTPCommunicationHandler extends AbstractCommunicationHandler {
 
-	private final String endline = "\r\n";
-
 	public void sendLine(BufferedOutputStream writer, String msg) {
 		
 		try {

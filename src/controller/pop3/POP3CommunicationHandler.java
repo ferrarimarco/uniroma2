@@ -8,16 +8,10 @@ import controller.AbstractCommunicationHandler;
 
 public class POP3CommunicationHandler extends AbstractCommunicationHandler {
 
-	private final String endline = "\r\n";
-	private final String terminationOctet = ".";
+	private static final String terminationOctet = ".";
 	
 	// 512 - 2 (for endline)
 	private final int maxCharsPerLine = 510;
-
-	@Override
-	public void sendString(BufferedOutputStream writer, String string){
-		sendStringWithLinesLimit(writer, string, Integer.MAX_VALUE);
-	}
 	
 	@Override
 	public void sendStringWithLinesLimit(BufferedOutputStream writer, String string, int linesLimit){
