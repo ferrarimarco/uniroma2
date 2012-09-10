@@ -102,7 +102,6 @@ public class POP3CommunicationHandler extends AbstractCommunicationHandler {
 	
 	@Override
 	public void sendResponse(BufferedOutputStream writer, String statusIndicator, String response){
-		
 		if (response.length() > 0) {
 			sendLine(writer, statusIndicator + " " + response, false, false);
 		}else{
