@@ -16,8 +16,6 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	
 	private static final String dataTerminator = "\r\n.\r\n";
 	
-	// TODO: NOOP, RSET
-	
 	@Override
 	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
 		
@@ -34,12 +32,16 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		}else if(smtpCommand.equals(SMTPCommand.DATA)){
 			DATACommand(communicationHandler, writer, persistanceManager, clientId);
 		}else if(smtpCommand.equals(SMTPCommand.QUIT)){
-			QUITCommand(communicationHandler, writer, argument, persistanceManager, clientId);
+			QUITCommand(communicationHandler, writer, persistanceManager, clientId);
+		}else if(smtpCommand.equals(SMTPCommand.RSET)){
+			RSETCommand(communicationHandler, writer, persistanceManager, clientId);
+		}else if(smtpCommand.equals(SMTPCommand.NOOP)){
+			NOOPCommand(communicationHandler, writer, persistanceManager, clientId);
 		}else if(smtpCommand.equals(SMTPCommand.UNSUPPORTED)){
 			unsupportedCommand(communicationHandler, persistanceManager, clientId, writer);
 		}
 	}
-	
+
 	private void EHLOCommand(CommunicationHandler communicationHandler,	BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId, String argument) {
 		
 		communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "Welcome!");
@@ -152,7 +154,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		}
 	}
 
-	private void QUITCommand(CommunicationHandler communicationHandler,	BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId) {
+	private void QUITCommand(CommunicationHandler communicationHandler,	BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
 		clearTempTable(persistanceManager, clientId);
 		
 		persistanceManager.delete(StorageLocation.SMTP_SESSIONS, clientId);
@@ -160,6 +162,16 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		communicationHandler.sendResponse(writer, SMTPCode.QUIT_OK_RESPONSE.toString(), "Bye!");		
 	}
 
+	private void NOOPCommand(CommunicationHandler communicationHandler,	BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
+		communicationHandler.sendResponse(writer, SMTPCode.GREETINGS.toString(), "");
+	}
+
+	private void RSETCommand(CommunicationHandler communicationHandler,	BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
+		clearTempTable(persistanceManager, clientId);
+
+		communicationHandler.sendResponse(writer, SMTPCode.GREETINGS.toString(), "");
+	}
+	
 	private void unsupportedCommand(CommunicationHandler communicationHandler, PersistanceManager persistanceManager, String clientId, BufferedOutputStream writer){
 		communicationHandler.sendResponse(writer, SMTPCode.UNSUPPORTED_COMMAND.toString(), "Command is not supported");
 	}

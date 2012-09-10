@@ -2,7 +2,7 @@ package controller.smtp;
 
 public enum SMTPCommand {
 
-	EHLO, HELO, MAIL, RCPT, DATA, QUIT, EMPTY, UNSUPPORTED;
+	EHLO, HELO, MAIL, RCPT, DATA, QUIT, RSET, NOOP, EMPTY, UNSUPPORTED;
 	
 	public static SMTPCommand parseCommand(String value){
 		
@@ -20,6 +20,10 @@ public enum SMTPCommand {
 			return DATA;
 		}else if(value.equals(QUIT.toString())){
 			return QUIT;
+		}else if(value.equals(RSET.toString())){
+			return RSET;
+		}else if(value.equals(NOOP.toString())){
+			return NOOP;
 		}else if(value.equals(EMPTY.toString())){
 			return EMPTY;
 		}else{
