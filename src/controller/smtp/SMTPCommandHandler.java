@@ -1,13 +1,23 @@
 package controller.smtp;
 
 import java.io.BufferedOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import org.apache.commons.codec.binary.Hex;
 
 import controller.AbstractCommandHandler;
 import controller.CommunicationHandler;
 import controller.persistance.FieldName;
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageLocation;
+import controller.pop3.POP3MessageDeletion;
 
 public class SMTPCommandHandler extends AbstractCommandHandler {
 	
@@ -69,7 +79,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		
 		String address = getAddressFromArgument(argument);
 		
-		if(!isValidAddress(address)){
+		if(!isValidAddress(address, persistanceManager)){
 			communicationHandler.sendResponse(writer, SMTPCode.SYNTAX_ERROR.toString(), "Address is not valid.");
 			return;
 		}
@@ -102,7 +112,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		String address = getAddressFromArgument(argument);
 		
 		// Check the address
-		if(!isValidAddress(address)){
+		if(!isValidAddress(address, persistanceManager)){
 			communicationHandler.sendResponse(writer, SMTPCode.SYNTAX_ERROR.toString(), "Address is not valid.");
 			return;
 		}
@@ -146,12 +156,92 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		// Search for data termination sequence
 		if(data.indexOf(dataTerminator) != -1){// End of message data
 			
-			// TODO: process message
+			processMessage(persistanceManager, clientId);
 			
 			communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "");
 			
 			setStatus(persistanceManager, SMTPSessionStatus.GREETINGS, clientId);
 		}
+	}
+
+	private void processMessage(PersistanceManager persistanceManager, String clientId) {
+		
+        // Date
+        DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+        Date date = new Date();
+        String origDate = "Date:" + dateFormat.format(date);
+        
+		String from = "From:" + persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_FROM, clientId);
+		
+		List<String> toList = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO, clientId);
+		
+		String to = "To:";
+		
+		for(int i = 0; i < toList.size(); i++){
+			
+			to += toList.get(i);
+			
+			if(i < toList.size() - 1){
+				to += toList.get(i) + ", ";
+			}
+		}
+
+		String messageBody = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
+		
+		String toHash = from + to + messageBody;
+		
+		// Compute message UID
+		MessageDigest cript = null;
+		
+		try {
+			cript = MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		cript.reset();
+		
+        try {
+			cript.update(toHash.getBytes("utf8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+        
+        String uid = new String(Hex.encodeHex(cript.digest())).substring(0, 20);
+		
+		String header = origDate + "\r\n" + from + "\r\n" + to + "\r\n" + uid;
+		String body = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
+		
+		int messageSize = (header + "\r\n" + body).length();
+		
+		// Get users list to deliver the message
+		List<String> users = new ArrayList<String>(toList.size());
+		
+		for(int i = 0; i < toList.size(); i++){
+			
+			int startIndex = 0;
+			int endIndex = toList.get(i).indexOf("@");
+			
+			// Search for < character (Name <email@domain.ext>)
+			if(toList.get(i).indexOf("<") != -1){
+				startIndex = toList.get(i).indexOf("<") + 1;
+			}
+			
+			users.set(i, toList.get(i).substring(startIndex, endIndex));
+		}
+		
+		
+		for(int i = 0; i < users.size(); i++){
+			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(),
+					uid,
+					users.get(i),
+					POP3MessageDeletion.NO.toString(),
+					Integer.toString(messageSize),
+					header,
+					body);
+		}
+		
+		// Delete the temp message
+		persistanceManager.delete(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId);
 	}
 
 	private void QUITCommand(CommunicationHandler communicationHandler,	BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
@@ -217,9 +307,22 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		return argument.substring(startIndex + 1, endIndex);
 	}
 	
-	private boolean isValidAddress(String address){
-		// TODO: write implementation
-		return true;
+	private boolean isValidAddress(String address, PersistanceManager persistanceManager){
+		// TODO: check format
+		
+		int startIndex = 0;
+		
+		if(address.indexOf("<") != -1){
+			startIndex = address.indexOf("<") + 1;
+		}
+		
+		if(address.indexOf("@") == -1){
+			return false;
+		}
+		
+		String username = address.substring(startIndex, address.indexOf("@"));
+		
+		return persistanceManager.isPresent(StorageLocation.POP3_USERS, FieldName.POP3_USER_NAME, username);
 	}
 	
 	private int getRecipientNumber(PersistanceManager persistanceManager, String clientId){

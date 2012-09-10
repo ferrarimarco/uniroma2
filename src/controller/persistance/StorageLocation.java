@@ -13,6 +13,8 @@ public enum StorageLocation {
 			return "pop3users_claudiani_ferrari";
 		}else if(this.equals(POP3_MAILDROPS)){
 			return "pop3maildrops_claudiani_ferrari";
+		}else if(this.equals(SMTP_SESSIONS)){
+			return "smtpSessions_claudiani_ferrari";
 		}else if(this.equals(SMTP_TEMP_MESSAGE_STORE)){
 			return "smtp_temp_message_store_claudiani_ferrari";
 		}else{

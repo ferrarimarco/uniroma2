@@ -71,6 +71,20 @@ public enum FieldName {
 		return pop3StatusFieldNames;
 	}
 	
+	public static List<FieldName> getPOP3MessagesTableFieldNames(){
+		
+		List<FieldName> pop3StatusFieldNames = new ArrayList<FieldName>();
+		
+		pop3StatusFieldNames.add(POP3_MESSAGE_UID);
+		pop3StatusFieldNames.add(POP3_MESSAGE_TO);
+		pop3StatusFieldNames.add(POP3_MESSAGE_TO_DELETE);
+		pop3StatusFieldNames.add(POP3_MESSAGE_DIMENSION);
+		pop3StatusFieldNames.add(POP3_MESSAGE_HEADER);
+		pop3StatusFieldNames.add(POP3_MESSAGE_DATA);
+		
+		return pop3StatusFieldNames;
+	}
+	
 	public static List<FieldName> getMessageToDeleteTableFieldOnly(){
 		
 		List<FieldName> pop3StatusFieldNames = new ArrayList<FieldName>();

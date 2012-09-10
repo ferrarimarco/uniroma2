@@ -292,8 +292,8 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		setLastCommandWithOneArgument(persistanceManager, clientId, POP3Command.RETR, POP3StatusIndicator.OK, argument);
 		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "message follows");
 		
-		// TODO: check if this is correct. Perhaps there is something that terminates the header (a blank line?)
-		String toSend = messageHeader + message;
+		// TODO: check if this is correct
+		String toSend = messageHeader + "\r\n" + message;
 		
 		communicationHandler.sendString(writer, toSend);
 	}
