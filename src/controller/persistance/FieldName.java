@@ -19,7 +19,7 @@ public enum FieldName {
 	SMTP_SESSION_ID, SMTP_SESSION_STATUS, SMTP_LAST_COMMAND, SMTP_LAST_COMMAND_RESULT, SMTP_LAST_COMMAND_FIRST_ARGUMENT,
 	
 	// SMTP temp message store
-	SMTP_TEMP_ID, SMTP_TEMP_FROM;
+	SMTP_TEMP_ID, SMTP_TEMP_FROM, SMTP_TEMP_TO, SMTP_TEMP_DATA;
 	
 	@Override
 	public String toString(){
@@ -118,6 +118,15 @@ public enum FieldName {
 		List<FieldName> smtpStatusFieldNames = new ArrayList<FieldName>();
 
 		smtpStatusFieldNames.add(SMTP_TEMP_FROM);
+		
+		return smtpStatusFieldNames;
+	}
+	
+	public static List<FieldName> getSMTPTempTableDataFieldOnly(){
+		
+		List<FieldName> smtpStatusFieldNames = new ArrayList<FieldName>();
+
+		smtpStatusFieldNames.add(SMTP_TEMP_DATA);
 		
 		return smtpStatusFieldNames;
 	}
