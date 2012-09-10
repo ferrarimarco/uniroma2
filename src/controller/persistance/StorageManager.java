@@ -69,4 +69,16 @@ public class StorageManager implements PersistanceManager {
 		return awsDynamoDBStorageManager.getMessageUIDs(clientId);
 	}
 
+	@Override
+	public void addToSet(StorageLocation location, String keyValue, FieldName fieldName, String... values) {
+		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
+		awsDynamoDBStorageManager.addToSet(location, keyValue, fieldName, values);
+	}
+
+	@Override
+	public List<String> getSet(StorageLocation location, FieldName fieldName, String keyValue) {
+		PersistanceManager awsDynamoDBStorageManager = getAWSDynamoDBStorageManager();
+		return awsDynamoDBStorageManager.getSet(location, fieldName, keyValue);
+	}
+
 }

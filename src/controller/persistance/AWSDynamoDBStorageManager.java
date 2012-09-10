@@ -235,4 +235,32 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 	private String getClientUserName(String clientId){
 		return read(StorageLocation.POP3_SESSIONS, FieldName.POP3_SESSION_USER_NAME, clientId);
 	}
+
+	@Override
+	public void addToSet(StorageLocation location, String keyValue, FieldName fieldName, String... values) {
+		Map<String, AttributeValueUpdate> updateItems = new HashMap<String, AttributeValueUpdate>();
+		
+		Key key = new Key().withHashKeyElement(new AttributeValue().withS(keyValue));
+		
+		// Add two new authors to the list.
+		updateItems.put(fieldName.toString(), new AttributeValueUpdate().withAction(AttributeAction.ADD).withValue(new AttributeValue().withSS(values)));
+		
+		UpdateItemRequest updateItemRequest = new UpdateItemRequest().withTableName(location.toString())
+				.withKey(key).
+				withAttributeUpdates(updateItems);
+		
+		client.updateItem(updateItemRequest);
+	}
+
+	@Override
+	public List<String> getSet(StorageLocation location, FieldName fieldName, String keyValue) {
+	
+		GetItemRequest getItemRequest = new GetItemRequest().withTableName(location.toString())
+				.withKey(new Key().withHashKeyElement(new AttributeValue().withS(keyValue)))
+				.withAttributesToGet(Arrays.asList(fieldName.toString()));
+
+		GetItemResult result = getClient().getItem(getItemRequest);
+
+		return result.getItem().get(fieldName.toString()).getSS();
+	}
 }
