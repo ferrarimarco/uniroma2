@@ -71,7 +71,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 		}
 	}
 	
-	private void stop(BufferedReader reader, BufferedOutputStream writer){
+	protected void stop(BufferedReader reader, BufferedOutputStream writer){
 		try {
 			reader.close();
 			writer.close();

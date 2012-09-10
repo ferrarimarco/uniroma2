@@ -562,4 +562,14 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		
 		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, statusFields, status.toString());
 	}
+
+	@Override
+	public void processMessageData(CommunicationHandler communicationHandler,
+			BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId,
+			String data) {
+		// TODO Auto-generated method stub
+		
+		// TODO: this method is needed only by SMTPCommandHandler
+		
+	}
 }

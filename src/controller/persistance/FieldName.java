@@ -16,7 +16,10 @@ public enum FieldName {
 	POP3_MESSAGE_UID, POP3_MESSAGE_TO, POP3_MESSAGE_TO_DELETE, POP3_MESSAGE_DIMENSION, POP3_MESSAGE_HEADER, POP3_MESSAGE_DATA,
 	
 	// SMTP session table
-	SMTP_SESSION_ID, SMTP_SESSION_STATUS, SMTP_LAST_COMMAND, SMTP_LAST_COMMAND_RESULT, SMTP_LAST_COMMAND_FIRST_ARGUMENT;
+	SMTP_SESSION_ID, SMTP_SESSION_STATUS, SMTP_LAST_COMMAND, SMTP_LAST_COMMAND_RESULT, SMTP_LAST_COMMAND_FIRST_ARGUMENT,
+	
+	// SMTP temp message store
+	SMTP_TEMP_ID, SMTP_TEMP_FROM;
 	
 	@Override
 	public String toString(){
@@ -106,6 +109,15 @@ public enum FieldName {
 		List<FieldName> smtpStatusFieldNames = new ArrayList<FieldName>();
 
 		smtpStatusFieldNames.add(SMTP_SESSION_STATUS);
+		
+		return smtpStatusFieldNames;
+	}
+	
+	public static List<FieldName> getSMTPTempTableFromFieldOnly(){
+		
+		List<FieldName> smtpStatusFieldNames = new ArrayList<FieldName>();
+
+		smtpStatusFieldNames.add(SMTP_TEMP_FROM);
 		
 		return smtpStatusFieldNames;
 	}

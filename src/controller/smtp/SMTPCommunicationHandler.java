@@ -29,15 +29,6 @@ public class SMTPCommunicationHandler extends AbstractCommunicationHandler {
 			ioException.printStackTrace();
 		}
 	}
-	
-	public void sendResponse(BufferedOutputStream writer, SMTPCode code, String response){
-		
-		if (response.length() > 0) {
-			sendLine(writer, code.toString() + " " + response);
-		}else{
-			sendLine(writer, code.toString());
-		}
-	}
 
 	@Override
 	public void sendResponse(BufferedOutputStream writer, String statusIndicator, String response) {
@@ -52,9 +43,8 @@ public class SMTPCommunicationHandler extends AbstractCommunicationHandler {
 	}
 
 	@Override
-	public void sendListAsMultiLineResponse(BufferedOutputStream writer, List<String> list) {
-		// TODO Auto-generated method stub
-		
+	public void sendListAsMultiLineResponse(BufferedOutputStream writer, List<String> list){
+
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package controller.smtp;
 
 public enum SMTPSessionStatus {
-	GREETINGS, TRANSACTION, 
+	GREETINGS, TRANSACTION, TRANSACTION_DATA,
 	
 	UNKNOWN, EMPTY;
 	
@@ -18,6 +18,8 @@ public enum SMTPSessionStatus {
 			return GREETINGS;
 		}else if(value.equals(TRANSACTION.toString())){
 			return TRANSACTION;
+		}else if(value.equals(TRANSACTION_DATA.toString())){
+			return TRANSACTION_DATA;
 		}else{
 			return UNKNOWN;
 		}

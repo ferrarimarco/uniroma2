@@ -5,6 +5,8 @@ import java.util.List;
 
 public interface CommunicationHandler {
 
+	// TODO: check if we can delete some methods
+	
 	void sendResponse(BufferedOutputStream writer, String statusIndicator, String response);
 	void sendString(BufferedOutputStream writer, String string);
 	void sendListAsMultiLineResponse(BufferedOutputStream writer, List<String> list);
