@@ -8,33 +8,72 @@ import controller.CommunicationHandler;
 import controller.persistance.FieldName;
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageLocation;
+import controller.pop3.POP3Command;
 
 public class SMTPCommandHandler extends AbstractCommandHandler {
 	
 	@Override
 	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
-
-		// TODO: change to IF with SMTPCommand enum
-		switch(command.toUpperCase()){
-		case "EHLO":
-			break;
-		case "HELO":
-			break;
-		case "MAIL":
-			break;
-		case "RCPT":
-			break;
-		case "DATA":
-			break;
-		case "QUIT":
-			break;
-		default:
-			unsupportedCommand(communicationHandler, writer);
-			break;
+		
+		SMTPCommand smtpCommand = SMTPCommand.parseCommand(command);
+		
+		if(smtpCommand.equals(SMTPCommand.EHLO)){
+			EHLOCommand(communicationHandler, writer, persistanceManager, clientId);
+		}else if(smtpCommand.equals(SMTPCommand.HELO)){
+			HELOCommand(communicationHandler, writer, persistanceManager, clientId);
+		}else if(smtpCommand.equals(SMTPCommand.MAIL)){
+			MAILCommand(communicationHandler, writer, argument, persistanceManager, clientId);
+		}else if(smtpCommand.equals(SMTPCommand.RCPT)){
+			RCPTCommand(communicationHandler, writer, argument, persistanceManager, clientId);
+		}else if(smtpCommand.equals(SMTPCommand.DATA)){
+			DATACommand(communicationHandler, writer, persistanceManager, clientId);
+		}else if(smtpCommand.equals(SMTPCommand.QUIT)){
+			QUITCommand(communicationHandler, writer, argument, persistanceManager, clientId);
+		}else if(smtpCommand.equals(SMTPCommand.UNSUPPORTED)){
+			unsupportedCommand(communicationHandler, persistanceManager, clientId, writer);
 		}
 	}
 	
-	private void unsupportedCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer){
+	private void EHLOCommand(CommunicationHandler communicationHandler,
+			BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void HELOCommand(CommunicationHandler communicationHandler,
+			BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void MAILCommand(CommunicationHandler communicationHandler,
+			BufferedOutputStream writer, String argument, PersistanceManager persistanceManager,
+			String clientId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void RCPTCommand(CommunicationHandler communicationHandler,
+			BufferedOutputStream writer, String argument, PersistanceManager persistanceManager,
+			String clientId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void DATACommand(CommunicationHandler communicationHandler,
+			BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void QUITCommand(CommunicationHandler communicationHandler,
+			BufferedOutputStream writer, String argument, PersistanceManager persistanceManager,
+			String clientId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void unsupportedCommand(CommunicationHandler communicationHandler, PersistanceManager persistanceManager, String clientId, BufferedOutputStream writer){
 		
 		// TODO: save as last command unsupported
 		
