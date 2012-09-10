@@ -31,39 +31,33 @@ public class SMTPRequestHandler extends AbstractRequestHandler {
 		// TODO: DEBUG
 		System.out.println("Connection received from " + clientId);
 		
-		try {
-			// Get Input and Output streams
-			BufferedOutputStream writer = new BufferedOutputStream(socket.getOutputStream());
-			writer.flush();
+		// Get current status
+		SMTPSessionStatus currentStatus = SMTPSessionStatus.parseStatus(storageManager.read(StorageLocation.SMTP_SESSIONS, FieldName.SMTP_SESSION_STATUS, clientId));
+		
+		if(currentStatus.equals(SMTPSessionStatus.TRANSACTION_DATA)){
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			
-			SMTPSessionStatus currentStatus = SMTPSessionStatus.parseStatus(storageManager.read(StorageLocation.SMTP_SESSIONS, FieldName.SMTP_SESSION_STATUS, clientId));
-			
-			if(currentStatus.equals(SMTPSessionStatus.TRANSACTION_DATA)){
-				// TODO: process data
+			try {
+				// Get Input and Output streams
+				BufferedOutputStream writer = new BufferedOutputStream(socket.getOutputStream());
+				writer.flush();
+
+				BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				
 				String data;
-				
+
 				while ((data = reader.readLine()) != null) {
 					System.out.println("Server receives: " + data);
 					commandHandler.processMessageData(communicationHandler, writer, storageManager, clientId, data);
-				}
-				
-			}else{
-				super.handleRequest(socket, commandHandler, communicationHandler);
-			}	
+				}	
 
-			// Done handling the command
-			super.stop(reader, writer);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}		
-	}
-	
-	public void handleData(String data){
+				// Done handling data
+				super.stop(reader, writer);
 
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}else{
+			super.handleRequest(socket, commandHandler, communicationHandler);
+		}
 	}
-	
 }

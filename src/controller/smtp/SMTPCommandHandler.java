@@ -16,6 +16,8 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	
 	private static final String dataTerminator = "\r\n.\r\n";
 	
+	// TODO: NOOP, RSET
+	
 	@Override
 	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
 		
@@ -88,7 +90,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		}
 		
 		// Check if the address can be added
-		int recipientNumber = getRecipientNumber(clientId);
+		int recipientNumber = getRecipientNumber(persistanceManager, clientId);
 		
 		if(recipientNumber >= MAX_RECIPIENTS){
 			communicationHandler.sendResponse(writer,SMTPCode.EXCEEDED_STORAGE_ALLOCATION.toString(), "You cannot add any more recipients.");
@@ -103,7 +105,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 			return;
 		}
 		
-		addRecipient(address, clientId);
+		persistanceManager.addToSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId, FieldName.SMTP_TEMP_TO, address);
 		
 		communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "");
 		
@@ -130,30 +132,35 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	
 	public void processMessageData(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId, String data){
 		
+		// Get previous data
+		String message = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
+
+		// Add the new line to the message body
+		message += data;
+		
+		// Update message body
+		persistanceManager.update(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId, FieldName.getSMTPTempTableDataFieldOnly(), message);
+		
 		// Search for data termination sequence
 		if(data.indexOf(dataTerminator) != -1){// End of message data
-			
-			// TODO: Add data to data field
-
-			// TODO: change status to what?
 			
 			// TODO: process message
 			
 			communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "");
-		}else{
-			// TODO: add data to data field
+			
+			setStatus(persistanceManager, SMTPSessionStatus.GREETINGS, clientId);
 		}
 	}
 
 	private void QUITCommand(CommunicationHandler communicationHandler,	BufferedOutputStream writer, String argument, PersistanceManager persistanceManager, String clientId) {
-		// TODO Auto-generated method stub
+		clearTempTable(persistanceManager, clientId);
 		
+		persistanceManager.delete(StorageLocation.SMTP_SESSIONS, clientId);
+		
+		communicationHandler.sendResponse(writer, SMTPCode.QUIT_OK_RESPONSE.toString(), "Bye!");		
 	}
 
 	private void unsupportedCommand(CommunicationHandler communicationHandler, PersistanceManager persistanceManager, String clientId, BufferedOutputStream writer){
-		
-		// TODO: save as last command unsupported
-		
 		communicationHandler.sendResponse(writer, SMTPCode.UNSUPPORTED_COMMAND.toString(), "Command is not supported");
 	}
 	
@@ -200,17 +207,13 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	
 	private boolean isValidAddress(String address){
 		// TODO: write implementation
-		return false;
+		return true;
 	}
 	
-	private int getRecipientNumber(String clientId){
-		// TODO: write implementation
+	private int getRecipientNumber(PersistanceManager persistanceManager, String clientId){
 		
-		return 0;
-	}
-	
-	private void addRecipient(String recipient, String clientId){
-		// TODO: write implementation
-	}
-	
+		List<String> recipients = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO, clientId);
+		
+		return recipients.size();
+	}	
 }
