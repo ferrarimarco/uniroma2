@@ -8,7 +8,6 @@ import controller.CommunicationHandler;
 import controller.persistance.FieldName;
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageLocation;
-import controller.pop3.POP3Command;
 
 public class SMTPCommandHandler extends AbstractCommandHandler {
 	
