@@ -9,7 +9,7 @@ import controller.persistance.FieldName;
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageLocation;
 
-// TODO: extend AbstractCommandHandler
+// TODO: send last command update only for commands that need to check the previous command?
 
 public class POP3CommandHandler extends AbstractCommandHandler {
 	
