@@ -16,7 +16,7 @@ public enum FieldName {
 	POP3_MESSAGE_UID, POP3_MESSAGE_TO, POP3_MESSAGE_TO_DELETE, POP3_MESSAGE_DIMENSION, POP3_MESSAGE_HEADER, POP3_MESSAGE_DATA,
 	
 	// SMTP session table
-	SMTP_SESSION_ID;
+	SMTP_SESSION_ID, SMTP_SESSION_STATUS, SMTP_LAST_COMMAND, SMTP_LAST_COMMAND_RESULT, SMTP_LAST_COMMAND_FIRST_ARGUMENT;
 	
 	@Override
 	public String toString(){
@@ -75,5 +75,38 @@ public enum FieldName {
 		pop3StatusFieldNames.add(POP3_MESSAGE_TO_DELETE);
 		
 		return pop3StatusFieldNames;
+	}
+	
+	public static List<FieldName> getSMTPStatusTableFieldNames(){
+		
+		List<FieldName> smtpStatusFieldNames = new ArrayList<FieldName>();
+		
+		smtpStatusFieldNames.add(SMTP_SESSION_ID);
+		smtpStatusFieldNames.add(SMTP_SESSION_STATUS);
+		smtpStatusFieldNames.add(SMTP_LAST_COMMAND);
+		smtpStatusFieldNames.add(SMTP_LAST_COMMAND_RESULT);
+		smtpStatusFieldNames.add(SMTP_LAST_COMMAND_FIRST_ARGUMENT);
+		
+		return smtpStatusFieldNames;
+	}
+	
+	public static List<FieldName> getSMTPStatusCommandTableFieldNames(){
+		
+		List<FieldName> smtpStatusFieldNames = new ArrayList<FieldName>();
+		
+		smtpStatusFieldNames.add(SMTP_LAST_COMMAND);
+		smtpStatusFieldNames.add(SMTP_LAST_COMMAND_RESULT);
+		smtpStatusFieldNames.add(SMTP_LAST_COMMAND_FIRST_ARGUMENT);
+		
+		return smtpStatusFieldNames;
+	}
+	
+	public static List<FieldName> getSMTPStatusTableFieldOnly(){
+		
+		List<FieldName> smtpStatusFieldNames = new ArrayList<FieldName>();
+
+		smtpStatusFieldNames.add(SMTP_SESSION_STATUS);
+		
+		return smtpStatusFieldNames;
 	}
 }
