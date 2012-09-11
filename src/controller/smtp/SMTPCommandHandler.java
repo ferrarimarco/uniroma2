@@ -1,16 +1,8 @@
 package controller.smtp;
 
 import java.io.BufferedOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import org.apache.commons.codec.binary.Hex;
 
 import controller.AbstractCommandHandler;
 import controller.CommunicationHandler;
@@ -27,28 +19,35 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	private static final String dataTerminator = "\r\n.\r\n";
 	
 	@Override
-	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
+	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String line, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
 		
-		SMTPCommand smtpCommand = SMTPCommand.parseCommand(command);
+		SMTPSessionStatus currentStatus = getStatus(persistanceManager, clientId);
 		
-		if(smtpCommand.equals(SMTPCommand.EHLO)){
-			EHLOCommand(communicationHandler, writer, persistanceManager, clientId, argument);
-		}else if(smtpCommand.equals(SMTPCommand.HELO)){
-			HELOCommand(communicationHandler, writer, persistanceManager, clientId, argument);
-		}else if(smtpCommand.equals(SMTPCommand.MAIL)){
-			MAILCommand(communicationHandler, writer, persistanceManager, clientId, argument);
-		}else if(smtpCommand.equals(SMTPCommand.RCPT)){
-			RCPTCommand(communicationHandler, writer, persistanceManager, clientId, argument);
-		}else if(smtpCommand.equals(SMTPCommand.DATA)){
-			DATACommand(communicationHandler, writer, persistanceManager, clientId);
-		}else if(smtpCommand.equals(SMTPCommand.QUIT)){
-			QUITCommand(communicationHandler, writer, persistanceManager, clientId);
-		}else if(smtpCommand.equals(SMTPCommand.RSET)){
-			RSETCommand(communicationHandler, writer, persistanceManager, clientId);
-		}else if(smtpCommand.equals(SMTPCommand.NOOP)){
-			NOOPCommand(communicationHandler, writer, persistanceManager, clientId);
-		}else if(smtpCommand.equals(SMTPCommand.UNSUPPORTED)){
-			unsupportedCommand(communicationHandler, persistanceManager, clientId, writer);
+		if(!currentStatus.equals(SMTPSessionStatus.TRANSACTION_DATA)){
+
+			SMTPCommand smtpCommand = SMTPCommand.parseCommand(command);
+
+			if(smtpCommand.equals(SMTPCommand.EHLO)){
+				EHLOCommand(communicationHandler, writer, persistanceManager, clientId, argument);
+			}else if(smtpCommand.equals(SMTPCommand.HELO)){
+				HELOCommand(communicationHandler, writer, persistanceManager, clientId, argument);
+			}else if(smtpCommand.equals(SMTPCommand.MAIL)){
+				MAILCommand(communicationHandler, writer, persistanceManager, clientId, argument);
+			}else if(smtpCommand.equals(SMTPCommand.RCPT)){
+				RCPTCommand(communicationHandler, writer, persistanceManager, clientId, argument);
+			}else if(smtpCommand.equals(SMTPCommand.DATA)){
+				DATACommand(communicationHandler, writer, persistanceManager, clientId);
+			}else if(smtpCommand.equals(SMTPCommand.QUIT)){
+				QUITCommand(communicationHandler, writer, persistanceManager, clientId);
+			}else if(smtpCommand.equals(SMTPCommand.RSET)){
+				RSETCommand(communicationHandler, writer, persistanceManager, clientId);
+			}else if(smtpCommand.equals(SMTPCommand.NOOP)){
+				NOOPCommand(communicationHandler, writer, persistanceManager, clientId);
+			}else if(smtpCommand.equals(SMTPCommand.UNSUPPORTED)){
+				unsupportedCommand(communicationHandler, persistanceManager, clientId, writer);
+			}
+		}else{
+			processMessageData(communicationHandler, writer, persistanceManager, clientId, line);
 		}
 	}
 
@@ -128,7 +127,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		// Check SMTP session status
 		SMTPSessionStatus currentStatus = getStatus(persistanceManager, clientId);
 		
-		if(!currentStatus.equals(SMTPSessionStatus.TRANSACTION) || !currentStatus.equals(SMTPSessionStatus.TRANSACTION_DATA)){
+		if(!currentStatus.equals(SMTPSessionStatus.TRANSACTION)){
 			communicationHandler.sendResponse(writer, SMTPCode.BAD_SEQUENCE.toString(), "Bad command sequence.");
 			return;
 		}
@@ -142,19 +141,21 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 	}
 	
-	public void processMessageData(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId, String data){
+	private void processMessageData(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId, String data){
 		
 		// Get previous data
 		String message = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
 
 		// Add the new line to the message body
-		message += data;
-		
-		// Update message body
-		persistanceManager.update(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId, FieldName.getSMTPTempTableDataFieldOnly(), message);
-		
+		message += data + "\r\n";
+
 		// Search for data termination sequence
-		if(data.indexOf(dataTerminator) != -1){// End of message data
+		if(message.indexOf(dataTerminator) == -1){
+			
+			// Update message body
+			persistanceManager.update(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId, FieldName.getSMTPTempTableDataFieldOnly(), message);
+						
+		}else{// End of message data
 			
 			processMessage(persistanceManager, clientId);
 			
@@ -167,72 +168,50 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	private void processMessage(PersistanceManager persistanceManager, String clientId) {
 		
         // Date
-        DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
-        Date date = new Date();
-        String origDate = "Date:" + dateFormat.format(date);
-        
-		String from = "From:" + persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_FROM, clientId);
-		
 		List<String> toList = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO, clientId);
 		
-		String to = "To:";
+		String messageData = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
 		
-		for(int i = 0; i < toList.size(); i++){
-			
-			to += toList.get(i);
-			
-			if(i < toList.size() - 1){
-				to += toList.get(i) + ", ";
-			}
-		}
-
-		String messageBody = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
+		// Search for Message-ID
+		int startIndexId = messageData.indexOf("Message-ID:<");
+		int endIndexId = messageData.indexOf(">", startIndexId);
+        String messageId = messageData.substring(startIndexId + 14, endIndexId);
 		
-		String toHash = from + to + messageBody;
-		
-		// Compute message UID
-		MessageDigest cript = null;
-		
-		try {
-			cript = MessageDigest.getInstance("SHA-256");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		cript.reset();
-		
-        try {
-			cript.update(toHash.getBytes("utf8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+        System.out.println("Message id: " + messageId);
         
-        String uid = new String(Hex.encodeHex(cript.digest())).substring(0, 20);
+        int startIndexHeader = 0;
+        int endIndexHeader = messageData.indexOf("\r\n\r\n");
+		String header = messageData.substring(startIndexHeader, endIndexHeader);
 		
-		String header = origDate + "\r\n" + from + "\r\n" + to + "\r\n" + uid;
-		String body = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
+		System.out.println("Header: " + header);
+		
+		String body = messageData.substring(endIndexHeader + 1);
+		
+		System.out.println("body: " + body);
 		
 		int messageSize = (header + "\r\n" + body).length();
+		
+		System.out.println("Message size: " + messageSize);
 		
 		// Get users list to deliver the message
 		List<String> users = new ArrayList<String>(toList.size());
 		
 		for(int i = 0; i < toList.size(); i++){
 			
-			int startIndex = 0;
-			int endIndex = toList.get(i).indexOf("@");
+			int startIndexUsers = 0;
+			int endIndexUsers = toList.get(i).indexOf("@");
 			
 			// Search for < character (Name <email@domain.ext>)
 			if(toList.get(i).indexOf("<") != -1){
-				startIndex = toList.get(i).indexOf("<") + 1;
+				startIndexUsers = toList.get(i).indexOf("<") + 1;
 			}
 			
-			users.set(i, toList.get(i).substring(startIndex, endIndex));
+			users.add(toList.get(i).substring(startIndexUsers, endIndexUsers));
 		}
-		
 		
 		for(int i = 0; i < users.size(); i++){
 			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(),
-					uid,
+					messageId,
 					users.get(i),
 					POP3MessageDeletion.NO.toString(),
 					Integer.toString(messageSize),

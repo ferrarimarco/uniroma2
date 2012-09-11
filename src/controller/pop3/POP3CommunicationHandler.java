@@ -17,7 +17,7 @@ public class POP3CommunicationHandler extends AbstractCommunicationHandler {
 	public void sendStringWithLinesLimit(BufferedOutputStream writer, String string, int linesLimit){
 		
 		if(string.length() <= maxCharsPerLine){// String fits one line
-			sendLine(writer, string, false, false);
+			sendLine(writer, string, true, true);
 		}else{// Need more than one line
 			
 			// Compute how many lines are needed
@@ -36,9 +36,9 @@ public class POP3CommunicationHandler extends AbstractCommunicationHandler {
 			for(int i = 0; i < lines; i++){
 				// TODO: check this count!
 				if(i == lines - 2){
-					sendString(writer, string.substring(i * maxCharsPerLine, i * maxCharsPerLine + maxCharsPerLine));
+					sendLine(writer, string.substring(i * maxCharsPerLine, i * maxCharsPerLine + maxCharsPerLine), true, false);
 				}else{
-					sendString(writer, string.substring(i * maxCharsPerLine, string.length()));
+					sendLine(writer, string.substring(i * maxCharsPerLine, string.length()), true, true);
 				}
 			}
 		}
@@ -108,5 +108,4 @@ public class POP3CommunicationHandler extends AbstractCommunicationHandler {
 			sendLine(writer, statusIndicator, false, false);
 		}
 	}
-	
 }

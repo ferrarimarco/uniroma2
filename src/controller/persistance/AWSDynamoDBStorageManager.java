@@ -63,7 +63,7 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 
 		GetItemResult result = getClient().getItem(getItemRequest);
 
-		if(result.getItem() == null){
+		if(result.getItem() == null || result.getItem().get(fieldName.toString()) == null){
 			return "";
 		}else{
 			return result.getItem().get(fieldName.toString()).getS();
@@ -260,7 +260,11 @@ public class AWSDynamoDBStorageManager implements PersistanceManager {
 				.withAttributesToGet(Arrays.asList(fieldName.toString()));
 
 		GetItemResult result = getClient().getItem(getItemRequest);
-
-		return result.getItem().get(fieldName.toString()).getSS();
+		
+		if(result.getItem() == null || result.getItem().get(fieldName.toString()) == null){
+			return new ArrayList<String>();
+		}else{
+			return result.getItem().get(fieldName.toString()).getSS();
+		}
 	}
 }

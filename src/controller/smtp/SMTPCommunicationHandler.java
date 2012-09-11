@@ -32,7 +32,8 @@ public class SMTPCommunicationHandler extends AbstractCommunicationHandler {
 
 	@Override
 	public void sendResponse(BufferedOutputStream writer, String statusIndicator, String response) {
-		// TODO Auto-generated method stub
+		
+		sendLine(writer, statusIndicator + " " + response);
 		
 	}
 

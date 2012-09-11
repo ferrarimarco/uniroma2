@@ -89,6 +89,8 @@ public enum SMTPCode {
 			value = "553";
 		}else if(this.equals(NO_VALID_RECIPIENTS)){
 			value = "554";
+		}else{
+			value = "EMPTY";
 		}
 		
 		return value;

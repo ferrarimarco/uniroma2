@@ -8,6 +8,7 @@ import controller.pop3.POP3CommandHandler;
 import controller.pop3.POP3CommunicationHandler;
 import controller.pop3.POP3RequestHandler;
 import controller.smtp.SMTPCommandHandler;
+import controller.smtp.SMTPCommunicationHandler;
 import controller.smtp.SMTPRequestHandler;
 
 public class ConnectionListener implements Runnable {
@@ -48,7 +49,7 @@ public class ConnectionListener implements Runnable {
 				if(serverSocket.getLocalPort() == POP3_PORT){
 					requestHandler.handleRequest(connection, new POP3CommandHandler(), new POP3CommunicationHandler());
 				}else if(serverSocket.getLocalPort() == SMTP_PORT){
-					requestHandler.handleRequest(connection, new SMTPCommandHandler(), new POP3CommunicationHandler());
+					requestHandler.handleRequest(connection, new SMTPCommandHandler(), new SMTPCommunicationHandler());
 				}
 
 				connection.close();

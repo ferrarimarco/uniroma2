@@ -32,6 +32,8 @@ public enum POP3Command {
 			return RSET;
 		}else if(value.equals(TOP.toString())){
 			return TOP;
+		}else if(value.equals(UIDL.toString())){
+			return UIDL;
 		}else{
 			return UNSUPPORTED;
 		}

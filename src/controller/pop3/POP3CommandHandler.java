@@ -14,7 +14,7 @@ import controller.persistance.StorageLocation;
 public class POP3CommandHandler extends AbstractCommandHandler {
 	
 	@Override
-	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
+	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String line, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
 		
 		POP3Command pop3Command = POP3Command.parseCommand(command);
 		
@@ -221,12 +221,16 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 			
 			// Get information about all the messages in the maildrop
 			List<String> messageDimensions = persistanceManager.scanForMessageDimensions(clientId);
-			
-			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), messageDimensions.size() + " messages");
+						
+			// Add message index
+			for(int i = 0; i < messageDimensions.size(); i++){
+				messageDimensions.set(i, (i + 1) + " " + messageDimensions.get(i));
+			}
 			
 			// Send response			
 			if(messageDimensions.size() > 0){
-				
+
+				communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), messageDimensions.size() + " messages");
 				communicationHandler.sendListAsMultiLineResponse(writer, messageDimensions);
 
 			}else{// No messages in the maildrop
@@ -238,16 +242,19 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 			
 			setLastCommandWithOneArgument(persistanceManager, clientId, POP3Command.LIST, POP3StatusIndicator.OK, argument);
 
+			// TODO: this will not work because there is no range key in the table
 			List<String> messageDimensions = persistanceManager.scanForMessageDimensions(clientId);
 			
+			int messageNumber = Integer.parseInt(argument) - 1;
+			
 			// Check if such message exists
-			if(Integer.parseInt(argument) >= messageDimensions.size() || Integer.parseInt(argument) < 0){
+			if(messageNumber >= messageDimensions.size() || messageNumber < 0){
 				communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
 				return;
-			}	
+			}
 			
 			// Get the dimension of the message
-			int dimension = Integer.parseInt(messageDimensions.get(Integer.parseInt(argument)));
+			int dimension = Integer.parseInt(messageDimensions.get(messageNumber));
 
 			// Send the response
 			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), argument + " " + dimension);		
@@ -275,7 +282,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		// Get UIDs for all the messages
 		List<String> uids = persistanceManager.getMessageUIDs(clientId);
 		
-		int messageNumber = Integer.parseInt(argument);
+		int messageNumber = Integer.parseInt(argument) - 1;
 		
 		// Check if the specified message exists
 		if(messageNumber >= uids.size()){
@@ -319,7 +326,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		// Get UIDs for all the messages
 		List<String> uids = persistanceManager.getMessageUIDs(clientId);
 		
-		int messageNumber = Integer.parseInt(argument);
+		int messageNumber = Integer.parseInt(argument) - 1;
 		
 		// Check if the specified message exists
 		if(messageNumber >= uids.size()){
@@ -359,7 +366,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		// Get UIDs for all the messages
 		List<String> uids = persistanceManager.getMessageUIDs(clientId);
 		
-		int messageNumber = Integer.parseInt(argument);
+		int messageNumber = Integer.parseInt(argument) - 1;
 		
 		// Check if the specified message exists
 		if(messageNumber >= uids.size()){
@@ -437,7 +444,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		// Check the argument
 		if(argument.isEmpty()){
 			
-			setLastCommand(persistanceManager, clientId, POP3Command.LIST, POP3StatusIndicator.OK);
+			setLastCommand(persistanceManager, clientId, POP3Command.UIDL, POP3StatusIndicator.OK);
 			
 			// Get information about all the messages in the maildrop
 			List<String> uids = persistanceManager.getMessageUIDs(clientId);
@@ -449,7 +456,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 				
 				// Add message number
 				for(int i = 0; i < uids.size(); i++){
-					uids.set(i, i + " " + uids.get(i));
+					uids.set(i, (i + 1) + " " + uids.get(i));
 				}
 				
 				communicationHandler.sendListAsMultiLineResponse(writer, uids);
@@ -465,16 +472,18 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 			List<String> uids = persistanceManager.getMessageUIDs(clientId);
 			
+			int messageNumber = Integer.parseInt(argument) - 1;
+			
 			// Check if such message exists
-			if(Integer.parseInt(argument) >= uids.size() || Integer.parseInt(argument) < 0){
+			if(messageNumber >= uids.size() || messageNumber < 0){
 				communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
 				return;
-			}	
+			}
 			
 			// Get the UID of the message
-			String messageUid = uids.get(Integer.parseInt(argument));
+			String messageUid = uids.get(messageNumber);
 
-			String response = argument.toString() + " " + messageUid;
+			String response = (messageNumber + 1) + " " + messageUid;
 			
 			// Send the response
 			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), argument + " " + response);		
@@ -561,15 +570,5 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		List<FieldName> statusFields = FieldName.getPOP3StatusTableFieldOnly();
 		
 		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, statusFields, status.toString());
-	}
-
-	@Override
-	public void processMessageData(CommunicationHandler communicationHandler,
-			BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId,
-			String data) {
-		// TODO Auto-generated method stub
-		
-		// TODO: this method is needed only by SMTPCommandHandler
-		
 	}
 }

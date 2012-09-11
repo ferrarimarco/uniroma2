@@ -13,17 +13,11 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 
 	@Override
 	public void handleRequest(Socket socket, CommandHandler commandHandler, CommunicationHandler communicationHandler) {
-
-		PersistanceManager storageManager = new StorageManager();
 		
-		// TODO: the client uses multiple ports!!! so the port section may change!!!!
-		
-		String clientId = socket.getInetAddress().getHostAddress();
-		// Temp solution: comment the port. This will not work if multiple users share the same public ip
-		//clientId += ":" + socket.getPort();
+		String clientId = getClientId(socket);
 		
 		// TODO: DEBUG
-		System.out.println("Connection received from " + clientId);
+		System.out.println("Connection received from " + clientId + " on port " + socket.getLocalPort());
 		
 		try {
 			// Get Input and Output streams
@@ -33,6 +27,8 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			
 			// Send greetings (if necessary)
+			PersistanceManager storageManager = new StorageManager();
+			
 			commandHandler.sendGreetings(communicationHandler, writer, storageManager, clientId);
 			
 			String message = "";
@@ -43,6 +39,11 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 			
 			while ((message = reader.readLine()) != null) {
 				System.out.println("Server receives: " + message);
+				
+				// Initialize
+				command = "";
+				argument = "";
+				secondArgument = "";
 				
 				commandElements = message.split("\\s+");
 				
@@ -60,7 +61,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 				// TODO: DEBUG
 				//System.out.println(java.util.Arrays.toString(commandElements));
 				
-				commandHandler.handleCommand(communicationHandler, writer, command, argument, secondArgument, storageManager, clientId);
+				commandHandler.handleCommand(communicationHandler, writer, message, command, argument, secondArgument, storageManager, clientId);
 			}
 
 			// Done handling the command
@@ -78,6 +79,16 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
+	}
+	
+	protected String getClientId(Socket socket){
+		// TODO: the client uses multiple ports!!! so the port section may change!!!!
+		
+		String clientId = socket.getInetAddress().getHostAddress();
+		// Temp solution: comment the port. This will not work if multiple users share the same public ip
+		//clientId += ":" + socket.getPort();
+		
+		return clientId;
 	}
 	
 }
