@@ -34,7 +34,7 @@ public class StorageManager implements PersistanceManager {
 		awsDynamoDBStorageManager.delete(location, keyValue);
 	}
 
-	private AWSDynamoDBStorageManager getAWSDynamoDBStorageManager() {
+	private PersistanceManager getAWSDynamoDBStorageManager() {
 		return StorageManagerFactory.createAWSDynamoDBStorageManager();
 	}
 
