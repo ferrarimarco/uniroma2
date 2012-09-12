@@ -183,9 +183,9 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		
 		System.out.println("Header: " + header);
 		
-		String body = messageData.substring(endIndexHeader + 3, messageData.length() - 2);
+		String body = messageData.substring(endIndexHeader + 4, messageData.length() - 2);
 		
-		// Handle byte stuffing in message body
+		// TODO: check Handle byte stuffing in message body
 		messageData = messageData.replace(SpecialCharactersSequence.SMTP_BYTE_STUFFING.toString(), SpecialCharactersSequence.SMTP_BYTE_DESTUFFING.toString());
 		
 		System.out.println("body: " + body);
@@ -211,11 +211,16 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		}
 		
 		for(int i = 0; i < users.size(); i++){
-			// TODO: add other users to TO field
+			
+			// Update messageId to handle the same message written to multiple senders
+			String user = users.get(i);
+			String newMessageId = messageId + "_" + user;
+			
+			header = header.replace(messageId, newMessageId);
 			
 			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(),
-					messageId,
-					users.get(i),
+					newMessageId,
+					user,
 					POP3MessageDeletion.NO.toString(),
 					Integer.toString(messageSize),
 					header,
