@@ -51,8 +51,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 
-		// Check the status of the POP3 session: USER is available only in AUTH
-		// status
+		// Check the status of the POP3 session: USER is available only in AUTH status
 		if (!status.equals(POP3SessionStatus.AUTHORIZATION)) {
 			setLastCommand(persistanceManager, clientId, POP3Command.USER, POP3StatusIndicator.ERR);
 			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in AUTHORIZATION status.");
@@ -91,16 +90,14 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 		POP3SessionStatus status = getStatus(persistanceManager, clientId);
 
-		// Check the status of the POP3 session: PASS is available only in AUTH
-		// status
+		// Check the status of the POP3 session: PASS is available only in AUTH status
 		if (!status.equals(POP3SessionStatus.AUTHORIZATION)) {
 			setLastCommand(persistanceManager, clientId, POP3Command.PASS, POP3StatusIndicator.ERR);
 			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in AUTHORIZATION status.");
 			return;
 		}
 
-		// Check the previous command: PASS is available only after a successful
-		// USER command
+		// Check the previous command: PASS is available only after a successful USER command
 		POP3Command previousCommand = getPreviousCommand(persistanceManager, clientId);
 		POP3StatusIndicator previousCommandResult = getPreviousCommandResult(persistanceManager, clientId);
 

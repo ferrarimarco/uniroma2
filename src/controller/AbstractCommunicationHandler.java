@@ -27,9 +27,7 @@ public abstract class AbstractCommunicationHandler implements CommunicationHandl
 			writer.write(msg.getBytes());
 
 			/*
-			 * // TODO: DEBUG: PRINT EXA CHAR VALUES for(int i = 0; i <
-			 * msg.getBytes().length; i++){
-			 * System.out.println(String.format("0x%02X", msg.getBytes()[i])); }
+			 * // TODO: DEBUG: PRINT EXA CHAR VALUES for(int i = 0; i < msg.getBytes().length; i++){ System.out.println(String.format("0x%02X", msg.getBytes()[i])); }
 			 */
 
 			if (multiLine && lastLine) {
