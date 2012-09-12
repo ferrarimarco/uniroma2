@@ -17,6 +17,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	private static final int MAX_RECIPIENTS = 10;
 	
 	private static final String dataTerminator = "\r\n.\r\n";
+	private static final String endLine = "\r\n";
 	
 	@Override
 	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String line, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
@@ -147,7 +148,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		String message = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
 
 		// Add the new line to the message body
-		message += data + "\r\n";
+		message += data + endLine;
 
 		// Search for data termination sequence
 		if(message.indexOf(dataTerminator) == -1){
@@ -167,7 +168,6 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 	private void processMessage(PersistanceManager persistanceManager, String clientId) {
 		
-        // Date
 		List<String> toList = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO, clientId);
 		
 		String messageData = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
@@ -180,12 +180,15 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
         System.out.println("Message id: " + messageId);
         
         int startIndexHeader = 0;
-        int endIndexHeader = messageData.indexOf("\r\n\r\n");
+        int endIndexHeader = messageData.indexOf(endLine + endLine);
 		String header = messageData.substring(startIndexHeader, endIndexHeader);
 		
 		System.out.println("Header: " + header);
 		
-		String body = messageData.substring(endIndexHeader + 1);
+		String body = messageData.substring(endIndexHeader + 3, messageData.length() - 2);
+		
+		// Handle byte stuffing in message body
+		messageData = messageData.replace(endLine + ".." + endLine, endLine + "." + endLine);
 		
 		System.out.println("body: " + body);
 		
@@ -210,6 +213,8 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		}
 		
 		for(int i = 0; i < users.size(); i++){
+			// TODO: add other users to TO field
+			
 			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(),
 					messageId,
 					users.get(i),
