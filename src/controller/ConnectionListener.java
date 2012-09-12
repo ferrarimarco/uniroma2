@@ -16,9 +16,9 @@ public class ConnectionListener implements Runnable {
 	private ServerSocket serverSocket;
 	private static final int POP3_PORT = 110;
 	private static final int SMTP_PORT = 25;
-	
+
 	public ConnectionListener(int portNumber, int backlog) {
-		
+
 		try {
 			serverSocket = new ServerSocket(portNumber, backlog);
 		} catch (IOException e) {
@@ -29,26 +29,26 @@ public class ConnectionListener implements Runnable {
 	@Override
 	public void run() {
 		try {
-			
+
 			// Wait for connection
 			System.out.println("Waiting for connection on port " + serverSocket.getLocalPort());
 
 			RequestHandler requestHandler = null;
-			
-			if(serverSocket.getLocalPort() == POP3_PORT){
+
+			if (serverSocket.getLocalPort() == POP3_PORT) {
 				requestHandler = new POP3RequestHandler();
-			}else if(serverSocket.getLocalPort() == SMTP_PORT){
+			} else if (serverSocket.getLocalPort() == SMTP_PORT) {
 				requestHandler = new SMTPRequestHandler();
 			}
-			
+
 			Socket connection;
-			
-			while(true){
+
+			while (true) {
 				connection = serverSocket.accept();
 
-				if(serverSocket.getLocalPort() == POP3_PORT){
+				if (serverSocket.getLocalPort() == POP3_PORT) {
 					requestHandler.handleRequest(connection, new POP3CommandHandler(), new POP3CommunicationHandler());
-				}else if(serverSocket.getLocalPort() == SMTP_PORT){
+				} else if (serverSocket.getLocalPort() == SMTP_PORT) {
 					requestHandler.handleRequest(connection, new SMTPCommandHandler(), new SMTPCommunicationHandler());
 				}
 
@@ -56,11 +56,11 @@ public class ConnectionListener implements Runnable {
 			}
 
 		} catch (IOException ioException) {
-			ioException.printStackTrace();			
+			ioException.printStackTrace();
 		}
 	}
 
-	public void stop(){
+	public void stop() {
 		try {
 			serverSocket.close();
 		} catch (IOException ioException) {

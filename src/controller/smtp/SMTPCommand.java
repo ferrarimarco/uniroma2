@@ -3,32 +3,32 @@ package controller.smtp;
 public enum SMTPCommand {
 
 	EHLO, HELO, MAIL, RCPT, DATA, QUIT, RSET, NOOP, EMPTY, UNSUPPORTED;
-	
-	public static SMTPCommand parseCommand(String value){
-		
+
+	public static SMTPCommand parseCommand(String value) {
+
 		value = value.toUpperCase();
-		
-		if(value.equals(EHLO.toString())){
+
+		if (value.equals(EHLO.toString())) {
 			return EHLO;
-		}else if(value.equals(HELO.toString())){
+		} else if (value.equals(HELO.toString())) {
 			return HELO;
-		}else if(value.equals(MAIL.toString())){
+		} else if (value.equals(MAIL.toString())) {
 			return MAIL;
-		}else if(value.equals(RCPT.toString())){
+		} else if (value.equals(RCPT.toString())) {
 			return RCPT;
-		}else if(value.equals(DATA.toString())){
+		} else if (value.equals(DATA.toString())) {
 			return DATA;
-		}else if(value.equals(QUIT.toString())){
+		} else if (value.equals(QUIT.toString())) {
 			return QUIT;
-		}else if(value.equals(RSET.toString())){
+		} else if (value.equals(RSET.toString())) {
 			return RSET;
-		}else if(value.equals(NOOP.toString())){
+		} else if (value.equals(NOOP.toString())) {
 			return NOOP;
-		}else if(value.equals(EMPTY.toString())){
+		} else if (value.equals(EMPTY.toString())) {
 			return EMPTY;
-		}else{
+		} else {
 			return UNSUPPORTED;
 		}
 	}
-	
+
 }
