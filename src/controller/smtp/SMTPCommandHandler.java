@@ -6,6 +6,7 @@ import java.util.List;
 
 import controller.AbstractCommandHandler;
 import controller.CommunicationHandler;
+import controller.SpecialCharactersSequence;
 import controller.persistance.FieldName;
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageLocation;
@@ -15,9 +16,6 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	
 	// TODO: study this value
 	private static final int MAX_RECIPIENTS = 10;
-	
-	private static final String dataTerminator = "\r\n.\r\n";
-	private static final String endLine = "\r\n";
 	
 	@Override
 	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String line, String command, String argument, String secondArgument, PersistanceManager persistanceManager, String clientId){
@@ -148,10 +146,10 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		String message = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
 
 		// Add the new line to the message body
-		message += data + endLine;
+		message += data + SpecialCharactersSequence.LINE_END.toString();
 
 		// Search for data termination sequence
-		if(message.indexOf(dataTerminator) == -1){
+		if(message.indexOf(SpecialCharactersSequence.SMTP_DATA_END.toString()) == -1){
 			
 			// Update message body
 			persistanceManager.update(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId, FieldName.getSMTPTempTableDataFieldOnly(), message);
@@ -180,7 +178,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
         System.out.println("Message id: " + messageId);
         
         int startIndexHeader = 0;
-        int endIndexHeader = messageData.indexOf(endLine + endLine);
+        int endIndexHeader = messageData.indexOf(SpecialCharactersSequence.LINE_END.toString() + SpecialCharactersSequence.LINE_END.toString());
 		String header = messageData.substring(startIndexHeader, endIndexHeader);
 		
 		System.out.println("Header: " + header);
@@ -188,11 +186,11 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		String body = messageData.substring(endIndexHeader + 3, messageData.length() - 2);
 		
 		// Handle byte stuffing in message body
-		messageData = messageData.replace(endLine + ".." + endLine, endLine + "." + endLine);
+		messageData = messageData.replace(SpecialCharactersSequence.SMTP_BYTE_STUFFING.toString(), SpecialCharactersSequence.SMTP_BYTE_DESTUFFING.toString());
 		
 		System.out.println("body: " + body);
 		
-		int messageSize = (header + "\r\n" + body).length();
+		int messageSize = (header + SpecialCharactersSequence.LINE_END.toString() + body).length();
 		
 		System.out.println("Message size: " + messageSize);
 		

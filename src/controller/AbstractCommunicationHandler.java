@@ -6,9 +6,6 @@ import java.util.List;
 
 public abstract class AbstractCommunicationHandler implements CommunicationHandler {
 
-	private static final String endline = "\r\n";
-	private static final String terminationOctet = ".";
-	
 	// 512 - 2 (for endline)
 	private final int maxCharsPerLinePOP3 = 510;
 	
@@ -16,15 +13,15 @@ public abstract class AbstractCommunicationHandler implements CommunicationHandl
 		
 		try {
 			
-			msg += endline;
+			msg += SpecialCharactersSequence.LINE_END.toString();
 			
 			System.out.println("Server invia:" + msg);
 			
 			// Check if the line starts with the termination octet.
-			if(multiLine && msg.startsWith(terminationOctet)){
+			if(multiLine && msg.startsWith(SpecialCharactersSequence.POP3_TERMINATION_OCTET.toString())){
 				
 				// Byte-stuff according to POP3 protocol specification
-				msg = terminationOctet + msg;
+				msg = SpecialCharactersSequence.POP3_TERMINATION_OCTET.toString() + msg;
 			}			
 			
 			writer.write(msg.getBytes());
@@ -37,7 +34,7 @@ public abstract class AbstractCommunicationHandler implements CommunicationHandl
 			*/
 			
 			if(multiLine && lastLine){
-				writer.write((terminationOctet + endline).getBytes());
+				writer.write((SpecialCharactersSequence.POP3_TERMINATION_OCTET.toString() + SpecialCharactersSequence.LINE_END.toString()).getBytes());
 				
 				System.out.println("Server invia il carattere di terminazione.");
 			}
