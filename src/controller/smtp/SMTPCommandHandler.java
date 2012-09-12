@@ -176,13 +176,9 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		int endIndexId = messageData.indexOf(">", startIndexId);
 		String messageId = messageData.substring(startIndexId + 14, endIndexId);
 
-		System.out.println("Message id: " + messageId);
-
 		int startIndexHeader = 0;
 		int endIndexHeader = messageData.indexOf(SpecialCharactersSequence.LINE_END.toString() + SpecialCharactersSequence.LINE_END.toString());
 		String header = messageData.substring(startIndexHeader, endIndexHeader);
-
-		System.out.println("Header: " + header);
 
 		String body = messageData.substring(endIndexHeader + 4, messageData.length() - 2);
 
@@ -192,8 +188,6 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		System.out.println("body: " + body);
 
 		int messageSize = (header + SpecialCharactersSequence.LINE_END.toString() + body).length();
-
-		System.out.println("Message size: " + messageSize);
 
 		// Get users list to deliver the message
 		List<String> users = new ArrayList<String>(toList.size());
@@ -213,8 +207,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 		for (int i = 0; i < users.size(); i++) {
 
-			// Update messageId to handle the same message written to multiple
-			// senders
+			// Update messageId to handle the same message written to multiple senders
 			String user = users.get(i);
 			String newMessageId = messageId + "_" + user;
 
@@ -287,7 +280,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	}
 
 	private boolean isValidAddress(String address, PersistanceManager persistanceManager) {
-		// TODO: check format
+		// TODO: check email format
 
 		int startIndex = 0;
 
