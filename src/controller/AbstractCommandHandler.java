@@ -12,4 +12,7 @@ public abstract class AbstractCommandHandler implements CommandHandler {
 
 	@Override
 	public abstract void sendGreetings(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId);
+	
+	@Override
+	public abstract void clearStatus(PersistanceManager persistanceManager, String clientId);
 }

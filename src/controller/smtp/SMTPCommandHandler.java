@@ -145,7 +145,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 		// Get previous data
 		String message = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
-
+		
 		// Add the new line to the message body
 		message += data + SpecialCharactersSequence.LINE_END.toString();
 
@@ -182,9 +182,12 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 		String body = messageData.substring(endIndexHeader + 4, messageData.length() - 2);
 
-		// TODO: check Handle byte stuffing in message body
-		messageData = messageData.replace(SpecialCharactersSequence.SMTP_BYTE_STUFFING.toString(), SpecialCharactersSequence.SMTP_BYTE_DESTUFFING.toString());
 
+		// TODO: check Handle byte stuffing in message body
+		// To handle byte stuffing in body
+		
+		body = body.replace(SpecialCharactersSequence.LINE_END + "..", SpecialCharactersSequence.LINE_END + ".");
+		
 		System.out.println("body: " + body);
 
 		int messageSize = (header + SpecialCharactersSequence.LINE_END.toString() + body).length();
@@ -302,5 +305,13 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		List<String> recipients = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO, clientId);
 
 		return recipients.size();
+	}
+
+	@Override
+	public void clearStatus(PersistanceManager persistanceManager, String clientId) {
+		
+		clearTempTable(persistanceManager, clientId);
+
+		persistanceManager.delete(StorageLocation.SMTP_SESSIONS, clientId);		
 	}
 }

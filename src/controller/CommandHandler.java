@@ -10,4 +10,6 @@ public interface CommandHandler {
 			PersistanceManager persistanceManager, String clientId);
 
 	void sendGreetings(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId);
+	
+	void clearStatus(PersistanceManager persistanceManager, String clientId);
 }

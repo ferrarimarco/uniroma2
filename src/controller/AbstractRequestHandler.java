@@ -19,16 +19,16 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 		// TODO: DEBUG
 		System.out.println("Connection received from " + clientId + " on port " + socket.getLocalPort());
 
+		PersistanceManager storageManager = new StorageManager();
+		
 		try {
 			// Get Input and Output streams
 			BufferedOutputStream writer = new BufferedOutputStream(socket.getOutputStream());
 			writer.flush();
 
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
+			
 			// Send greetings (if necessary)
-			PersistanceManager storageManager = new StorageManager();
-
 			commandHandler.sendGreetings(communicationHandler, writer, storageManager, clientId);
 
 			String message = "";
@@ -69,6 +69,9 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			
+			// Clear session status
+			commandHandler.clearStatus(storageManager, clientId);
 		}
 	}
 

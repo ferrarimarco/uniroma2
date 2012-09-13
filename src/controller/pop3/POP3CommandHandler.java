@@ -521,4 +521,9 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, statusFields, status.toString());
 	}
+
+	@Override
+	public void clearStatus(PersistanceManager persistanceManager, String clientId) {
+		persistanceManager.delete(StorageLocation.POP3_SESSIONS, clientId);		
+	}
 }
