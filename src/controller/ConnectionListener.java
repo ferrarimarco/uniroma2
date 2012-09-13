@@ -52,6 +52,8 @@ public class ConnectionListener implements Runnable {
 					requestHandler.handleRequest(connection, new SMTPCommandHandler(), new SMTPCommunicationHandler());
 				}
 
+				System.out.println("CL: close connection");
+				
 				connection.close();
 			}
 

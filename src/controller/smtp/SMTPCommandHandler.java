@@ -183,9 +183,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		String body = messageData.substring(endIndexHeader + 4, messageData.length() - 2);
 
 
-		// TODO: check Handle byte stuffing in message body
-		// To handle byte stuffing in body
-		
+		// Handle byte stuffing in body
 		body = body.replace(SpecialCharactersSequence.LINE_END + "..", SpecialCharactersSequence.LINE_END + ".");
 		
 		System.out.println("body: " + body);
