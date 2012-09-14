@@ -35,7 +35,7 @@ public class StorageManager implements PersistanceManager {
 	}
 
 	private PersistanceManager getAWSDynamoDBStorageManager() {
-		return StorageManagerFactory.createAWSDynamoDBStorageManager();
+		return PersistanceManagerFactory.createAWSDynamoDBStorageManager();
 	}
 
 	@Override

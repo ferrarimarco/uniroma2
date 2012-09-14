@@ -1,6 +1,6 @@
 package controller.persistance;
 
-public class StorageManagerFactory {
+public class PersistanceManagerFactory {
 
 	public static PersistanceManager createAWSDynamoDBStorageManager() {
 		return new AWSDynamoDBStorageManager();
