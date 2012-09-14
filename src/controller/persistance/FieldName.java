@@ -18,7 +18,7 @@ public enum FieldName {
 	SMTP_SESSION_ID, SMTP_SESSION_STATUS, SMTP_LAST_COMMAND, SMTP_LAST_COMMAND_RESULT, SMTP_LAST_COMMAND_FIRST_ARGUMENT,
 
 	// SMTP temp message store
-	SMTP_TEMP_ID, SMTP_TEMP_FROM, SMTP_TEMP_TO, SMTP_TEMP_DATA;
+	SMTP_TEMP_ID, SMTP_TEMP_FROM, SMTP_TEMP_RAW_DATA, SMTP_TEMP_TO_ADDRESSES, SMTP_TEMP_TO_USERS, SMTP_TEMP_HEADER, SMTP_TEMP_BODY, SMTP_TEMP_MESSAGE_SIZE;
 
 	@Override
 	public String toString() {
@@ -139,7 +139,7 @@ public enum FieldName {
 
 		List<FieldName> smtpStatusFieldNames = new ArrayList<FieldName>();
 
-		smtpStatusFieldNames.add(SMTP_TEMP_DATA);
+		smtpStatusFieldNames.add(SMTP_TEMP_RAW_DATA);
 
 		return smtpStatusFieldNames;
 	}

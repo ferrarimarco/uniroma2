@@ -1,7 +1,6 @@
 package controller.smtp;
 
 import java.io.BufferedOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import controller.AbstractCommandHandler;
@@ -53,8 +52,8 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 	private void EHLOCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId, String argument) {
 
+		setStatus(persistanceManager, SMTPSessionStatus.GREETINGS, clientId);		
 		communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "Welcome!");
-
 	}
 
 	private void HELOCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId, String argument) {
@@ -83,8 +82,8 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 			return;
 		}
 
-		// Insert FROM data in temp table
-		persistanceManager.update(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId, FieldName.getSMTPTempTableFromFieldOnly(), address);
+		// Initialize data
+		persistanceManager.create(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.getSMTPTempTableFromFieldOnly(), clientId);
 
 		communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "");
 
@@ -116,7 +115,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 			return;
 		}
 
-		persistanceManager.addToSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId, FieldName.SMTP_TEMP_TO, address);
+		persistanceManager.addToSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId, FieldName.SMTP_TEMP_TO_ADDRESSES, address);
 
 		communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "");
 
@@ -144,7 +143,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	private void processMessageData(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId, String data) {
 
 		// Get previous data
-		String message = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
+		String message = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_RAW_DATA, clientId);
 		
 		// Add the new line to the message body
 		message += data + SpecialCharactersSequence.LINE_END.toString();
@@ -153,6 +152,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		if (message.indexOf(SpecialCharactersSequence.SMTP_DATA_END.toString()) == -1) {
 
 			// Update message body
+			// TODO: check update
 			persistanceManager.update(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId, FieldName.getSMTPTempTableDataFieldOnly(), message);
 
 		} else {// End of message data
@@ -166,55 +166,23 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	}
 
 	private void processMessage(PersistanceManager persistanceManager, String clientId) {
-
-		List<String> toList = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO, clientId);
-
-		String messageData = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_DATA, clientId);
-
-		// Search for Message-ID
-		int startIndexId = messageData.indexOf("Message-ID:<");
-		int endIndexId = messageData.indexOf(">", startIndexId);
-		String messageId = messageData.substring(startIndexId + 14, endIndexId);
-
-		int startIndexHeader = 0;
-		int endIndexHeader = messageData.indexOf(SpecialCharactersSequence.LINE_END.toString() + SpecialCharactersSequence.LINE_END.toString());
-		String header = messageData.substring(startIndexHeader, endIndexHeader);
-
-		String body = messageData.substring(endIndexHeader + 4, messageData.length() - 2);
-
-
-		// Handle byte stuffing in body
-		body = body.replace(SpecialCharactersSequence.LINE_END + "..", SpecialCharactersSequence.LINE_END + ".");
 		
-		System.out.println("body: " + body);
-
-		int messageSize = (header + SpecialCharactersSequence.LINE_END.toString() + body).length();
-
-		// Get users list to deliver the message
-		List<String> users = new ArrayList<String>(toList.size());
-
-		for (int i = 0; i < toList.size(); i++) {
-
-			int startIndexUsers = 0;
-			int endIndexUsers = toList.get(i).indexOf("@");
-
-			// Search for < character (Name <email@domain.ext>)
-			if (toList.get(i).indexOf("<") != -1) {
-				startIndexUsers = toList.get(i).indexOf("<") + 1;
-			}
-
-			users.add(toList.get(i).substring(startIndexUsers, endIndexUsers));
-		}
-
+		List<String> users = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO_USERS, clientId);
+		String messageId = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_ID, clientId);
+		String header = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_HEADER, clientId);
+		String body = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_BODY, clientId);
+		String messageSize = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_MESSAGE_SIZE, clientId);
+		
 		for (int i = 0; i < users.size(); i++) {
 
 			// Update messageId to handle the same message written to multiple senders
 			String user = users.get(i);
+			
 			String newMessageId = messageId + "_" + user;
 
 			header = header.replace(messageId, newMessageId);
 
-			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, user, POP3MessageDeletion.NO.toString(), Integer.toString(messageSize),
+			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, user, POP3MessageDeletion.NO.toString(), messageSize,
 					header, body);
 		}
 
@@ -300,7 +268,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 	private int getRecipientNumber(PersistanceManager persistanceManager, String clientId) {
 
-		List<String> recipients = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO, clientId);
+		List<String> recipients = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO_ADDRESSES, clientId);
 
 		return recipients.size();
 	}

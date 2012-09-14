@@ -12,6 +12,7 @@ public class Message {
 	private String uid;
 	private int size;
 	private List<String> toAddresses;
+	private String fromAddress;
 	
 	private String rawData;
 	private boolean isReady;
@@ -26,9 +27,13 @@ public class Message {
 		toUsers = new ArrayList<String>();
 	}
 	
-	public void addRawData(String newData){
-		rawData += newData;
+	public void setRawData(String newData){
+		rawData = newData;
 	}
+	
+	public String getRawData(){
+		return rawData;
+	}	
 	
 	public String getHeader(){
 		if(isReady){
@@ -61,9 +66,9 @@ public class Message {
 		toAddresses.add(newUser);
 	}
 	
-	public int getMessageSize(){
+	public String getMessageSize(){
 		if(isReady){
-			return size;
+			return Integer.toString(size);
 		}else{
 			processMessage();
 			return getMessageSize();
@@ -78,6 +83,10 @@ public class Message {
 			return getToUsers();
 		}		
 	}
+	
+	public List<String> getToAddresses(){
+		return toAddresses;
+	}	
 	
 	private void processMessage(){
 		
@@ -94,6 +103,7 @@ public class Message {
 
 		body = messageData.substring(endIndexHeader + 4, messageData.length() - 2);
 
+		// TODO: check \r\n..\r\n.\r\n 
 		// Handle byte stuffing in body
 		body = body.replace(SpecialCharactersSequence.LINE_END + "..", SpecialCharactersSequence.LINE_END + ".");
 		
@@ -112,12 +122,20 @@ public class Message {
 
 			// Search for < character (Name <email@domain.ext>)
 			if (toAddresses.get(i).indexOf("<") != -1) {
-				startIndexUsers = toUsers.get(i).indexOf("<") + 1;
+				startIndexUsers = toAddresses.get(i).indexOf("<") + 1;
 			}
 
-			toUsers.add(toUsers.get(i).substring(startIndexUsers, endIndexUsers));
+			toUsers.add(toAddresses.get(i).substring(startIndexUsers, endIndexUsers));
 		}
 		
 		isReady = true;
+	}
+
+	public String getFromAddress() {
+		return fromAddress;
+	}
+
+	public void setFromAddress(String fromAddress) {
+		this.fromAddress = fromAddress;
 	}
 }
