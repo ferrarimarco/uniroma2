@@ -8,7 +8,7 @@ public class Index {
 		ConnectionListener smtpServer = new ConnectionListener(25, 10);
 
 		Thread pop3Thread = new Thread(pop3Server);
-		//pop3Thread.start();
+		pop3Thread.start();
 
 		Thread smtpThread = new Thread(smtpServer);
 		smtpThread.start();
