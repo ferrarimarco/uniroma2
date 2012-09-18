@@ -126,6 +126,7 @@ public enum FieldName {
 		return smtpStatusFieldNames;
 	}
 
+
 	public static List<FieldName> getSMTPTempTableFromFieldOnly() {
 
 		List<FieldName> smtpStatusFieldNames = new ArrayList<FieldName>();

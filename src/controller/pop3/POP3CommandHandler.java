@@ -311,6 +311,9 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		int messageNumber = Integer.parseInt(argument) - 1;
 
 		// Check if the specified message exists
+		// TODO: problem: if I have two messages in the maildrop and I delete one, this condition prevents the deletion of the second
+		// because the client knows that there are more than two messages
+		// maybe I should get ALL UIDS, not just the ones that are for messages not marked for deletion?
 		if (messageNumber >= uids.size()) {
 			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
 			return;

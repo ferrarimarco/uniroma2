@@ -22,8 +22,10 @@ public class SMTPTempMessageStorageManager extends AbstractVolatileMemoryStorage
 	public void create(StorageLocation location, List<FieldName> fieldNames, String... values) {
 		
 		String clientId = values[0];
+		String from = values[1];
 		
 		Message message = new Message();
+		message.setFromAddress(from);
 		
 		getMemoryStorageLocation(location).put(clientId, message);
 	}
@@ -40,6 +42,8 @@ public class SMTPTempMessageStorageManager extends AbstractVolatileMemoryStorage
 			return getMemoryStorageLocation(location).get(keyValue).getMessageSize();
 		}else if(fieldName.equals(FieldName.SMTP_TEMP_RAW_DATA)){
 			return getMemoryStorageLocation(location).get(keyValue).getRawData();
+		}else if(fieldName.equals(FieldName.SMTP_TEMP_FROM)){
+			return getMemoryStorageLocation(location).get(keyValue).getFromAddress();
 		}else{
 			return "";
 		}
@@ -63,6 +67,7 @@ public class SMTPTempMessageStorageManager extends AbstractVolatileMemoryStorage
 		if(fieldNames.get(0).equals(FieldName.SMTP_TEMP_RAW_DATA)){
 			getMemoryStorageLocation(location).get(keyValue).setRawData(values[0]);
 		}else if(fieldNames.get(0).equals(FieldName.SMTP_TEMP_FROM)){
+			// TODO: delete this, is not used??????
 			getMemoryStorageLocation(location).get(keyValue).setFromAddress(values[0]);
 		}else{
 			// TODO Because we use this method to update the SMTP_TEMP_RAW_DATA and SMTP_TEMP_FROM fields	

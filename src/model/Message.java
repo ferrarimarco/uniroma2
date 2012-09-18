@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import controller.SpecialCharactersSequence;
+import controller.net.Domain;
 
 public class Message {
 
@@ -14,6 +15,30 @@ public class Message {
 	private List<String> toAddresses;
 	private String fromAddress;
 	
+	public void setToAddresses(List<String> toAddresses) {
+		this.toAddresses = toAddresses;
+	}
+
+	public String getUid() {
+		return uid;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+
+	public void setHeader(String header) {
+		this.header = header;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
+	}
+
+	public void setReady(boolean isReady) {
+		this.isReady = isReady;
+	}
+
 	private String rawData;
 	private boolean isReady;
 	private List<String> toUsers;
@@ -75,6 +100,10 @@ public class Message {
 		}
 	}
 	
+	public void setMessageSize(String size){
+		this.size = Integer.parseInt(size);
+	}
+	
 	public List<String> getToUsers(){
 		if(isReady){
 			return toUsers;
@@ -119,13 +148,26 @@ public class Message {
 
 			int startIndexUsers = 0;
 			int endIndexUsers = toAddresses.get(i).indexOf("@");
-
+			
 			// Search for < character (Name <email@domain.ext>)
 			if (toAddresses.get(i).indexOf("<") != -1) {
 				startIndexUsers = toAddresses.get(i).indexOf("<") + 1;
 			}
-
-			toUsers.add(toAddresses.get(i).substring(startIndexUsers, endIndexUsers));
+			
+			int startDomainIndex = toAddresses.get(i).indexOf("@") + 1;
+			int endDomainIndex = toAddresses.get(i).length();
+			
+			if (toAddresses.get(i).indexOf(">") != -1) {
+				endDomainIndex = toAddresses.get(i).indexOf(">");
+			}
+			
+			// Check if the address is one of our addresses
+			String domain = toAddresses.get(i).substring(startDomainIndex, endDomainIndex);
+			
+			if(Domain.parseDomain(domain).equals(Domain.LOCAL_HOST)){
+				toUsers.add(toAddresses.get(i).substring(startIndexUsers, endIndexUsers));
+				toAddresses.remove(i);
+			}
 		}
 		
 		isReady = true;

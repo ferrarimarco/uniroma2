@@ -3,6 +3,8 @@ package controller.smtp;
 import java.io.BufferedOutputStream;
 import java.util.List;
 
+import model.Message;
+
 import controller.AbstractCommandHandler;
 import controller.CommunicationHandler;
 import controller.SpecialCharactersSequence;
@@ -16,6 +18,8 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	// TODO: study this value
 	private static final int MAX_RECIPIENTS = 10;
 
+	// TODO: check when the client does not send the QUIT command if it receives errors.
+	
 	@Override
 	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String line, String command, String argument, String secondArgument,
 			PersistanceManager persistanceManager, String clientId) {
@@ -83,7 +87,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		}
 
 		// Initialize data
-		persistanceManager.create(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.getSMTPTempTableFromFieldOnly(), clientId);
+		persistanceManager.create(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.getSMTPTempTableFromFieldOnly(), clientId, address);
 
 		communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "");
 
@@ -118,7 +122,6 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		persistanceManager.addToSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId, FieldName.SMTP_TEMP_TO_ADDRESSES, address);
 
 		communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "");
-
 	}
 
 	private void DATACommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
@@ -152,20 +155,19 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		if (message.indexOf(SpecialCharactersSequence.SMTP_DATA_END.toString()) == -1) {
 
 			// Update message body
-			// TODO: check update
 			persistanceManager.update(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId, FieldName.getSMTPTempTableDataFieldOnly(), message);
 
 		} else {// End of message data
 
-			processMessage(persistanceManager, clientId);
+			SMTPCode result = processMessage(persistanceManager, clientId);
 
-			communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "");
+			communicationHandler.sendResponse(writer, result.toString(), "");
 
 			setStatus(persistanceManager, SMTPSessionStatus.GREETINGS, clientId);
 		}
 	}
 
-	private void processMessage(PersistanceManager persistanceManager, String clientId) {
+	private SMTPCode processMessage(PersistanceManager persistanceManager, String clientId) {
 		
 		List<String> users = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO_USERS, clientId);
 		String messageId = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_ID, clientId);
@@ -173,21 +175,54 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		String body = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_BODY, clientId);
 		String messageSize = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_MESSAGE_SIZE, clientId);
 		
+		// Process the message for our users
 		for (int i = 0; i < users.size(); i++) {
 
 			// Update messageId to handle the same message written to multiple senders
 			String user = users.get(i);
 			
 			String newMessageId = messageId + "_" + user;
-
+			
 			header = header.replace(messageId, newMessageId);
-
-			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, user, POP3MessageDeletion.NO.toString(), messageSize,
-					header, body);
+			
+			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, user, POP3MessageDeletion.NO.toString(), messageSize, header, body);
 		}
-
+		
+		// Now process the message for external users
+		List<String> toAddresses = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO_ADDRESSES, clientId);
+		
+		SMTPCode result = SMTPCode.OK;
+		
+		if(toAddresses.size() > 0){
+			
+			Message message = new Message();
+			
+			String rawData = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_RAW_DATA, clientId);
+			String fromAddress = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_FROM, clientId);
+			
+			message.setRawData(rawData);
+			message.setHeader(header);
+			message.setBody(body);
+			message.setUid(messageId);
+			message.setMessageSize(messageSize);
+			message.setFromAddress(fromAddress);
+			message.setToAddresses(toAddresses);
+			
+			result = processExternalMessage(message);
+		}
+		
 		// Delete the temp message
 		persistanceManager.delete(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId);
+		
+		return result;
+	}
+	
+	private SMTPCode processExternalMessage(Message message){
+		SMTPMessageSender smtpMessageSender = new SMTPMessageSender();
+		
+		String result = smtpMessageSender.sendMessage(message);
+		
+		return SMTPCode.parseCode(result);
 	}
 
 	private void QUITCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
@@ -249,21 +284,25 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	}
 
 	private boolean isValidAddress(String address, PersistanceManager persistanceManager) {
-		// TODO: check email format
 
 		int startIndex = 0;
+		int endIndex = address.length();
 
+		// Get the address only
 		if (address.indexOf("<") != -1) {
 			startIndex = address.indexOf("<") + 1;
+			endIndex = address.indexOf(">");
 		}
 
-		if (address.indexOf("@") == -1) {
+		address = address.substring(startIndex, endIndex);
+		
+		// Check email format
+		if (!address.matches("[^@]+@([-\\p{Alnum}]+\\.)*\\p{Alnum}+")) {
 			return false;
 		}
 
-		String username = address.substring(startIndex, address.indexOf("@"));
-
-		return persistanceManager.isPresent(StorageLocation.POP3_USERS, FieldName.POP3_USER_NAME, username);
+		SMTPMessageSender smtpMessageSender = new SMTPMessageSender();
+		return smtpMessageSender.verifyEmailAccountExistance(address, persistanceManager);
 	}
 
 	private int getRecipientNumber(PersistanceManager persistanceManager, String clientId) {
