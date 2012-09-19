@@ -12,6 +12,8 @@ import controller.persistance.StorageLocation;
 
 public class POP3CommandHandler extends AbstractCommandHandler {
 
+	// TODO: check when the client does not send the QUIT command if it receives errors.
+	
 	@Override
 	public void handleCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, String line, String command, String argument, String secondArgument,
 			PersistanceManager persistanceManager, String clientId) {
