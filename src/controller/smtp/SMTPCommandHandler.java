@@ -169,28 +169,19 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 	private SMTPCode processMessage(PersistanceManager persistanceManager, String clientId) {
 		
+		// To hold local user names
 		List<String> users = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO_USERS, clientId);
+		
+		// To hold external addresses
+		List<String> toAddresses = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO_ADDRESSES, clientId);
+		
 		String messageId = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_ID, clientId);
 		String header = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_HEADER, clientId);
 		String body = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_BODY, clientId);
 		String messageSize = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_MESSAGE_SIZE, clientId);
 		
-		// Process the message for our users
-		for (int i = 0; i < users.size(); i++) {
-
-			// Update messageId to handle the same message written to multiple senders
-			String user = users.get(i);
-			
-			String newMessageId = messageId + "_" + user;
-			
-			header = header.replace(messageId, newMessageId);
-			
-			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, user, POP3MessageDeletion.NO.toString(), messageSize, header, body);
-		}
-		
 		// Now process the message for external users
-		List<String> toAddresses = persistanceManager.getSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_TO_ADDRESSES, clientId);
-		
+
 		SMTPCode result = SMTPCode.OK;
 		
 		if(toAddresses.size() > 0){
@@ -209,6 +200,17 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 			message.setToAddresses(toAddresses);
 			
 			result = processExternalMessage(message);
+		}
+		
+		// Process the message for our users
+		for (int i = 0; i < users.size(); i++) {
+
+			// Update messageId to handle the same message written to multiple senders
+			String user = users.get(i);
+			String newMessageId = messageId + "_" + user;
+			header = header.replace(messageId, newMessageId);
+			
+			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, user, POP3MessageDeletion.NO.toString(), messageSize, header, body);
 		}
 		
 		// Delete the temp message

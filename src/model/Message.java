@@ -142,8 +142,6 @@ public class Message {
 		size = messageSize;
 
 		// Get users list to deliver the message
-		//List<String> users = toUsers;
-
 		for (int i = 0; i < toAddresses.size(); i++) {
 
 			int startIndexUsers = 0;
