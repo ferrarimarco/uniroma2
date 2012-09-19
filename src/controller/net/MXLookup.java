@@ -1,8 +1,11 @@
 package controller.net;
 import java.util.Arrays;
 import java.util.Comparator;
-import javax.naming.*;
-import javax.naming.directory.*;
+
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.InitialDirContext;
 
 public class MXLookup {
 

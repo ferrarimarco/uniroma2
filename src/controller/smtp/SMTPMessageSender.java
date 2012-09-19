@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.naming.NamingException;
 
 import model.Message;
-
 import controller.SpecialCharactersSequence;
 import controller.net.Domain;
 import controller.net.MXLookup;

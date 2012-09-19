@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 import java.util.List;
 
 import model.Message;
-
 import controller.AbstractCommandHandler;
 import controller.CommunicationHandler;
 import controller.SpecialCharactersSequence;
@@ -228,9 +227,8 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	}
 
 	private void QUITCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
-		clearTempTable(persistanceManager, clientId);
-
-		persistanceManager.delete(StorageLocation.SMTP_SESSIONS, clientId);
+		
+		clearStatus(persistanceManager, clientId);
 
 		communicationHandler.sendResponse(writer, SMTPCode.QUIT_OK_RESPONSE.toString(), "Bye!");
 	}
