@@ -64,8 +64,6 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 				commandHandler.handleCommand(communicationHandler, writer, message, command, argument, secondArgument, storageManager, clientId);
 			}
 			
-			System.out.println("ABS:RH: Close reader and writer");
-
 			// Done handling the command
 			stop(reader, writer);
 
