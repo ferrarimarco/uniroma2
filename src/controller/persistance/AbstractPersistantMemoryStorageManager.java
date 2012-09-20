@@ -3,8 +3,8 @@ package controller.persistance;
 import java.util.List;
 
 
-public abstract class AbstractVolatileMemoryStorageManager implements PersistanceManager {
-	
+public abstract class AbstractPersistantMemoryStorageManager implements PersistanceManager {
+
 	@Override
 	public abstract void create(StorageLocation location, List<FieldName> fieldNames, String... values);
 

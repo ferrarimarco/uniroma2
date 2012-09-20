@@ -27,7 +27,7 @@ import com.amazonaws.services.dynamodb.model.UpdateItemRequest;
 
 import controller.pop3.POP3MessageDeletion;
 
-public class AWSDynamoDBStorageManager implements PersistanceManager {
+public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageManager {
 
 	private AmazonDynamoDBClient client;
 

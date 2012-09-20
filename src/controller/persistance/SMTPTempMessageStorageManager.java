@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import model.Message;
 
 public class SMTPTempMessageStorageManager extends AbstractVolatileMemoryStorageManager {
@@ -92,6 +94,24 @@ public class SMTPTempMessageStorageManager extends AbstractVolatileMemoryStorage
 	@Override
 	public boolean isPresent(StorageLocation location, FieldName fieldName, String keyValue) {
 		return getMemoryStorageLocation(location).containsKey(keyValue);
+	}
+	
+	@Override
+	public void scanAndDeletePop3Messages(String clientId) {
+		// TODO Auto-generated method stub
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public List<String> scanForMessageDimensions(String ClientId) {
+		// TODO Auto-generated method stub
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public List<String> getMessageUIDs(String ClientId) {
+		// TODO Auto-generated method stub
+		throw new NotImplementedException();
 	}
 	
 }
