@@ -231,7 +231,13 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 			List<String> messageDimensions = persistanceManager.scanForMessageDimensions(clientId);
 
 			int messageNumber = Integer.parseInt(argument) - 1;
-
+			
+			// Check how many DELE commands were issued in this session
+			int deleCommands = checkDELECommand(persistanceManager, clientId);
+			
+			// Update message number
+			messageNumber -= deleCommands;
+			
 			// Check if such message exists
 			if (messageNumber >= messageDimensions.size() || messageNumber < 0) {
 				communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
@@ -267,9 +273,12 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 		int messageNumber = Integer.parseInt(argument) - 1;
 
-		System.out.println("UIDS argument: " + argument);
-		System.out.println("UIDS size: " + uids.size());
+		// Check how many DELE commands were issued in this session
+		int deleCommands = checkDELECommand(persistanceManager, clientId);
 
+		// Update message number
+		messageNumber -= deleCommands;
+		
 		// Check if the specified message exists
 		if (messageNumber >= uids.size()) {
 			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
@@ -312,10 +321,13 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 		int messageNumber = Integer.parseInt(argument) - 1;
 
+		// Check how many DELE commands were issued in this session
+		int deleCommands = checkDELECommand(persistanceManager, clientId);
+
+		// Update message number
+		messageNumber -= deleCommands;
+		
 		// Check if the specified message exists
-		// TODO: problem: if I have two messages in the maildrop and I delete one, this condition prevents the deletion of the second
-		// because the client knows that there are more than two messages
-		// maybe I should get ALL UIDS, not just the ones that are for messages not marked for deletion?
 		if (messageNumber >= uids.size()) {
 			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
 			return;
@@ -326,6 +338,9 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		// Mark the message for deletion
 		persistanceManager.update(StorageLocation.POP3_MAILDROPS, uids.get(messageNumber), messageToDeleteField, POP3MessageDeletion.YES.toString());
 
+		// Update DELE command count
+		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getPOP3DelesFieldOnly(), Integer.toString(deleCommands + 1));
+		
 		// Send positive response
 		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "Message marked for deletion.");
 	}
@@ -351,6 +366,12 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 		int messageNumber = Integer.parseInt(argument) - 1;
 
+		// Check how many DELE commands were issued in this session
+		int deleCommands = checkDELECommand(persistanceManager, clientId);
+
+		// Update message number
+		messageNumber -= deleCommands;
+		
 		// Check if the specified message exists
 		if (messageNumber >= uids.size()) {
 			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
@@ -405,6 +426,9 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		for (int i = 0; i < uids.size(); i++) {
 			persistanceManager.update(StorageLocation.POP3_MAILDROPS, uids.get(i), messageToDeleteField, POP3MessageDeletion.NO.toString());
 		}
+		
+		// Update DELE command count
+		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getPOP3DelesFieldOnly(), Integer.toString(0));
 
 		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "Maildrop reset completed.");
 	}
@@ -447,6 +471,12 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 			int messageNumber = Integer.parseInt(argument) - 1;
 
+			// Check how many DELE commands were issued in this session
+			int deleCommands = checkDELECommand(persistanceManager, clientId);
+
+			// Update message number
+			messageNumber -= deleCommands;
+			
 			// Check if such message exists
 			if (messageNumber >= uids.size() || messageNumber < 0) {
 				communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
@@ -475,7 +505,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 			// Set the status to AUTH directly to avoid another query
 			persistanceManager.create(StorageLocation.POP3_SESSIONS, FieldName.getPOP3StatusTableFieldNames(), clientId, POP3SessionStatus.AUTHORIZATION.toString(), POP3Command.EMPTY.toString(),
-					POP3StatusIndicator.UNKNOWN.toString(), POP3Command.EMPTY.toString(), POP3Command.EMPTY.toString(), POP3Command.EMPTY.toString());
+					POP3StatusIndicator.UNKNOWN.toString(), POP3Command.EMPTY.toString(), POP3Command.EMPTY.toString(), POP3Command.EMPTY.toString(), Integer.toString(0));
 
 			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "POP3 server ready to roll!");
 		}
@@ -533,5 +563,12 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 	@Override
 	public void clearStatus(PersistanceManager persistanceManager, String clientId) {
 		persistanceManager.delete(StorageLocation.POP3_SESSIONS, clientId);		
+	}
+	
+	private int checkDELECommand(PersistanceManager persistanceManager, String clientId) {
+		
+		// Check how many DELE commands were issued in this session
+		return Integer.parseInt(persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_HOW_MANY_DELES, clientId));
+
 	}
 }
