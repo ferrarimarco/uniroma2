@@ -84,8 +84,6 @@ public class SMTPMessageSender {
 		out.sendData(SMTPCommand.QUIT.toString() + SpecialCharactersSequence.LINE_END.toString());
 		System.out.println(mxRecord + " says: " + out.waitForAnswer());
 		
-		// TODO: last response is not stored. Why?
-		
 		// Close connection and streams
 		try {
 			out.close();
