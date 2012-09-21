@@ -27,12 +27,12 @@ public abstract class AbstractVolatileMemoryStorageManager implements Persistanc
 	public abstract boolean isPresent(StorageLocation location, FieldName fieldName, String keyValue);
 
 	@Override
-	public abstract void scanAndDeletePop3Messages(String clientId);
+	public abstract void scanAndDeletePop3Messages(String clientId, String userName);
 
 	@Override
-	public abstract List<String> scanForMessageDimensions(String ClientId);
+	public abstract List<String> scanForMessageDimensions(String clientId, String userName);
 
 	@Override
-	public abstract List<String> getMessageUIDs(String ClientId);
+	public abstract List<String> getMessageUIDs(String clientId, String userName);
 
 }

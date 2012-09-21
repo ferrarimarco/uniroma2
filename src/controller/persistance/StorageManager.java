@@ -7,14 +7,20 @@ public class StorageManager implements PersistanceManager {
 	private PersistanceManager awsDynamoDBStorageManager;
 	private PersistanceManager smtpTempMessageStorageManager;
 	
+	private PersistanceManager pop3SessionStatusStorageManager;
+	
 	public StorageManager(){
 		awsDynamoDBStorageManager = PersistanceManagerFactory.createAWSDynamoDBStorageManager();
 		smtpTempMessageStorageManager = PersistanceManagerFactory.createSMTPTempMessageStorageManager();
+		
+		pop3SessionStatusStorageManager = new POP3SessionStatusStorageManager();
 	}
 	
 	private PersistanceManager getPersistanceManager(StorageLocation location) {
 		if(location.equals(StorageLocation.SMTP_TEMP_MESSAGE_STORE)){
 			return smtpTempMessageStorageManager;
+		}else if(location.equals(StorageLocation.POP3_SESSIONS)) {
+			return pop3SessionStatusStorageManager;
 		}else{
 			return awsDynamoDBStorageManager;
 		}
@@ -51,22 +57,22 @@ public class StorageManager implements PersistanceManager {
 	}
 
 	@Override
-	public void scanAndDeletePop3Messages(String clientId) {
+	public void scanAndDeletePop3Messages(String clientId, String userName) {
 		PersistanceManager persistanceManager = getPersistanceManager(StorageLocation.POP3_MAILDROPS);
-		persistanceManager.scanAndDeletePop3Messages(clientId);
+		persistanceManager.scanAndDeletePop3Messages(clientId, userName);
 
 	}
 
 	@Override
-	public List<String> scanForMessageDimensions(String clientId) {
+	public List<String> scanForMessageDimensions(String clientId, String userName) {
 		PersistanceManager persistanceManager = getPersistanceManager(StorageLocation.POP3_MAILDROPS);
-		return persistanceManager.scanForMessageDimensions(clientId);
+		return persistanceManager.scanForMessageDimensions(clientId, userName);
 	}
 
 	@Override
-	public List<String> getMessageUIDs(String clientId) {
+	public List<String> getMessageUIDs(String clientId, String userName) {
 		PersistanceManager persistanceManager = getPersistanceManager(StorageLocation.POP3_MAILDROPS);
-		return persistanceManager.getMessageUIDs(clientId);
+		return persistanceManager.getMessageUIDs(clientId, userName);
 	}
 
 	@Override

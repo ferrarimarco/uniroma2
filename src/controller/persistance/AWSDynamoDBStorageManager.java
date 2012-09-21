@@ -123,9 +123,7 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 	}
 
 	@Override
-	public void scanAndDeletePop3Messages(String clientId) {
-
-		String userName = getClientUserName(clientId);
+	public void scanAndDeletePop3Messages(String clientId, String userName) {
 
 		// User is not authenticated
 		if (userName.isEmpty()) {
@@ -152,9 +150,7 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 	}
 
 	@Override
-	public List<String> scanForMessageDimensions(String clientId) {
-
-		String userName = getClientUserName(clientId);
+	public List<String> scanForMessageDimensions(String clientId, String userName) {
 
 		Condition userNameCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(userName));
 
@@ -180,9 +176,7 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 	}
 
 	@Override
-	public List<String> getMessageUIDs(String clientId) {
-
-		String userName = getClientUserName(clientId);
+	public List<String> getMessageUIDs(String clientId, String userName) {
 
 		Condition userNameCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(userName));
 
@@ -207,9 +201,6 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 		return messageUIDs;
 	}
 
-	private String getClientUserName(String clientId) {
-		return read(StorageLocation.POP3_SESSIONS, FieldName.POP3_SESSION_USER_NAME, clientId);
-	}
 
 	@Override
 	public void addToSet(StorageLocation location, String keyValue, FieldName fieldName, String... values) {

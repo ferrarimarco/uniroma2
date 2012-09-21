@@ -97,19 +97,19 @@ public class SMTPTempMessageStorageManager extends AbstractVolatileMemoryStorage
 	}
 	
 	@Override
-	public void scanAndDeletePop3Messages(String clientId) {
+	public void scanAndDeletePop3Messages(String clientId, String userName) {
 		// TODO Auto-generated method stub
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public List<String> scanForMessageDimensions(String ClientId) {
+	public List<String> scanForMessageDimensions(String clientId, String userName) {
 		// TODO Auto-generated method stub
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public List<String> getMessageUIDs(String ClientId) {
+	public List<String> getMessageUIDs(String clientId, String userName) {
 		// TODO Auto-generated method stub
 		throw new NotImplementedException();
 	}
