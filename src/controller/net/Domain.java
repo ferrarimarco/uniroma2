@@ -21,7 +21,7 @@ public enum Domain {
 		String value = "";
 
 		if (this.equals(LOCAL_HOST)) {
-			value = "192.168.1.11";
+			value = "ec2-54-243-216-96.compute-1.amazonaws.com";
 		}else if(this.equals(UNKNOWN)){
 			value = ""; 
 		}
