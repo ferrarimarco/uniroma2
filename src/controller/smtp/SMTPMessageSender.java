@@ -180,7 +180,7 @@ public class SMTPMessageSender {
 			System.out.println(mxRecord + " says: " + out.waitForAnswer());	
 			
 			System.out.println("Invio raw data: " + message.getRawData());
-			out.sendData(SMTPCommand.DATA.toString() + SpecialCharactersSequence.LINE_END);
+			out.sendData(message.getRawData() + SpecialCharactersSequence.LINE_END);
 			
 			System.out.println("Send termination sequence.");
 			out.sendData(SpecialCharactersSequence.SMTP_DATA_END.toString());
