@@ -91,7 +91,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 		String clientId = socket.getInetAddress().getHostAddress();
 		// Temp solution: comment the port. This will not work if multiple users
 		// share the same public ip
-		// clientId += ":" + socket.getPort();
+		clientId += ":" + socket.getPort();
 
 		return clientId;
 	}

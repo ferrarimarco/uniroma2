@@ -123,8 +123,17 @@ public class Message {
 
 		// Search for Message-ID
 		int startIndexId = messageData.indexOf("Message-ID:<");
+		int offset = 14;
+		
+		if(startIndexId == -1) {
+			startIndexId = messageData.indexOf("Message-ID: <");
+			offset++;
+		}
+		
+		System.out.println("StartINDEX ID: " + startIndexId);
+		
 		int endIndexId = messageData.indexOf(">", startIndexId);
-		uid = messageData.substring(startIndexId + 14, endIndexId);
+		uid = messageData.substring(startIndexId + offset, endIndexId);
 
 		int startIndexHeader = 0;
 		int endIndexHeader = messageData.indexOf(SpecialCharactersSequence.LINE_END.toString() + SpecialCharactersSequence.LINE_END.toString());

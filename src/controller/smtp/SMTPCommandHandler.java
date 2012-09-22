@@ -87,8 +87,8 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 		// Initialize data
 		persistanceManager.create(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.getSMTPTempTableFromFieldOnly(), clientId, address);
-
-		communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "");
+		
+		communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "OK");
 
 	}
 
@@ -120,7 +120,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 		persistanceManager.addToSet(StorageLocation.SMTP_TEMP_MESSAGE_STORE, clientId, FieldName.SMTP_TEMP_TO_ADDRESSES, address);
 
-		communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "");
+		communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "OK");
 	}
 
 	private void DATACommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
@@ -160,7 +160,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 			SMTPCode result = processMessage(persistanceManager, clientId);
 
-			communicationHandler.sendResponse(writer, result.toString(), "");
+			communicationHandler.sendResponse(writer, result.toString(), "OK");
 
 			setStatus(persistanceManager, SMTPSessionStatus.GREETINGS, clientId);
 		}
@@ -234,13 +234,13 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 	}
 
 	private void NOOPCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
-		communicationHandler.sendResponse(writer, SMTPCode.GREETINGS.toString(), "");
+		communicationHandler.sendResponse(writer, SMTPCode.GREETINGS.toString(), "OK");
 	}
 
 	private void RSETCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
 		clearTempTable(persistanceManager, clientId);
 
-		communicationHandler.sendResponse(writer, SMTPCode.GREETINGS.toString(), "");
+		communicationHandler.sendResponse(writer, SMTPCode.GREETINGS.toString(), "OK");
 	}
 
 	private void unsupportedCommand(CommunicationHandler communicationHandler, PersistanceManager persistanceManager, String clientId, BufferedOutputStream writer) {
