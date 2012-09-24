@@ -25,18 +25,25 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 		SMTPSessionStatus currentStatus = getStatus(persistanceManager, clientId);
 
+		String commandArgument = argument;
+		
+		// To handle the space after the : (EXAMPLE: MAIL FROM: <address@domain.ext> instead of MAIL FROM:<address@domain.ext)
+		if(!commandArgument.startsWith("<")) {
+			commandArgument = secondArgument;
+		}
+		
 		if (!currentStatus.equals(SMTPSessionStatus.TRANSACTION_DATA)) {
 
 			SMTPCommand smtpCommand = SMTPCommand.parseCommand(command);
 
 			if (smtpCommand.equals(SMTPCommand.EHLO)) {
-				EHLOCommand(communicationHandler, writer, persistanceManager, clientId, argument);
+				EHLOCommand(communicationHandler, writer, persistanceManager, clientId);
 			} else if (smtpCommand.equals(SMTPCommand.HELO)) {
-				HELOCommand(communicationHandler, writer, persistanceManager, clientId, argument);
+				HELOCommand(communicationHandler, writer, persistanceManager, clientId);
 			} else if (smtpCommand.equals(SMTPCommand.MAIL)) {
-				MAILCommand(communicationHandler, writer, persistanceManager, clientId, argument);
+				MAILCommand(communicationHandler, writer, persistanceManager, clientId, commandArgument);
 			} else if (smtpCommand.equals(SMTPCommand.RCPT)) {
-				RCPTCommand(communicationHandler, writer, persistanceManager, clientId, argument);
+				RCPTCommand(communicationHandler, writer, persistanceManager, clientId, commandArgument);
 			} else if (smtpCommand.equals(SMTPCommand.DATA)) {
 				DATACommand(communicationHandler, writer, persistanceManager, clientId);
 			} else if (smtpCommand.equals(SMTPCommand.QUIT)) {
@@ -53,15 +60,15 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		}
 	}
 
-	private void EHLOCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId, String argument) {
+	private void EHLOCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
 
 		setStatus(persistanceManager, SMTPSessionStatus.GREETINGS, clientId);		
 		communicationHandler.sendResponse(writer, SMTPCode.OK.toString(), "Welcome!");
 	}
 
-	private void HELOCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId, String argument) {
+	private void HELOCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
 
-		EHLOCommand(communicationHandler, writer, persistanceManager, clientId, argument);
+		EHLOCommand(communicationHandler, writer, persistanceManager, clientId);
 	}
 
 	private void MAILCommand(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId, String argument) {
@@ -253,8 +260,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		// Store client ID in DB
 		if (!persistanceManager.isPresent(StorageLocation.SMTP_SESSIONS, FieldName.SMTP_SESSION_ID, clientId)) {
 
-			persistanceManager.create(StorageLocation.SMTP_SESSIONS, FieldName.getSMTPStatusTableFieldNames(), clientId, SMTPSessionStatus.GREETINGS.toString(), SMTPCommand.EMPTY.toString(),
-					SMTPCode.EMPTY.toString(), SMTPCommand.EMPTY.toString(), SMTPCommand.EMPTY.toString());
+			persistanceManager.create(StorageLocation.SMTP_SESSIONS, FieldName.getSMTPStatusTableFieldNames(), clientId, SMTPSessionStatus.GREETINGS.toString());
 
 			communicationHandler.sendResponse(writer, SMTPCode.GREETINGS.toString(), "SMTP server ready to roll!");
 		}
@@ -277,6 +283,8 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 	private String getAddressFromArgument(String argument) {
 
+		System.out.println("SMTP getAddressFromArg: " + argument);
+		
 		int startIndex = argument.indexOf('<');
 		int endIndex = argument.indexOf('>');
 

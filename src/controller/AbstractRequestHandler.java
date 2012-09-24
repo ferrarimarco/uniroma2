@@ -47,7 +47,12 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 
 				commandElements = message.split("\\s+");
 
-				command = commandElements[0];
+				// Check if the sender sends an empty line
+				if(commandElements.length > 0) {
+					command = commandElements[0];
+				}else {
+					command = "";
+				}
 
 				if (commandElements.length > 1) {
 					argument = commandElements[1];

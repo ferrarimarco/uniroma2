@@ -76,8 +76,11 @@ public class SMTPMessageSender {
 		
 		boolean result = false;
 		
+		System.out.println("SMTP Code: " + code);
+		
 		if(SMTPCode.parseCode(code).equals(SMTPCode.OK)){
 			result = true;
+			System.out.println("OK, address verified");
 		}
 		
 		System.out.println("Invio: " + SMTPCommand.QUIT.toString() + SpecialCharactersSequence.LINE_END);
