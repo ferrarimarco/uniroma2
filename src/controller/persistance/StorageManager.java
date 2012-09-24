@@ -9,11 +9,15 @@ public class StorageManager implements PersistanceManager {
 	
 	private PersistanceManager pop3SessionStatusStorageManager;
 	
+	private PersistanceManager smtpSessionStorageManager;
+	
 	public StorageManager(){
 		awsDynamoDBStorageManager = PersistanceManagerFactory.createAWSDynamoDBStorageManager();
 		smtpTempMessageStorageManager = PersistanceManagerFactory.createSMTPTempMessageStorageManager();
 		
 		pop3SessionStatusStorageManager = new POP3SessionStatusStorageManager();
+		
+		smtpSessionStorageManager = new SMTPSessionsStorageManager();
 	}
 	
 	private PersistanceManager getPersistanceManager(StorageLocation location) {
@@ -21,6 +25,8 @@ public class StorageManager implements PersistanceManager {
 			return smtpTempMessageStorageManager;
 		}else if(location.equals(StorageLocation.POP3_SESSIONS)) {
 			return pop3SessionStatusStorageManager;
+		}else if(location.equals(StorageLocation.SMTP_SESSIONS)) {
+			return smtpSessionStorageManager;
 		}else{
 			return awsDynamoDBStorageManager;
 		}
