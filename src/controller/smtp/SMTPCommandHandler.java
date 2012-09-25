@@ -27,9 +27,14 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 		String commandArgument = argument;
 		
-		// To handle the space after the : (EXAMPLE: MAIL FROM: <address@domain.ext> instead of MAIL FROM:<address@domain.ext)
-		if(!commandArgument.startsWith("<")) {
+		// To handle the space after the : (EXAMPLE: MAIL FROM: <address@domain.ext> instead of MAIL FROM:<address@domain.ext>)
+		if(commandArgument.indexOf("<") == -1) {
 			commandArgument = secondArgument;
+		}
+		
+		if(commandArgument.indexOf("<") == -1 || commandArgument.indexOf(">") == -1) {
+			communicationHandler.sendResponse(writer, SMTPCode.SYNTAX_ERROR.toString(), "Bad command");
+			return;
 		}
 		
 		if (!currentStatus.equals(SMTPSessionStatus.TRANSACTION_DATA)) {
