@@ -38,6 +38,8 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 			String[] commandElements;
 
 			while ((message = reader.readLine()) != null) {
+				
+				// TODO: debug
 				System.out.println("Server receives: " + message);
 
 				// Initialize
@@ -63,9 +65,6 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 					secondArgument = commandElements[2];
 				}
 
-				// TODO: DEBUG
-				// System.out.println(java.util.Arrays.toString(commandElements));
-
 				commandHandler.handleCommand(communicationHandler, writer, message, command, argument, secondArgument, storageManager, clientId);
 			}
 			
@@ -77,6 +76,8 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 			
 			// Clear session status
 			commandHandler.clearStatus(storageManager, clientId);
+		} finally {
+			
 		}
 	}
 
