@@ -11,9 +11,23 @@ import controller.persistance.StorageManager;
 
 public abstract class AbstractRequestHandler implements RequestHandler {
 
+	private Socket socket;
+	private CommandHandler commandHandler;
+	private CommunicationHandler communicationHandler;
+	
+	public AbstractRequestHandler(Socket socket, CommandHandler commandHandler, CommunicationHandler communicationHandler) {
+		this.socket = socket;
+		this.commandHandler = commandHandler;
+		this.communicationHandler = communicationHandler;
+	}
+	
 	@Override
-	public void handleRequest(Socket socket, CommandHandler commandHandler, CommunicationHandler communicationHandler) {
-
+	public void run() {
+		handleRequest();
+	}
+	
+	@Override
+	public void handleRequest() {
 		String clientId = getClientId(socket);
 
 		// TODO: DEBUG
@@ -70,6 +84,9 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 			
 			// Done handling the command
 			stop(reader, writer);
+			
+			// Close connection
+			socket.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -29,30 +29,25 @@ public class ConnectionListener implements Runnable {
 	@Override
 	public void run() {
 		try {
-
-			// Wait for connection
-			System.out.println("Waiting for connection on port " + serverSocket.getLocalPort());
-
-			RequestHandler requestHandler = null;
-
-			if (serverSocket.getLocalPort() == POP3_PORT) {
-				requestHandler = new POP3RequestHandler();
-			} else if (serverSocket.getLocalPort() == SMTP_PORT) {
-				requestHandler = new SMTPRequestHandler();
-			}
-
-			Socket connection;
-
 			while (true) {
-				connection = serverSocket.accept();
+				
+				// Wait for connection
+				System.out.println("Waiting for connection on port " + serverSocket.getLocalPort());
+				
+				Socket connection = serverSocket.accept();
+				
+				RequestHandler requestHandler = null;
 
 				if (serverSocket.getLocalPort() == POP3_PORT) {
-					requestHandler.handleRequest(connection, new POP3CommandHandler(), new POP3CommunicationHandler());
+					requestHandler = new POP3RequestHandler(connection, new POP3CommandHandler(), new POP3CommunicationHandler());
+					//requestHandler.handleRequest(connection, new POP3CommandHandler(), new POP3CommunicationHandler());
 				} else if (serverSocket.getLocalPort() == SMTP_PORT) {
-					requestHandler.handleRequest(connection, new SMTPCommandHandler(), new SMTPCommunicationHandler());
+					requestHandler = new SMTPRequestHandler(connection, new SMTPCommandHandler(), new SMTPCommunicationHandler());
+					//requestHandler.handleRequest(connection, new SMTPCommandHandler(), new SMTPCommunicationHandler());
 				}
-
-				connection.close();
+				
+				Thread reqHandlerT = new Thread(requestHandler);
+				reqHandlerT.start();
 			}
 
 		} catch (IOException ioException) {
