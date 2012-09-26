@@ -261,14 +261,22 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 	@Override
 	public void sendGreetings(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
-
-		// Store client ID in DB
-		if (!persistanceManager.isPresent(StorageLocation.SMTP_SESSIONS, FieldName.SMTP_SESSION_ID, clientId)) {
-
-			persistanceManager.create(StorageLocation.SMTP_SESSIONS, FieldName.getSMTPStatusTableFieldNames(), clientId, SMTPSessionStatus.GREETINGS.toString());
-
-			communicationHandler.sendResponse(writer, SMTPCode.GREETINGS.toString(), "SMTP server ready to roll!");
+		
+		// Check if there is already a session record (dirty session)
+		if (persistanceManager.isPresent(StorageLocation.SMTP_SESSIONS, FieldName.SMTP_SESSION_ID, clientId)) {
+			
+			// Clean the dirty session
+			clearStatus(persistanceManager, clientId);
+			
+			// TODO: Debug
+			System.out.println("Found a dirty session. Cleaning complete.");
 		}
+		
+		// Create a new session record
+		// Set the status to AUTH directly to avoid another query
+		persistanceManager.create(StorageLocation.SMTP_SESSIONS, FieldName.getSMTPStatusTableFieldNames(), clientId, SMTPSessionStatus.GREETINGS.toString());
+
+		communicationHandler.sendResponse(writer, SMTPCode.GREETINGS.toString(), "SMTP server ready to roll!");
 	}
 
 	private SMTPSessionStatus getStatus(PersistanceManager persistanceManager, String clientId) {
@@ -330,6 +338,6 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		
 		clearTempTable(persistanceManager, clientId);
 
-		persistanceManager.delete(StorageLocation.SMTP_SESSIONS, clientId);		
+		persistanceManager.delete(StorageLocation.SMTP_SESSIONS, clientId);
 	}
 }

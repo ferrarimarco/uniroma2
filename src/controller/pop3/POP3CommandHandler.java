@@ -520,15 +520,19 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 	@Override
 	public void sendGreetings(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId) {
 
-		// Store client ID in DB
-		if (!persistanceManager.isPresent(StorageLocation.POP3_SESSIONS, FieldName.POP3_SESSION_ID, clientId)) {
-
-			// Set the status to AUTH directly to avoid another query
-			persistanceManager.create(StorageLocation.POP3_SESSIONS, FieldName.getPOP3StatusTableFieldNames(), clientId, POP3SessionStatus.AUTHORIZATION.toString(), POP3Command.EMPTY.toString(),
-					POP3StatusIndicator.UNKNOWN.toString(), POP3Command.EMPTY.toString(), POP3Command.EMPTY.toString(), POP3Command.EMPTY.toString(), Integer.toString(0));
-
-			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "POP3 server ready to roll!");
+		// Check if there is already a session record (dirty session)
+		if (persistanceManager.isPresent(StorageLocation.POP3_SESSIONS, FieldName.POP3_SESSION_ID, clientId)) {
+			
+			// Clean the dirty session
+			persistanceManager.delete(StorageLocation.POP3_SESSIONS, clientId);
 		}
+		
+		// Create a new session record
+		// Set the status to AUTH directly to avoid another query
+		persistanceManager.create(StorageLocation.POP3_SESSIONS, FieldName.getPOP3StatusTableFieldNames(), clientId, POP3SessionStatus.AUTHORIZATION.toString(), POP3Command.EMPTY.toString(), POP3StatusIndicator.UNKNOWN.toString(), POP3Command.EMPTY.toString(), POP3Command.EMPTY.toString(), POP3Command.EMPTY.toString(), Integer.toString(0));
+
+		// Send response
+		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "POP3 server ready to roll!");
 	}
 
 	private POP3Command getPreviousCommand(PersistanceManager persistanceManager, String clientId) {
