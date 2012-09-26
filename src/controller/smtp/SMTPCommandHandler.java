@@ -340,4 +340,8 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 		persistanceManager.delete(StorageLocation.SMTP_SESSIONS, clientId);
 	}
+	
+	public void sendAbnormalTerminationResponse(CommunicationHandler communicationHandler, BufferedOutputStream writer) {
+		communicationHandler.sendResponse(writer, SMTPCode.TERMINATION_NEEDED.toString(), "There was an error: I must close the connection.");
+	}
 }

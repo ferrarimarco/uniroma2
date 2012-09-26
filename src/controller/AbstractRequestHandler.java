@@ -35,12 +35,15 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 
 		PersistanceManager storageManager = new StorageManager();
 		
+		BufferedOutputStream writer = null;
+		BufferedReader reader = null;
+		
 		try {
 			// Get Input and Output streams
-			BufferedOutputStream writer = new BufferedOutputStream(socket.getOutputStream());
+			writer = new BufferedOutputStream(socket.getOutputStream());
 			writer.flush();
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			
 			// Send greetings (if necessary)
 			commandHandler.sendGreetings(communicationHandler, writer, storageManager, clientId);
@@ -81,39 +84,35 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 
 				commandHandler.handleCommand(communicationHandler, writer, message, command, argument, secondArgument, storageManager, clientId);
 			}
-			
-			// Done handling the command
-			stop(reader, writer);
-			
-			// Close connection
-			socket.close();
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			
 			// Clear session status
 			commandHandler.clearStatus(storageManager, clientId);
+			
+			// Send abnormal termination request
+			commandHandler.sendAbnormalTerminationResponse(communicationHandler, writer);
 		} finally {
 			
+			// Done handling the command
+			stop(socket, reader, writer);
+
 		}
 	}
 
-	protected void stop(BufferedReader reader, BufferedOutputStream writer) {
+	private void stop(Socket socket, BufferedReader reader, BufferedOutputStream writer) {
 		try {
 			reader.close();
 			writer.close();
+			socket.close();
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
 	}
 
-	protected String getClientId(Socket socket) {
-		// TODO: the client uses multiple ports!!! so the port section may
-		// change!!!!
-
+	private String getClientId(Socket socket) {
 		String clientId = socket.getInetAddress().getHostAddress();
-		// Temp solution: comment the port. This will not work if multiple users
-		// share the same public ip
 		clientId += ":" + socket.getPort();
 
 		return clientId;

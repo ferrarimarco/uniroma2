@@ -12,4 +12,6 @@ public interface CommandHandler {
 	void sendGreetings(CommunicationHandler communicationHandler, BufferedOutputStream writer, PersistanceManager persistanceManager, String clientId);
 	
 	void clearStatus(PersistanceManager persistanceManager, String clientId);
+	
+	void sendAbnormalTerminationResponse(CommunicationHandler communicationHandler, BufferedOutputStream writer);
 }

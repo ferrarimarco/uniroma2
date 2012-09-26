@@ -599,4 +599,9 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 	private String getClientUserName(PersistanceManager persistanceManage, String clientId) {
 		return persistanceManage.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_SESSION_USER_NAME, clientId);
 	}
+	
+	public void sendAbnormalTerminationResponse(CommunicationHandler communicationHandler, BufferedOutputStream writer) {
+		// POP3 does not send anything
+		System.out.println("POP3 Abnormal Termination response is EMPTY.");
+	}
 }
