@@ -24,22 +24,22 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 			PersistanceManager persistanceManager, String clientId) {
 
 		SMTPSessionStatus currentStatus = getStatus(persistanceManager, clientId);
-
-		String commandArgument = argument;
-		
-		// To handle the space after the : (EXAMPLE: MAIL FROM: <address@domain.ext> instead of MAIL FROM:<address@domain.ext>)
-		if(commandArgument.indexOf("<") == -1) {
-			commandArgument = secondArgument;
-		}
-		
-		if(commandArgument.indexOf("<") == -1 || commandArgument.indexOf(">") == -1) {
-			communicationHandler.sendResponse(writer, SMTPCode.SYNTAX_ERROR.toString(), "Bad command");
-			return;
-		}
 		
 		if (!currentStatus.equals(SMTPSessionStatus.TRANSACTION_DATA)) {
 
 			SMTPCommand smtpCommand = SMTPCommand.parseCommand(command);
+			
+			String commandArgument = argument;
+			
+			// To handle the space after the : (EXAMPLE: MAIL FROM: <address@domain.ext> instead of MAIL FROM:<address@domain.ext>)
+			if(commandArgument.indexOf("<") == -1) {
+				commandArgument = secondArgument;
+			}
+			
+			if((commandArgument.indexOf("<") == -1 || commandArgument.indexOf(">") == -1) && (smtpCommand.equals(SMTPCommand.MAIL) || smtpCommand.equals(SMTPCommand.RCPT))) {
+				communicationHandler.sendResponse(writer, SMTPCode.SYNTAX_ERROR.toString(), "Bad command");
+				return;
+			}
 
 			if (smtpCommand.equals(SMTPCommand.EHLO)) {
 				EHLOCommand(communicationHandler, writer, persistanceManager, clientId);
