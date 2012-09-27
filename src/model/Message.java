@@ -121,6 +121,8 @@ public class Message {
 		
 		String messageData = rawData;
 
+		// TODO: make this search dynamic
+		
 		// Search for Message-ID
 		int startIndexId = messageData.indexOf("Message-ID:<");
 		int offset = 14;

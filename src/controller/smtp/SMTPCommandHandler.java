@@ -191,6 +191,9 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 		String body = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_BODY, clientId);
 		String messageSize = persistanceManager.read(StorageLocation.SMTP_TEMP_MESSAGE_STORE, FieldName.SMTP_TEMP_MESSAGE_SIZE, clientId);
 		
+		// Set a unique header for this message
+		messageId += "_" + Integer.toString(header.hashCode() + body.hashCode());
+		
 		// Now process the message for external users
 
 		SMTPCode result = SMTPCode.OK;
@@ -296,8 +299,6 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 
 	private String getAddressFromArgument(String argument) {
 
-		System.out.println("SMTP getAddressFromArg: " + argument);
-		
 		int startIndex = argument.indexOf('<');
 		int endIndex = argument.indexOf('>');
 

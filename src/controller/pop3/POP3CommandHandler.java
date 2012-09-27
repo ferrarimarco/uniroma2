@@ -299,9 +299,6 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		String messageHeader = persistanceManager.read(StorageLocation.POP3_MAILDROPS, FieldName.POP3_MESSAGE_HEADER, uids.get(messageNumber));
 		String message = persistanceManager.read(StorageLocation.POP3_MAILDROPS, FieldName.POP3_MESSAGE_DATA, uids.get(messageNumber));
 
-		System.out.println("POP3, header: " + messageHeader);
-		System.out.println("POP3, data: " + message);
-		
 		// Send the message in the multiline response
 		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "message follows");
 

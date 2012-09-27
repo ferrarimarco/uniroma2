@@ -85,7 +85,7 @@ public abstract class AbstractCommunicationHandler implements CommunicationHandl
 
 			for (int i = 0; i < lines; i++) {
 				// TODO: check this count!
-				if (i == lines - 2) {
+				if (i <= lines - 2) {
 					sendLine(writer, string.substring(i * maxCharsPerLinePOP3, i * maxCharsPerLinePOP3 + maxCharsPerLinePOP3), true, false);
 				} else {
 					sendLine(writer, string.substring(i * maxCharsPerLinePOP3, string.length()), true, true);
