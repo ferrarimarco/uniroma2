@@ -130,8 +130,6 @@ public class Message {
 			offset++;
 		}
 		
-		System.out.println("StartINDEX ID: " + startIndexId);
-		
 		int endIndexId = messageData.indexOf(">", startIndexId);
 		uid = messageData.substring(startIndexId + offset, endIndexId);
 
@@ -145,8 +143,6 @@ public class Message {
 		// Handle byte stuffing in body
 		body = body.replace(SpecialCharactersSequence.LINE_END + "..", SpecialCharactersSequence.LINE_END + ".");
 		
-		System.out.println("body: " + body);
-
 		int messageSize = (header + SpecialCharactersSequence.LINE_END.toString() + body).length();
 		size = messageSize;
 
