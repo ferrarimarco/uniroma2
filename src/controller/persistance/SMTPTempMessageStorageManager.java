@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import model.Message;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class SMTPTempMessageStorageManager extends AbstractVolatileMemoryStorageManager {
 

@@ -31,7 +31,8 @@ public class ConnectionListener implements Runnable {
 		try {
 			while (true) {
 				
-				// Wait for connection
+				// TODO: debug Wait for connection
+				AbstractRequestHandler.log.info("Waiting for connection on port " + serverSocket.getLocalPort());
 				System.out.println("Waiting for connection on port " + serverSocket.getLocalPort());
 				
 				Socket connection = serverSocket.accept();

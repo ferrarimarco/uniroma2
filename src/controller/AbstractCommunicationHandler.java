@@ -15,6 +15,8 @@ public abstract class AbstractCommunicationHandler implements CommunicationHandl
 
 			msg += SpecialCharactersSequence.LINE_END.toString();
 
+			// TODO: debug
+			AbstractRequestHandler.log.info("Server invia:" + msg);
 			System.out.println("Server invia:" + msg);
 
 			// Check if the line starts with the termination octet.
@@ -27,12 +29,15 @@ public abstract class AbstractCommunicationHandler implements CommunicationHandl
 			writer.write(msg.getBytes());
 
 			/*
-			 * // TODO: DEBUG: PRINT EXA CHAR VALUES for(int i = 0; i < msg.getBytes().length; i++){ System.out.println(String.format("0x%02X", msg.getBytes()[i])); }
+			 * // TODO: DEBUG: PRINT EXA CHAR VALUES 
+			 * for(int i = 0; i < msg.getBytes().length; i++){ System.out.println(String.format("0x%02X", msg.getBytes()[i])); }
 			 */
 
 			if (multiLine && lastLine) {
 				writer.write((SpecialCharactersSequence.POP3_TERMINATION_OCTET.toString() + SpecialCharactersSequence.LINE_END.toString()).getBytes());
 
+				// TODO: debug
+				AbstractRequestHandler.log.info("Server invia il carattere di terminazione.");
 				System.out.println("Server invia il carattere di terminazione.");
 			}
 
