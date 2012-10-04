@@ -6,7 +6,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-
 public class OutgoingConnection {
 
 	private Socket connection;
@@ -42,15 +41,17 @@ public class OutgoingConnection {
 	}
 	
 	public String waitForAnswer(){
-		int readChar = 0;;
+		int readChar = 0;
 		String message = "";
 		
 		try {
+	
 			while((readChar = inputStreamReader.read()) != -1){
-				
+
 				message += (char) readChar;
 				
-				if(readChar == 10){
+				// Check for LF or CR to handle endlines
+				if(readChar == 10 || readChar == 13){
 					break;
 				}
 			}

@@ -123,6 +123,10 @@ public class Message {
 
 		// TODO: make this search dynamic
 		
+		// TODO: DEBUG
+		// TODO: print rawData and debug indexes when there is an email that contains HTML tags
+		//AbstractRequestHandler.log.info("Message ID: " + newMessageId);
+		
 		// Search for Message-ID
 		int startIndexId = messageData.indexOf("Message-ID:<");
 		int offset = 14;
