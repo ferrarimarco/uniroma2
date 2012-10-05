@@ -205,8 +205,6 @@ public class SMTPMessageSender {
 			
 			AbstractRequestHandler.log.info(mxRecord + " says: " + answer);
 			
-			// THIS THROWS A NULL POINTER EXCEPTION BECAUSE THE answer is an empty string
-			// check outgoing connection
 			String code = answer.substring(0, 3);
 			
 			AbstractRequestHandler.log.info("Invio: " + SMTPCommand.QUIT.toString() + SpecialCharactersSequence.LINE_END);
