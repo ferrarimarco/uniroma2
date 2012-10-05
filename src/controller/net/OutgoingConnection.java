@@ -30,7 +30,7 @@ public class OutgoingConnection {
 		}
 	}
 	
-	public void sendData(String data){
+	public void sendData(String data) {
 		try {
 			writer.write(data.getBytes());
 			writer.flush();
@@ -45,22 +45,29 @@ public class OutgoingConnection {
 		String message = "";
 		
 		try {
-	
+			int charNumber = 0;
+			
 			while((readChar = inputStreamReader.read()) != -1){
-
-				message += (char) readChar;
+				
+				// To handle the (eventual) \r or \n at the beginning of the line
+				if(charNumber > 1 || (charNumber <= 1 && (readChar != 10 && readChar != 13))) {
+					message += (char) readChar;
+				}
 				
 				// Check for LF or CR to handle endlines
-				if(readChar == 10 || readChar == 13){
+				if((readChar == 10 || readChar == 13) && charNumber > 1){
 					break;
 				}
+				
+				charNumber++;
 			}
 			
 			return message;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return "";
+			
+			// Return what we've read so far
+			return message;
 		}
 	}
 	

@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+import controller.AbstractRequestHandler;
 import controller.SpecialCharactersSequence;
 import controller.net.Domain;
 
@@ -125,26 +126,40 @@ public class Message {
 		
 		// TODO: DEBUG
 		// TODO: print rawData and debug indexes when there is an email that contains HTML tags
-		//AbstractRequestHandler.log.info("Message ID: " + newMessageId);
+		AbstractRequestHandler.log.info("----- BEGIN MESSAGE DEBUG -----");
 		
 		// Search for Message-ID
 		int startIndexId = messageData.indexOf("Message-ID:<");
-		int offset = 14;
+		AbstractRequestHandler.log.info("startIndexId (searching for Message-ID:): " + startIndexId);
+		
+		int offset = 12;
 		
 		if(startIndexId == -1) {
 			startIndexId = messageData.indexOf("Message-ID: <");
 			offset++;
+			
+			AbstractRequestHandler.log.info("Message-ID:< not found. Switching to Message-ID: <: " + startIndexId);
 		}
 		
 		int endIndexId = messageData.indexOf(">", startIndexId);
+		AbstractRequestHandler.log.info("endIndexId: " + endIndexId);
+		
 		uid = messageData.substring(startIndexId + offset, endIndexId);
-
+		AbstractRequestHandler.log.info("uid: " + uid);
+		
+		
 		int startIndexHeader = 0;
 		int endIndexHeader = messageData.indexOf(SpecialCharactersSequence.LINE_END.toString() + SpecialCharactersSequence.LINE_END.toString());
+		AbstractRequestHandler.log.info("endIndexHeader: " + endIndexHeader);
+		
 		header = messageData.substring(startIndexHeader, endIndexHeader);
 
+		AbstractRequestHandler.log.info("HEADER: " + header);
+		
 		body = messageData.substring(endIndexHeader + 4, messageData.length() - 2);
 
+		AbstractRequestHandler.log.info("BODY: " + body);
+		
 		// TODO: check \r\n..\r\n.\r\n 
 		// Handle byte stuffing in body
 		body = body.replace(SpecialCharactersSequence.LINE_END + "..", SpecialCharactersSequence.LINE_END + ".");
