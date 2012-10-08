@@ -63,22 +63,15 @@ public class StorageManager implements PersistanceManager {
 	}
 
 	@Override
-	public void scanAndDeletePop3Messages(String clientId, String userName) {
-		PersistanceManager persistanceManager = getPersistanceManager(StorageLocation.POP3_MAILDROPS);
-		persistanceManager.scanAndDeletePop3Messages(clientId, userName);
-
-	}
-
-	@Override
 	public List<String> scanForMessageDimensions(String clientId, String userName) {
 		PersistanceManager persistanceManager = getPersistanceManager(StorageLocation.POP3_MAILDROPS);
 		return persistanceManager.scanForMessageDimensions(clientId, userName);
 	}
 
 	@Override
-	public List<String> getMessageUIDs(String clientId, String userName) {
-		PersistanceManager persistanceManager = getPersistanceManager(StorageLocation.POP3_MAILDROPS);
-		return persistanceManager.getMessageUIDs(clientId, userName);
+	public List<String> getMessageUIDs(StorageLocation location, String clientId, String userName, boolean isToDelete) {
+		PersistanceManager persistanceManager = getPersistanceManager(location);
+		return persistanceManager.getMessageUIDs(location, clientId, userName, isToDelete);
 	}
 
 	@Override

@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import controller.AbstractRequestHandler;
+
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
@@ -67,6 +69,19 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 			getMemoryStorageLocation(location).get(keyValue).setLastCommandSecondArg(values[3]);
 		}else if(fieldNames.get(0).equals(FieldName.POP3_SESSION_STATUS)) {
 			getMemoryStorageLocation(location).get(keyValue).setSessionStatus(values[0]);
+		}else if(fieldNames.get(0).equals(FieldName.POP3_SESSION_UIDS)) {
+			
+			AbstractRequestHandler.log.info("Adding "+ values.length +" UIDS " + " to " + location.toString());
+			
+			for(int i = 0; i < values.length; i++) {
+				getMemoryStorageLocation(location).get(keyValue).addUID(values[i]);
+			}
+		}else if(fieldNames.get(0).equals(FieldName.POP3_MESSAGE_TO_DELETE)) {
+			
+			AbstractRequestHandler.log.info("Marking message "+ values[0] +" for deletion");
+			
+			getMemoryStorageLocation(location).get(keyValue).setUIDDeletion(values[0], values[1]);
+			
 		}
 	}
 
@@ -89,21 +104,15 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 	}
 
 	@Override
-	public void scanAndDeletePop3Messages(String clientId, String userName) {
+	public List<String> scanForMessageDimensions(String clientId, String userName) {
 		// TODO Auto-generated method stub
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public List<String> scanForMessageDimensions(String ClientId, String userName) {
-		// TODO Auto-generated method stub
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public List<String> getMessageUIDs(String ClientId, String userName) {
-		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+	public List<String> getMessageUIDs(StorageLocation location, String clientId, String userName, boolean isToDelete) {
+		AbstractRequestHandler.log.info("Get UIDS from " + location.toString());
+		return getMemoryStorageLocation(location).get(clientId).getUIDsList(isToDelete);		
 	}
 
 }

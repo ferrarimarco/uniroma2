@@ -51,7 +51,6 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 
 		// TODO: DEBUG
 		log.info("Connection received from " + clientId + " on port " + socket.getLocalPort());
-		System.out.println("Connection received from " + clientId + " on port " + socket.getLocalPort());
 
 		PersistanceManager storageManager = new StorageManager();
 		
@@ -75,10 +74,6 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 			String[] commandElements;
 
 			while ((message = reader.readLine()) != null) {
-				
-				// TODO: debug
-				log.info("Server receives: " + message);
-				System.out.println("Server receives: " + message);
 
 				// Initialize
 				command = "";

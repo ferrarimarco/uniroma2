@@ -1,5 +1,13 @@
 package controller.persistance;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import controller.AbstractRequestHandler;
+import controller.pop3.POP3MessageDeletion;
+
 public class POP3SessionStatusRecord {
 
 	private String sessionStatus;
@@ -9,7 +17,8 @@ public class POP3SessionStatusRecord {
 	private String lastCommandFirstArg;
 	private String lastCommandSecondArg;
 	private String howManyDeles;
-	
+	private Map<String, String> uids;
+		
 	public POP3SessionStatusRecord(String sessionStatus, String lastCommand, String lastCommandResult, String sessionUserName, String lastCommandFirstArg, String lastCommandSecondArg, String howManyDeles) {
 
 		this.sessionStatus = sessionStatus;
@@ -19,6 +28,7 @@ public class POP3SessionStatusRecord {
 		this.lastCommandFirstArg = lastCommandFirstArg;
 		this.lastCommandSecondArg = lastCommandSecondArg;
 		this.howManyDeles = howManyDeles;
+		uids = new HashMap<String, String>();
 	}
 
 	public String getSessionStatus() {
@@ -104,6 +114,44 @@ public class POP3SessionStatusRecord {
 		this.howManyDeles = howManyDeles;
 	}
 	
+	public void addUID(String uid) {
+		uids.put(uid, POP3MessageDeletion.NO.toString());
+	}
+	
+	public void setUIDDeletion(String uid, String deletion) {
+		uids.put(uid, POP3MessageDeletion.parseValue(deletion).toString());
+	}
+
+	public List<String> getUIDsList(boolean isToDelete) {
+		
+		List<String> uidsList = new ArrayList<String>(uids.keySet());
+		
+		AbstractRequestHandler.log.info("uids size " + uids.size());
+		AbstractRequestHandler.log.info("uidsList size " + uidsList.size());
+		
+		List<String> uidsNoDeletion = new ArrayList<String>(uids.size());
+		
+		for(int i = 0; i < uids.size(); i++) {
+			if(!isToDelete) {
+				
+				AbstractRequestHandler.log.info("Get UIDs of message NOT to delete");
+				
+				if(uids.get(uidsList.get(i)).equals(POP3MessageDeletion.NO.toString())) {
+					uidsNoDeletion.add(uidsList.get(i));
+					AbstractRequestHandler.log.info("Add " + uidsList.get(i));
+				}				
+			}else {
+				AbstractRequestHandler.log.info("Get UIDs of message TO delete");
+				
+				if(uids.get(uidsList.get(i)).equals(POP3MessageDeletion.YES.toString())) {
+					uidsNoDeletion.add(uidsList.get(i));
+					AbstractRequestHandler.log.info("Add " + uidsList.get(i));
+				}
+			}
+		}
+
+		return uidsNoDeletion;
+	}
 	
 	
 }

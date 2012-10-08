@@ -70,17 +70,12 @@ public class SMTPSessionsStorageManager extends AbstractVolatileMemoryStorageMan
 	}
 
 	@Override
-	public void scanAndDeletePop3Messages(String clientId, String userName) {
-		throw new NotImplementedException();
-	}
-
-	@Override
 	public List<String> scanForMessageDimensions(String clientId, String userName) {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public List<String> getMessageUIDs(String clientId, String userName) {
+	public List<String> getMessageUIDs(StorageLocation location, String clientId, String userName, boolean isToDelete) {
 		throw new NotImplementedException();
 	}
 

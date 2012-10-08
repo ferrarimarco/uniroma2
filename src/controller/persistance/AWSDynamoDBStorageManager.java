@@ -19,18 +19,25 @@ import com.amazonaws.services.dynamodb.model.DeleteItemRequest;
 import com.amazonaws.services.dynamodb.model.GetItemRequest;
 import com.amazonaws.services.dynamodb.model.GetItemResult;
 import com.amazonaws.services.dynamodb.model.Key;
+import com.amazonaws.services.dynamodb.model.ProvisionedThroughputExceededException;
 import com.amazonaws.services.dynamodb.model.PutItemRequest;
 import com.amazonaws.services.dynamodb.model.ReturnValue;
 import com.amazonaws.services.dynamodb.model.ScanRequest;
 import com.amazonaws.services.dynamodb.model.ScanResult;
 import com.amazonaws.services.dynamodb.model.UpdateItemRequest;
 
+import controller.AbstractRequestHandler;
 import controller.pop3.POP3MessageDeletion;
 
 public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageManager {
 
 	private AmazonDynamoDBClient client;
 
+	private static final int MAX_RETRIES = 10;
+	private static final int SLEEP_TIME = 500;
+	
+	// TODO: manage the thr exceeded condition: if the DB cannot be contacted in MAX_RETRIES tries then we have to handle this
+	
 	public AWSDynamoDBStorageManager() {
 		AWSCredentials credentials;
 		try {
@@ -51,7 +58,22 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 		Map<String, AttributeValue> item = newItem(fieldNames, values);
 
 		PutItemRequest putItemRequest = new PutItemRequest(location.toString(), item);
-		getClient().putItem(putItemRequest);
+
+		for(int i = 0; i < MAX_RETRIES; i++) {
+			try {
+				getClient().putItem(putItemRequest);
+				return;
+			} catch (ProvisionedThroughputExceededException e) {
+				AbstractRequestHandler.log.info("----------------- THR EXCEDEED ("+ Thread.currentThread().getId() + "): Tentativo Numero " + i + " fallito. Riprovo");
+				
+				// TODO: check this nested exception
+				try {
+					Thread.sleep(SLEEP_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
 	}
 
 	@Override
@@ -60,16 +82,30 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 		GetItemRequest getItemRequest = new GetItemRequest().withTableName(location.toString()).withKey(new Key().withHashKeyElement(new AttributeValue().withS(keyValue)))
 				.withAttributesToGet(Arrays.asList(fieldName.toString()));
 
-		GetItemResult result = getClient().getItem(getItemRequest);
+		GetItemResult result = null;
 
+		for(int i = 0; i < MAX_RETRIES; i++) {
+			try {
+				result = getClient().getItem(getItemRequest);
+				break;
+			} catch (ProvisionedThroughputExceededException e) {
+				AbstractRequestHandler.log.info("----------------- THR EXCEDEED ("+ Thread.currentThread().getId() + "): Tentativo Numero " + i + " fallito. Riprovo");
+				
+				// TODO: check this nested exception
+				try {
+					Thread.sleep(SLEEP_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+		
 		if (result.getItem() == null || result.getItem().get(fieldName.toString()) == null) {
 			return "";
 		} else {
 			return result.getItem().get(fieldName.toString()).getS();
 		}
 	}
-
-	// TODO: make the update multi field to avoid multiple queries
 
 	@Override
 	public void update(StorageLocation location, String keyValue, List<FieldName> fieldNames, String... values) {
@@ -86,7 +122,21 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 		// Update the attributes
 		UpdateItemRequest updateItemRequest = new UpdateItemRequest().withTableName(location.toString()).withKey(key).withReturnValues(ReturnValue.ALL_NEW).withAttributeUpdates(updateItems);
 
-		getClient().updateItem(updateItemRequest);
+		for(int i = 0; i < MAX_RETRIES; i++) {
+			try {
+				getClient().updateItem(updateItemRequest);
+				break;
+			} catch (ProvisionedThroughputExceededException e) {
+				AbstractRequestHandler.log.info("----------------- THR EXCEDEED ("+ Thread.currentThread().getId() + "): Tentativo Numero " + i + " fallito. Riprovo");
+				
+				// TODO: check this nested exception
+				try {
+					Thread.sleep(SLEEP_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
 	}
 
 	@Override
@@ -94,14 +144,44 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 
 		DeleteItemRequest deleteItemRequest = new DeleteItemRequest().withTableName(location.toString()).withKey(new Key().withHashKeyElement(new AttributeValue().withS(keyValue)));
 
-		getClient().deleteItem(deleteItemRequest);
+		for(int i = 0; i < MAX_RETRIES; i++) {
+			try {
+				getClient().deleteItem(deleteItemRequest);
+				break;
+			} catch (ProvisionedThroughputExceededException e) {
+				AbstractRequestHandler.log.info("----------------- THR EXCEDEED ("+ Thread.currentThread().getId() + "): Tentativo Numero " + i + " fallito. Riprovo");
+				
+				// TODO: check this nested exception
+				try {
+					Thread.sleep(SLEEP_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
 	}
 
 	@Override
 	public boolean isPresent(StorageLocation location, FieldName fieldName, String keyValue) {
 
-		String result = read(location, fieldName, keyValue);
+		String result = "";
 
+		for(int i = 0; i < MAX_RETRIES; i++) {
+			try {
+				result = read(location, fieldName, keyValue);
+				break;
+			} catch (ProvisionedThroughputExceededException e) {
+				AbstractRequestHandler.log.info("----------------- THR EXCEDEED ("+ Thread.currentThread().getId() + "): Tentativo Numero " + i + " fallito. Riprovo");
+				
+				// TODO: check this nested exception
+				try {
+					Thread.sleep(SLEEP_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+		
 		if (result.isEmpty()) {
 			return false;
 		} else {
@@ -117,36 +197,26 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 
 		for (int i = 0; i < fieldNames.size(); i++) {
 			items.put(fieldNames.get(i).toString(), new AttributeValue(values[i]));
+			
+			for(int j = 0; j < MAX_RETRIES; j++) {
+				try {
+					items.put(fieldNames.get(i).toString(), new AttributeValue(values[i]));
+					break;
+				} catch (ProvisionedThroughputExceededException e) {
+					AbstractRequestHandler.log.info("----------------- THR EXCEDEED ("+ Thread.currentThread().getId() + "): Tentativo Numero " + i + " fallito. Riprovo");
+					
+					// TODO: check this nested exception
+					try {
+						Thread.sleep(SLEEP_TIME);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+			
 		}
 
 		return items;
-	}
-
-	@Override
-	public void scanAndDeletePop3Messages(String clientId, String userName) {
-
-		// User is not authenticated
-		if (userName.isEmpty()) {
-			return;
-		}
-
-		Condition userNameCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(userName));
-
-		Condition messageToDeleteCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(POP3MessageDeletion.YES.toString()));
-
-		Map<String, Condition> conditions = new HashMap<String, Condition>();
-
-		conditions.put(FieldName.POP3_MESSAGE_TO.toString(), userNameCondition);
-		conditions.put(FieldName.POP3_MESSAGE_TO_DELETE.toString(), messageToDeleteCondition);
-
-		ScanRequest scanRequest = new ScanRequest().withTableName(StorageLocation.POP3_MAILDROPS.toString()).withScanFilter(conditions)
-				.withAttributesToGet(Arrays.asList(FieldName.POP3_MESSAGE_UID.toString()));
-
-		ScanResult result = getClient().scan(scanRequest);
-
-		for (Map<String, AttributeValue> item : result.getItems()) {
-			delete(StorageLocation.POP3_MAILDROPS, item.get(FieldName.POP3_MESSAGE_UID.toString()).getS());
-		}
 	}
 
 	@Override
@@ -164,10 +234,26 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 		ScanRequest scanRequest = new ScanRequest().withTableName(StorageLocation.POP3_MAILDROPS.toString()).withScanFilter(conditions)
 				.withAttributesToGet(Arrays.asList(FieldName.POP3_MESSAGE_DIMENSION.toString()));
 
-		ScanResult result = getClient().scan(scanRequest);
+		ScanResult result = null;
 
+		for(int i = 0; i < MAX_RETRIES; i++) {
+			try {
+				result = getClient().scan(scanRequest);
+				break;
+			} catch (ProvisionedThroughputExceededException e) {
+				AbstractRequestHandler.log.info("----------------- THR EXCEDEED ("+ Thread.currentThread().getId() + "): Tentativo Numero " + i + " fallito. Riprovo");
+				
+				// TODO: check this nested exception
+				try {
+					Thread.sleep(SLEEP_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+		
 		List<String> messageDimensions = new ArrayList<String>();
-
+		
 		for (Map<String, AttributeValue> item : result.getItems()) {
 			messageDimensions.add(item.get(FieldName.POP3_MESSAGE_DIMENSION.toString()).getS());
 		}
@@ -176,24 +262,46 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 	}
 
 	@Override
-	public List<String> getMessageUIDs(String clientId, String userName) {
+	public List<String> getMessageUIDs(StorageLocation location, String clientId, String userName, boolean isToDelete) {
 
 		Condition userNameCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(userName));
 
-		Condition messageToDeleteCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(POP3MessageDeletion.NO.toString()));
-
+		Condition messageToDeleteCondition = null;
+		
+		if(!isToDelete) {
+			messageToDeleteCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(POP3MessageDeletion.NO.toString()));
+		}else {
+			messageToDeleteCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(POP3MessageDeletion.YES.toString()));
+		}
+		
 		Map<String, Condition> conditions = new HashMap<String, Condition>();
 
 		conditions.put(FieldName.POP3_MESSAGE_TO.toString(), userNameCondition);
 		conditions.put(FieldName.POP3_MESSAGE_TO_DELETE.toString(), messageToDeleteCondition);
 
-		ScanRequest scanRequest = new ScanRequest().withTableName(StorageLocation.POP3_MAILDROPS.toString()).withScanFilter(conditions)
+		ScanRequest scanRequest = new ScanRequest().withTableName(location.toString()).withScanFilter(conditions)
 				.withAttributesToGet(Arrays.asList(FieldName.POP3_MESSAGE_UID.toString()));
 
-		ScanResult result = getClient().scan(scanRequest);
+		ScanResult result = null;
 
+		for(int i = 0; i < MAX_RETRIES; i++) {
+			try {
+				result = getClient().scan(scanRequest);
+				break;
+			} catch (ProvisionedThroughputExceededException e) {
+				AbstractRequestHandler.log.info("----------------- THR EXCEDEED ("+ Thread.currentThread().getId() + "): Tentativo Numero " + i + " fallito. Riprovo");
+				
+				// TODO: check this nested exception
+				try {
+					Thread.sleep(SLEEP_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+		
 		List<String> messageUIDs = new ArrayList<String>();
-
+		
 		for (Map<String, AttributeValue> item : result.getItems()) {
 			messageUIDs.add(item.get(FieldName.POP3_MESSAGE_UID.toString()).getS());
 		}
@@ -213,7 +321,21 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 
 		UpdateItemRequest updateItemRequest = new UpdateItemRequest().withTableName(location.toString()).withKey(key).withAttributeUpdates(updateItems);
 
-		client.updateItem(updateItemRequest);
+		for(int i = 0; i < MAX_RETRIES; i++) {
+			try {
+				getClient().updateItem(updateItemRequest);
+				break;
+			} catch (ProvisionedThroughputExceededException e) {
+				AbstractRequestHandler.log.info("----------------- THR EXCEDEED ("+ Thread.currentThread().getId() + "): Tentativo Numero " + i + " fallito. Riprovo");
+				
+				// TODO: check this nested exception
+				try {
+					Thread.sleep(SLEEP_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
 	}
 
 	@Override
@@ -222,8 +344,24 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 		GetItemRequest getItemRequest = new GetItemRequest().withTableName(location.toString()).withKey(new Key().withHashKeyElement(new AttributeValue().withS(keyValue)))
 				.withAttributesToGet(Arrays.asList(fieldName.toString()));
 
-		GetItemResult result = getClient().getItem(getItemRequest);
+		GetItemResult result = null;
 
+		for(int i = 0; i < MAX_RETRIES; i++) {
+			try {
+				result = getClient().getItem(getItemRequest);
+				break;
+			} catch (ProvisionedThroughputExceededException e) {
+				AbstractRequestHandler.log.info("----------------- THR EXCEDEED ("+ Thread.currentThread().getId() + "): Tentativo Numero " + i + " fallito. Riprovo");
+				
+				// TODO: check this nested exception
+				try {
+					Thread.sleep(SLEEP_TIME);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+		
 		if (result.getItem() == null || result.getItem().get(fieldName.toString()) == null) {
 			return new ArrayList<String>();
 		} else {

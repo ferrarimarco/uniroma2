@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.util.List;
 
 import controller.AbstractCommandHandler;
+import controller.AbstractRequestHandler;
 import controller.CommunicationHandler;
 import controller.SpecialCharactersSequence;
 import controller.persistance.FieldName;
@@ -19,7 +20,10 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 			PersistanceManager persistanceManager, String clientId) {
 
 		POP3Command pop3Command = POP3Command.parseCommand(command);
-
+		
+		// TODO: debug
+		AbstractRequestHandler.log.info("Server receives: " + line);
+		
 		if (pop3Command.equals(POP3Command.CAPA)) {
 			CAPACommand(communicationHandler, writer, persistanceManager, clientId);
 		} else if (pop3Command.equals(POP3Command.QUIT)) {
@@ -135,6 +139,18 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 		setStatus(persistanceManager, POP3SessionStatus.TRANSACTION, clientId);
 
+		// Get the UIDs from the POP3_MAILDROPS location (to complete session initialization)
+		// Subsequent calls to getMessageUIDs will have the POP3_SESSIONS location to avoid a table scan
+		List<String> uids = persistanceManager.getMessageUIDs(StorageLocation.POP3_MAILDROPS, clientId, userName, false);
+		
+		AbstractRequestHandler.log.info("uids List length "+ uids.size());
+		
+		String[] uidsArray = uids.toArray(new String[uids.size()]);
+		
+		AbstractRequestHandler.log.info("uidsArray length "+ uidsArray.length);
+		
+		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getPOP3UIDS(), uids.toArray(new String[uids.size()]));
+		
 		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "Authentication successful.");
 	}
 
@@ -152,8 +168,14 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		
 		String userName = getClientUserName(persistanceManager, clientId);
 		
-		persistanceManager.scanAndDeletePop3Messages(clientId, userName);
-
+		// Get uids of the messages marked for deletion
+		List<String> uids = persistanceManager.getMessageUIDs(StorageLocation.POP3_SESSIONS, clientId, userName, true);
+		
+		for(int i = 0; i < uids.size(); i++) {
+			// Delete messages marked for deletion
+			persistanceManager.delete(StorageLocation.POP3_MAILDROPS, uids.get(i));
+		}
+		
 		persistanceManager.delete(StorageLocation.POP3_SESSIONS, clientId);
 	}
 
@@ -279,7 +301,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		String userName = getClientUserName(persistanceManager, clientId);
 		
 		// Get UIDs for all the messages
-		List<String> uids = persistanceManager.getMessageUIDs(clientId, userName);
+		List<String> uids = persistanceManager.getMessageUIDs(StorageLocation.POP3_SESSIONS, clientId, userName, false);
 
 		int messageNumber = Integer.parseInt(argument) - 1;
 
@@ -326,7 +348,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		String userName = getClientUserName(persistanceManager, clientId);
 		
 		// Get UIDs for all the messages
-		List<String> uids = persistanceManager.getMessageUIDs(clientId, userName);
+		List<String> uids = persistanceManager.getMessageUIDs(StorageLocation.POP3_SESSIONS, clientId, userName, false);
 
 		int messageNumber = Integer.parseInt(argument) - 1;
 
@@ -346,7 +368,8 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 		// Mark the message for deletion
 		persistanceManager.update(StorageLocation.POP3_MAILDROPS, uids.get(messageNumber), messageToDeleteField, POP3MessageDeletion.YES.toString());
-
+		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, messageToDeleteField, uids.get(messageNumber), POP3MessageDeletion.YES.toString());
+		
 		// Update DELE command count
 		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getPOP3DelesFieldOnly(), Integer.toString(deleCommands + 1));
 		
@@ -373,7 +396,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		String userName = getClientUserName(persistanceManager, clientId);
 		
 		// Get UIDs for all the messages
-		List<String> uids = persistanceManager.getMessageUIDs(clientId, userName);
+		List<String> uids = persistanceManager.getMessageUIDs(StorageLocation.POP3_SESSIONS, clientId, userName, false);
 
 		int messageNumber = Integer.parseInt(argument) - 1;
 
@@ -431,13 +454,16 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		String userName = getClientUserName(persistanceManager, clientId);
 		
 		// Get UIDs for all the messages
-		List<String> uids = persistanceManager.getMessageUIDs(clientId, userName);
+		List<String> uids = persistanceManager.getMessageUIDs(StorageLocation.POP3_SESSIONS, clientId, userName, true);
 
 		List<FieldName> messageToDeleteField = FieldName.getMessageToDeleteTableFieldOnly();
 
 		// Unmarks every messaged marked for deletion
 		for (int i = 0; i < uids.size(); i++) {
+			// TODO: perhaps I should work only with SESSIONS in memory, using the DB for persistance only
 			persistanceManager.update(StorageLocation.POP3_MAILDROPS, uids.get(i), messageToDeleteField, POP3MessageDeletion.NO.toString());
+			
+			persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, messageToDeleteField, uids.get(i), POP3MessageDeletion.NO.toString());
 		}
 		
 		// Update DELE command count
@@ -461,10 +487,13 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 			String userName = getClientUserName(persistanceManager, clientId);
 			
 			// Get information about all the messages in the maildrop
-			List<String> uids = persistanceManager.getMessageUIDs(clientId, userName);
+			List<String> uids = persistanceManager.getMessageUIDs(StorageLocation.POP3_SESSIONS, clientId, userName, false);
 
 			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "");
 
+			// Update DELE command count
+			persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getPOP3DelesFieldOnly(), Integer.toString(0));
+			
 			// Send response
 			if (uids.size() > 0) {
 
@@ -484,7 +513,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 			String userName = getClientUserName(persistanceManager, clientId);
 			
-			List<String> uids = persistanceManager.getMessageUIDs(clientId, userName);
+			List<String> uids = persistanceManager.getMessageUIDs(StorageLocation.POP3_SESSIONS, clientId, userName, false);
 
 			int messageNumber = Integer.parseInt(argument) - 1;
 
@@ -527,7 +556,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		// Create a new session record
 		// Set the status to AUTH directly to avoid another query
 		persistanceManager.create(StorageLocation.POP3_SESSIONS, FieldName.getPOP3StatusTableFieldNames(), clientId, POP3SessionStatus.AUTHORIZATION.toString(), POP3Command.EMPTY.toString(), POP3StatusIndicator.UNKNOWN.toString(), POP3Command.EMPTY.toString(), POP3Command.EMPTY.toString(), POP3Command.EMPTY.toString(), Integer.toString(0));
-
+		
 		// Send response
 		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "POP3 server ready to roll!");
 	}
