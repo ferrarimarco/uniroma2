@@ -12,8 +12,8 @@ public class StorageManager implements PersistanceManager {
 	private PersistanceManager smtpSessionStorageManager;
 	
 	public StorageManager(){
-		awsDynamoDBStorageManager = PersistanceManagerFactory.createAWSDynamoDBStorageManager();
-		smtpTempMessageStorageManager = PersistanceManagerFactory.createSMTPTempMessageStorageManager();
+		awsDynamoDBStorageManager = new AWSDynamoDBStorageManager();
+		smtpTempMessageStorageManager = new SMTPTempMessageStorageManager();
 		
 		pop3SessionStatusStorageManager = new POP3SessionStatusStorageManager();
 		
