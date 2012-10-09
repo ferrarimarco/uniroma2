@@ -131,18 +131,16 @@ public class POP3SessionStatusRecord {
 		
 		List<String> uidsNoDeletion = new ArrayList<String>(uids.size());
 		
+		// TODO: optimize isToDelete with howManyDeles
+		
 		for(int i = 0; i < uids.size(); i++) {
 			if(!isToDelete) {
-				
-				AbstractRequestHandler.log.info("Get UIDs of message NOT to delete");
 				
 				if(uids.get(uidsList.get(i)).equals(POP3MessageDeletion.NO.toString())) {
 					uidsNoDeletion.add(uidsList.get(i));
 					AbstractRequestHandler.log.info("Add " + uidsList.get(i));
 				}				
 			}else {
-				AbstractRequestHandler.log.info("Get UIDs of message TO delete");
-				
 				if(uids.get(uidsList.get(i)).equals(POP3MessageDeletion.YES.toString())) {
 					uidsNoDeletion.add(uidsList.get(i));
 					AbstractRequestHandler.log.info("Add " + uidsList.get(i));
