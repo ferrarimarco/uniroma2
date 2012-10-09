@@ -6,7 +6,7 @@ import java.util.List;
 public enum FieldName {
 
 	// Users table
-	POP3_USER_NAME, POP3_FULL_NAME, POP3_USER_PASSWORD,
+	POP3_USER_NAME, POP3_FULL_NAME, POP3_USER_PASSWORD, USER_MESSAGES_NUMBER, MESSAGES_TOTAL_DIMENSION,
 
 	// POP3 Session table
 	POP3_SESSION_ID, POP3_SESSION_STATUS, POP3_LAST_COMMAND, POP3_LAST_COMMAND_RESULT, POP3_SESSION_USER_NAME, POP3_LAST_COMMAND_FIRST_ARGUMENT, POP3_LAST_COMMAND_SECOND_ARGUMENT, POP3_HOW_MANY_DELES, POP3_SESSION_UIDS,
@@ -25,6 +25,15 @@ public enum FieldName {
 		return super.toString().toLowerCase();
 	}
 
+	public static List<FieldName> getMaildropStatData(){
+		List<FieldName> maildropData = new ArrayList<FieldName>();
+
+		maildropData.add(USER_MESSAGES_NUMBER);
+		maildropData.add(MESSAGES_TOTAL_DIMENSION);
+
+		return maildropData;
+	}
+	
 	public static List<FieldName> getPOP3StatusTableFieldNames() {
 
 		List<FieldName> pop3StatusFieldNames = new ArrayList<FieldName>();

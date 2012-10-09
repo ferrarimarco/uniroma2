@@ -237,6 +237,19 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 			AbstractRequestHandler.log.info("User: " + user);
 			*/
 			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, user, POP3MessageDeletion.NO.toString(), messageSize, header, body);
+			
+			// Update maildrop data
+
+			int messageCountNumber = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_USERS, FieldName.USER_MESSAGES_NUMBER, user));
+			int messageTotalSizeNumber = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_USERS, FieldName.MESSAGES_TOTAL_DIMENSION, user));
+
+			messageCountNumber++;			
+			messageTotalSizeNumber += Integer.parseInt(messageSize);
+			
+			String messagesCount = Integer.toString(messageCountNumber);
+			String messageTotalSize = Integer.toString(messageTotalSizeNumber);
+			
+			persistanceManager.update(StorageLocation.POP3_USERS, user, FieldName.getMaildropStatData(), messagesCount, messageTotalSize);
 		}
 		
 		// Delete the temp message
