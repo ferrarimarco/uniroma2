@@ -34,7 +34,7 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 	private AmazonDynamoDBClient client;
 
 	private static final int MAX_RETRIES = 10;
-	private static final int SLEEP_TIME = 500;
+	private static final int SLEEP_TIME = 5;
 	
 	// TODO: manage the thr exceeded condition: if the DB cannot be contacted in MAX_RETRIES tries then we have to handle this
 	
@@ -54,7 +54,7 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 
 	@Override
 	public void create(StorageLocation location, List<FieldName> fieldNames, String... values) {
-
+		
 		Map<String, AttributeValue> item = newItem(fieldNames, values);
 
 		PutItemRequest putItemRequest = new PutItemRequest(location.toString(), item);
@@ -68,7 +68,11 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 				
 				// TODO: check this nested exception
 				try {
-					Thread.sleep(SLEEP_TIME);
+					// Exponential backoff
+					double endInterval = (int) Math.pow(2, i);
+					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
+					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
+					Thread.sleep(delay);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -93,7 +97,11 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 				
 				// TODO: check this nested exception
 				try {
-					Thread.sleep(SLEEP_TIME);
+					// Exponential backoff
+					double endInterval = (int) Math.pow(2, i);
+					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
+					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
+					Thread.sleep(delay);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -131,7 +139,11 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 				
 				// TODO: check this nested exception
 				try {
-					Thread.sleep(SLEEP_TIME);
+					// Exponential backoff
+					double endInterval = (int) Math.pow(2, i);
+					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
+					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
+					Thread.sleep(delay);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -153,7 +165,11 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 				
 				// TODO: check this nested exception
 				try {
-					Thread.sleep(SLEEP_TIME);
+					// Exponential backoff
+					double endInterval = (int) Math.pow(2, i);
+					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
+					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
+					Thread.sleep(delay);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -175,7 +191,11 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 				
 				// TODO: check this nested exception
 				try {
-					Thread.sleep(SLEEP_TIME);
+					// Exponential backoff
+					double endInterval = (int) Math.pow(2, i);
+					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
+					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
+					Thread.sleep(delay);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -196,24 +216,7 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 		// TODO: check if filedNames and values have the same size
 
 		for (int i = 0; i < fieldNames.size(); i++) {
-			items.put(fieldNames.get(i).toString(), new AttributeValue(values[i]));
-			
-			for(int j = 0; j < MAX_RETRIES; j++) {
-				try {
-					items.put(fieldNames.get(i).toString(), new AttributeValue(values[i]));
-					break;
-				} catch (ProvisionedThroughputExceededException e) {
-					AbstractRequestHandler.log.info("----------------- THR EXCEDEED ("+ Thread.currentThread().getId() + "): Tentativo Numero " + i + " fallito. Riprovo");
-					
-					// TODO: check this nested exception
-					try {
-						Thread.sleep(SLEEP_TIME);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-				}
-			}
-			
+			items.put(fieldNames.get(i).toString(), new AttributeValue(values[i]));			
 		}
 
 		return items;
@@ -245,7 +248,11 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 				
 				// TODO: check this nested exception
 				try {
-					Thread.sleep(SLEEP_TIME);
+					// Exponential backoff
+					double endInterval = (int) Math.pow(2, i);
+					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
+					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
+					Thread.sleep(delay);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -293,7 +300,11 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 				
 				// TODO: check this nested exception
 				try {
-					Thread.sleep(SLEEP_TIME);
+					// Exponential backoff
+					double endInterval = (int) Math.pow(2, i);
+					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
+					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
+					Thread.sleep(delay);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -308,7 +319,6 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 
 		return messageUIDs;
 	}
-
 
 	@Override
 	public void addToSet(StorageLocation location, String keyValue, FieldName fieldName, String... values) {
@@ -330,7 +340,11 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 				
 				// TODO: check this nested exception
 				try {
-					Thread.sleep(SLEEP_TIME);
+					// Exponential backoff
+					double endInterval = (int) Math.pow(2, i);
+					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
+					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
+					Thread.sleep(delay);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -355,7 +369,11 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 				
 				// TODO: check this nested exception
 				try {
-					Thread.sleep(SLEEP_TIME);
+					// Exponential backoff
+					double endInterval = (int) Math.pow(2, i);
+					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
+					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
+					Thread.sleep(delay);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
