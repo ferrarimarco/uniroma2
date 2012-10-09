@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import controller.AbstractRequestHandler;
 import controller.pop3.POP3MessageDeletion;
 
 public class POP3SessionStatusRecord {
@@ -125,25 +124,17 @@ public class POP3SessionStatusRecord {
 	public List<String> getUIDsList(boolean isToDelete) {
 		
 		List<String> uidsList = new ArrayList<String>(uids.keySet());
-		
-		AbstractRequestHandler.log.info("uids size " + uids.size());
-		AbstractRequestHandler.log.info("uidsList size " + uidsList.size());
-		
 		List<String> uidsNoDeletion = new ArrayList<String>(uids.size());
-		
-		// TODO: optimize isToDelete with howManyDeles
 		
 		for(int i = 0; i < uids.size(); i++) {
 			if(!isToDelete) {
 				
 				if(uids.get(uidsList.get(i)).equals(POP3MessageDeletion.NO.toString())) {
 					uidsNoDeletion.add(uidsList.get(i));
-					AbstractRequestHandler.log.info("Add " + uidsList.get(i));
 				}				
 			}else {
 				if(uids.get(uidsList.get(i)).equals(POP3MessageDeletion.YES.toString())) {
 					uidsNoDeletion.add(uidsList.get(i));
-					AbstractRequestHandler.log.info("Add " + uidsList.get(i));
 				}
 			}
 		}
