@@ -44,6 +44,9 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 			return getMemoryStorageLocation(location).get(keyValue).getSessionStatus();
 		}else if(fieldName.equals(FieldName.POP3_HOW_MANY_DELES)) {
 			return getMemoryStorageLocation(location).get(keyValue).getHowManyDeles();
+		}else if(fieldName.equals(FieldName.POP3_MESSAGE_DIMENSION)) {
+			// TODO: check this (two keyvalues)
+			return getMemoryStorageLocation(location).get(keyValue).getDimension(keyValue);
 		}else {
 			return "";
 		}
@@ -82,6 +85,15 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 			
 			getMemoryStorageLocation(location).get(keyValue).setUIDDeletion(values[0], values[1]);
 			
+		}else if(fieldNames.get(0).equals(FieldName.POP3_DIMENSIONS_LIST)) {
+			
+			AbstractRequestHandler.log.info("Adding dimensions ");
+			
+			getMemoryStorageLocation(location).get(keyValue);
+			
+			for(int i = 0; i < values.length; i++) {
+				getMemoryStorageLocation(location).get(keyValue).addDimension(values[i]);
+			}			
 		}
 	}
 
@@ -93,9 +105,7 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 
 	@Override
 	public void delete(StorageLocation location, String keyValue) {
-
 		getMemoryStorageLocation(location).remove(keyValue);
-		
 	}
 
 	@Override
@@ -104,15 +114,14 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 	}
 
 	@Override
-	public List<String> scanForMessageDimensions(String clientId, String userName) {
-		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+	public List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName) {
+		return getMemoryStorageLocation(location).get(clientId).getDimensionsList();
 	}
 
 	@Override
 	public List<String> getMessageUIDs(StorageLocation location, String clientId, String userName, boolean isToDelete) {
 		AbstractRequestHandler.log.info("Get UIDS from " + location.toString());
-		return getMemoryStorageLocation(location).get(clientId).getUIDsList(isToDelete);		
+		return getMemoryStorageLocation(location).get(clientId).getUIDsList(isToDelete);
 	}
 
 }

@@ -63,9 +63,9 @@ public class StorageManager implements PersistanceManager {
 	}
 
 	@Override
-	public List<String> scanForMessageDimensions(String clientId, String userName) {
-		PersistanceManager persistanceManager = getPersistanceManager(StorageLocation.POP3_MAILDROPS);
-		return persistanceManager.scanForMessageDimensions(clientId, userName);
+	public List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName) {
+		PersistanceManager persistanceManager = getPersistanceManager(location);
+		return persistanceManager.scanForMessageDimensions(location, clientId, userName);
 	}
 
 	@Override

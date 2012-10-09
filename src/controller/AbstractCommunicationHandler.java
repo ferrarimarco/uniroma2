@@ -9,7 +9,8 @@ public abstract class AbstractCommunicationHandler implements CommunicationHandl
 	// 512 - 2 (for endline)
 	private final int maxCharsPerLinePOP3 = 510;
 
-	private void sendLine(BufferedOutputStream writer, String msg, boolean multiLine, boolean lastLine) {
+	@Override
+	public void sendLine(BufferedOutputStream writer, String msg, boolean multiLine, boolean lastLine) {
 
 		try {
 
@@ -17,7 +18,6 @@ public abstract class AbstractCommunicationHandler implements CommunicationHandl
 
 			// TODO: debug
 			AbstractRequestHandler.log.info("Server invia:" + msg);
-			System.out.println("Server invia:" + msg);
 
 			// Check if the line starts with the termination octet.
 			if (multiLine && msg.startsWith(SpecialCharactersSequence.POP3_TERMINATION_OCTET.toString())) {
@@ -38,7 +38,6 @@ public abstract class AbstractCommunicationHandler implements CommunicationHandl
 
 				// TODO: debug
 				AbstractRequestHandler.log.info("Server invia il carattere di terminazione.");
-				System.out.println("Server invia il carattere di terminazione.");
 			}
 
 			writer.flush();

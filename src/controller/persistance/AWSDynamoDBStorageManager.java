@@ -223,7 +223,7 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 	}
 
 	@Override
-	public List<String> scanForMessageDimensions(String clientId, String userName) {
+	public List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName) {
 
 		Condition userNameCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(userName));
 
@@ -285,12 +285,12 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 
 		conditions.put(FieldName.POP3_MESSAGE_TO.toString(), userNameCondition);
 		conditions.put(FieldName.POP3_MESSAGE_TO_DELETE.toString(), messageToDeleteCondition);
-
+		
 		ScanRequest scanRequest = new ScanRequest().withTableName(location.toString()).withScanFilter(conditions)
-				.withAttributesToGet(Arrays.asList(FieldName.POP3_MESSAGE_UID.toString()));
+				.withAttributesToGet(Arrays.asList(FieldName.POP3_MESSAGE_UID.toString(), FieldName.POP3_MESSAGE_DIMENSION.toString()));
 
 		ScanResult result = null;
-
+		
 		for(int i = 0; i < MAX_RETRIES; i++) {
 			try {
 				result = getClient().scan(scanRequest);
@@ -315,6 +315,7 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 		
 		for (Map<String, AttributeValue> item : result.getItems()) {
 			messageUIDs.add(item.get(FieldName.POP3_MESSAGE_UID.toString()).getS());
+			messageUIDs.add(item.get(FieldName.POP3_MESSAGE_DIMENSION.toString()).getS());
 		}
 
 		return messageUIDs;

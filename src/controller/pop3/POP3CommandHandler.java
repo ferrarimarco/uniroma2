@@ -1,6 +1,7 @@
 package controller.pop3;
 
 import java.io.BufferedOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import controller.AbstractCommandHandler;
@@ -120,7 +121,6 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 			return;
 		}
 
-		// TODO: hash the password?
 		// Get the password for the current user name
 		String userName = getPreviousCommandFirstArgument(persistanceManager, clientId);
 		String password = persistanceManager.read(StorageLocation.POP3_PASSWORDS, FieldName.POP3_USER_PASSWORD, userName);
@@ -141,15 +141,26 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 		// Get the UIDs from the POP3_MAILDROPS location (to complete session initialization)
 		// Subsequent calls to getMessageUIDs will have the POP3_SESSIONS location to avoid a table scan
-		List<String> uids = persistanceManager.getMessageUIDs(StorageLocation.POP3_MAILDROPS, clientId, userName, false);
+		List<String> uidsAndDimensions = persistanceManager.getMessageUIDs(StorageLocation.POP3_MAILDROPS, clientId, userName, false);
 		
-		AbstractRequestHandler.log.info("uids List length "+ uids.size());
+		AbstractRequestHandler.log.info("uids List length "+ uidsAndDimensions.size());
+		
+		List<String> uids = new ArrayList<String>(uidsAndDimensions.size() / 2);
+		List<String> dimensions = new ArrayList<String>(uidsAndDimensions.size() / 2);
+		
+		for(int i = 0; i < uidsAndDimensions.size(); i = i + 2) {
+			uids.add(uidsAndDimensions.get(i));
+			dimensions.add(uidsAndDimensions.get(i + 1));
+		}
 		
 		String[] uidsArray = uids.toArray(new String[uids.size()]);
+		String[] dimensionArray = dimensions.toArray(new String[dimensions.size()]);
 		
 		AbstractRequestHandler.log.info("uidsArray length "+ uidsArray.length);
+		AbstractRequestHandler.log.info("dimensionArray length "+ dimensionArray.length);
 		
-		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getPOP3UIDS(), uids.toArray(new String[uids.size()]));
+		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getPOP3UIDS(), uidsArray);
+		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getPOP3Dimensions(), dimensionArray);
 		
 		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "Authentication successful.");
 	}
@@ -200,6 +211,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		// Check the status of the POP3 session
 		if (!status.equals(POP3SessionStatus.TRANSACTION)) {
 			communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "This command is available only in TRANSACTION status.");
+			return;
 		}
 
 		int messages = 0;
@@ -207,6 +219,8 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		
 		String userName = getClientUserName(persistanceManager, clientId);
 
+		// TODO: check count consistency! (STAT shows less messages than UIDL)
+		
 		messages = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_USERS, FieldName.USER_MESSAGES_NUMBER, userName));
 		totalDimension = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_USERS, FieldName.MESSAGES_TOTAL_DIMENSION, userName));
 
@@ -223,35 +237,34 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 			return;
 		}
 
+		String userName = getClientUserName(persistanceManager, clientId);
+		
+		// Get UIDs for all the messages
+		List<String> uids = persistanceManager.getMessageUIDs(StorageLocation.POP3_SESSIONS, clientId, userName, false);
+		
+		// No messages in the maildrop
+		if (uids.size() == 0) {
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "");
+			communicationHandler.sendBlankLineMultilineEnd(writer);
+			return;
+		}
+		
+		List<String> dimensions = persistanceManager.scanForMessageDimensions(StorageLocation.POP3_SESSIONS, clientId, userName);
+		
 		// Check the argument
 		if (argument.isEmpty()) {
-
-			String userName = getClientUserName(persistanceManager, clientId);
 			
-			// Get information about all the messages in the maildrop
-			List<String> messageDimensions = persistanceManager.scanForMessageDimensions(clientId, userName);
-
-			// Add message index
-			for (int i = 0; i < messageDimensions.size(); i++) {
-				messageDimensions.set(i, (i + 1) + " " + messageDimensions.get(i));
+			// Send the first part of the response
+			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), uids.size() + " messages");
+			
+			for (int i = 0; i < dimensions.size(); i++) {
+				if(i <= dimensions.size() - 2) {
+					communicationHandler.sendLine(writer, (i + 1) + " " + dimensions.get(i), true, false);
+				}else {
+					communicationHandler.sendLine(writer, (i + 1) + " " + dimensions.get(i), true, true);
+				}
 			}
-
-			// Send response
-			if (messageDimensions.size() > 0) {
-
-				communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), messageDimensions.size() + " messages");
-				communicationHandler.sendListAsMultiLineResponse(writer, messageDimensions);
-
-			} else {// No messages in the maildrop
-				communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "");
-				communicationHandler.sendBlankLineMultilineEnd(writer);
-			}
-
 		} else {
-
-			String userName = getClientUserName(persistanceManager, clientId);
-			
-			List<String> messageDimensions = persistanceManager.scanForMessageDimensions(clientId, userName);
 
 			int messageNumber = Integer.parseInt(argument) - 1;
 			
@@ -262,13 +275,13 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 			messageNumber -= deleCommands;
 			
 			// Check if such message exists
-			if (messageNumber >= messageDimensions.size() || messageNumber < 0) {
+			if (messageNumber >= uids.size() || messageNumber < 0) {
 				communicationHandler.sendResponse(writer, POP3StatusIndicator.ERR.toString(), "no such message");
 				return;
 			}
 
 			// Get the dimension of the message
-			int dimension = Integer.parseInt(messageDimensions.get(messageNumber));
+			int dimension = Integer.parseInt(dimensions.get(messageNumber));
 
 			// Send the response
 			communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), argument + " " + dimension);
@@ -360,7 +373,6 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		List<FieldName> messageToDeleteField = FieldName.getMessageToDeleteTableFieldOnly();
 
 		// Mark the message for deletion
-		persistanceManager.update(StorageLocation.POP3_MAILDROPS, uids.get(messageNumber), messageToDeleteField, POP3MessageDeletion.YES.toString());
 		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, messageToDeleteField, uids.get(messageNumber), POP3MessageDeletion.YES.toString());
 		
 		// Update DELE command count
@@ -476,17 +488,11 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		
 		// Unmarks every messaged marked for deletion
 		for (int i = 0; i < uids.size(); i++) {
-			// TODO: perhaps I should work only with SESSIONS in memory, using the DB for persistance only
-			persistanceManager.update(StorageLocation.POP3_MAILDROPS, uids.get(i), messageToDeleteField, POP3MessageDeletion.NO.toString());
-			
 			persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, messageToDeleteField, uids.get(i), POP3MessageDeletion.NO.toString());
 			
 			// Get deleted message size
-			String messageSize = persistanceManager.read(StorageLocation.POP3_MAILDROPS, FieldName.POP3_MESSAGE_DIMENSION, uids.get(i));
-			
-			if(!messageSize.isEmpty()) {
-				messageTotalSizeNumber += Integer.parseInt(messageSize);
-			}
+			String messageSize = persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_MESSAGE_DIMENSION, uids.get(i));
+			messageTotalSizeNumber += Integer.parseInt(messageSize);
 			
 			messageCountNumber++;			
 		}

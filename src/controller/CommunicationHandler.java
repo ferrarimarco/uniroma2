@@ -13,4 +13,6 @@ public interface CommunicationHandler {
 	void sendBlankLineMultilineEnd(BufferedOutputStream writer);
 
 	void sendStringWithLinesLimit(BufferedOutputStream writer, String string, int linesLimit);
+	
+	void sendLine(BufferedOutputStream writer, String msg, boolean multiLine, boolean lastLine);
 }

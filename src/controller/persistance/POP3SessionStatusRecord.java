@@ -17,6 +17,7 @@ public class POP3SessionStatusRecord {
 	private String lastCommandSecondArg;
 	private String howManyDeles;
 	private Map<String, String> uids;
+	private List<String> dimensions;
 		
 	public POP3SessionStatusRecord(String sessionStatus, String lastCommand, String lastCommandResult, String sessionUserName, String lastCommandFirstArg, String lastCommandSecondArg, String howManyDeles) {
 
@@ -28,6 +29,7 @@ public class POP3SessionStatusRecord {
 		this.lastCommandSecondArg = lastCommandSecondArg;
 		this.howManyDeles = howManyDeles;
 		uids = new HashMap<String, String>();
+		dimensions = new ArrayList<String>();
 	}
 
 	public String getSessionStatus() {
@@ -142,5 +144,34 @@ public class POP3SessionStatusRecord {
 		return uidsNoDeletion;
 	}
 	
+	public void addDimension(String dimension) {
+		dimensions.add(dimension);
+	}
 	
+	public List<String> getDimensionsList() {
+		
+		List<String> uidsList = new ArrayList<String>(uids.keySet());
+		List<String> dimensions = new ArrayList<String>(uids.size());
+		
+		for(int i = 0; i < uidsList.size(); i++) {
+			if(uids.get(uidsList.get(i)).equals(POP3MessageDeletion.NO.toString())) {
+				dimensions.add(this.dimensions.get(i));
+			}
+		}
+
+		return dimensions;
+	}
+	
+	public String getDimension(String uid) {
+		
+		List<String> uidsList = new ArrayList<String>(uids.keySet());
+		
+		for(int i = 0; i < uidsList.size(); i++) {
+			if(uidsList.equals(uid)) {
+				return dimensions.get(i);
+			}
+		}
+		
+		return "";
+	}
 }

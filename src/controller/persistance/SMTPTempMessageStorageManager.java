@@ -96,7 +96,7 @@ public class SMTPTempMessageStorageManager extends AbstractVolatileMemoryStorage
 	}
 
 	@Override
-	public List<String> scanForMessageDimensions(String clientId, String userName) {
+	public List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName) {
 		throw new NotImplementedException();
 	}
 
