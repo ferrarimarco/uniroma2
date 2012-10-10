@@ -18,7 +18,7 @@ public interface PersistanceManager {
 
 	boolean isPresent(StorageLocation location, FieldName fieldName, String keyValue);
 
-	List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName);
+	List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName, boolean isToDelete);
 
 	List<String> getMessageUIDs(StorageLocation location, String clientId, String userName, boolean isToDelete);
 }

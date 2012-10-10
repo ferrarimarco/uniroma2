@@ -223,12 +223,18 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 	}
 
 	@Override
-	public List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName) {
+	public List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName, boolean isToDelete) {
 
 		Condition userNameCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(userName));
 
-		Condition messageToDeleteCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(POP3MessageDeletion.NO.toString()));
-
+		Condition messageToDeleteCondition = null;
+		
+		if(!isToDelete){
+			messageToDeleteCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(POP3MessageDeletion.NO.toString()));
+		}else{
+			messageToDeleteCondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(POP3MessageDeletion.YES.toString()));
+		}
+		
 		Map<String, Condition> conditions = new HashMap<String, Condition>();
 
 		conditions.put(FieldName.POP3_MESSAGE_TO.toString(), userNameCondition);

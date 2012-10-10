@@ -70,7 +70,7 @@ public class SMTPSessionsStorageManager extends AbstractVolatileMemoryStorageMan
 	}
 
 	@Override
-	public List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName) {
+	public List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName, boolean isToDelete) {
 		throw new NotImplementedException();
 	}
 

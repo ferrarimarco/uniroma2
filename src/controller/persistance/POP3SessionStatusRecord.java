@@ -148,14 +148,20 @@ public class POP3SessionStatusRecord {
 		dimensions.add(dimension);
 	}
 	
-	public List<String> getDimensionsList() {
+	public List<String> getDimensionsList(boolean isToDelete) {
 		
 		List<String> uidsList = new ArrayList<String>(uids.keySet());
 		List<String> dimensions = new ArrayList<String>(uids.size());
-		
+
 		for(int i = 0; i < uidsList.size(); i++) {
-			if(uids.get(uidsList.get(i)).equals(POP3MessageDeletion.NO.toString())) {
-				dimensions.add(this.dimensions.get(i));
+			if(!isToDelete){
+				if(uids.get(uidsList.get(i)).equals(POP3MessageDeletion.NO.toString())) {
+					dimensions.add(this.dimensions.get(i));
+				}
+			}else{
+				if(uids.get(uidsList.get(i)).equals(POP3MessageDeletion.YES.toString())) {
+					dimensions.add(this.dimensions.get(i));
+				}
 			}
 		}
 

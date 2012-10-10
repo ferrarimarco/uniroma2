@@ -44,9 +44,6 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 			return getMemoryStorageLocation(location).get(keyValue).getSessionStatus();
 		}else if(fieldName.equals(FieldName.POP3_HOW_MANY_DELES)) {
 			return getMemoryStorageLocation(location).get(keyValue).getHowManyDeles();
-		}else if(fieldName.equals(FieldName.POP3_MESSAGE_DIMENSION)) {
-			// TODO: check this (two keyvalues)
-			return getMemoryStorageLocation(location).get(keyValue).getDimension(keyValue);
 		}else {
 			return "";
 		}
@@ -114,8 +111,8 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 	}
 
 	@Override
-	public List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName) {
-		return getMemoryStorageLocation(location).get(clientId).getDimensionsList();
+	public List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName, boolean isToDelete) {
+		return getMemoryStorageLocation(location).get(clientId).getDimensionsList(isToDelete);
 	}
 
 	@Override

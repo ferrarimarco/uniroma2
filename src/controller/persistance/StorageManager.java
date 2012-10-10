@@ -63,9 +63,9 @@ public class StorageManager implements PersistanceManager {
 	}
 
 	@Override
-	public List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName) {
+	public List<String> scanForMessageDimensions(StorageLocation location, String clientId, String userName, boolean isToDelete) {
 		PersistanceManager persistanceManager = getPersistanceManager(location);
-		return persistanceManager.scanForMessageDimensions(location, clientId, userName);
+		return persistanceManager.scanForMessageDimensions(location, clientId, userName, isToDelete);
 	}
 
 	@Override
