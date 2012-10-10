@@ -44,6 +44,10 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 			return getMemoryStorageLocation(location).get(keyValue).getSessionStatus();
 		}else if(fieldName.equals(FieldName.POP3_HOW_MANY_DELES)) {
 			return getMemoryStorageLocation(location).get(keyValue).getHowManyDeles();
+		}else if(fieldName.equals(FieldName.USER_MESSAGES_NUMBER)) {
+			return getMemoryStorageLocation(location).get(keyValue).getMessagesNumber();
+		}else if(fieldName.equals(FieldName.MESSAGES_TOTAL_DIMENSION)) {
+			return getMemoryStorageLocation(location).get(keyValue).getMessagesTotalSize();
 		}else {
 			return "";
 		}
@@ -57,18 +61,25 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 
 	@Override
 	public void update(StorageLocation location, String keyValue, List<FieldName> fieldNames, String... values) {
-
 		if(fieldNames.get(0).equals(FieldName.POP3_SESSION_USER_NAME)){
+			
 			getMemoryStorageLocation(location).get(keyValue).setSessionUserName(values[0]);
+			
 		}else if(fieldNames.get(0).equals(FieldName.POP3_HOW_MANY_DELES)) {
+			
 			getMemoryStorageLocation(location).get(keyValue).setHowManyDeles(values[0]);
+			
 		}else if(fieldNames.get(0).equals(FieldName.POP3_LAST_COMMAND)) {
+			
 			getMemoryStorageLocation(location).get(keyValue).setLastCommand(values[0]);
 			getMemoryStorageLocation(location).get(keyValue).setLastCommandResult(values[1]);
 			getMemoryStorageLocation(location).get(keyValue).setLastCommandFirstArg(values[2]);
 			getMemoryStorageLocation(location).get(keyValue).setLastCommandSecondArg(values[3]);
+			
 		}else if(fieldNames.get(0).equals(FieldName.POP3_SESSION_STATUS)) {
+			
 			getMemoryStorageLocation(location).get(keyValue).setSessionStatus(values[0]);
+			
 		}else if(fieldNames.get(0).equals(FieldName.POP3_SESSION_UIDS)) {
 			
 			AbstractRequestHandler.log.info("Adding "+ values.length +" UIDS " + " to " + location.toString());
@@ -76,6 +87,7 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 			for(int i = 0; i < values.length; i++) {
 				getMemoryStorageLocation(location).get(keyValue).addUID(values[i]);
 			}
+			
 		}else if(fieldNames.get(0).equals(FieldName.POP3_MESSAGE_TO_DELETE)) {
 			
 			AbstractRequestHandler.log.info("Marking message "+ values[0] +" for deletion");
@@ -91,6 +103,12 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 			for(int i = 0; i < values.length; i++) {
 				getMemoryStorageLocation(location).get(keyValue).addDimension(values[i]);
 			}			
+		}else if(fieldNames.get(0).equals(FieldName.USER_MESSAGES_NUMBER)) {
+			
+			AbstractRequestHandler.log.info("Updating messages number ");
+			
+			getMemoryStorageLocation(location).get(keyValue).setMessagesNumber(values[0]);
+			getMemoryStorageLocation(location).get(keyValue).setMessagesTotalSize(values[1]);
 		}
 	}
 

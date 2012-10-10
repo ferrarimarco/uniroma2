@@ -5,7 +5,7 @@ import java.util.List;
 
 public enum FieldName {
 
-	// Users table
+	// Users table (USER_MESSAGES_NUMBER and MESSAGES_TOTAL_DIMENSION are used also for each POP3 Session)
 	POP3_USER_NAME, POP3_FULL_NAME, POP3_USER_PASSWORD, USER_MESSAGES_NUMBER, MESSAGES_TOTAL_DIMENSION,
 
 	// POP3 Session table
@@ -129,7 +129,7 @@ public enum FieldName {
 
 		return pop3StatusFieldNames;
 	}
-
+	
 	public static List<FieldName> getSMTPStatusTableFieldNames() {
 
 		List<FieldName> smtpStatusFieldNames = new ArrayList<FieldName>();

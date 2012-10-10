@@ -18,9 +18,10 @@ public class POP3SessionStatusRecord {
 	private String howManyDeles;
 	private Map<String, String> uids;
 	private List<String> dimensions;
+	private String messagesNumber;
+	private String messagesTotalSize;
 		
 	public POP3SessionStatusRecord(String sessionStatus, String lastCommand, String lastCommandResult, String sessionUserName, String lastCommandFirstArg, String lastCommandSecondArg, String howManyDeles) {
-
 		this.sessionStatus = sessionStatus;
 		this.lastCommand = lastCommand;
 		this.lastCommandResult = lastCommandResult;
@@ -30,34 +31,30 @@ public class POP3SessionStatusRecord {
 		this.howManyDeles = howManyDeles;
 		uids = new HashMap<String, String>();
 		dimensions = new ArrayList<String>();
+		messagesNumber = Integer.toString(0);
+		messagesTotalSize = Integer.toString(0);
 	}
 
 	public String getSessionStatus() {
-	
 		return sessionStatus;
 	}
-
 	
 	public void setSessionStatus(String sessionStatus) {
-	
 		this.sessionStatus = sessionStatus;
 	}
 
 	
 	public String getLastCommand() {
-	
 		return lastCommand;
 	}
 
 	
 	public void setLastCommand(String lastCommand) {
-	
 		this.lastCommand = lastCommand;
 	}
 
 	
 	public String getLastCommandResult() {
-	
 		return lastCommandResult;
 	}
 
@@ -179,5 +176,21 @@ public class POP3SessionStatusRecord {
 		}
 		
 		return "";
+	}
+
+	public String getMessagesNumber() {
+		return messagesNumber;
+	}
+
+	public void setMessagesNumber(String messagesNumber) {
+		this.messagesNumber = messagesNumber;
+	}
+
+	public String getMessagesTotalSize() {
+		return messagesTotalSize;
+	}
+
+	public void setMessagesTotalSize(String messagesTotalSize) {
+		this.messagesTotalSize = messagesTotalSize;
 	}
 }
