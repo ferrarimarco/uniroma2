@@ -16,15 +16,19 @@ import com.amazonaws.services.dynamodb.model.AttributeValueUpdate;
 import com.amazonaws.services.dynamodb.model.ComparisonOperator;
 import com.amazonaws.services.dynamodb.model.Condition;
 import com.amazonaws.services.dynamodb.model.DeleteItemRequest;
+import com.amazonaws.services.dynamodb.model.DescribeTableRequest;
 import com.amazonaws.services.dynamodb.model.GetItemRequest;
 import com.amazonaws.services.dynamodb.model.GetItemResult;
 import com.amazonaws.services.dynamodb.model.Key;
+import com.amazonaws.services.dynamodb.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodb.model.ProvisionedThroughputExceededException;
 import com.amazonaws.services.dynamodb.model.PutItemRequest;
 import com.amazonaws.services.dynamodb.model.ReturnValue;
 import com.amazonaws.services.dynamodb.model.ScanRequest;
 import com.amazonaws.services.dynamodb.model.ScanResult;
+import com.amazonaws.services.dynamodb.model.TableDescription;
 import com.amazonaws.services.dynamodb.model.UpdateItemRequest;
+import com.amazonaws.services.dynamodb.model.UpdateTableRequest;
 
 import controller.AbstractRequestHandler;
 import controller.pop3.POP3MessageDeletion;
@@ -35,6 +39,12 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 
 	private static final int MAX_RETRIES = 10;
 	private static final int SLEEP_TIME = 5;
+	private static final long MAX_READ_THR = 100L;
+	private static final long MAX_WRITE_THR = 100L;
+	private static final long MIN_READ_THR = 5L;
+	private static final long MIN_WRITE_THR = 5L;
+	private static final long READ_THR_INCREMENT = 5L;
+	private static final long WRITE_THR_INCREMENT = 5L;
 	
 	// TODO: manage the thr exceeded condition: if the DB cannot be contacted in MAX_RETRIES tries then we have to handle this
 	
@@ -50,6 +60,30 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 
 	private AmazonDynamoDBClient getClient() {
 		return client;
+	}
+
+	private void increaseThroughput(String tableName) {
+		TableDescription tableDescription = getClient().describeTable(new DescribeTableRequest().withTableName(tableName)).getTable();
+
+		Long readCapacity = tableDescription.getProvisionedThroughput().getReadCapacityUnits();
+		Long writeCapacity = tableDescription.getProvisionedThroughput().getWriteCapacityUnits();
+
+		if((writeCapacity <= MAX_WRITE_THR - WRITE_THR_INCREMENT) && (readCapacity <= MAX_READ_THR - READ_THR_INCREMENT)) {
+
+			ProvisionedThroughput provisionedThroughput = new ProvisionedThroughput()
+			.withReadCapacityUnits(readCapacity + READ_THR_INCREMENT)
+			.withWriteCapacityUnits(writeCapacity + WRITE_THR_INCREMENT);
+
+			AbstractRequestHandler.log.info("Increasing capacity of " + tableName + " to (r,w) " + (readCapacity + 5L) + " " + (writeCapacity + 5L));
+
+			UpdateTableRequest updateTableRequest = new UpdateTableRequest()
+			.withTableName(tableName)
+			.withProvisionedThroughput(provisionedThroughput);
+
+			getClient().updateTable(updateTableRequest);
+		}else {
+			AbstractRequestHandler.log.info("Cannot increase throughput anymore for table: " + tableName);
+		}
 	}
 
 	@Override
@@ -73,10 +107,21 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
 					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
 					Thread.sleep(delay);
+					
+					// Try to increase provisioned thr and retry
+					if(i == MAX_RETRIES - 1) {
+						// Restart
+						i = -1;
+						
+						increaseThroughput(location.toString());
+					}
+					
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
 			}
+			
+
 		}
 	}
 
@@ -102,6 +147,15 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
 					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
 					Thread.sleep(delay);
+					
+					// Try to increase provisioned thr and retry
+					if(i == MAX_RETRIES - 1) {
+						// Restart
+						i = -1;
+						
+						increaseThroughput(location.toString());
+					}
+					
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -144,6 +198,14 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
 					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
 					Thread.sleep(delay);
+					
+					// Try to increase provisioned thr and retry
+					if(i == MAX_RETRIES - 1) {
+						// Restart
+						i = -1;
+						
+						increaseThroughput(location.toString());
+					}					
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -170,6 +232,15 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
 					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
 					Thread.sleep(delay);
+					
+					// Try to increase provisioned thr and retry
+					if(i == MAX_RETRIES - 1) {
+						// Restart
+						i = -1;
+						
+						increaseThroughput(location.toString());
+					}
+					
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -196,6 +267,14 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
 					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
 					Thread.sleep(delay);
+					
+					// Try to increase provisioned thr and retry
+					if(i == MAX_RETRIES - 1) {
+						// Restart
+						i = -1;
+						
+						increaseThroughput(location.toString());
+					}
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -259,6 +338,14 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 					int delay = SLEEP_TIME + (int) (SLEEP_TIME * Math.random() * (endInterval + 1));
 					AbstractRequestHandler.log.info("Aspetto per " + delay + " ms");
 					Thread.sleep(delay);
+					
+					// Try to increase provisioned thr and retry
+					if(i == MAX_RETRIES - 1) {
+						// Restart
+						i = -1;
+						
+						increaseThroughput(location.toString());
+					}
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
