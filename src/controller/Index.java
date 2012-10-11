@@ -1,5 +1,10 @@
 package controller;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import controller.persistance.AWSDynamoDBDownScaler;
+
 public class Index {
 
 	public static final int POP3_PORT = 110;
@@ -20,5 +25,12 @@ public class Index {
 		
 		Thread healthCheckThread = new Thread (healthCheckServer);
 		healthCheckThread.start();
+		
+		// Timer to handle scale down of DynamoDB
+		Timer scaleDownTimer = new Timer();
+		TimerTask scaleDownTask = new AWSDynamoDBDownScaler();
+		
+		// Schedule the event every 10 minutes (= 600000 milliseconds)
+		scaleDownTimer.schedule(scaleDownTask, 0, 600000L);
 	}
 }

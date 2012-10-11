@@ -3,6 +3,7 @@ package controller.persistance;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,12 +42,13 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 	private static final int SLEEP_TIME = 5;
 	private static final long MAX_READ_THR = 100L;
 	private static final long MAX_WRITE_THR = 100L;
-	private static final long MIN_READ_THR = 5L;
-	private static final long MIN_WRITE_THR = 5L;
-	private static final long READ_THR_INCREMENT = 5L;
-	private static final long WRITE_THR_INCREMENT = 5L;
-	
-	// TODO: manage the thr exceeded condition: if the DB cannot be contacted in MAX_RETRIES tries then we have to handle this
+	public static final long MIN_READ_THR = 5L;
+	public static final long MIN_WRITE_THR = 5L;
+	public static final long READ_THR_INCREMENT = 6L;
+	public static final long WRITE_THR_INCREMENT = 6L;
+	public static final long READ_THR_DECREMENT = 3L;
+	public static final long WRITE_THR_DECREMENT = 3L;
+	private static final long COOLDOWN = 300000L; // Five minutes 
 	
 	public AWSDynamoDBStorageManager() {
 		AWSCredentials credentials;
@@ -65,8 +67,8 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 	private void increaseThroughput(String tableName) {
 		TableDescription tableDescription = getClient().describeTable(new DescribeTableRequest().withTableName(tableName)).getTable();
 
-		Long readCapacity = tableDescription.getProvisionedThroughput().getReadCapacityUnits();
-		Long writeCapacity = tableDescription.getProvisionedThroughput().getWriteCapacityUnits();
+		long readCapacity = tableDescription.getProvisionedThroughput().getReadCapacityUnits();
+		long writeCapacity = tableDescription.getProvisionedThroughput().getWriteCapacityUnits();
 
 		if((writeCapacity <= MAX_WRITE_THR - WRITE_THR_INCREMENT) && (readCapacity <= MAX_READ_THR - READ_THR_INCREMENT)) {
 
@@ -74,18 +76,58 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 			.withReadCapacityUnits(readCapacity + READ_THR_INCREMENT)
 			.withWriteCapacityUnits(writeCapacity + WRITE_THR_INCREMENT);
 
-			AbstractRequestHandler.log.info("Increasing capacity of " + tableName + " to (r,w) " + (readCapacity + 5L) + " " + (writeCapacity + 5L));
+			AbstractRequestHandler.log.info("Increasing capacity of " + tableName + " to (r,w) " + (readCapacity + READ_THR_INCREMENT) + " " + (writeCapacity + WRITE_THR_INCREMENT));
 
 			UpdateTableRequest updateTableRequest = new UpdateTableRequest()
 			.withTableName(tableName)
 			.withProvisionedThroughput(provisionedThroughput);
 
 			getClient().updateTable(updateTableRequest);
+			
+			long timeMillis = Calendar.getInstance().getTimeInMillis();
+			
+			String timeNow = Long.toString(timeMillis);
+			
+			update(StorageLocation.TABLES_MAINTENANCE, tableName, FieldName.getMaintenanceFields() , timeNow);
+			
 		}else {
 			AbstractRequestHandler.log.info("Cannot increase throughput anymore for table: " + tableName);
 		}
 	}
 
+	public void decreaseThroughput(String tableName) {
+		
+		TableDescription tableDescription = getClient().describeTable(new DescribeTableRequest().withTableName(tableName)).getTable();
+
+		long readCapacity = tableDescription.getProvisionedThroughput().getReadCapacityUnits();
+		long writeCapacity = tableDescription.getProvisionedThroughput().getWriteCapacityUnits();
+
+		// Read update time
+		long updateTime = Long.parseLong(read(StorageLocation.TABLES_MAINTENANCE, FieldName.UPDATE_TIME, tableName));
+		long timeMillis = Calendar.getInstance().getTimeInMillis();
+		
+		if (timeMillis - updateTime > COOLDOWN) {
+			if ((writeCapacity >= MIN_WRITE_THR + WRITE_THR_DECREMENT) && (readCapacity >= MIN_READ_THR + READ_THR_DECREMENT)) {
+
+				ProvisionedThroughput provisionedThroughput = new ProvisionedThroughput().withReadCapacityUnits(readCapacity - READ_THR_DECREMENT).withWriteCapacityUnits(writeCapacity - WRITE_THR_DECREMENT);
+
+				AbstractRequestHandler.log.info("Decreasing capacity of " + tableName + " to (r,w) " + (readCapacity - READ_THR_DECREMENT) + " " + (writeCapacity - WRITE_THR_DECREMENT));
+
+				UpdateTableRequest updateTableRequest = new UpdateTableRequest().withTableName(tableName).withProvisionedThroughput(provisionedThroughput);
+
+				getClient().updateTable(updateTableRequest);
+
+				timeMillis = Calendar.getInstance().getTimeInMillis();
+
+				String timeNow = Long.toString(timeMillis);
+
+				update(StorageLocation.TABLES_MAINTENANCE, tableName, FieldName.getMaintenanceFields(), timeNow);
+			} else {
+				AbstractRequestHandler.log.info("Cannot increase throughput anymore for table: " + tableName);
+			}
+		}
+	}
+	
 	@Override
 	public void create(StorageLocation location, List<FieldName> fieldNames, String... values) {
 		

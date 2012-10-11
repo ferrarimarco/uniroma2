@@ -18,13 +18,25 @@ public enum FieldName {
 	SMTP_SESSION_ID, SMTP_SESSION_STATUS,
 
 	// SMTP temp message store
-	SMTP_TEMP_ID, SMTP_TEMP_FROM, SMTP_TEMP_RAW_DATA, SMTP_TEMP_TO_ADDRESSES, SMTP_TEMP_TO_USERS, SMTP_TEMP_HEADER, SMTP_TEMP_BODY, SMTP_TEMP_MESSAGE_SIZE;
+	SMTP_TEMP_ID, SMTP_TEMP_FROM, SMTP_TEMP_RAW_DATA, SMTP_TEMP_TO_ADDRESSES, SMTP_TEMP_TO_USERS, SMTP_TEMP_HEADER, SMTP_TEMP_BODY, SMTP_TEMP_MESSAGE_SIZE,
 
+	// Tables maintenance table
+	UPDATE_TIME;
+	
 	@Override
 	public String toString() {
 		return super.toString().toLowerCase();
 	}
 
+	public static List<FieldName> getMaintenanceFields(){
+		
+		List<FieldName> maintenanceData = new ArrayList<FieldName>();
+
+		maintenanceData.add(UPDATE_TIME);
+
+		return maintenanceData;
+	}
+	
 	public static List<FieldName> getMaildropStatData(){
 		List<FieldName> maildropData = new ArrayList<FieldName>();
 
