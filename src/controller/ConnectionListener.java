@@ -14,8 +14,6 @@ import controller.smtp.SMTPRequestHandler;
 public class ConnectionListener implements Runnable {
 
 	private ServerSocket serverSocket;
-	private static final int POP3_PORT = 110;
-	private static final int SMTP_PORT = 25;
 
 	public ConnectionListener(int portNumber, int backlog) {
 
@@ -31,20 +29,19 @@ public class ConnectionListener implements Runnable {
 		try {
 			while (true) {
 				
-				// TODO: debug Wait for connection
 				AbstractRequestHandler.log.info("Waiting for connection on port " + serverSocket.getLocalPort());
-				System.out.println("Waiting for connection on port " + serverSocket.getLocalPort());
 				
 				Socket connection = serverSocket.accept();
 				
 				RequestHandler requestHandler = null;
 
-				if (serverSocket.getLocalPort() == POP3_PORT) {
+				if (serverSocket.getLocalPort() == Index.POP3_PORT) {
 					requestHandler = new POP3RequestHandler(connection, new POP3CommandHandler(), new POP3CommunicationHandler());
-					//requestHandler.handleRequest(connection, new POP3CommandHandler(), new POP3CommunicationHandler());
-				} else if (serverSocket.getLocalPort() == SMTP_PORT) {
+				} else if (serverSocket.getLocalPort() == Index.SMTP_PORT) {
 					requestHandler = new SMTPRequestHandler(connection, new SMTPCommandHandler(), new SMTPCommunicationHandler());
-					//requestHandler.handleRequest(connection, new SMTPCommandHandler(), new SMTPCommunicationHandler());
+				}else if(serverSocket.getLocalPort() == Index.HEALTH_CHECK_PORT) {
+					AbstractRequestHandler.log.info("Received health check on port " + serverSocket.getLocalPort());
+					connection.close();
 				}
 				
 				Thread reqHandlerT = new Thread(requestHandler);
