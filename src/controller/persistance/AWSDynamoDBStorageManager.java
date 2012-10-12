@@ -169,12 +169,17 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 
 	@Override
 	public String read(StorageLocation location, FieldName fieldName, String keyValue) {
-
+		
 		GetItemRequest getItemRequest = new GetItemRequest().withTableName(location.toString()).withKey(new Key().withHashKeyElement(new AttributeValue().withS(keyValue)))
 				.withAttributesToGet(Arrays.asList(fieldName.toString()));
+		
+		// We need consistent reads to update maildrop stat data
+		if(fieldName.equals(FieldName.USER_MESSAGES_NUMBER) || fieldName.equals(FieldName.MESSAGES_TOTAL_DIMENSION)) {
+			getItemRequest = getItemRequest.withConsistentRead(true);
+		}
 
 		GetItemResult result = null;
-
+		
 		for(int i = 0; i < MAX_RETRIES; i++) {
 			try {
 				result = getClient().getItem(getItemRequest);

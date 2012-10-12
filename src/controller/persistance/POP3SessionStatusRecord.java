@@ -20,6 +20,8 @@ public class POP3SessionStatusRecord {
 	private List<String> dimensions;
 	private String messagesNumber;
 	private String messagesTotalSize;
+	private String deletedMessagesTotalSize;
+	private String deletedMessagesNumber;
 		
 	public POP3SessionStatusRecord(String sessionStatus, String lastCommand, String lastCommandResult, String sessionUserName, String lastCommandFirstArg, String lastCommandSecondArg, String howManyDeles) {
 		this.sessionStatus = sessionStatus;
@@ -33,6 +35,8 @@ public class POP3SessionStatusRecord {
 		dimensions = new ArrayList<String>();
 		messagesNumber = Integer.toString(0);
 		messagesTotalSize = Integer.toString(0);
+		deletedMessagesTotalSize = "0";
+		deletedMessagesNumber = "0";
 	}
 
 	public String getSessionStatus() {
@@ -192,5 +196,21 @@ public class POP3SessionStatusRecord {
 
 	public void setMessagesTotalSize(String messagesTotalSize) {
 		this.messagesTotalSize = messagesTotalSize;
+	}
+
+	public String getDeletedMessagesTotalSize() {
+		return deletedMessagesTotalSize;
+	}
+
+	public void setDeletedMessagesTotalSize(String deletedMessagesTotalSize) {
+		this.deletedMessagesTotalSize = deletedMessagesTotalSize;
+	}
+
+	public String getDeletedMessagesNumber() {
+		return deletedMessagesNumber;
+	}
+
+	public void setDeletedMessagesNumber(String deletedMessagesNumber) {
+		this.deletedMessagesNumber = deletedMessagesNumber;
 	}
 }

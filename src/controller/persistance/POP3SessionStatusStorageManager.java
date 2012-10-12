@@ -48,6 +48,10 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 			return getMemoryStorageLocation(location).get(keyValue).getMessagesNumber();
 		}else if(fieldName.equals(FieldName.MESSAGES_TOTAL_DIMENSION)) {
 			return getMemoryStorageLocation(location).get(keyValue).getMessagesTotalSize();
+		}else if(fieldName.equals(FieldName.POP3_DELETED_MESSAGES_NUMBER)) {
+			return getMemoryStorageLocation(location).get(keyValue).getDeletedMessagesNumber();
+		}else if(fieldName.equals(FieldName.POP3_DELETED_MESSAGES_SIZE)) {
+			return getMemoryStorageLocation(location).get(keyValue).getDeletedMessagesTotalSize();
 		}else {
 			return "";
 		}
@@ -105,10 +109,16 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 			}			
 		}else if(fieldNames.get(0).equals(FieldName.USER_MESSAGES_NUMBER)) {
 			
-			AbstractRequestHandler.log.info("Updating messages number ");
+			AbstractRequestHandler.log.info("Updating messages number and size");
 			
 			getMemoryStorageLocation(location).get(keyValue).setMessagesNumber(values[0]);
 			getMemoryStorageLocation(location).get(keyValue).setMessagesTotalSize(values[1]);
+		}else if(fieldNames.get(0).equals(FieldName.POP3_DELETED_MESSAGES_NUMBER)) {
+			
+			AbstractRequestHandler.log.info("Updating deleted number and size");
+			
+			getMemoryStorageLocation(location).get(keyValue).setDeletedMessagesNumber(values[0]);
+			getMemoryStorageLocation(location).get(keyValue).setDeletedMessagesTotalSize(values[1]);
 		}
 	}
 

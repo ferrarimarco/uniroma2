@@ -200,11 +200,17 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		int messages = 0;
 		int totalDimension = 0;
 		
-		messages = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.USER_MESSAGES_NUMBER, clientId));
-		totalDimension = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.MESSAGES_TOTAL_DIMENSION, clientId));
-
-		persistanceManager.update(StorageLocation.POP3_USERS, userName, FieldName.getMaildropStatData(), Integer.toString(messages), Integer.toString(totalDimension));
+		messages = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_USERS, FieldName.USER_MESSAGES_NUMBER, clientId));
+		totalDimension = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_USERS, FieldName.MESSAGES_TOTAL_DIMENSION, clientId));
 		
+		// Update deleted messages stats
+		int deletedMessagesCount = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_DELETED_MESSAGES_NUMBER, clientId));
+		int deletedMessagesSize = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_DELETED_MESSAGES_SIZE, clientId));
+		messages -= deletedMessagesCount;
+		totalDimension -= deletedMessagesSize;
+		
+		persistanceManager.update(StorageLocation.POP3_USERS, userName, FieldName.getMaildropStatData(), Integer.toString(messages), Integer.toString(totalDimension));
+
 		persistanceManager.delete(StorageLocation.POP3_SESSIONS, clientId);
 	}
 
@@ -402,18 +408,24 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		int messageCountNumber = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.USER_MESSAGES_NUMBER, clientId));
 		int messageTotalSizeNumber = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.MESSAGES_TOTAL_DIMENSION, clientId));
 		
-		// Update message count
-		messageCountNumber--;
-		
+		// Update maildrop data
+		messageCountNumber--;		
 		int messageSizeNumber = Integer.parseInt(dimensionsList.get(messageNumber));
-		
-		// Update messages total dimension
 		messageTotalSizeNumber -= messageSizeNumber;
 		
 		String messagesCount = Integer.toString(messageCountNumber);
 		String messageTotalSize = Integer.toString(messageTotalSizeNumber);
 		
 		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getMaildropStatData(), messagesCount, messageTotalSize);
+		
+		// Update deleted messages stats
+		int deletedMessagesCount = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_DELETED_MESSAGES_NUMBER, clientId));
+		deletedMessagesCount++;
+		
+		int deletedMessagesSize = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_DELETED_MESSAGES_SIZE, clientId));
+		deletedMessagesSize += messageSizeNumber;
+		
+		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getDeletedMessagesStats(), Integer.toString(deletedMessagesCount), Integer.toString(deletedMessagesSize));
 		
 		// Send positive response
 		communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "Message marked for deletion.");
@@ -521,6 +533,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		String messageTotalSize = Integer.toString(messageTotalSizeNumber);
 		
 		persistanceManager.update(StorageLocation.POP3_USERS, userName, FieldName.getMaildropStatData(), messagesCount, messageTotalSize);
+		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getDeletedMessagesStats(), Integer.toString(0), Integer.toString(0));
 		
 		// Update DELE command count
 		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getPOP3DelesFieldOnly(), Integer.toString(0));
