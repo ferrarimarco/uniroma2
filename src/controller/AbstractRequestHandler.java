@@ -5,10 +5,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageManager;
@@ -20,24 +19,29 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	private CommunicationHandler communicationHandler;
 	
 	public static final Logger log = Logger.getLogger("sd-mail-server-claudiani-ferrari.mailserver");
-	private static FileHandler fileHandler;
+	//private static FileHandler fileHandler;
 	
 	public AbstractRequestHandler(Socket socket, CommandHandler commandHandler, CommunicationHandler communicationHandler) {
 		this.socket = socket;
 		this.commandHandler = commandHandler;
 		this.communicationHandler = communicationHandler;
-		
+		/*
 		try {
-			fileHandler = new FileHandler("/home/ubuntu/log.txt", true);
+			//fileHandler = new FileHandler("/home/ubuntu/log.txt", true);
 			
-			fileHandler.setFormatter(new SimpleFormatter());
+			//fileHandler.setFormatter(new SimpleFormatter());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 
-		log.addHandler(fileHandler);
+		//log.addHandler(fileHandler);
 		log.setLevel(Level.INFO);
+		Handler[] handlers = log.getHandlers();
+		
+		for(int i = 0; i < handlers.length; i++) {
+			log.removeHandler(handlers[i]);
+		}
 	}
 	
 	@Override
