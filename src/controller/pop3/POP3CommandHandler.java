@@ -278,6 +278,9 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 					communicationHandler.sendLine(writer, (i + 1) + " " + dimensions.get(i), true, true);
 				}
 			}
+			
+			// Update DELE command count
+			persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getPOP3DelesFieldOnly(), Integer.toString(0));
 		} else {
 
 			int messageNumber = Integer.parseInt(argument) - 1;
@@ -558,8 +561,8 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 				communicationHandler.sendListAsMultiLineResponse(writer, uids);
 
 			} else {// No messages in the maildrop
-				communicationHandler.sendResponse(writer, POP3StatusIndicator.OK.toString(), "");
 				communicationHandler.sendBlankLineMultilineEnd(writer);
+				return;
 			}
 
 		} else {
