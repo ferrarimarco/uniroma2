@@ -123,7 +123,7 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 
 				update(StorageLocation.TABLES_MAINTENANCE, tableName, FieldName.getMaintenanceFields(), timeNow);
 			} else {
-				AbstractRequestHandler.log.info("Cannot increase throughput anymore for table: " + tableName);
+				AbstractRequestHandler.log.info("Cannot decrease throughput anymore for table: " + tableName);
 			}
 		}
 	}
