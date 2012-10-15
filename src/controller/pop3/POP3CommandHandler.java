@@ -156,18 +156,17 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		String[] uidsArray = uids.toArray(new String[uids.size()]);
 		String[] dimensionArray = dimensions.toArray(new String[dimensions.size()]);
 		
-		AbstractRequestHandler.log.info("uidsArray length "+ uidsArray.length);
-		AbstractRequestHandler.log.info("dimensionArray length "+ dimensionArray.length);
-		
 		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getPOP3UIDS(), uidsArray);
 		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getPOP3Dimensions(), dimensionArray);
 		
-		int messages = 0;
-		int totalDimension = 0;
+		String messagesCons = persistanceManager.read(StorageLocation.POP3_USERS, FieldName.USER_MESSAGES_NUMBER, userName);
+		String totalDim = persistanceManager.read(StorageLocation.POP3_USERS, FieldName.MESSAGES_TOTAL_DIMENSION, userName);
+
+		AbstractRequestHandler.log.info("messages: "+ messagesCons);
+		AbstractRequestHandler.log.info("totalDimension: "+ totalDim);
 		
-		// TODO: check count consistency! (STAT shows less messages than UIDL)
-		messages = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_USERS, FieldName.USER_MESSAGES_NUMBER, userName));
-		totalDimension = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_USERS, FieldName.MESSAGES_TOTAL_DIMENSION, userName));
+		int messages = Integer.parseInt(messagesCons);
+		int totalDimension = Integer.parseInt(totalDim);
 
 		persistanceManager.update(StorageLocation.POP3_SESSIONS, clientId, FieldName.getMaildropStatData(), Integer.toString(messages), Integer.toString(totalDimension));
 		
@@ -197,11 +196,14 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		}
 		
 		// Update maildrop data
-		int messages = 0;
-		int totalDimension = 0;
+		String messagesCons = persistanceManager.read(StorageLocation.POP3_USERS, FieldName.USER_MESSAGES_NUMBER, userName);
+		String totalDim = persistanceManager.read(StorageLocation.POP3_USERS, FieldName.MESSAGES_TOTAL_DIMENSION, userName);
+
+		AbstractRequestHandler.log.info("messages: "+ messagesCons);
+		AbstractRequestHandler.log.info("totalDimension: "+ totalDim);
 		
-		messages = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_USERS, FieldName.USER_MESSAGES_NUMBER, clientId));
-		totalDimension = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_USERS, FieldName.MESSAGES_TOTAL_DIMENSION, clientId));
+		int messages = Integer.parseInt(messagesCons);
+		int totalDimension = Integer.parseInt(totalDim);
 		
 		// Update deleted messages stats
 		int deletedMessagesCount = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_DELETED_MESSAGES_NUMBER, clientId));

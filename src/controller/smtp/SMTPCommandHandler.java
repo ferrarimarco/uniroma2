@@ -228,14 +228,14 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 			String user = users.get(i);
 			String newMessageId = messageId + "_" + user;
 			header = header.replace(messageId, newMessageId);
-			/*
+			
 			// TODO: DEBUG
 			AbstractRequestHandler.log.info("Message ID: " + newMessageId);
 			AbstractRequestHandler.log.info("Header: " + header);
 			AbstractRequestHandler.log.info("Body: " + body);
 			AbstractRequestHandler.log.info("Message size: " + messageSize);
 			AbstractRequestHandler.log.info("User: " + user);
-			*/
+			
 			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, user, POP3MessageDeletion.NO.toString(), messageSize, header, body);
 			
 			// Update maildrop data
