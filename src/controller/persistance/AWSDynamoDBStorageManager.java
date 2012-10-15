@@ -48,7 +48,7 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 	public static final long WRITE_THR_INCREMENT = 6L;
 	public static final long READ_THR_DECREMENT = 3L;
 	public static final long WRITE_THR_DECREMENT = 3L;
-	private static final long COOLDOWN = 300000L; // Five minutes 
+	private static final long COOLDOWN = 1200000L; // 20 minutes 
 	
 	public AWSDynamoDBStorageManager() {
 		AWSCredentials credentials;
