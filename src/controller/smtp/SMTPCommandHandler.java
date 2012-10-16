@@ -11,7 +11,6 @@ import controller.SpecialCharactersSequence;
 import controller.persistance.FieldName;
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageLocation;
-import controller.pop3.POP3MessageDeletion;
 
 public class SMTPCommandHandler extends AbstractCommandHandler {
 
@@ -237,7 +236,8 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 			AbstractRequestHandler.log.info("User: " + user);
 			
 			// Add the message to user's maildrop
-			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, user, POP3MessageDeletion.NO.toString(), messageSize, header, body);
+			// TODO: delete unnecessary fields
+			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, header, body);
 			
 			// Add the message uid to uids table
 			persistanceManager.create(StorageLocation.POP3_UIDS, FieldName.getUidsTableFields(), user, newMessageId, messageSize);

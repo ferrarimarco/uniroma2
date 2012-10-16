@@ -192,7 +192,7 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		
 		for(int i = 0; i < uids.size(); i++) {
 			// Delete messages marked for deletion
-			persistanceManager.delete(StorageLocation.POP3_MAILDROPS, uids.get(i));			
+			persistanceManager.delete(StorageLocation.POP3_MAILDROPS, uids.get(i));	
 			persistanceManager.delete(StorageLocation.POP3_UIDS, userName, uids.get(i));
 		}
 		
