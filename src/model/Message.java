@@ -147,7 +147,6 @@ public class Message {
 		uid = messageData.substring(startIndexId + offset, endIndexId);
 		AbstractRequestHandler.log.info("uid: " + uid);
 		
-		
 		int startIndexHeader = 0;
 		int endIndexHeader = messageData.indexOf(SpecialCharactersSequence.LINE_END.toString() + SpecialCharactersSequence.LINE_END.toString());
 		AbstractRequestHandler.log.info("endIndexHeader: " + endIndexHeader);
@@ -156,6 +155,7 @@ public class Message {
 
 		AbstractRequestHandler.log.info("HEADER: " + header);
 		
+		// TODO: delete the final CRLF.CRLF
 		body = messageData.substring(endIndexHeader + 4, messageData.length() - 2);
 
 		AbstractRequestHandler.log.info("BODY: " + body);
