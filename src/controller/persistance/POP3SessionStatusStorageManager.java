@@ -148,5 +148,9 @@ public class POP3SessionStatusStorageManager extends AbstractVolatileMemoryStora
 		AbstractRequestHandler.log.info("Get UIDS from " + location.toString());
 		return getMemoryStorageLocation(location).get(clientId).getUIDsList(isToDelete);
 	}
-
+	
+	@Override
+	public void delete(StorageLocation location, String keyValue, String rangeKey) {
+		throw new NotImplementedException();
+	}
 }

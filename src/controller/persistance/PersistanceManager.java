@@ -15,6 +15,8 @@ public interface PersistanceManager {
 	void addToSet(StorageLocation location, String keyValue, FieldName fieldName, String... values);
 
 	void delete(StorageLocation location, String keyValue);
+	
+	void delete(StorageLocation location, String keyValue, String rangeKey);
 
 	boolean isPresent(StorageLocation location, FieldName fieldName, String keyValue);
 

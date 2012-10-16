@@ -79,4 +79,9 @@ public class SMTPSessionsStorageManager extends AbstractVolatileMemoryStorageMan
 		throw new NotImplementedException();
 	}
 
+	@Override
+	public void delete(StorageLocation location, String keyValue, String rangeKey) {
+		throw new NotImplementedException();
+	}
+	
 }

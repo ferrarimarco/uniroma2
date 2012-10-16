@@ -104,5 +104,10 @@ public class SMTPTempMessageStorageManager extends AbstractVolatileMemoryStorage
 	public List<String> getMessageUIDs(StorageLocation location, String clientId, String userName, boolean isToDelete) {
 		throw new NotImplementedException();
 	}
+
+	@Override
+	public void delete(StorageLocation location, String keyValue, String rangeKey) {
+		throw new NotImplementedException();
+	}
 	
 }

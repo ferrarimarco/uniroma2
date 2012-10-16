@@ -1,7 +1,7 @@
 package controller.persistance;
 
 public enum StorageLocation {
-	POP3_SESSIONS, POP3_USERS, POP3_PASSWORDS, POP3_MAILDROPS,
+	POP3_SESSIONS, POP3_USERS, POP3_PASSWORDS, POP3_MAILDROPS, POP3_UIDS,
 
 	SMTP_SESSIONS, SMTP_TEMP_MESSAGE_STORE,
 	
@@ -21,6 +21,8 @@ public enum StorageLocation {
 			return "smtp_temp_message_store_claudiani_ferrari";
 		} else if (this.equals(TABLES_MAINTENANCE)) {
 			return "table_maintenance_data";
+		} else if (this.equals(POP3_UIDS)) {
+			return "pop3_uids";
 		} else {
 			// TODO: check this return statement
 			// This should never occur

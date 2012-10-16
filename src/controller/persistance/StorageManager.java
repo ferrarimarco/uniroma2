@@ -86,4 +86,10 @@ public class StorageManager implements PersistanceManager {
 		return persistanceManager.getSet(location, fieldName, keyValue);
 	}
 
+	@Override
+	public void delete(StorageLocation location, String keyValue, String rangeKey) {
+		PersistanceManager persistanceManager = getPersistanceManager(location);
+		persistanceManager.delete(location, keyValue, rangeKey);
+	}
+
 }

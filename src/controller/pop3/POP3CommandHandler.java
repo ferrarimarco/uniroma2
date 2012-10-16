@@ -139,11 +139,11 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 
 		setStatus(persistanceManager, POP3SessionStatus.TRANSACTION, clientId);
 
-		// Get the UIDs from the POP3_MAILDROPS location (to complete session initialization)
-		// Subsequent calls to getMessageUIDs will have the POP3_SESSIONS location to avoid a table scan
-		List<String> uidsAndDimensions = persistanceManager.getMessageUIDs(StorageLocation.POP3_MAILDROPS, clientId, userName, false);
+		// Get the UIDs from the POP3_UIDS location (to complete session initialization)
+		// Subsequent calls to getMessageUIDs will have the POP3_SESSIONS location to avoid another DB query
+		List<String> uidsAndDimensions = persistanceManager.getMessageUIDs(StorageLocation.POP3_UIDS, clientId, userName, false);
 		
-		AbstractRequestHandler.log.info("uids List length "+ uidsAndDimensions.size());
+		AbstractRequestHandler.log.info("uidsAndDimensions List length "+ uidsAndDimensions.size());
 		
 		List<String> uids = new ArrayList<String>(uidsAndDimensions.size() / 2);
 		List<String> dimensions = new ArrayList<String>(uidsAndDimensions.size() / 2);
@@ -192,7 +192,8 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		
 		for(int i = 0; i < uids.size(); i++) {
 			// Delete messages marked for deletion
-			persistanceManager.delete(StorageLocation.POP3_MAILDROPS, uids.get(i));
+			persistanceManager.delete(StorageLocation.POP3_MAILDROPS, uids.get(i));			
+			persistanceManager.delete(StorageLocation.POP3_UIDS, userName, uids.get(i));
 		}
 		
 		// Update maildrop data

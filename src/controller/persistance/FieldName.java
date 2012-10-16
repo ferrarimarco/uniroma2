@@ -132,6 +132,17 @@ public enum FieldName {
 
 		return pop3StatusFieldNames;
 	}
+	
+	public static List<FieldName> getUidsTableFields() {
+
+		List<FieldName> uidsTableFields = new ArrayList<FieldName>();
+
+		uidsTableFields.add(POP3_MESSAGE_TO);
+		uidsTableFields.add(POP3_MESSAGE_UID);
+		uidsTableFields.add(POP3_MESSAGE_DIMENSION);
+
+		return uidsTableFields;
+	}
 
 	public static List<FieldName> getMessageToDeleteTableFieldOnly() {
 
