@@ -276,7 +276,9 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 	@Override
 	public void delete(StorageLocation location, String keyValue) {
 
-		DeleteItemRequest deleteItemRequest = new DeleteItemRequest().withTableName(location.toString()).withKey(new Key().withHashKeyElement(new AttributeValue().withS(keyValue)));
+		DeleteItemRequest deleteItemRequest = new DeleteItemRequest()
+			.withTableName(location.toString())
+			.withKey(new Key().withHashKeyElement(new AttributeValue().withS(keyValue)));
 
 		for(int i = 0; i < MAX_RETRIES; i++) {
 			try {

@@ -124,7 +124,6 @@ public enum FieldName {
 		List<FieldName> pop3StatusFieldNames = new ArrayList<FieldName>();
 
 		pop3StatusFieldNames.add(POP3_MESSAGE_UID);
-		pop3StatusFieldNames.add(POP3_MESSAGE_TO);
 		pop3StatusFieldNames.add(POP3_MESSAGE_HEADER);
 		pop3StatusFieldNames.add(POP3_MESSAGE_DATA);
 

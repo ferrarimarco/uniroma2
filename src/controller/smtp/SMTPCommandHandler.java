@@ -236,7 +236,7 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 			AbstractRequestHandler.log.info("User: " + user);
 			
 			// Add the message to user's maildrop
-			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, user, header, body);
+			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, header, body);
 			
 			// Add the message uid to uids table
 			persistanceManager.create(StorageLocation.POP3_UIDS, FieldName.getUidsTableFields(), user, newMessageId, messageSize);
