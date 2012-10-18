@@ -173,12 +173,7 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 	public String read(StorageLocation location, FieldName fieldName, String keyValue) {
 		
 		GetItemRequest getItemRequest = new GetItemRequest().withTableName(location.toString()).withKey(new Key().withHashKeyElement(new AttributeValue().withS(keyValue)))
-				.withAttributesToGet(Arrays.asList(fieldName.toString()));
-		
-		// We need consistent reads to update maildrop stat data
-		if(fieldName.equals(FieldName.USER_MESSAGES_NUMBER) || fieldName.equals(FieldName.MESSAGES_TOTAL_DIMENSION)) {
-			getItemRequest = getItemRequest.withConsistentRead(true);
-		}
+				.withAttributesToGet(Arrays.asList(fieldName.toString())).withConsistentRead(true);
 
 		GetItemResult result = null;
 		
@@ -214,25 +209,41 @@ public class AWSDynamoDBStorageManager extends AbstractPersistantMemoryStorageMa
 		if (result.getItem() == null || result.getItem().get(fieldName.toString()) == null) {
 			return "";
 		} else {
-			return result.getItem().get(fieldName.toString()).getS();
+			if(fieldName.equals(FieldName.USER_MESSAGES_NUMBER) || fieldName.equals(FieldName.MESSAGES_TOTAL_DIMENSION)) {
+				return result.getItem().get(fieldName.toString()).getN();
+			}else {
+				return result.getItem().get(fieldName.toString()).getS();
+			}
 		}
 	}
 
 	@Override
 	public void update(StorageLocation location, String keyValue, List<FieldName> fieldNames, String... values) {
 
+		UpdateItemRequest updateItemRequest = null;
+		
 		Map<String, AttributeValueUpdate> updateItems = new HashMap<String, AttributeValueUpdate>();
 		Key key = new Key().withHashKeyElement(new AttributeValue().withS(keyValue));
+		
+		if(!location.equals(StorageLocation.POP3_USERS)) {
+			// TODO: check if filedNames and values have the same size
 
-		// TODO: check if filedNames and values have the same size
-
-		for (int i = 0; i < fieldNames.size(); i++) {
-			updateItems.put(fieldNames.get(i).toString(), new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(new AttributeValue(values[i])));
+			for (int i = 0; i < fieldNames.size(); i++) {
+				updateItems.put(fieldNames.get(i).toString(), new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(new AttributeValue(values[i])));
+			}
+		}else {
+			for (int i = 0; i < fieldNames.size(); i++) {
+				updateItems.put(fieldNames.get(i).toString(), new AttributeValueUpdate().withAction(AttributeAction.ADD).withValue(new AttributeValue().withN(values[i])));
+			}
 		}
-
-		// Update the attributes
-		UpdateItemRequest updateItemRequest = new UpdateItemRequest().withTableName(location.toString()).withKey(key).withReturnValues(ReturnValue.ALL_NEW).withAttributeUpdates(updateItems);
-
+		
+			// Update the attributes
+			updateItemRequest = new UpdateItemRequest()
+			.withTableName(location.toString())
+			.withKey(key)
+			.withReturnValues(ReturnValue.ALL_NEW) //TODO: is this necessary?
+			.withAttributeUpdates(updateItems);
+		
 		for(int i = 0; i < MAX_RETRIES; i++) {
 			try {
 				getClient().updateItem(updateItemRequest);

@@ -162,9 +162,6 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		String messagesCons = persistanceManager.read(StorageLocation.POP3_USERS, FieldName.USER_MESSAGES_NUMBER, userName);
 		String totalDim = persistanceManager.read(StorageLocation.POP3_USERS, FieldName.MESSAGES_TOTAL_DIMENSION, userName);
 
-		AbstractRequestHandler.log.info("messages: "+ messagesCons);
-		AbstractRequestHandler.log.info("totalDimension: "+ totalDim);
-		
 		int messages = Integer.parseInt(messagesCons);
 		int totalDimension = Integer.parseInt(totalDim);
 
@@ -197,23 +194,11 @@ public class POP3CommandHandler extends AbstractCommandHandler {
 		}
 		
 		// Update maildrop data
-		String messagesCons = persistanceManager.read(StorageLocation.POP3_USERS, FieldName.USER_MESSAGES_NUMBER, userName);
-		String totalDim = persistanceManager.read(StorageLocation.POP3_USERS, FieldName.MESSAGES_TOTAL_DIMENSION, userName);
+		String deletedMessagesCount = "-" + persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_DELETED_MESSAGES_NUMBER, clientId);
+		String deletedMessagesSize = "-" + persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_DELETED_MESSAGES_SIZE, clientId);
+		persistanceManager.update(StorageLocation.POP3_USERS, userName, FieldName.getMaildropStatData(), deletedMessagesCount, deletedMessagesSize);
 
-		AbstractRequestHandler.log.info("messages: "+ messagesCons);
-		AbstractRequestHandler.log.info("totalDimension: "+ totalDim);
-		
-		int messages = Integer.parseInt(messagesCons);
-		int totalDimension = Integer.parseInt(totalDim);
-		
-		// Update deleted messages stats
-		int deletedMessagesCount = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_DELETED_MESSAGES_NUMBER, clientId));
-		int deletedMessagesSize = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_SESSIONS, FieldName.POP3_DELETED_MESSAGES_SIZE, clientId));
-		messages -= deletedMessagesCount;
-		totalDimension -= deletedMessagesSize;
-		
-		persistanceManager.update(StorageLocation.POP3_USERS, userName, FieldName.getMaildropStatData(), Integer.toString(messages), Integer.toString(totalDimension));
-
+		// Delete session information
 		persistanceManager.delete(StorageLocation.POP3_SESSIONS, clientId);
 	}
 

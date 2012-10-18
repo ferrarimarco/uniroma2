@@ -11,7 +11,6 @@ import controller.SpecialCharactersSequence;
 import controller.persistance.FieldName;
 import controller.persistance.PersistanceManager;
 import controller.persistance.StorageLocation;
-import controller.pop3.POP3MessageDeletion;
 
 public class SMTPCommandHandler extends AbstractCommandHandler {
 
@@ -237,22 +236,13 @@ public class SMTPCommandHandler extends AbstractCommandHandler {
 			AbstractRequestHandler.log.info("User: " + user);
 			
 			// Add the message to user's maildrop
-			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, user, POP3MessageDeletion.NO.toString(), messageSize, header, body);
+			persistanceManager.create(StorageLocation.POP3_MAILDROPS, FieldName.getPOP3MessagesTableFieldNames(), newMessageId, user, header, body);
 			
 			// Add the message uid to uids table
 			persistanceManager.create(StorageLocation.POP3_UIDS, FieldName.getUidsTableFields(), user, newMessageId, messageSize);
 			
 			// Update maildrop data
-			int messageCountNumber = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_USERS, FieldName.USER_MESSAGES_NUMBER, user));
-			int messageTotalSizeNumber = Integer.parseInt(persistanceManager.read(StorageLocation.POP3_USERS, FieldName.MESSAGES_TOTAL_DIMENSION, user));
-			
-			messageCountNumber++;			
-			messageTotalSizeNumber += Integer.parseInt(messageSize);
-			
-			String messagesCount = Integer.toString(messageCountNumber);
-			String messageTotalSize = Integer.toString(messageTotalSizeNumber);
-			
-			persistanceManager.update(StorageLocation.POP3_USERS, user, FieldName.getMaildropStatData(), messagesCount, messageTotalSize);
+			persistanceManager.update(StorageLocation.POP3_USERS, user, FieldName.getMaildropStatData(), Integer.toString(1), messageSize);
 		}
 		
 		// Delete the temp message
