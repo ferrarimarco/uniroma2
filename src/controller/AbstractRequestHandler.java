@@ -49,8 +49,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 		handleRequest();
 	}
 	
-	@Override
-	public void handleRequest() {
+	private void handleRequest() {
 		String clientId = getClientId(socket);
 
 		// TODO: DEBUG
