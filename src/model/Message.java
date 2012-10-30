@@ -128,17 +128,34 @@ public class Message {
 		// TODO: print rawData and debug indexes when there is an email that contains HTML tags
 		AbstractRequestHandler.log.info("----- BEGIN MESSAGE DEBUG -----");
 		
-		// Search for Message-ID
+		AbstractRequestHandler.log.info("Rawdata: " + rawData);
+		
+		// Search for Message-ID:<
 		int startIndexId = messageData.indexOf("Message-ID:<");
 		AbstractRequestHandler.log.info("startIndexId (searching for Message-ID:): " + startIndexId);
 		
 		int offset = 12;
 		
+		// Try with Message-Id:<
+		if(startIndexId == -1) {
+			startIndexId = messageData.indexOf("Message-Id:<");
+			AbstractRequestHandler.log.info("startIndexId (searching for Message-Id:): " + startIndexId);	
+		}
+		
+		// Try with Message-ID: <
 		if(startIndexId == -1) {
 			startIndexId = messageData.indexOf("Message-ID: <");
 			offset++;
 			
 			AbstractRequestHandler.log.info("Message-ID:< not found. Switching to Message-ID: <: " + startIndexId);
+		}
+		
+		// Try with Message-Id: <
+		if(startIndexId == -1) {
+			startIndexId = messageData.indexOf("Message-Id: <");
+			offset++;
+			
+			AbstractRequestHandler.log.info("Message-Id:< not found. Switching to Message-Id: <: " + startIndexId);
 		}
 		
 		int endIndexId = messageData.indexOf(">", startIndexId);
