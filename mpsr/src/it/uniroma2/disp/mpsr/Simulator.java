@@ -6,7 +6,9 @@ public class Simulator {
 	private static final int users = 35;
 	
 	public static void main(String[] args) {
-	
+		
+		
+		
 	}
 
 }
