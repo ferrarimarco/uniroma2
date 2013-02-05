@@ -5,7 +5,7 @@ import info.ferrarimarco.java.helper.math.SimpleMatrix;
 public class Simulator {
 
 	private static final int nodes = 4;
-	private static final int users = 1;
+	private static final int users = 2;
 	
 	public static void main(String[] args) {
 		
@@ -14,15 +14,28 @@ public class Simulator {
 		double mu2 = 1/0.08; // BE server
 		double mu3 = 1.0/7.0; // client2
 		
+		System.out.println("mu0:" + mu0);
+		System.out.println("mu1:" + mu1);
+		System.out.println("mu2:" + mu2);
+		System.out.println("mu3:" + mu3);
+		
 		StatusMatrixGenerator statusMatrixGenerator = new StatusMatrixGenerator(users, nodes);
 		
 		SimpleMatrix<Integer> statusMatrix = statusMatrixGenerator.generateStatusMatrix();
 		SimpleMatrix<Double> routingMatrix = RoutingMatrixGenerator.generateRoutingMatrix(4);
 		
+		System.out.println(statusMatrix.toString());
+		System.out.println(routingMatrix.toString());
+		
 		double x0 = 5.0;
 		double x1 = ((5.0 * mu0) / mu1) * (1.0 + routingMatrix.getElement(2, 3)/routingMatrix.getElement(2, 0));
 		double x2 = (5.0 * mu0) / (mu2 * routingMatrix.getElement(2, 0));
 		double x3 = (5.0 * mu0 * routingMatrix.getElement(2, 3)) / (mu3 * routingMatrix.getElement(2, 0));
+		
+		System.out.println("x0:" + x0);
+		System.out.println("x1:" + x1);
+		System.out.println("x2:" + x2);
+		System.out.println("x3:" + x3);
 		
 		double GN = 0.0;
 		
@@ -34,7 +47,8 @@ public class Simulator {
 			GN += GNTerm;
 		}
 		
-		System.out.println(GN);
+		
+		System.out.println("G(N): " + GN);
 	}
 
 }
