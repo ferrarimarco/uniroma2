@@ -1,7 +1,7 @@
 package it.uniroma2.disp.mpsr.test;
 
 import info.ferrarimarco.java.helper.math.SimpleMatrix;
-import it.uniroma2.disp.mpsr.StatusMatrixGenerator;
+import it.uniroma2.disp.mpsr.init.StatusMatrixGenerator;
 
 public class StatusMatrixGeneratorTest {
 
