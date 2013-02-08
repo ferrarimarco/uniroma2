@@ -1,4 +1,4 @@
-package it.uniroma2.disp.mpsr;
+package it.uniroma2.disp.mpsr.init;
 
 import info.ferrarimarco.java.helper.math.SimpleMatrix;
 

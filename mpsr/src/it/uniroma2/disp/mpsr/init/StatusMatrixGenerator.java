@@ -1,4 +1,4 @@
-package it.uniroma2.disp.mpsr;
+package it.uniroma2.disp.mpsr.init;
 
 import java.util.ArrayList;
 import java.util.List;
