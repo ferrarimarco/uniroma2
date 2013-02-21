@@ -19,4 +19,14 @@ public class NodesInitializer {
 		return nodes;
 	}
 	
+	public static List<Node> generatesNodesForMVA(int nodesNumber){
+		
+		List<Node> nodes = generateNodes(nodesNumber);
+		
+		nodes.add(new Node(true, 4)); // client1 reject
+		nodes.add(new Node(true, 5)); // client2 reject
+		
+		return nodes;
+	}
+	
 }
