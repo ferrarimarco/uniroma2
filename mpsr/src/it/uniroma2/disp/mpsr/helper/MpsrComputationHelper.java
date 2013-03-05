@@ -8,12 +8,12 @@ import java.util.List;
 
 public class MpsrComputationHelper {
 
-	public static double multiplier(List<Integer> status, List<Node> nodes, double[] x){
+	public static double multiplier(List<Integer> status, List<Node> nodes, List<Double> x){
 
 		double result = 1.0;
 
 		for(int i = 0; i < status.size(); i++){
-			result = result * computeTerm(nodes.get(i), x[i], status.get(i));
+			result = result * computeTerm(nodes.get(i), x.get(i), status.get(i));
 		}
 
 		return result;
@@ -23,7 +23,6 @@ public class MpsrComputationHelper {
 		double result = 1.0;
 
 		if(node.isInstantService()){
-			// beta_i(n_i) = n_i! for nodes != single processor node
 			result = result * (Math.pow(x, statusComponent)/ ComputationHelper.factorial(statusComponent));
 		}
 		else{
@@ -33,13 +32,13 @@ public class MpsrComputationHelper {
 		return result;
 	}
 
-	public static SimpleMatrix<Double> computeRelativeVisits(double y[]){
+	public static SimpleMatrix<Double> computeRelativeVisits(List<Double> y){
 
-		SimpleMatrix<Double> vMatrix = new SimpleMatrix<Double>(y.length, y.length, 0.0);
+		SimpleMatrix<Double> vMatrix = new SimpleMatrix<Double>(y.size(), y.size(), 0.0);
 
 		for(int i = 0; i < vMatrix.getRows(); i++){
 			for(int j = 0; j < vMatrix.getColumns(); j++){
-				vMatrix.setElement(i, j, y[i] / y[j]);
+				vMatrix.setElement(i, j, y.get(i) / y.get(j));
 			}
 		}
 		return vMatrix;
@@ -47,14 +46,13 @@ public class MpsrComputationHelper {
 
 	public static double mva(List<Double> mu, SimpleMatrix<Double> visitsMatrix, List<Node> nodes, int usersCount){
 
-		
-
 		SimpleMatrix<Double> eNi_nMatrix = new SimpleMatrix<Double>(usersCount + 1, nodes.size() + 1, 0.0);
 		SimpleMatrix<Double> eTi_nMatrix = new SimpleMatrix<Double>(usersCount + 1, nodes.size() + 1, 0.0);
 		SimpleMatrix<Double> lambdai_nMatrix = new SimpleMatrix<Double>(usersCount + 1, nodes.size() + 1, 0.0);
 		SimpleMatrix<Double> rho_iMatrix = new SimpleMatrix<Double>(usersCount + 1, nodes.size() + 1, 0.0);
 
 		for(int N = 1; N <= usersCount; N++){
+			
 			for(int M = 1; M <= nodes.size(); M++){
 				double eTi_n = computeEti_n(nodes.get(M-1), mu.get(M-1), eNi_nMatrix.getElement(N-1, M-1));
 				eTi_nMatrix.setElement(N-1, M-1, eTi_n);

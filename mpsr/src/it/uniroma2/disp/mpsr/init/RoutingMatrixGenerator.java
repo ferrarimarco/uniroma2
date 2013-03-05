@@ -44,6 +44,8 @@ public class RoutingMatrixGenerator {
 		// Centro 1: FE server
 		// Centro 2: BE server
 		// Centro 3: client2
+		// Centro 4: c1_r
+		// Centro 5: c2_r
 		
 		routingMatrix.setElement(0, 0, 0.0); // client1 to client1
 		routingMatrix.setElement(0, 1, 1.0); // client1 to FE server

@@ -1,16 +1,28 @@
 package it.uniroma2.disp.mpsr.init;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MuGenerator {
 	
-	public static double[] computeMus(int nodes){
-		double[] mu = new double[nodes];
+	public static List<Double> computeMus(int nodesNumber){
+		List<Double> mu = new ArrayList<Double>(nodesNumber);
 		
-		mu[0] = 1.0/7.0; // client1
-		mu[1] = 1/0.3; // FE server
-		mu[2] = 1/0.08; // BE server
-		mu[3] = 1.0/7.0; // client2
+		mu.add(1.0/7.0); // client1
+		mu.add(1/0.3); // FE server
+		mu.add(1/0.08); // BE server
+		mu.add(1.0/7.0); // client2
 		
 		return mu;
+	}
+	
+	public static List<Double> computeMusMVA(int nodesNumber){
+		List<Double> muMVA = computeMus(nodesNumber);
+
+		muMVA.add(1.0/0.05);
+		muMVA.add(1.0/0.05);
+		
+		return muMVA;
 	}
 	
 }

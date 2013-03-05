@@ -39,42 +39,43 @@ public class StatusMatrixGenerator {
 
 	private List<List<Integer>> generateStatus(int cardinality, int nodes, int users){
 
-		int numSubStati;
-
-		List<List<Integer>> stati_generati = new ArrayList<List<Integer>>(nodes);
+		List<List<Integer>> statuses = new ArrayList<List<Integer>>(nodes);
 
 		// columns initialization
-		for(int q = 0; q < nodes; q++){
-			stati_generati.add(new ArrayList<Integer>(cardinality));
+		for(int i = 0; i < nodes; i++){
+			statuses.add(new ArrayList<Integer>(cardinality));
 		}
 
 		if(nodes == 1){
-			stati_generati.get(0).add(users);
-		}else if(nodes==2){
-			for(int i = 0;i < cardinality; i++){
-				stati_generati.get(0).add(users-i);
-				stati_generati.get(1).add(i);
+			statuses.get(0).add(users);
+		}else if(nodes == 2){
+			for(int i = 0; i < cardinality; i++){
+				statuses.get(0).add(users-i);
+				statuses.get(1).add(i);
 			}
-		}else if(nodes>=3){
-			for(int j=0; j<nodes; j++){
-				if(j==0) stati_generati.get(j).add(users);
-				else stati_generati.get(j).add(0);
+		}else if(nodes >= 3){
+			for(int j = 0; j < nodes; j++){
+				if(j == 0){
+					statuses.get(j).add(users);
+				} else { 
+					statuses.get(j).add(0);
+				}
 			}
 
-			for(int i=1; i<=users; i++){
-				numSubStati = computeCardinality(i, nodes - 1);
-				List<List<Integer>> tmp_stati_generati = new ArrayList<List<Integer>>(nodes-1);
-				tmp_stati_generati = this.generateStatus(numSubStati, nodes-1, i);
+			for(int i = 1; i <= users; i++){
+				int tempStatusesNumber = computeCardinality(i, nodes - 1);
+				List<List<Integer>> temporaryStatusList = new ArrayList<List<Integer>>(nodes-1);
+				temporaryStatusList = this.generateStatus(tempStatusesNumber, nodes-1, i);
 
-				for(int j=1; j<numSubStati+1; j++){
-					stati_generati.get(0).add(users-i);
-					for(int k=1; k<nodes; k++){
-						stati_generati.get(k).add(tmp_stati_generati.get(k-1).get(j-1));
+				for(int j = 1; j < tempStatusesNumber + 1; j++){
+					statuses.get(0).add(users-i);
+					for(int k = 1; k < nodes; k++){
+						statuses.get(k).add(temporaryStatusList.get(k-1).get(j-1));
 					}
 				}
 			}
 		}
 
-		return stati_generati;
-	}       
+		return statuses;
+	}
 }

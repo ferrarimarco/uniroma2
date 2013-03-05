@@ -7,7 +7,7 @@ import it.uniroma2.disp.mpsr.model.Node;
 
 public class GNCalculator {
 
-	public static double computeGN(SimpleMatrix<Integer> statusMatrix, double[] x, List<Node> nodes){
+	public static double computeGN(SimpleMatrix<Integer> statusMatrix, List<Double> x, List<Node> nodes){
 		
 		double GN = 0.0;
 		

@@ -1,34 +1,38 @@
 package it.uniroma2.disp.mpsr.init;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import info.ferrarimarco.java.helper.math.SimpleMatrix;
 
 public class XYCalculator {
 
-	public static double[] computeX(int nodes, SimpleMatrix<Double> routingMatrix, double[] mu){
+	public static List<Double> computeX(int nodes, SimpleMatrix<Double> routingMatrix, List<Double> mu){
 		
-		double[] x = new double[nodes];
+		List<Double> x = new ArrayList<Double>(nodes);
 		
-		x[0] = 1.0;
-		x[1] = mu[0] / (mu[2] * routingMatrix.getElement(2, 0));
-		x[2] = mu[0] / (mu[1] * routingMatrix.getElement(2, 0));
-		x[3] = (mu[0] * routingMatrix.getElement(2, 3)) / (mu[3] * routingMatrix.getElement(2, 0));
+		x.add(1.0);
+		x.add(mu.get(0) / (mu.get(2) * routingMatrix.getElement(2, 0)));
+		x.add(mu.get(0) / (mu.get(1) * routingMatrix.getElement(2, 0)));
+		x.add((mu.get(0) * routingMatrix.getElement(2, 3)) / (mu.get(3) * routingMatrix.getElement(2, 0)));
 		
 		return x;
 	}
 	
-	public static double[] computeYMVA(int nodes, SimpleMatrix<Double> routingMatrix, List<Double> mu){
+	public static List<Double> computeYMVA(int nodes, SimpleMatrix<Double> routingMatrix, List<Double> mu){
 		
-		double[] y = new double[nodes];
+		List<Double> y = new ArrayList<Double>(nodes);
 		
-		y[2] = 1.0;
+		for(int i = 0; i < nodes; i++){
+			y.add(0.0);
+		}
 		
-		y[0] = (y[2] * routingMatrix.getElement(2, 0)) / (1.0 - routingMatrix.getElement(0, 4));
-		y[1] = y[2];
-		y[3] = (y[2] * routingMatrix.getElement(2, 3)) / (1 - routingMatrix.getElement(3, 5));
-		y[4] = y[0] * routingMatrix.getElement(0, 4);
-		y[5] = y[3] * routingMatrix.getElement(3, 5);
+		y.set(2, 1.0);
+		y.set(0, (y.get(2) * routingMatrix.getElement(2, 0)) / (1.0 - routingMatrix.getElement(0, 4)));
+		y.set(1, y.get(2));	
+		y.set(3, (y.get(2) * routingMatrix.getElement(2, 3)) / (1 - routingMatrix.getElement(3, 5)));		
+		y.set(4, y.get(0) * routingMatrix.getElement(0, 4));		
+		y.set(5, y.get(3) * routingMatrix.getElement(3, 5));
 		
 		return y;
 	}

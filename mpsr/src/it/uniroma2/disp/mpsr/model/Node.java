@@ -4,11 +4,13 @@ public class Node {
 	
 	private boolean instantService;
 	private int id;
+	private String description;
 
-	public Node(boolean instantService, int id) {
+	public Node(boolean instantService, int id, String description) {
 		super();
 		this.setInstantService(instantService);
 		this.setId(id);
+		this.setDescription(description);
 	}
 
 	public boolean isInstantService() {
@@ -25,6 +27,21 @@ public class Node {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	
+	public String getDescription() {
+		return description;
+	}
+
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	@Override
+	public String toString(){
+		return "[" + getId() + "]: " + getDescription();
 	}
 
 }
