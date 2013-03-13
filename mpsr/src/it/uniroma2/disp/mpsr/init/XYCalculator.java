@@ -35,6 +35,5 @@ public class XYCalculator {
 		y.set(5, y.get(3) * routingMatrix.getElement(3, 5));
 		
 		return y;
-	}
-	
+	}	
 }

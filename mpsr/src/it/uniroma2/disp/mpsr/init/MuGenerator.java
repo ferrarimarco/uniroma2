@@ -23,6 +23,5 @@ public class MuGenerator {
 		muMVA.add(1.0/0.05);
 		
 		return muMVA;
-	}
-	
+	}	
 }

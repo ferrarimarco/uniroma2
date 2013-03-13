@@ -1,9 +1,11 @@
 package it.uniroma2.disp.mpsr.helper;
 
+import info.ferrarimarco.java.helper.io.IoHelper;
 import info.ferrarimarco.java.helper.math.ComputationHelper;
 import info.ferrarimarco.java.helper.math.SimpleMatrix;
 import it.uniroma2.disp.mpsr.model.Node;
 
+import java.io.IOException;
 import java.util.List;
 
 public class MpsrComputationHelper {
@@ -76,7 +78,15 @@ public class MpsrComputationHelper {
 				rho_iMatrix.setElement(N-1, M-1, rhoi_n);
 			}
 		}
-
+		
+		try {			
+			IoHelper.writeStringToFile(eNi_nMatrix.toString(), "results\\MVADetailsEni.txt", true);
+			IoHelper.writeStringToFile(eTi_nMatrix.toString(), "results\\MVADetailsEti.txt", true);
+			IoHelper.writeStringToFile(rho_iMatrix.toString(), "results\\MVADetailsRhoi.txt", true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		double trc1 = 0.0;
 		
 		for(int i = 1; i < visitsMatrix.getRows(); i++){

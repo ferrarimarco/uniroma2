@@ -27,6 +27,5 @@ public class NodesInitializer {
 		nodes.add(new Node(true, 5, "Client2 Reject")); // client2 reject
 		
 		return nodes;
-	}
-	
+	}	
 }

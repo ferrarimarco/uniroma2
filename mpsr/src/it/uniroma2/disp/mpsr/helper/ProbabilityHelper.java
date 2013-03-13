@@ -8,6 +8,5 @@ public class ProbabilityHelper {
 	
 	public static double computeStatusProbability(List<Integer> status, List<Node> nodes, List<Double> x, double GN){
 		return MpsrComputationHelper.multiplier(status, nodes, x) / GN;
-	}
-	
+	}	
 }

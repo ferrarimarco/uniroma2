@@ -117,8 +117,17 @@ public class Simulator {
 		
 		try {
 			IoHelper.writeStringToFile("MVA", "results\\MVA.txt");
+			IoHelper.writeStringToFile("", "results\\MVA_thresholds_trc1.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		
+		try {
+			IoHelper.writeStringToFile("-------------", "results\\MVADetailsEni.txt");
+			IoHelper.writeStringToFile("-------------", "results\\MVADetailsEti.txt");
+			IoHelper.writeStringToFile("-------------", "results\\MVADetailsRhoi.txt");
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 		
 		for(int i = 1; i <= saturationMap.size(); i++){
@@ -139,9 +148,17 @@ public class Simulator {
 				
 				SimpleMatrix<Double> visits = MpsrComputationHelper.computeRelativeVisits(yMVA);
 				
+				try {
+					IoHelper.writeStringToFile("THR_1: " + threshold_1 + ", THR_2: " + threshold_2, "results\\MVADetailsEni.txt", true);
+					IoHelper.writeStringToFile("THR_1: " + threshold_1 + ", THR_2: " + threshold_2, "results\\MVADetailsEti.txt", true);
+					IoHelper.writeStringToFile("THR_1: " + threshold_1 + ", THR_2: " + threshold_2, "results\\MVADetailsRhoi.txt", true);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
 				double tr_i = MpsrComputationHelper.mva(muMVA, visits, nodesListMVA, users);
 				
-				// Check if the probabilities are in range
+				// Check if the probabilities are in range				
 				if(p_c1_c1_rj <= 0.20 && p_c2_c2_rj <= 0.20){
 					if(minTr == 0.0){
 						minTr = tr_i;
@@ -161,14 +178,16 @@ public class Simulator {
 				try {
 					IoHelper.writeStringToFile("-------------", "results\\MVA.txt", true);
 					IoHelper.writeStringToFile("THR_1: " + threshold_1 + ", THR_2: " + threshold_2, "results\\MVA.txt", true);
+					IoHelper.writeStringToFile("Trc1:", "results\\MVA.txt", true);
+					IoHelper.writeStringToFile(Double.toString(tr_i), "results\\MVA.txt", true);
 					IoHelper.writeStringToFile("ROUTING MATRIX:", "results\\MVA.txt", true);
 					IoHelper.writeStringToFile(routingMatrixMVA.toString(), "results\\MVA.txt", true);
 					IoHelper.writeStringToFile("Y[i]:", "results\\MVA.txt", true);
 					IoHelper.writeCollectionToFile(yMVA, "results\\MVA.txt", true);
 					IoHelper.writeStringToFile("Visits (V[i,j]):", "results\\MVA.txt", true);
 					IoHelper.writeStringToFile(visits.toString(), "results\\MVA.txt", true);
-					IoHelper.writeStringToFile("Trc1:", "results\\MVA.txt", true);
-					IoHelper.writeStringToFile(Double.toString(tr_i), "results\\MVA.txt", true);
+					
+					IoHelper.writeStringToFile(threshold_1 + ":" + threshold_2 + ";" + Double.toString(tr_i), "results\\MVA_thresholds_trc1.txt", true);					
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -176,7 +195,7 @@ public class Simulator {
 		}
 		
 		try {
-			IoHelper.writeStringToFile("-------------", "results\\MVAMinThr.txt", true);
+			IoHelper.writeStringToFile("-------------", "results\\MVAMinThr.txt");
 			IoHelper.writeStringToFile("THR_1: " + min_Threshold_1 + ", THR_2: " + min_Threshold_2, "results\\MVAMinThr.txt", true);
 			IoHelper.writeStringToFile("p_c1_c1_rj_minTr:" + p_c1_c1_rj_minTr, "results\\MVAMinThr.txt", true);
 			IoHelper.writeStringToFile("p_c2_c2_rj_minTr:" + p_c2_c2_rj_minTr, "results\\MVAMinThr.txt", true);

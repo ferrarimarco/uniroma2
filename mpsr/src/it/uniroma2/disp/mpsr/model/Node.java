@@ -43,5 +43,4 @@ public class Node {
 	public String toString(){
 		return "[" + getId() + "]: " + getDescription();
 	}
-
 }
