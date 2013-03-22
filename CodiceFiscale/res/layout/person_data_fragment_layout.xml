@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    android:layout_height="wrap_content" >
 
-    <EditText
-        android:id="@+id/nameEditText"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:ems="10"
-        android:hint="@string/name" >
+        android:orientation="vertical" >
 
-        <requestFocus />
-    </EditText>
+        <EditText
+            android:id="@+id/nameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/name" />
 
-    <EditText
-        android:id="@+id/surnameEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:ems="10"
-        android:hint="@string/surname" />
+        <EditText
+            android:id="@+id/surnameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/surname" >
+
+            <requestFocus />
+        </EditText>
+
+    </LinearLayout>
 
         <RadioGroup
         android:id="@+id/genderRadioGroup"

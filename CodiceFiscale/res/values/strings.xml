@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">CodiceFiscale</string>
+    <string name="app_name">Codice Fiscale</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="name">Nome</string>
-    <string name="surname">Cognome</string>
-    <string name="male">Maschio</string>
-    <string name="female">Femmina</string>
+    <string name="name">Name</string>
+    <string name="surname">Surname</string>
+    <string name="male">M</string>
+    <string name="female">F</string>
     <string name="pickDateButtonText">...</string>
     <string name="okButtonText">OK</string>
     <string name="province">Province</string>
     <string name="city">City</string>
+    <string name="cfPlaceHolder">XXXXXXXXXXXXXXXX</string>
+    <string name="cfResultHint">CF</string>
 
 </resources>

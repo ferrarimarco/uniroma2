@@ -23,7 +23,6 @@ public class MainActivity extends Activity implements BirthDatePickerFragment.On
 		
 		setContentView(R.layout.activity_main);
 		
-		
 		// Here because if not I get this bug: https://code.google.com/p/android/issues/detail?id=5237
 		// when I'll find a fix I will move this init code in BirthPlaceDataFragment
 		ArrayAdapter<String> provinceAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, new String[] {"Roma", "Milano", "Parma", "Torino"});
