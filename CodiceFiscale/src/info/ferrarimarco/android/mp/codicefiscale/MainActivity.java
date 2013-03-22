@@ -1,78 +1,39 @@
 package info.ferrarimarco.android.mp.codicefiscale;
 
+import android.content.Context;
 import android.os.Bundle;
+
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.view.Menu;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
-public class MainActivity extends Activity {
-
+public class MainActivity extends Activity implements BirthDatePickerFragment.OnDatePickedListener {
+	
+	private static Context context;
+	private static FragmentManager fragmentManager;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		MainActivity.context = getApplicationContext();
+		MainActivity.fragmentManager = getFragmentManager();
+		
 		setContentView(R.layout.activity_main);
 		
-		/****** AutoCompleteTextView field initialization ******/
+		
+		// Here because if not I get this bug: https://code.google.com/p/android/issues/detail?id=5237
+		// when I'll find a fix I will move this init code in BirthPlaceDataFragment
+		ArrayAdapter<String> provinceAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, new String[] {"Roma", "Milano", "Parma", "Torino"});
 		AutoCompleteTextView provinceAutoComplete = (AutoCompleteTextView) findViewById(R.id.provinceAutoCompleteTextView);
-		AutoCompleteTextView townAutoComplete = (AutoCompleteTextView) findViewById(R.id.cityAutoCompleteTextView);
-		ArrayAdapter<String> provinceAdapter = new ArrayAdapter<String>(this, 
-				                                        android.R.layout.simple_dropdown_item_1line, 
-				                                        new String[] {"Roma",
-				                                                      "Milano",
-				                                                      "Parma",
-				                                                      "Torino",
-				                                                      "Sanbuceto"});
-		ArrayAdapter<String> townAdapter = new ArrayAdapter<String>(this, 
-                android.R.layout.simple_dropdown_item_1line, 
-                new String[] {"Civitavecchia",
-                              "Trombopolis",
-                              "Inculopolis",
-                              "Tivoli",
-                              "Sanbuceto"});
 		provinceAutoComplete.setAdapter(provinceAdapter);
+		
+		ArrayAdapter<String> townAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, new String[] {"Roma", "Latina", "Frosinone", "Viterbo", "Rieti"});
+		AutoCompleteTextView townAutoComplete = (AutoCompleteTextView) findViewById(R.id.cityAutoCompleteTextView);
 		townAutoComplete.setAdapter(townAdapter);
-		/****** End AutoCompleteTextView field initialization ******/
-		
-		/****** Adding an OnItemClickListener to AutoCompleteTextView fields... ******/
-		provinceAutoComplete.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> provinceAdapter, View view, int pos,
-					long id) {
-				String selection = (String) provinceAdapter.getItemAtPosition(pos);
-				Toast.makeText(
-        				getApplicationContext(), 
-        				"Ah, abiti in provincia di " + selection + "?", 
-        				Toast.LENGTH_LONG
-        			).show();
-			}
-		});
-		
-		townAutoComplete.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> townAdapter, View view, int pos,
-					long id) {
-				String selection = (String) townAdapter.getItemAtPosition(pos);
-				Toast.makeText(
-        				getApplicationContext(), 
-        				"Ah, abiti a " + selection + "?", 
-        				Toast.LENGTH_LONG
-        			).show();
-				Toast.makeText(
-        				getApplicationContext(), 
-        				"Ma 'n te vergogni??", 
-        				Toast.LENGTH_LONG
-        			).show();
-			}
-		});
-		/****** Finished adding an OnItemClickListener to AutoCompleteTextView fields... ******/
-		
+		// end code to fix		
 	}
 
 	@Override
@@ -82,4 +43,20 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	@Override
+	public void onDatePicked(int year, int month, int day) {
+		BirthDateFragment birthDateFragment = (BirthDateFragment) fragmentManager.findFragmentById(R.id.birthDateFragment);
+
+        if (birthDateFragment != null) {
+        	birthDateFragment.updateDateFieldContent(year, month, day);
+        }
+	}
+
+	public static Context getContext() {
+		return context;
+	}
+
+	public static FragmentManager getCurrentSupportFragmentManager() {
+		return fragmentManager;
+	}
 }

@@ -8,5 +8,9 @@
     <string name="surname">Cognome</string>
     <string name="male">Maschio</string>
     <string name="female">Femmina</string>
+    <string name="pickDateButtonText">...</string>
+    <string name="okButtonText">OK</string>
+    <string name="province">Province</string>
+    <string name="city">City</string>
 
 </resources>
