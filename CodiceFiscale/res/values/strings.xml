@@ -8,10 +8,8 @@
     <string name="male">M</string>
     <string name="female">F</string>
     <string name="pickDateButtonText">&#8230;</string>
-    <string name="okButtonText">OK</string>
     <string name="province">Province</string>
     <string name="city">City</string>
     <string name="cfPlaceHolder">XXXXXXXXXXXXXXXX</string>
-    <string name="cfResultHint">CF</string>
 
 </resources>
