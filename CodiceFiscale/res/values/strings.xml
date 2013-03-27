@@ -11,5 +11,6 @@
     <string name="province">Province</string>
     <string name="city">City</string>
     <string name="cfPlaceHolder">XXXXXXXXXXXXXXXX</string>
+    <string name="dateEditTextHint">Date</string>
 
 </resources>
