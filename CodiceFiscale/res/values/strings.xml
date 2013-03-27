@@ -7,7 +7,7 @@
     <string name="surname">Surname</string>
     <string name="male">M</string>
     <string name="female">F</string>
-    <string name="pickDateButtonText">...</string>
+    <string name="pickDateButtonText">&#8230;</string>
     <string name="okButtonText">OK</string>
     <string name="province">Province</string>
     <string name="city">City</string>
