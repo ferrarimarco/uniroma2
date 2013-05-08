@@ -8,12 +8,32 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
+     <Button
+         android:id="@+id/jsonButton"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentLeft="true"
+         android:layout_alignParentTop="true"
+         android:text="@string/jsonButtonText" />
+     
      <ListView
-        android:id="@+id/ListViewContatti"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:padding="5dp"
-		android:textSize="12sp" >
-       
-    </ListView>
+         android:id="@+id/ListViewContatti"
+         android:layout_width="fill_parent"
+         android:layout_height="fill_parent"
+         android:layout_alignLeft="@+id/jsonButton"
+         android:layout_below="@+id/jsonButton"
+         android:padding="5dp"
+         android:textSize="12sp" >
+
+     </ListView>
+
+     <Button
+         android:id="@+id/xmlButton"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_above="@+id/ListViewContatti"
+         android:layout_marginLeft="16dp"
+         android:layout_toRightOf="@+id/jsonButton"
+         android:text="@string/xmlButtonText" />
+
 </RelativeLayout>

@@ -2,6 +2,9 @@ package it.mp.claudianiferrari.parserjson;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 public class MainActivity extends Activity {
 
@@ -14,7 +17,24 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		//new DownloadJsonObjectTask(this).execute(jsonUrl);
-		new DownloadXmlObjectTask(this).execute(xmlUrl);
+		Button jsonButton = (Button) findViewById(R.id.jsonButton);
+		
+		jsonButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				new DownloadJsonObjectTask(MainActivity.this).execute(jsonUrl);
+			}
+		});
+		
+		Button xmlButton = (Button) findViewById(R.id.xmlButton);
+		
+		xmlButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				new DownloadXmlObjectTask(MainActivity.this).execute(xmlUrl);
+			}
+		});
 	}
 }
