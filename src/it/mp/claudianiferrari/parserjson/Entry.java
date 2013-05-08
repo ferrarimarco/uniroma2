@@ -1,11 +1,19 @@
 package it.mp.claudianiferrari.parserjson;
 
+import org.simpleframework.xml.Element;
+
 //This class represents a single entry (post) in the XML feed.
 // It includes the data members "title," "link," and "summary."
 public class Entry {
+	
+	@Element
     private String title;
-    private String link;
-    private String summary;
+    
+	@Element
+	private String link;
+    
+	@Element
+	private String summary;
 
     public Entry(String title, String summary, String link) {
         this.title = title;
