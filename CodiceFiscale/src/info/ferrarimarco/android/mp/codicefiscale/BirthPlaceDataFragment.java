@@ -13,6 +13,8 @@ public class BirthPlaceDataFragment extends Fragment {
 		
 		View view = inflater.inflate(R.layout.birth_place_data_fragment_layout, container, false);
 		
+		
+		
 		return view;
 	}
 	

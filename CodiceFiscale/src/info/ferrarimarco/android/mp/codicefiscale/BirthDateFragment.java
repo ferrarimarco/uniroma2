@@ -28,16 +28,6 @@ public class BirthDateFragment extends Fragment {
 			}
 		});
 		
-		EditText birthDateTextView = (EditText) view.findViewById(R.id.birthDateFragment);
-		
-		birthDateTextView.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				showDatePickerDialog(v);
-			}			
-		});
-		
 		return view;
 	}
 	

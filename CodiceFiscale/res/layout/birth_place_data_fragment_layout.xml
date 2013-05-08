@@ -11,7 +11,7 @@
             android:layout_weight="1"
             android:ems="10"
             android:hint="@string/province"
-            android:completionThreshold="2" />
+            android:completionThreshold="1" />
 
         <AutoCompleteTextView
             android:id="@+id/cityAutoCompleteTextView"

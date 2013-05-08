@@ -9,7 +9,8 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/dateEditTextHint"
-        android:inputType="text" >
+        android:inputType="text"
+        android:enabled="false" >
 
         <requestFocus />
     </EditText>

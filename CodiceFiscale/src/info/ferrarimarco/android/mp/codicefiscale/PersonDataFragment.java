@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.RadioButton;
 
 
 public class PersonDataFragment extends Fragment{
@@ -29,10 +30,10 @@ public class PersonDataFragment extends Fragment{
 				
 				String surnameCodiceFiscale = CodiceFiscaleHelper.computeSurname(surname);
 				
-				EditText resultEditText = (EditText) view.findViewById(R.id.resultTextView);				
-				String actualCodiceFiscale = resultEditText.getText().toString();
+				CfResultsFragment cfResultsFragment = (CfResultsFragment) MainActivity.getCurrentSupportFragmentManager().findFragmentById(R.id.CfResultsFragment);
 				
-				resultEditText.setText(surnameCodiceFiscale + actualCodiceFiscale.substring(3));
+				String currentCfResultsContent = cfResultsFragment.getCurrentCfResultsFieldContents();
+				cfResultsFragment.updateCfResultsField(surnameCodiceFiscale + currentCfResultsContent.substring(3));
 			}
 
 			@Override
@@ -53,10 +54,14 @@ public class PersonDataFragment extends Fragment{
 				
 				String nameCodiceFiscale = CodiceFiscaleHelper.computeName(name);
 				
-				EditText resultEditText = (EditText) view.findViewById(R.id.resultTextView);				
-				String actualCodiceFiscale = resultEditText.getText().toString();
+				CfResultsFragment cfResultsFragment = (CfResultsFragment) MainActivity.getCurrentSupportFragmentManager().findFragmentById(R.id.CfResultsFragment);
 				
-				resultEditText.setText(actualCodiceFiscale.substring(0, 3) + nameCodiceFiscale + actualCodiceFiscale.substring(6));
+				String currentCfResultsContent = cfResultsFragment.getCurrentCfResultsFieldContents();
+				
+				String first = currentCfResultsContent.substring(0, 3);
+				String after = currentCfResultsContent.substring(6);
+				
+				cfResultsFragment.updateCfResultsField(first + nameCodiceFiscale + after);	
 			}
 
 			@Override
@@ -68,5 +73,11 @@ public class PersonDataFragment extends Fragment{
 		});
 		
 		return view;
+	}
+	
+	public boolean isMaleRadioChecked(){
+		RadioButton maleRadio = (RadioButton) view.findViewById(R.id.maleRadio);
+		
+		return maleRadio.isChecked();
 	}
 }

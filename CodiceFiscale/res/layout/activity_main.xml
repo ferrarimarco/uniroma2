@@ -24,23 +24,12 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    tools:layout="@layout/birth_place_data_fragment_layout" />
-	
-	<LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
 
-        <EditText
-            android:id="@+id/resultTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:enabled="false"
-            android:inputType="text"
-            android:text="@string/cfPlaceHolder" >
-
-            <requestFocus />
-        </EditText>
-    </LinearLayout>
+	<fragment
+	    android:id="@+id/CfResultsFragment"
+	    android:name="info.ferrarimarco.android.mp.codicefiscale.CfResultsFragment"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    tools:layout="@layout/cf_results_fragment_layout" />
 
 </LinearLayout>
