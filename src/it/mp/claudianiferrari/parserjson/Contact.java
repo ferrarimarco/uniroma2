@@ -8,25 +8,23 @@ public class Contact {
 	private String email;
 	private String address;
 	private String gender;
-	private String mobile;
-	private String home;
-	private String office;
+	private PhoneNumbers pNumbers;
+
 	
-	public Contact(String id, String name, String email, String address, String gender, String mobile, String home, String office) {
+	public Contact(String id, String name, String email, String address, String gender, PhoneNumbers pNumbers) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.email = email;
 		this.address = address;
 		this.gender = gender;
-		this.mobile = mobile;
-		this.home = home;
-		this.office = office;
+		this.pNumbers = pNumbers;
+		
 	}
 	
 	@Override
 	public String toString(){
-		return name + System.getProperty("line.separator") + email + System.getProperty("line.separator") + mobile;
+		return name + System.getProperty("line.separator") + email + System.getProperty("line.separator") + pNumbers.getMobile();
 	}
 	
 	public String getId() {
@@ -69,28 +67,14 @@ public class Contact {
 		this.gender = gender;
 	}
 	
-	public String getMobile() {
-		return mobile;
+	public PhoneNumbers getpNumbers() {
+		return pNumbers;
 	}
 	
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
+	public void setpNumbers(PhoneNumbers pNumbers) {
+		this.pNumbers =  pNumbers;
 	}
 	
-	public String getHome() {
-		return home;
-	}
-	
-	public void setHome(String home) {
-		this.home = home;
-	}
-	
-	public String getOffice() {
-		return office;
-	}
-	
-	public void setOffice(String office) {
-		this.office = office;
-	}
+
 	
 }
