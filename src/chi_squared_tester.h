@@ -9,6 +9,6 @@
 #ifndef CHI_SQUARED_TESTER_H_
 #define CHI_SQUARED_TESTER_H_
 
-int chi_squared_test(double numbers[], int number_size, double alpha);
+int chi_squared_test(double numbers[], int number_size, int k_subintervals, double alpha);
 
 #endif /* CHI_SQUARED_TESTER_H_ */

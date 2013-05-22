@@ -1,8 +1,9 @@
 /*
  * serial_tester.h
  *
- *  Created on: 21/mag/2013
- *      Author: Marco
+ *  Created on: 22/mag/2013
+ *      Author: Marco Ferrari <ferrari.marco@gmail.com>
+ *      Website: http://www.ferrarimarco.info
  */
 
 #ifndef SERIAL_TESTER_H_

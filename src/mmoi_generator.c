@@ -88,9 +88,9 @@ double genrand_real2(void)
 int main(void)
 {
 	int i;
-	//unsigned long init = 0x123;
+	unsigned long init = 0x123;
 	//unsigned long init = 0x234;
-	unsigned long init = 0x345;
+	//unsigned long init = 0x345;
 
 	init_genrand(init);
 
@@ -107,24 +107,23 @@ int main(void)
 
 	int serial_test_result = serial_test(numbers, count, sub_intervals, confidence);
 
-	int chi_squared_test_result = chi_squared_test(numbers, count, confidence);
+	int chi_squared_test_result = chi_squared_test(numbers, count, sub_intervals, confidence);
 
-	/* uncomment this section to save results on a file
 	FILE * fp;
-	fp = fopen ("3.txt","w");
+	fp = fopen ("1.txt","w");
 
 	fprintf(fp, "Seed: %lu\n", init);
 	fprintf(fp, "Sequence Length: %d\n", count);
 	fprintf(fp, "Confidence: %f\n", confidence);
 	fprintf(fp, "Sub intervals: %d\n", sub_intervals);
 	fprintf(fp, "Test Result (serial test) (0 = PASSED, 1 = FAILED): %d\n", serial_test_result);
+	fprintf(fp, "Test Result (chi squared test) (0 = PASSED, 1 = FAILED): %d\n", chi_squared_test_result);
 
 	for (i=0; i<count; i++) {
 		fprintf(fp, "%f\n", numbers[i]);
 	}
 
 	fclose (fp);
-	*/
 
 	free(numbers);
 
