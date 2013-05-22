@@ -87,45 +87,64 @@ double genrand_real2(void)
 
 int main(void)
 {
-	int i;
-	unsigned long init = 0x123;
-	//unsigned long init = 0x234;
-	//unsigned long init = 0x345;
-
-	init_genrand(init);
-
+	unsigned long init[3]={0x123, 0x234, 0x345};
 	int count = 131072;
-	double *numbers;
-	numbers = (double*) malloc(count * sizeof(double));
-
-	for (i=0; i<count; i++) {
-		numbers[i] = genrand_real2();
-	}
-
 	int sub_intervals = 4096;
 	double confidence = 0.10;
 
-	int serial_test_result = serial_test(numbers, count, sub_intervals, confidence);
+	int j;
+	for(j = 0; j < 3; j++){
 
-	int chi_squared_test_result = chi_squared_test(numbers, count, sub_intervals, confidence);
+		init_genrand(init[j]);
 
-	FILE * fp;
-	fp = fopen ("1.txt","w");
+		double *numbers;
+		numbers = (double*) malloc(count * sizeof(double));
 
-	fprintf(fp, "Seed: %lu\n", init);
-	fprintf(fp, "Sequence Length: %d\n", count);
-	fprintf(fp, "Confidence: %f\n", confidence);
-	fprintf(fp, "Sub intervals: %d\n", sub_intervals);
-	fprintf(fp, "Test Result (serial test) (0 = PASSED, 1 = FAILED): %d\n", serial_test_result);
-	fprintf(fp, "Test Result (chi squared test) (0 = PASSED, 1 = FAILED): %d\n", chi_squared_test_result);
+		int i;
 
-	for (i=0; i<count; i++) {
-		fprintf(fp, "%f\n", numbers[i]);
+		for (i=0; i<count; i++) {
+			numbers[i] = genrand_real2();
+		}
+
+		int serial_test_result = serial_test(numbers, count, sub_intervals, confidence);
+		int chi_squared_test_result = chi_squared_test(numbers, count, sub_intervals, confidence);
+
+		char results_file_name[1024];
+		snprintf(results_file_name, sizeof(results_file_name), "%u.txt", j);
+
+		char sequence_file_name[1024];
+		snprintf(sequence_file_name, sizeof(sequence_file_name), "%u_sequence.txt", j);
+
+		char transformation_pareto_file_name[1024];
+		snprintf(transformation_pareto_file_name, sizeof(transformation_pareto_file_name), "%u_pareto.txt", j);
+
+		char transformation_weibull_file_name[1024];
+		snprintf(transformation_weibull_file_name, sizeof(transformation_weibull_file_name), "%u_weibull.txt", j);
+
+		FILE * fp_results = fopen (results_file_name,"w");
+		FILE * fp_sequence = fopen (sequence_file_name,"w");
+		FILE * fp_pareto = fopen (transformation_pareto_file_name,"w");
+		FILE * fp_weibull = fopen (transformation_weibull_file_name,"w");
+
+		fprintf(fp_results, "Seed: %lu\n", init[j]);
+		fprintf(fp_results, "Sequence Length: %d\n", count);
+		fprintf(fp_results, "Confidence: %f\n", confidence);
+		fprintf(fp_results, "Sub intervals: %d\n", sub_intervals);
+		fprintf(fp_results, "Test Result (serial test) (0 = PASSED, 1 = FAILED): %d\n", serial_test_result);
+		fprintf(fp_results, "Test Result (chi squared test) (0 = PASSED, 1 = FAILED): %d\n", chi_squared_test_result);
+
+		fclose(fp_results);
+
+		for (i=0; i<count; i++) {
+			fprintf(fp_sequence, "%f\n", numbers[i]);
+		}
+
+		fclose(fp_sequence);
+		fclose(fp_pareto);
+		fclose(fp_weibull);
+
+		free(numbers);
 	}
-
-	fclose (fp);
-
-	free(numbers);
 
 	return 0;
 }
