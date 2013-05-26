@@ -26,7 +26,7 @@ double weibull(double u, double a, double b){
 
 	double first_term = a;
 	double exp = 1.0 / b;
-	double second_term = pow(1.0 - log(u), exp);
+	double second_term = pow(0.0 - log(u), exp);
 
 	double result = first_term * second_term;
 
