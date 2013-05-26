@@ -25,8 +25,6 @@ double pareto(double u, double k, double alpha){
 double weibull(double u, double a, double b){
 
 	double first_term = a;
-
-	double second_term_arg = log(u);
 	double exp = 1.0 / b;
 	double second_term = pow(1.0 - log(u), exp);
 

@@ -13,6 +13,7 @@
 
 #include "serial_tester.h"
 #include "chi_squared_tester.h"
+#include "transformations.h"
 
 /* Period parameters */
 #define N 624
@@ -100,6 +101,12 @@ int main(void)
 		double *numbers;
 		numbers = (double*) malloc(count * sizeof(double));
 
+		double *pareto_results;
+		pareto_results = (double*) malloc(count * sizeof(double));
+
+		double *weibull_results;
+		weibull_results = (double*) malloc(count * sizeof(double));
+
 		int i;
 
 		for (i=0; i<count; i++) {
@@ -139,11 +146,29 @@ int main(void)
 			fprintf(fp_sequence, "%f\n", numbers[i]);
 		}
 
+		double k = 1;
+		double alpha = 3;
+
+		double a = 1.5;
+		double b = 6;
+
+		for (i=0; i<count; i++){
+			pareto_results[i] = pareto(numbers[i], k, alpha);
+			weibull_results[i] = weibull(numbers[i], a, b);
+		}
+
+		for (i=0; i<count; i++) {
+			fprintf(fp_pareto, "%f\n", pareto_results[i]);
+			fprintf(fp_weibull, "%f\n", weibull_results[i]);
+		}
+
 		fclose(fp_sequence);
 		fclose(fp_pareto);
 		fclose(fp_weibull);
 
 		free(numbers);
+		free(pareto_results);
+		free(weibull_results);
 	}
 
 	return 0;
