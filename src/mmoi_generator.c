@@ -2,18 +2,18 @@
  ============================================================================
  Name        : mmoi_generator.c
  Author      : Marco Ferrari
- Version     :
  Copyright   : http://www.ferrarimarco.info
- Description : Hello World in C, Ansi-style
  ============================================================================
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "serial_tester.h"
 #include "chi_squared_tester.h"
 #include "transformations.h"
+#include "density_analyzer.h"
 
 /* Period parameters */
 #define N 624
@@ -166,6 +166,19 @@ int main(void)
 		fclose(fp_pareto);
 		fclose(fp_weibull);
 
+		char pareto_density_file_name[1024];
+		snprintf(pareto_density_file_name, sizeof(pareto_density_file_name), "%u_density_pareto.txt", j);
+
+		char weibull_density_file_name[1024];
+		snprintf(weibull_density_file_name, sizeof(weibull_density_file_name), "%u_density_weibull.txt", j);
+
+		char uniform_density_file_name[1024];
+		snprintf(uniform_density_file_name, sizeof(uniform_density_file_name), "%u_density_uniform.txt", j);
+
+		analyze_density(pareto_density_file_name, pareto_results, count);
+		analyze_density(weibull_density_file_name, weibull_results, count);
+		analyze_density(uniform_density_file_name, numbers, count);
+
 		free(numbers);
 		free(pareto_results);
 		free(weibull_results);
@@ -173,3 +186,5 @@ int main(void)
 
 	return 0;
 }
+
+
