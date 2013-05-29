@@ -154,7 +154,7 @@ int main(void)
 
 		for (i=0; i<count; i++){
 			pareto_results[i] = pareto(numbers[i], k, alpha);
-			weibull_results[i] = weibull(numbers[i], a, b);
+			weibull_results[i] = weibull(numbers[i], b, a);
 		}
 
 		for (i=0; i<count; i++) {
