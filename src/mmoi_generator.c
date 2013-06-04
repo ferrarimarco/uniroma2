@@ -14,6 +14,7 @@
 #include "chi_squared_tester.h"
 #include "transformations.h"
 #include "density_analyzer.h"
+#include "correlation_tester.h"
 
 /* Period parameters */
 #define N 624
@@ -93,6 +94,14 @@ int main(void)
 	int sub_intervals = 4096;
 	double confidence = 0.10;
 
+	double *sequence_0;
+	double *sequence_1;
+	double *sequence_2;
+
+	sequence_0 = (double*) malloc(count * sizeof(double));
+	sequence_1 = (double*) malloc(count * sizeof(double));
+	sequence_2 = (double*) malloc(count * sizeof(double));
+
 	int j;
 	for(j = 0; j < 3; j++){
 
@@ -111,6 +120,14 @@ int main(void)
 
 		for (i=0; i<count; i++) {
 			numbers[i] = genrand_real2();
+
+			if(j == 0){
+				sequence_0[i] = numbers[i];
+			}else if(j == 1){
+				sequence_1[i] = numbers[i];
+			}else if(j == 2){
+				sequence_2[i] = numbers[i];
+			}
 		}
 
 		int serial_test_result = serial_test(numbers, count, sub_intervals, confidence);
@@ -183,6 +200,25 @@ int main(void)
 		free(pareto_results);
 		free(weibull_results);
 	}
+
+	char correlation_results_file_name[1024];
+	snprintf(correlation_results_file_name, sizeof(correlation_results_file_name), "correlation.txt");
+
+	FILE * fp_correlation_results = fopen (correlation_results_file_name,"w");
+
+	double corr_01 = correlation_tester(sequence_0, sequence_1, count);
+	double corr_02 = correlation_tester(sequence_0, sequence_2, count);
+	double corr_12 = correlation_tester(sequence_1, sequence_2, count);
+
+	fprintf(fp_correlation_results, "Correlation (0,1): %f\n", corr_01);
+	fprintf(fp_correlation_results, "Correlation (0,2): %f\n", corr_02);
+	fprintf(fp_correlation_results, "Correlation (1,2): %f\n", corr_12);
+
+	fclose(fp_correlation_results);
+
+	free(sequence_0);
+	free(sequence_1);
+	free(sequence_2);
 
 	return 0;
 }
