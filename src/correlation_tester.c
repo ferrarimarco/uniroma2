@@ -2,7 +2,8 @@
  * correlation_tester.c
  *
  *  Created on: 04/giu/2013
- *      Author: Marco
+ *      Author: Marco Ferrari <ferrari.marco@gmail.com>
+ *      Website: http://www.ferrarimarco.info
  */
 
 
