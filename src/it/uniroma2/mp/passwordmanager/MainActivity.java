@@ -6,9 +6,7 @@ import java.util.Random;
 import it.uniroma2.mp.passwordmanager.persistance.PasswordDataSource;
 import it.uniroma2.mp.passwordmanager.persistance.model.Password;
 import android.os.Bundle;
-import android.app.Activity;
 import android.app.ListActivity;
-import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
