@@ -37,6 +37,12 @@
             android:layout_height="wrap_content"
             android:text="Delete First" 
             android:onClick="onClick"/>
+
+        <Button
+            android:id="@+id/encButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Encrypt" />
         
     </LinearLayout>
 
