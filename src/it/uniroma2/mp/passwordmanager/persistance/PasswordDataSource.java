@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.uniroma2.mp.passwordmanager.PasswordType;
-import it.uniroma2.mp.passwordmanager.persistance.model.Password;
+import it.uniroma2.mp.passwordmanager.model.Password;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;

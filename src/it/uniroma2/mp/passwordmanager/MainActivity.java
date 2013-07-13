@@ -2,15 +2,17 @@ package it.uniroma2.mp.passwordmanager;
 
 import java.security.Provider;
 import java.security.Security;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import it.uniroma2.mp.passwordmanager.authentication.AuthenticationTableGenerator;
 import it.uniroma2.mp.passwordmanager.encryption.EncryptionAlgorithm;
 import it.uniroma2.mp.passwordmanager.encryption.EncryptionHelper;
-import it.uniroma2.mp.passwordmanager.encryption.EncryptionHelper;
+import it.uniroma2.mp.passwordmanager.model.AuthenticationTable;
+import it.uniroma2.mp.passwordmanager.model.Password;
 import it.uniroma2.mp.passwordmanager.persistance.PasswordDataSource;
-import it.uniroma2.mp.passwordmanager.persistance.model.Password;
 import android.os.Bundle;
 import android.app.ListActivity;
 import android.util.Log;
@@ -81,14 +83,13 @@ public class MainActivity extends ListActivity {
 				adapter.add(newPassword);
 
 				encrypt = !encrypt;
-
-				Provider[] providers = Security.getProviders();
-				for (Provider provider : providers) {
-					Log.i("CRYPTO","provider: "+provider.getName());
-					Set<Provider.Service> services = provider.getServices();
-					for (Provider.Service service : services) {
-						Log.i("CRYPTO","  algorithm: "+service.getAlgorithm());
-					}
+				
+				AuthenticationTable authTable = new AuthenticationTable(0, "A");
+				
+				String [][] t = authTable.getTable();
+				
+				for(int i = 0; i < t.length; i++){
+					System.out.println(Arrays.toString(t[i]));
 				}
 			}
 		});

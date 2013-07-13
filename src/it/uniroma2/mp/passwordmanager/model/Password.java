@@ -1,4 +1,4 @@
-package it.uniroma2.mp.passwordmanager.persistance.model;
+package it.uniroma2.mp.passwordmanager.model;
 
 
 public class Password {
