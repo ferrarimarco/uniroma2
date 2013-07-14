@@ -15,6 +15,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 	public static final String TABLE_AUTH = "authentication";
 
 	public static final String TABLE_CONFIG = "configuration";
+	
+	public static final String TABLE_CATEGORIES = "categories";
+	public static final String COLUMN_PARENT = "parent";
 
 	private static final String DATABASE_NAME = "passwords.db";
 	private static final int DATABASE_VERSION = 1;
@@ -46,8 +49,31 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 				+ COLUMN_VALUE + " text not null);";
 		
 		database.execSQL(createTable);
+		
+		createTable = "create table " + TABLE_CATEGORIES + "("
+				+ COLUMN_ID + " integer primary key autoincrement, "
+				+ COLUMN_DESCRIPTION + " text not null,"
+				+ COLUMN_VALUE + " text not null,"
+				+ COLUMN_PARENT + " text not null);";
+		
+		database.execSQL(createTable);
+		
+		String categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + "EMAIL" +"', '" + "EMAIL" + "','"+ "-1" +"')";
+		database.execSQL(categoriesInitialization);
+		
+		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + "DEVICES" +"', '" + "DEVICES" + "','"+ "-1" +"')";
+		database.execSQL(categoriesInitialization);
+		
+		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + "BANKING" +"', '" + "BANKING" + "','"+ "-1" +"')";
+		database.execSQL(categoriesInitialization);
+		
+		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + "WEB" +"', '" + "WEB" + "','"+ "-1" +"')";
+		database.execSQL(categoriesInitialization);
+		
+		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + "OTHER" +"', '" + "OTHER" + "','"+ "-1" +"')";
+		database.execSQL(categoriesInitialization);
 	}
-
+	
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 	}
