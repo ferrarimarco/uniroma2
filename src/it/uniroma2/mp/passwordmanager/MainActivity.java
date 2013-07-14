@@ -9,6 +9,7 @@ import it.uniroma2.mp.passwordmanager.encryption.EncryptionAlgorithm;
 import it.uniroma2.mp.passwordmanager.encryption.EncryptionHelper;
 import it.uniroma2.mp.passwordmanager.model.AuthenticationTable;
 import it.uniroma2.mp.passwordmanager.model.Password;
+import it.uniroma2.mp.passwordmanager.model.PasswordType;
 import it.uniroma2.mp.passwordmanager.persistance.PasswordDataSource;
 import android.os.Bundle;
 import android.app.ListActivity;
