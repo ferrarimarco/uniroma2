@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">it.uniroma2.mp.passwordmanager</string>
+    <string name="app_name">MP Password Manager</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_master_password_init">Master Password Initialization</string>
+    <string name="masterPasswordHint">Insert Master Password</string>
+    <string name="confirmMasterPasswordHint">Confirm Master Password</string>
+    <string name="ok">OK</string>
+    <string name="masterPasswordOkConfirmation">Master Password Configured Successfully</string>
+    <string name="masterPasswordNotConfirmed">The passwords do not match</string>
 
 </resources>
