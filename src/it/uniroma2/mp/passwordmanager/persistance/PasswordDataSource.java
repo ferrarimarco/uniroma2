@@ -39,7 +39,7 @@ public class PasswordDataSource {
 		
 		String table = "";
 		
-		if(passwordType.equals(PasswordType.MASTER)){
+		if(passwordType.equals(PasswordType.MASTER) || passwordType.equals(PasswordType.AUTH_TABLE)){
 			table = SQLiteHelper.TABLE_AUTH;
 		}else if(passwordType.equals(PasswordType.STORED)){
 			table = SQLiteHelper.TABLE_PASSWORDS;
@@ -48,7 +48,7 @@ public class PasswordDataSource {
 		return table;
 	}
 	
-	public Password createPassword(String description, String value, PasswordType passwordType) {
+	public void createPassword(String description, String value, PasswordType passwordType) {
 		
 		ContentValues values = new ContentValues();
 		
@@ -57,15 +57,7 @@ public class PasswordDataSource {
 		
 		String table = getDBTable(passwordType);
 		
-		long insertId = database.insert(table, null, values);
-		
-		Cursor cursor = database.query(table, allColumns, SQLiteHelper.COLUMN_ID + " = " + insertId, null, null, null, null);
-		cursor.moveToFirst();
-		
-		Password newPassword = cursorToPassword(cursor);
-		cursor.close();
-		
-		return newPassword;
+		database.insert(table, null, values);
 	}
 
 	public void deletePassword(Password password, PasswordType passwordType) {
@@ -77,6 +69,21 @@ public class PasswordDataSource {
 		database.delete(table, SQLiteHelper.COLUMN_ID + " = " + id, null);
 	}
 
+	public String getPassword(PasswordType passwordType, String description){
+		
+		String table = getDBTable(passwordType);
+		
+		Cursor cursor = database.query(table, new String[] {SQLiteHelper.COLUMN_VALUE}, SQLiteHelper.COLUMN_DESCRIPTION + " = '" + description + "'", null, null, null, null);
+		
+		String result = "";
+		
+		if(cursor.moveToFirst()){
+			result = cursor.getString(0);
+		}
+		
+		return result;
+	}
+	
 	public List<Password> getAllPasswords(PasswordType passwordType) {
 		
 		List<Password> comments = new ArrayList<Password>();

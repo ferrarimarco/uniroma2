@@ -17,7 +17,7 @@ public class AuthenticationTable {
 		this.letterToAlwaysShow = letterToAlwaysShow;
 		
 		AuthenticationTableGenerator authTableGenerator = new AuthenticationTableGenerator();
-		table = authTableGenerator.generateTable(letterToAlwaysShow, tableRows, tableColumns);
+		table = authTableGenerator.generateTable(letterToAlwaysShow);
 	}
 	
 	public String[][] getTable() {

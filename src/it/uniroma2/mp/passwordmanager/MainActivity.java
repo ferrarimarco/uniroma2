@@ -28,6 +28,9 @@ public class MainActivity extends Activity {
 
 		if(configurationManager.isMasterPasswordConfigured()){// normal application flow
 			Toast.makeText(this, "Master password found", Toast.LENGTH_LONG).show();
+			
+			Intent intent = new Intent(this, AuthenticationActivity.class);
+			startActivity(intent);
 		}else{// show master password init activity
 			Intent intent = new Intent(this, MasterPasswordInitActivity.class);
 			startActivity(intent);

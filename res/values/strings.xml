@@ -9,5 +9,9 @@
     <string name="ok">OK</string>
     <string name="masterPasswordOkConfirmation">Master Password Configured Successfully</string>
     <string name="masterPasswordNotConfirmed">The passwords do not match</string>
+    <string name="masterPasswordLengthError">The Master Password must be exactly 8 characters long</string>
+    <string name="title_activity_authentication">Authentication</string>
+    <string name="auth_table_dummy_string">--</string>
+    <string name="auth_table_label">Master Password: </string>
 
 </resources>

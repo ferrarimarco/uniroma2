@@ -5,44 +5,47 @@ import java.util.Random;
 
 public class AuthenticationTableGenerator {
 
+	public static final int passwordLength = 8;
+	private static final int tableRows = 4;
+	private static final int tableColumns = 4;
+	
 	private static final String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	
-	public String[][] generateTable(String letterToAlwaysShow, int rows, int columns){
+	public String[][] generateTable(String letterToAlwaysShow){
 		
-		String[][] table = new String[rows][columns];
-		
-		Random rand = new Random();
+		String[][] table = new String[tableRows][tableColumns];
 		
 		int letterToAlwaysShowIndex = letters.indexOf(letterToAlwaysShow);
 		
-		int[] alreadyChosen = new int[letters.length()];
+		StringBuilder availableLetters = new StringBuilder(letters.length());
 		
-		for(int i = 0; i < alreadyChosen.length; i++){
-			alreadyChosen[i] = 0;
+		if(letterToAlwaysShowIndex == 0){
+			availableLetters.append(letters.substring(1));
+		}else if(letterToAlwaysShowIndex == letters.length() - 1){
+			availableLetters.append(letters.substring(0, letters.length() - 1));
+		}else{
+			availableLetters.append(letters.substring(0, letterToAlwaysShowIndex) + letters.substring(letterToAlwaysShowIndex + 1, letters.length()));
 		}
 		
-		// Initialization
+		Random rand = new Random();
+		
 		for(int i = 0; i < table.length; i++){
 			for(int j = 0; j < table[i].length; j++){
-				int randInt = rand.nextInt(letters.length());
-				
+
 				// to have all different letters in a table
-				while(alreadyChosen[randInt] != 0 || randInt == letterToAlwaysShowIndex){
-					randInt = rand.nextInt(letters.length());
-				}
+				int randInt = rand.nextInt(availableLetters.length());
 				
-				alreadyChosen[randInt]++;
+				table[i][j] = availableLetters.substring(randInt, randInt + 1);
 				
-				table[i][j] = letters.substring(randInt, randInt + 1);
+				availableLetters.deleteCharAt(randInt);
 			}
 		}
 		
 		// Put the letter to always show in a random position
-		int rowIndex = rand.nextInt(rows);
-		int columnIndex = rand.nextInt(columns);
+		int rowIndex = rand.nextInt(tableRows);
+		int columnIndex = rand.nextInt(tableColumns);
 		
 		table[rowIndex][columnIndex] = letterToAlwaysShow;
-		
 		
 		return table;
 	}
@@ -74,7 +77,7 @@ public class AuthenticationTableGenerator {
 				
 				scrambledTable[newRow][newColumn] = tableToScramble[i][j];
 			}
-		}		
+		}
 		
 		return scrambledTable;
 	}

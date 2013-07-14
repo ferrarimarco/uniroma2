@@ -26,6 +26,14 @@
             android:name="it.uniroma2.mp.passwordmanager.MasterPasswordInitActivity"
             android:label="@string/title_activity_master_password_init" >
         </activity>
+        <activity
+            android:name="it.uniroma2.mp.passwordmanager.AuthenticationActivity"
+            android:label="@string/title_activity_authentication"
+            android:parentActivityName="it.uniroma2.mp.passwordmanager.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="it.uniroma2.mp.passwordmanager.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
