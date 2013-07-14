@@ -39,7 +39,7 @@ public class PasswordDataSource {
 		
 		String table = "";
 		
-		if(passwordType.equals(PasswordType.AUTHENTICATION)){
+		if(passwordType.equals(PasswordType.MASTER)){
 			table = SQLiteHelper.TABLE_AUTH;
 		}else if(passwordType.equals(PasswordType.STORED)){
 			table = SQLiteHelper.TABLE_PASSWORDS;
@@ -47,7 +47,7 @@ public class PasswordDataSource {
 		
 		return table;
 	}
-
+	
 	public Password createPassword(String description, String value, PasswordType passwordType) {
 		
 		ContentValues values = new ContentValues();
