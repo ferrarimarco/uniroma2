@@ -1,11 +1,8 @@
 package it.uniroma2.mp.passwordmanager;
 
-import java.security.Provider;
-import java.security.Security;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import it.uniroma2.mp.passwordmanager.authentication.AuthenticationTableGenerator;
 import it.uniroma2.mp.passwordmanager.encryption.EncryptionAlgorithm;
@@ -15,7 +12,6 @@ import it.uniroma2.mp.passwordmanager.model.Password;
 import it.uniroma2.mp.passwordmanager.persistance.PasswordDataSource;
 import android.os.Bundle;
 import android.app.ListActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -90,6 +86,14 @@ public class MainActivity extends ListActivity {
 				
 				for(int i = 0; i < t.length; i++){
 					System.out.println(Arrays.toString(t[i]));
+				}
+				
+				AuthenticationTableGenerator authTGen = new AuthenticationTableGenerator();
+				
+				String[][] scrambled = authTGen.scrambleTable(t);
+				
+				for(int i = 0; i < scrambled.length; i++){
+					System.out.println(Arrays.toString(scrambled[i]));
 				}
 			}
 		});
