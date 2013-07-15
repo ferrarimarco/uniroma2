@@ -2,6 +2,7 @@ package it.uniroma2.mp.passwordmanager;
 
 import it.uniroma2.mp.passwordmanager.authentication.AuthenticationTableGenerator;
 import it.uniroma2.mp.passwordmanager.authentication.MasterPasswordManager;
+import it.uniroma2.mp.passwordmanager.model.Category;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.os.Build;
 
 public class AuthenticationActivity extends Activity {
@@ -85,6 +87,10 @@ public class AuthenticationActivity extends Activity {
 			
 			if(authenticationResult){
 				Toast.makeText(this, "Password: " + insertedMasterPassword.toString(), Toast.LENGTH_LONG).show();
+				
+				Intent intent = new Intent(this, CategoriesActivity.class);
+				intent.putExtra(Category.PARENT_PARAMETER_NAME, Category.NULL_PARENT_VALUE);
+				startActivity(intent);
 			}else{
 				initializeAuthenticationSequence();
 			}

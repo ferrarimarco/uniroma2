@@ -78,7 +78,7 @@ public class PasswordDataSource {
 		String result = "";
 		
 		if(cursor.moveToFirst()){
-			result = cursor.getString(0);
+			result = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_VALUE));
 		}
 		
 		return result;

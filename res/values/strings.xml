@@ -13,5 +13,13 @@
     <string name="title_activity_authentication">Authentication</string>
     <string name="auth_table_dummy_string">--</string>
     <string name="auth_table_label">Master Password: </string>
+    <string name="title_activity_categories">CategoriesActivity</string>
+    <string name="category_content_description">Category</string>
+    <string name="bank_category">Bank</string>
+    <string name="devices_category">Devices</string>
+    <string name="email_category">Email</string>
+    <string name="empty_category">Create new category</string>
+    <string name="other_category">Other</string>
+    <string name="web_category">Web</string>
 
 </resources>
