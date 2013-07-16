@@ -1,10 +1,12 @@
 package it.uniroma2.mp.passwordmanager;
 
-import it.uniroma2.mp.passwordmanager.model.Category;
+import it.uniroma2.mp.passwordmanager.SubcategoryCreationDialog.SubcategoryDialogListener;
+import it.uniroma2.mp.passwordmanager.model.GridItem;
 import it.uniroma2.mp.passwordmanager.persistance.CategoriesDataSource;
 import android.os.Bundle;
-import android.app.Activity;
 import android.content.Intent;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,7 +16,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class CategoriesActivity extends Activity {
+public class CategoriesActivity extends FragmentActivity implements SubcategoryDialogListener {
 
 	private String parentCategoryId;
 	private CategoriesDataSource categoriesDataSource;
@@ -28,7 +30,7 @@ public class CategoriesActivity extends Activity {
 		
 		GridView gridview = (GridView) findViewById(R.id.categoriesGridView);
 
-		parentCategoryId = getIntent().getStringExtra(Category.PARENT_PARAMETER_NAME);
+		parentCategoryId = getIntent().getStringExtra(GridItem.PARENT_PARAMETER_NAME);
 
 		gridview.setAdapter(new ImageAdapter(this, parentCategoryId));
 
@@ -37,20 +39,62 @@ public class CategoriesActivity extends Activity {
 				
 				FrameLayout layout = (FrameLayout) v;
 				
-				String parentCategoryValue = ((TextView) layout.getChildAt(1)).getText().toString();
+				String parentCategoryDescription = ((TextView) layout.getChildAt(1)).getText().toString();
+				String parentCategoryValue = GridItem.getValueFromDescription(parentCategoryDescription, CategoriesActivity.this);
 				
-				Toast.makeText(CategoriesActivity.this, parentCategoryValue, Toast.LENGTH_SHORT).show();
-				
-				categoriesDataSource.open();
-				String parentCategoryIdForChild = categoriesDataSource.getCategoryId(parentCategoryValue);
-				categoriesDataSource.close();
-				
-				Intent intent = new Intent(CategoriesActivity.this, CategoriesActivity.class);
-				intent.putExtra(Category.PARENT_PARAMETER_NAME, parentCategoryIdForChild);
-				startActivity(intent);
+				if(!parentCategoryValue.equals(GridItem.EMPTY_CATEGORY_VALUE)){// create a new category
+					categoriesDataSource.open();
+					String parentCategoryIdForChild = categoriesDataSource.getCategoryId(parentCategoryValue);
+					categoriesDataSource.close();
+					
+					Intent intent = null;
+					
+					if(parentCategoryId.equals(GridItem.NULL_PARENT_VALUE)){
+						intent = new Intent(CategoriesActivity.this, CategoriesActivity.class);
+						intent.putExtra(GridItem.PARENT_PARAMETER_NAME, parentCategoryIdForChild);
+						startActivity(intent);	
+					}else{
+						Toast.makeText(CategoriesActivity.this, "TestSubCatToast", Toast.LENGTH_LONG).show();
+					}
+					
+									
+				}else{
+					showSubcategoryCreationDialog();
+				}
 			}
 		});
 	}
+	
+    private void showSubcategoryCreationDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new SubcategoryCreationDialog();
+        dialog.show(getSupportFragmentManager(), "SubcategoryDialogFragment");
+    }
+
+    // The dialog fragment receives a reference to this Activity through the
+    // Fragment.onAttach() callback, which it uses to call the following methods
+    // defined by the NoticeDialogFragment.NoticeDialogListener interface
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        // User touched the dialog's positive button
+    	
+    	SubcategoryCreationDialog creationDialog = (SubcategoryCreationDialog) dialog;
+    	
+    	String subcategoryName = creationDialog.getSubcategoryName();
+    	
+    	GridItem category = new GridItem(subcategoryName, R.drawable.bank, Integer.parseInt(parentCategoryId));
+    	
+    	categoriesDataSource.open();
+    	categoriesDataSource.storeCategory(category);
+    	categoriesDataSource.close();
+    	
+    	// TODO: invalidare la view per aggiungere nuova categoria
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        // User touched the dialog's negative button
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

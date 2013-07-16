@@ -3,7 +3,7 @@ package it.uniroma2.mp.passwordmanager.persistance;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.uniroma2.mp.passwordmanager.model.Category;
+import it.uniroma2.mp.passwordmanager.model.GridItem;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -37,64 +37,67 @@ public class CategoriesDataSource {
 		dbHelper.close();
 	}
 
-	private Category cursorToCategory(Cursor cursor){
+	private GridItem cursorToCategory(Cursor cursor){
 		
 		String nameId = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_VALUE));
-		String name = Category.getDescription(nameId, context);
+		String name = GridItem.getDescription(nameId, context);
+		
+		// Custom GridItem has no builtin description
+		if(name.isEmpty()){
+			name = nameId;
+		}
+		
 		String drawableId = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_DRAWABLE_ID));
 		String parent = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_PARENT));
 
-		return new Category(name, Integer.parseInt(drawableId), Integer.parseInt(parent));
+		return new GridItem(name, Integer.parseInt(drawableId), Integer.parseInt(parent));
 	}
 	
-	public List<Category> getAllCategories(String parent){
+	public List<GridItem> getAllCategories(String parent){
 
-		Cursor cursor = database.query(SQLiteHelper.TABLE_CATEGORIES, allColumns, SQLiteHelper.COLUMN_PARENT + " = '" + parent + "' AND " + SQLiteHelper.COLUMN_VALUE + " != '" + Category.EMPTY_CATEGORY_VALUE + "'", null, null, null, null);
+		Cursor cursor = database.query(SQLiteHelper.TABLE_CATEGORIES, allColumns, SQLiteHelper.COLUMN_PARENT + " = '" + parent + "' AND " + SQLiteHelper.COLUMN_VALUE + " != '" + GridItem.EMPTY_CATEGORY_VALUE + "'", null, null, null, null);
 
-		List<Category> categories = new ArrayList<Category>();
+		List<GridItem> gridItems = new ArrayList<GridItem>();
 
 		if(cursor.moveToFirst()){
 			while (!cursor.isAfterLast()) {
-				categories.add(cursorToCategory(cursor));
+				gridItems.add(cursorToCategory(cursor));
 				cursor.moveToNext();
 			}
 		}
 
 		cursor.close();
 
-		return categories;
+		return gridItems;
 	}
 
-	public Category getEmptyCategory(){
-		Cursor cursor = database.query(SQLiteHelper.TABLE_CATEGORIES, allColumns, SQLiteHelper.COLUMN_VALUE + " = '" + Category.EMPTY_CATEGORY_VALUE + "'", null, null, null, null);
+	public GridItem getEmptyCategory(){
+		Cursor cursor = database.query(SQLiteHelper.TABLE_CATEGORIES, allColumns, SQLiteHelper.COLUMN_VALUE + " = '" + GridItem.EMPTY_CATEGORY_VALUE + "'", null, null, null, null);
 
-		Category category = null;
+		GridItem gridItem = null;
 
 		if(cursor.moveToFirst()){
-			String name = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_VALUE));
-			String drawableId = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_DRAWABLE_ID));
-			String parent = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_PARENT));
-
-			category = new Category(name, Integer.parseInt(drawableId), Integer.parseInt(parent));
+			gridItem = cursorToCategory(cursor);
 		}
 
-		return category;
+		return gridItem;
 	}
 
-	public void storeCategory(Category category){
+	public void storeCategory(GridItem gridItem){
 		ContentValues values = new ContentValues();
 
-		values.put(SQLiteHelper.COLUMN_VALUE, category.getName());
-		values.put(SQLiteHelper.COLUMN_PARENT, category.getParent());
+		values.put(SQLiteHelper.COLUMN_VALUE, gridItem.getName());
+		values.put(SQLiteHelper.COLUMN_PARENT, gridItem.getParent());
+		values.put(SQLiteHelper.COLUMN_DRAWABLE_ID, gridItem.getDrawableId());
 
 		database.insert(SQLiteHelper.TABLE_CATEGORIES, null, values);
 	}
 
-	public void deleteCategory(Category category) {
+	public void deleteCategory(GridItem gridItem) {
 
 		database.delete(SQLiteHelper.TABLE_CATEGORIES, 
-				SQLiteHelper.COLUMN_ID + " = '" + category.getName()
-				+ "' AND " + SQLiteHelper.COLUMN_PARENT + " = '" + category.getParent() + "'", null);
+				SQLiteHelper.COLUMN_ID + " = '" + gridItem.getName()
+				+ "' AND " + SQLiteHelper.COLUMN_PARENT + " = '" + gridItem.getParent() + "'", null);
 	}
 
 	public String getCategoryId(String value){

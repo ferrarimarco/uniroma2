@@ -2,16 +2,17 @@ package it.uniroma2.mp.passwordmanager;
 
 import it.uniroma2.mp.passwordmanager.authentication.AuthenticationTableGenerator;
 import it.uniroma2.mp.passwordmanager.authentication.MasterPasswordManager;
-import it.uniroma2.mp.passwordmanager.model.Category;
+import it.uniroma2.mp.passwordmanager.model.GridItem;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TableLayout;
-import android.widget.TableRow;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
 import android.content.Intent;
@@ -39,20 +40,24 @@ public class AuthenticationActivity extends Activity {
 		String[][] authenticationTable = masterPasswordManager.loadAuthenticationTable(authenticationTableIndex);
 		
 		AuthenticationTableGenerator authenticationTableGenerator = new AuthenticationTableGenerator();
-		String[][] scrambledTable = authenticationTableGenerator.scrambleTable(authenticationTable);
+		String[][] scrambledTable = authenticationTableGenerator.scrambleTable(authenticationTable);		
+		String[] scrambledTableOneRow = new String[scrambledTable.length * scrambledTable[0].length];
 		
-		TableLayout table = (TableLayout) findViewById(R.id.authenticationTableLayout);
-		
-		for(int i = 0; i < table.getChildCount(); i++){
-			
-			TableRow row = (TableRow) table.getChildAt(i);
-			
-			for(int j = 0; j < row.getChildCount(); j++){
-				TextView letterTextView = (TextView) row.getChildAt(j);
-				
-				letterTextView.setText(scrambledTable[i][j]);
+		for(int i = 0; i < scrambledTable.length; i++){
+			for(int j = 0; j < scrambledTable[i].length; j++){
+				scrambledTableOneRow[i * scrambledTable[i].length + j] = scrambledTable[i][j];
 			}
 		}
+		
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, scrambledTableOneRow);
+		GridView gridView = (GridView) findViewById(R.id.authenticationTable);
+		gridView.setAdapter(adapter);
+		gridView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+				tableLetterClick(v);
+			}});
 		
 		this.authenticationTableIndex++;
 	}
@@ -86,10 +91,8 @@ public class AuthenticationActivity extends Activity {
 			boolean authenticationResult = masterPasswordManager.checkMasterPassword(insertedMasterPassword.toString());
 			
 			if(authenticationResult){
-				Toast.makeText(this, "Password: " + insertedMasterPassword.toString(), Toast.LENGTH_LONG).show();
-				
 				Intent intent = new Intent(this, CategoriesActivity.class);
-				intent.putExtra(Category.PARENT_PARAMETER_NAME, Category.NULL_PARENT_VALUE);
+				intent.putExtra(GridItem.PARENT_PARAMETER_NAME, GridItem.NULL_PARENT_VALUE);
 				startActivity(intent);
 			}else{
 				initializeAuthenticationSequence();

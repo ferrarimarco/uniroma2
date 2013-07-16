@@ -4,7 +4,6 @@ import it.uniroma2.mp.passwordmanager.configuration.ConfigurationManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -27,8 +26,6 @@ public class MainActivity extends Activity {
 		ConfigurationManager configurationManager = new ConfigurationManager(this);
 
 		if(configurationManager.isMasterPasswordConfigured()){// normal application flow
-			Toast.makeText(this, "Master password found", Toast.LENGTH_LONG).show();
-			
 			Intent intent = new Intent(this, AuthenticationActivity.class);
 			startActivity(intent);
 		}else{// show master password init activity

@@ -7,6 +7,7 @@
     <string name="masterPasswordHint">Insert Master Password</string>
     <string name="confirmMasterPasswordHint">Confirm Master Password</string>
     <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="masterPasswordOkConfirmation">Master Password Configured Successfully</string>
     <string name="masterPasswordNotConfirmed">The passwords do not match</string>
     <string name="masterPasswordLengthError">The Master Password must be exactly 8 characters long</string>
@@ -18,8 +19,10 @@
     <string name="bank_category">Bank</string>
     <string name="devices_category">Devices</string>
     <string name="email_category">Email</string>
-    <string name="empty_category">Create new category</string>
+    <string name="empty_category">Create new subcategory</string>
     <string name="other_category">Other</string>
     <string name="web_category">Web</string>
+    <string name="subcategory_name">Subcategory name</string>
+    <string name="create_new_category_dialog_title">Create new category</string>
 
 </resources>

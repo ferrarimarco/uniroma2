@@ -1,7 +1,7 @@
 package it.uniroma2.mp.passwordmanager.persistance;
 
 import it.uniroma2.mp.passwordmanager.R;
-import it.uniroma2.mp.passwordmanager.model.Category;
+import it.uniroma2.mp.passwordmanager.model.GridItem;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -63,22 +63,22 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 		
 		database.execSQL(createTable);
 		
-		String categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + Category.EMAIL_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.email +"')";
+		String categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + GridItem.EMAIL_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.email +"')";
 		database.execSQL(categoriesInitialization);
 		
-		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + Category.DEVICES_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.devices +"')";
+		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + GridItem.DEVICES_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.devices +"')";
 		database.execSQL(categoriesInitialization);
 		
-		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '"+ Category.BANK_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.bank +"')";
+		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '"+ GridItem.BANK_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.bank +"')";
 		database.execSQL(categoriesInitialization);
 		
-		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + Category.WEB_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.web +"')";
+		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + GridItem.WEB_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.web +"')";
 		database.execSQL(categoriesInitialization);
 		
-		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + Category.OTHER_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.other +"')";
+		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + GridItem.OTHER_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.other +"')";
 		database.execSQL(categoriesInitialization);
 		
-		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + Category.EMPTY_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.empty +"')";
+		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + GridItem.EMPTY_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.empty +"')";
 		database.execSQL(categoriesInitialization);
 	}
 	
