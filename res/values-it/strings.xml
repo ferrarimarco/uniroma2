@@ -44,5 +44,6 @@
     <string name="aes">AES</string>
     <string name="blowfish">Blowfish</string>
     <string name="title_activity_password_hash">PasswordHashActivity</string>
+    <string name="masterPasswordInvalidChars">La password contiene caratteri non validi: -</string>
 
 </resources>

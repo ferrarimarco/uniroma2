@@ -14,7 +14,7 @@ public class MasterPasswordManager {
 	private PasswordDataSource passwordDataSource;
 	private ConfigurationDataSource configurationDataSource;
 	
-	private static final String authenticationTableRowSeparator = "-";
+	public static final String authenticationTableRowSeparator = "-";
 	
 	public MasterPasswordManager(Context context){
 		passwordDataSource = new PasswordDataSource(context);

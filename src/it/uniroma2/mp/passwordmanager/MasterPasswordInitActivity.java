@@ -39,6 +39,8 @@ public class MasterPasswordInitActivity extends Activity {
 						// TODO: real time check onTextChanged
 						
 						Toast.makeText(MasterPasswordInitActivity.this, getString(R.string.masterPasswordNotConfirmed), Toast.LENGTH_SHORT).show();
+					}else if(masterPassword.contains("-") || masterPassword.contains("'")){
+						Toast.makeText(MasterPasswordInitActivity.this, getString(R.string.masterPasswordInvalidChars), Toast.LENGTH_SHORT).show();
 					}else{
 						MasterPasswordManager masterPasswordManager = new MasterPasswordManager(MasterPasswordInitActivity.this);
 						masterPasswordManager.storeMasterPassword(masterPassword);
