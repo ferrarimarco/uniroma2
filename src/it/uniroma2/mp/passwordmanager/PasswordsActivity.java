@@ -136,7 +136,6 @@ public class PasswordsActivity extends FragmentActivity implements PasswordCreat
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 		FrameLayout frameLayout = (FrameLayout) info.targetView;
 		
-		TextView passwordIdTextView = (TextView) frameLayout.getChildAt(0);
 		TextView passwordValueTextView = (TextView) frameLayout.getChildAt(1);
 
 		long passwordId = (Long) passwordValueTextView.getTag();
@@ -152,7 +151,14 @@ public class PasswordsActivity extends FragmentActivity implements PasswordCreat
 			
 			break;
 		case R.id.delete_category_menu_item:
-			Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show();
+			passwordDataSource.open();
+			passwordDataSource.deletePassword(Long.toString(passwordId), PasswordType.STORED);
+			passwordDataSource.close();
+			
+			GridView gridview = (GridView) findViewById(R.id.passwordsGridView);
+			gridview.setAdapter(new PasswordAdapter(this, parentCategoryId));
+			
+			Toast.makeText(this, getString(R.string.password_deleted_toast), Toast.LENGTH_SHORT).show();
 			break;
 		default:
 			return super.onContextItemSelected(item);

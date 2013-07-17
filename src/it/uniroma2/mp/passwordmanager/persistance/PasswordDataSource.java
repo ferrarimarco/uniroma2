@@ -148,13 +148,11 @@ public class PasswordDataSource {
 		database.update(getDBTable(passwordType), dataToInsert, where, whereArgs);
 	}
 
-	public void deletePassword(Password password, PasswordType passwordType) {
-		
-		long id = password.getId();
+	public void deletePassword(String id, PasswordType passwordType) {
 		
 		String table = getDBTable(passwordType);
 		
-		database.delete(table, SQLiteHelper.COLUMN_ID + " = " + id, null);
+		database.delete(table, SQLiteHelper.COLUMN_ID + " = '" + id + "'", null);
 	}
 
 	private String[] getAllColumns(PasswordType passwordType){

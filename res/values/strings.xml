@@ -39,5 +39,6 @@
     <string name="password_name">Password</string>
     <string name="invalid_password_user_id">Invalid id</string>
     <string name="invalid_password_value">Invalid password</string>
-
+    <string name="password_deleted_toast">Password deleted</string>
+    <string name="category_deleted_toast">Category deleted</string>
 </resources>

@@ -108,11 +108,8 @@ public class CategoriesDataSource {
 		database.insert(SQLiteHelper.TABLE_CATEGORIES, null, values);
 	}
 
-	public void deleteCategory(GridItem gridItem) {
-
-		database.delete(SQLiteHelper.TABLE_CATEGORIES, 
-				SQLiteHelper.COLUMN_ID + " = '" + gridItem.getName()
-				+ "' AND " + SQLiteHelper.COLUMN_PARENT + " = '" + gridItem.getParent() + "'", null);
+	public void deleteCategory(String categoryId) {
+		database.delete(SQLiteHelper.TABLE_CATEGORIES, SQLiteHelper.COLUMN_ID + " = '" + categoryId + "'", null);
 	}
 	
 	public void updateCategory(GridItem gridItem){

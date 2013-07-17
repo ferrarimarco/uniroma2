@@ -181,10 +181,17 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 			GridItem gridItem = categoriesDataSource.getGridItem(categoryId);
 			categoriesDataSource.close();
 			showSubcategoryCreationDialog(gridItem.getName(), gridItem.getId());
-			
 			break;
 		case R.id.delete_category_menu_item:
-			Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show();
+			categoriesDataSource.open();
+			categoriesDataSource.deleteCategory(categoryId);
+			categoriesDataSource.close();
+			
+			GridView gridview = (GridView) findViewById(R.id.categoriesGridView);
+			gridview.setAdapter(new ImageAdapter(this, parentCategoryId));
+			
+			Toast.makeText(this, getString(R.string.category_deleted_toast), Toast.LENGTH_SHORT).show();
+			
 			break;
 		default:
 			return super.onContextItemSelected(item);
