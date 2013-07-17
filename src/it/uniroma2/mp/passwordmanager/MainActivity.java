@@ -45,7 +45,6 @@ public class MainActivity extends Activity {
 	
 	@Override
 	protected void onPause() {
-		//datasource.close();
 		super.onPause();
 	}
 

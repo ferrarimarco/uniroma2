@@ -41,4 +41,6 @@
     <string name="invalid_password_value">Invalid password</string>
     <string name="password_deleted_toast">Password deleted</string>
     <string name="category_deleted_toast">Category deleted</string>
+    <string name="aes">AES</string>
+    <string name="blowfish">Blowfish</string>
 </resources>

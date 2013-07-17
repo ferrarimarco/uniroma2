@@ -11,6 +11,7 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 
 public class PasswordCreationDialog extends DialogFragment {	
 
@@ -68,7 +69,18 @@ public class PasswordCreationDialog extends DialogFragment {
 				
 				userId = userIdEditText.getText().toString();
 				passwordValue = passwordEditText.getText().toString();
-
+				
+				RadioGroup algorithmRadioGroup = (RadioGroup) view.findViewById(R.id.encryption_algorithm_radio_group);
+				
+				// get selected radio button from radioGroup
+				int selectedId = algorithmRadioGroup.getCheckedRadioButtonId();
+				
+				if(selectedId == R.id.aes_radio){
+					algorithm = EncryptionAlgorithm.AES;
+				}else if(selectedId == R.id.blowfish_radio){
+					algorithm = EncryptionAlgorithm.BLOWFISH;
+				}
+				
 				// Send the positive button event back to the host activity
 				mListener.onDialogPositiveClick(PasswordCreationDialog.this);
 			}
