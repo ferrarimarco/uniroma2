@@ -44,6 +44,5 @@
     <string name="aes">AES</string>
     <string name="blowfish">Blowfish</string>
     <string name="title_activity_password_hash">PasswordHashActivity</string>
-    <string name="hello_world">Hello world!</string>
 
 </resources>
