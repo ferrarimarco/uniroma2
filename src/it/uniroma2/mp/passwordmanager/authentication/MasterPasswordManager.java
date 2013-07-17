@@ -28,7 +28,7 @@ public class MasterPasswordManager {
 	
 	private String loadMasterPassword(){
 		passwordDataSource.open();
-		String masterPassword = passwordDataSource.getPassword(PasswordType.MASTER, PasswordType.MASTER.toString());
+		String masterPassword = passwordDataSource.getPassword(PasswordType.MASTER, PasswordType.MASTER.toString(), "").getValue();
 		passwordDataSource.close();
 		
 		return masterPassword;
@@ -37,7 +37,7 @@ public class MasterPasswordManager {
 	public void storeMasterPassword(String masterPassword){
 		
 		passwordDataSource.open();
-		passwordDataSource.createPassword(PasswordType.MASTER.toString(), masterPassword, PasswordType.MASTER);
+		passwordDataSource.createPassword(PasswordType.MASTER.toString(), masterPassword, "", PasswordType.MASTER);
 		storeAuthenticationTables(masterPassword);
 		passwordDataSource.close();
 		
@@ -54,14 +54,14 @@ public class MasterPasswordManager {
 			
 			String[][] authenticationTable = authenticationTableGenerator.generateTable(masterPassword.substring(i, i + 1));
 			
-			passwordDataSource.createPassword(PasswordType.AUTH_TABLE.toString() + i, serializeAuthenticationTable(authenticationTable), PasswordType.AUTH_TABLE);
+			passwordDataSource.createPassword(PasswordType.AUTH_TABLE.toString() + i, serializeAuthenticationTable(authenticationTable), "", PasswordType.AUTH_TABLE);
 		}
 	}
 	
 	public String[][] loadAuthenticationTable(int authenticationTableIndex){
 		
 		passwordDataSource.open();
-		String serializedAuthenticationTable = passwordDataSource.getPassword(PasswordType.AUTH_TABLE, PasswordType.AUTH_TABLE.toString() + authenticationTableIndex);
+		String serializedAuthenticationTable = passwordDataSource.getPassword(PasswordType.AUTH_TABLE, PasswordType.AUTH_TABLE.toString() + authenticationTableIndex, "").getValue();
 		passwordDataSource.close();
 		
 		return deserializeAuthenticationTable(serializedAuthenticationTable);

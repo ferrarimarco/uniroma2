@@ -36,10 +36,9 @@ public class MainActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		//datasource.open();
 		super.onResume();
 		
-		startNextActivity();
+//		startNextActivity();
 	}
 	
 	@Override

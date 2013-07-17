@@ -47,10 +47,11 @@ public class CategoriesDataSource {
 			name = nameId;
 		}
 		
+		String id = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_ID));
 		String drawableId = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_DRAWABLE_ID));
 		String parent = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_PARENT));
 
-		return new GridItem(name, Integer.parseInt(drawableId), Integer.parseInt(parent));
+		return new GridItem(name, Integer.parseInt(drawableId), Integer.parseInt(parent), id);
 	}
 	
 	public List<GridItem> getAllCategories(String parent){
@@ -69,6 +70,20 @@ public class CategoriesDataSource {
 		cursor.close();
 
 		return gridItems;
+	}
+	
+	public GridItem getGridItem(String id){
+		Cursor cursor = database.query(SQLiteHelper.TABLE_CATEGORIES, allColumns, SQLiteHelper.COLUMN_ID + " = '" + id + "'", null, null, null, null);
+
+		GridItem gridItem = null;
+		
+		if(cursor.moveToFirst()){
+			gridItem = cursorToCategory(cursor);
+		}
+
+		cursor.close();
+
+		return gridItem;
 	}
 
 	public GridItem getEmptyCategory(){
@@ -98,6 +113,18 @@ public class CategoriesDataSource {
 		database.delete(SQLiteHelper.TABLE_CATEGORIES, 
 				SQLiteHelper.COLUMN_ID + " = '" + gridItem.getName()
 				+ "' AND " + SQLiteHelper.COLUMN_PARENT + " = '" + gridItem.getParent() + "'", null);
+	}
+	
+	public void updateCategory(GridItem gridItem){
+		String where = SQLiteHelper.COLUMN_ID + "=?";
+		String[] whereArgs = new String[] {gridItem.getId()};
+
+		ContentValues dataToInsert = new ContentValues();                          
+		dataToInsert.put(SQLiteHelper.COLUMN_VALUE, gridItem.getName());
+		dataToInsert.put(SQLiteHelper.COLUMN_PARENT, gridItem.getParent());
+		dataToInsert.put(SQLiteHelper.COLUMN_DRAWABLE_ID, gridItem.getDrawableId());
+		
+		database.update(SQLiteHelper.TABLE_CATEGORIES, dataToInsert, where, whereArgs);
 	}
 
 	public String getCategoryId(String value){

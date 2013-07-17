@@ -21,6 +21,12 @@ public class PasswordDataSource {
 	private String[] allColumns = {
 			SQLiteHelper.COLUMN_ID,
 			SQLiteHelper.COLUMN_DESCRIPTION,
+			SQLiteHelper.COLUMN_VALUE,
+			SQLiteHelper.COLUMN_CATEGORY };
+	
+	private String[] allColumnsAuth = {
+			SQLiteHelper.COLUMN_ID,
+			SQLiteHelper.COLUMN_DESCRIPTION,
 			SQLiteHelper.COLUMN_VALUE };
 
 	public PasswordDataSource(Context context){
@@ -48,12 +54,16 @@ public class PasswordDataSource {
 		return table;
 	}
 	
-	public void createPassword(String description, String value, PasswordType passwordType) {
+	public void createPassword(String description, String value, String parent, PasswordType passwordType) {
 		
 		ContentValues values = new ContentValues();
 		
 		values.put(SQLiteHelper.COLUMN_DESCRIPTION, description);
 		values.put(SQLiteHelper.COLUMN_VALUE, value);
+		
+		if(!passwordType.equals(PasswordType.AUTH_TABLE) && !passwordType.equals(PasswordType.MASTER)){
+			values.put(SQLiteHelper.COLUMN_CATEGORY, parent);
+		}
 		
 		String table = getDBTable(passwordType);
 		
@@ -69,28 +79,61 @@ public class PasswordDataSource {
 		database.delete(table, SQLiteHelper.COLUMN_ID + " = " + id, null);
 	}
 
-	public String getPassword(PasswordType passwordType, String description){
+	private String[] getAllColumns(PasswordType passwordType){
+		
+		String[] allCols = null;
+		
+		if(!passwordType.equals(PasswordType.AUTH_TABLE) && !passwordType.equals(PasswordType.MASTER)){
+			allCols = this.allColumns;
+		}else{
+			allCols = this.allColumnsAuth;
+		}
+		
+		return allCols;
+	}
+	
+	public Password getPassword(PasswordType passwordType, String description, String parent){
 		
 		String table = getDBTable(passwordType);
 		
-		Cursor cursor = database.query(table, new String[] {SQLiteHelper.COLUMN_VALUE}, SQLiteHelper.COLUMN_DESCRIPTION + " = '" + description + "'", null, null, null, null);
+		String condition = "";
 		
-		String result = "";
+		String[] allColumns = getAllColumns(passwordType);
+		
+		if(parent != null && !parent.isEmpty()){
+			condition = SQLiteHelper.COLUMN_DESCRIPTION + " = '" + description + "' AND " + SQLiteHelper.COLUMN_CATEGORY + " = '" + parent + "'";
+		}else{
+			condition = SQLiteHelper.COLUMN_DESCRIPTION + " = '" + description + "'";
+		}
+		
+		Cursor cursor = database.query(table, allColumns, condition, null, null, null, null);
+		
+		Password result = null;
 		
 		if(cursor.moveToFirst()){
-			result = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_VALUE));
+			result = cursorToPassword(cursor);
 		}
+		
+		cursor.close();
 		
 		return result;
 	}
 	
-	public List<Password> getAllPasswords(PasswordType passwordType) {
+	public List<Password> getAllPasswords(PasswordType passwordType, String parent) {
 		
 		List<Password> comments = new ArrayList<Password>();
 		
 		String table = getDBTable(passwordType);
 
-		Cursor cursor = database.query(table, allColumns, null, null, null, null, null);
+		String[] allColumns = getAllColumns(passwordType);
+		
+		String selection = null;
+		
+		if(parent != null && !parent.isEmpty()){
+			selection = SQLiteHelper.COLUMN_CATEGORY + " = '" + parent + "'";
+		}
+		
+		Cursor cursor = database.query(table, allColumns, selection, null, null, null, null);
 
 		cursor.moveToFirst();
 		
@@ -107,9 +150,9 @@ public class PasswordDataSource {
 
 	private Password cursorToPassword(Cursor cursor) {
 		Password password = new Password();
-		password.setId(cursor.getLong(0));
-		password.setValue(cursor.getString(1));
-		password.setDescription(cursor.getString(2));
+		password.setId(cursor.getLong(cursor.getColumnIndex(SQLiteHelper.COLUMN_ID)));
+		password.setValue(cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_VALUE)));
+		password.setDescription(cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_DESCRIPTION)));
 		
 		return password;
 	}

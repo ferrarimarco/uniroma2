@@ -38,6 +38,10 @@
             android:name="it.uniroma2.mp.passwordmanager.CategoriesActivity"
             android:label="@string/title_activity_categories" >
         </activity>
+        <activity
+            android:name="it.uniroma2.mp.passwordmanager.PasswordsActivity"
+            android:label="@string/title_activity_passwords" >
+        </activity>
     </application>
 
 </manifest>

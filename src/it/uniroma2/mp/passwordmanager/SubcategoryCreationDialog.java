@@ -9,13 +9,24 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.GridView;
 
 public class SubcategoryCreationDialog extends DialogFragment {	
-	
+
 	private String subcategoryName;
+	private int categoryDrawableId;
+	private String categoryId;
 	
+	private ImageAdapter imageAdapter;
+
+	public SubcategoryCreationDialog(){
+		subcategoryName = "";
+		categoryDrawableId = -1;
+	}
+
 	/* The activity that creates an instance of this dialog fragment must
 	 * implement this interface in order to receive event callbacks.
 	 * Each method passes the DialogFragment in case the host needs to query it. */
@@ -28,24 +39,22 @@ public class SubcategoryCreationDialog extends DialogFragment {
 	SubcategoryDialogListener mListener;
 
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 
-	    // Inflate and set the layout for the dialog
-	    // Pass null as the parent view because its going in the dialog layout
-		
 		// Build the dialog and set up the button click handlers
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		
+
+		// Inflate and set the layout for the dialog
+		// Pass null as the parent view because its going in the dialog layout
 		final View view = inflater.inflate(R.layout.subcategory_creation_dialog, null);
-		
+
 		builder.setView(view).setMessage(R.string.create_new_category_dialog_title)
 		.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 
 				EditText categoryNameEditText = (EditText) view.findViewById(R.id.subcategory_name_edittext);
 				subcategoryName = categoryNameEditText.getText().toString();
-				
+
 				// Send the positive button event back to the host activity
 				mListener.onDialogPositiveClick(SubcategoryCreationDialog.this);
 			}
@@ -53,45 +62,26 @@ public class SubcategoryCreationDialog extends DialogFragment {
 		.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				// Send the negative button event back to the host activity
-				mListener.onDialogPositiveClick(SubcategoryCreationDialog.this);
+				mListener.onDialogNegativeClick(SubcategoryCreationDialog.this);
 			}
 		});
-		
+
 		GridView imageChooserGridView = (GridView) view.findViewById(R.id.image_chooser_gridView);
-		ImageAdapter imageAdapter = new ImageAdapter(view.getContext(), GridItem.CUSTOM_CATEGORY_DRAWABLE_ID);
-		
+		imageAdapter = new ImageAdapter(view.getContext(), GridItem.CUSTOM_CATEGORY_DRAWABLE_ID);
+
 		imageChooserGridView.setAdapter(imageAdapter);
 		imageChooserGridView.setNumColumns(imageAdapter.getGridItemCount());
-		
-//		gridview.setOnItemClickListener(new OnItemClickListener() {
-//			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-//				
-//				FrameLayout layout = (FrameLayout) v;
-//				
-//				String parentCategoryDescription = ((TextView) layout.getChildAt(1)).getText().toString();
-//				String parentCategoryValue = GridItem.getValueFromDescription(parentCategoryDescription, CategoriesActivity.this);
-//				
-//				if(!parentCategoryValue.equals(GridItem.EMPTY_CATEGORY_VALUE)){// create a new category
-//					categoriesDataSource.open();
-//					String parentCategoryIdForChild = categoriesDataSource.getCategoryId(parentCategoryValue);
-//					categoriesDataSource.close();
-//					
-//					Intent intent = null;
-//					
-//					if(parentCategoryId.equals(GridItem.NULL_PARENT_VALUE)){
-//						intent = new Intent(CategoriesActivity.this, CategoriesActivity.class);
-//						intent.putExtra(GridItem.PARENT_PARAMETER_NAME, parentCategoryIdForChild);
-//						startActivity(intent);	
-//					}else{
-//						Toast.makeText(CategoriesActivity.this, "TestSubCatToast", Toast.LENGTH_LONG).show();
-//					}
-//					
-//									
-//				}else{
-//					showSubcategoryCreationDialog();
-//				}
-//			}
-//		});
+
+		imageChooserGridView.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+				categoryDrawableId = imageAdapter.getDrawableId(position);
+			}
+		});
+
+		if(!subcategoryName.isEmpty()){
+			EditText subcategoryNameEditText = (EditText) view.findViewById(R.id.subcategory_name_edittext);
+			subcategoryNameEditText.setText(subcategoryName);
+		}
 		
 		return builder.create();
 	}
@@ -117,5 +107,21 @@ public class SubcategoryCreationDialog extends DialogFragment {
 
 	public void setSubcategoryName(String subcategoryName) {
 		this.subcategoryName = subcategoryName;
+	}
+
+	public int getCategoryDrawableId() {
+		return categoryDrawableId;
+	}
+
+	public void setCategoryDrawableId(int categoryDrawableId) {
+		this.categoryDrawableId = categoryDrawableId;
+	}
+
+	public String getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(String categoryId) {
+		this.categoryId = categoryId;
 	}
 }

@@ -35,8 +35,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 		
 		String createTable = "create table "	+ TABLE_PASSWORDS + "("
 				+ COLUMN_ID + " integer primary key autoincrement, "
-				+ COLUMN_VALUE + " text not null, "
 				+ COLUMN_DESCRIPTION + " text not null, "
+				+ COLUMN_VALUE + " text not null, "
 				+ COLUMN_CATEGORY + " text not null);";
 		
 		database.execSQL(createTable);

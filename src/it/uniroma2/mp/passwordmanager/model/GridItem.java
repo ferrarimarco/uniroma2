@@ -8,6 +8,7 @@ public class GridItem {
     private final String name;
     private final int drawableId;
     private final int parent;
+    private String id;
     
     // to store the password
     // when GridItem is used to show a password, not a category
@@ -16,6 +17,7 @@ public class GridItem {
     public static final String PARENT_PARAMETER_NAME = "parentParameter";
     public static final String NULL_PARENT_VALUE = "-1";
     public static final String CUSTOM_CATEGORY_DRAWABLE_ID = "-2";
+    public static final String DUMMY_CATEGORY_ID = "-1";
     
     public static final String EMAIL_CATEGORY_VALUE = "EMAIL";
     public static final String DEVICES_CATEGORY_VALUE = "DEVICES";
@@ -24,10 +26,11 @@ public class GridItem {
     public static final String OTHER_CATEGORY_VALUE = "OTHER";
     public static final String EMPTY_CATEGORY_VALUE = "EMPTY";
 
-    public GridItem(String name, int drawableId, int parent) {
+    public GridItem(String name, int drawableId, int parent, String id) {
         this.name = name;
         this.drawableId = drawableId;
         this.parent = parent;
+        this.id = id;
     }
     
     public static String getDescription(String value, Context context){
@@ -96,6 +99,14 @@ public class GridItem {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 	
 }

@@ -32,30 +32,27 @@ public class ImageAdapter extends BaseAdapter {
 			categoriesDataSource = new CategoriesDataSource(context);
 			categoriesDataSource.open();
 			gridItems = categoriesDataSource.getAllCategories(parent);
-			if (!parent.equals(GridItem.NULL_PARENT_VALUE)) {
-				gridItems.add(categoriesDataSource.getEmptyCategory());
-			}
 			
 			categoriesDataSource.close();
 		}else{
 			gridItems = new ArrayList<GridItem>(10);
 			
-			GridItem gridItem = new GridItem("Drive", R.drawable.drive, Integer.parseInt(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID));
+			GridItem gridItem = new GridItem("Drive", R.drawable.drive, Integer.parseInt(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID), GridItem.DUMMY_CATEGORY_ID);
 			gridItems.add(gridItem);
 			
-			gridItem = new GridItem("ebay", R.drawable.ebay, Integer.parseInt(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID));
+			gridItem = new GridItem("ebay", R.drawable.ebay, Integer.parseInt(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID), GridItem.DUMMY_CATEGORY_ID);
 			gridItems.add(gridItem);
 			
-			gridItem = new GridItem("Facebook", R.drawable.facebook, Integer.parseInt(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID));
+			gridItem = new GridItem("Facebook", R.drawable.facebook, Integer.parseInt(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID), GridItem.DUMMY_CATEGORY_ID);
 			gridItems.add(gridItem);
 			
-			gridItem = new GridItem("Gmail", R.drawable.gmail, Integer.parseInt(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID));
+			gridItem = new GridItem("Gmail", R.drawable.gmail, Integer.parseInt(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID), GridItem.DUMMY_CATEGORY_ID);
 			gridItems.add(gridItem);
 			
-			gridItem = new GridItem("Hotmail", R.drawable.hotmail, Integer.parseInt(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID));
+			gridItem = new GridItem("Hotmail", R.drawable.hotmail, Integer.parseInt(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID), GridItem.DUMMY_CATEGORY_ID);
 			gridItems.add(gridItem);
 			
-			gridItem = new GridItem("Linkedin", R.drawable.linkedin, Integer.parseInt(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID));
+			gridItem = new GridItem("Linkedin", R.drawable.linkedin, Integer.parseInt(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID), GridItem.DUMMY_CATEGORY_ID);
 			gridItems.add(gridItem);
 		}
 		
@@ -102,19 +99,25 @@ public class ImageAdapter extends BaseAdapter {
 		picture = (ImageView) v.getTag(R.id.category_picture);
 		
 		GridItem gridItem = (GridItem) getItem(i);
-
-		if(!parent.equals(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID)){
+		
+		if(!parent.equals(GridItem.CUSTOM_CATEGORY_DRAWABLE_ID)){// do not show names on the subcategories creation popup
 			name = (TextView) v.getTag(R.id.category_text);
 			name.setText(gridItem.getName());
+			name.setTag(gridItem.getId());
 		}
 		
 		picture.setImageResource(gridItem.getDrawableId());
+		picture.setTag(gridItem.getDrawableId());
 
 		return v;
 	}
 
 	public int getGridItemCount(){
 		return gridItems.size();
+	}
+	
+	public int getDrawableId(int position){
+		return gridItems.get(position).getDrawableId();
 	}
 
 }
