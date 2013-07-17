@@ -42,6 +42,15 @@
             android:name="it.uniroma2.mp.passwordmanager.PasswordsActivity"
             android:label="@string/title_activity_passwords" >
         </activity>
+        <activity
+            android:name="it.uniroma2.mp.passwordmanager.PasswordHashActivity"
+            android:label="@string/title_activity_password_hash" >
+            <intent-filter>
+                <action android:name="it.uniroma2.mp.passwordmanager.HASH_ACTION" />
+                <category android:name="android.intent.category.DEFAULT" />
+<!--                 <data android:mimeType="text/plain" /> -->
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

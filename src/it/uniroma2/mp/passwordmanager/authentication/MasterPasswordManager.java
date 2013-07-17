@@ -90,7 +90,7 @@ public class MasterPasswordManager {
 		return result.toString();
 	}
 	
-	private String[][] deserializeAuthenticationTable(String serializedAuthenticationTable){
+	public String[][] deserializeAuthenticationTable(String serializedAuthenticationTable){
 		
 		String[] splittedString = serializedAuthenticationTable.split(authenticationTableRowSeparator);
 		
