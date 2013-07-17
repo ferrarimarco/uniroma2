@@ -50,7 +50,7 @@ public class SubcategoryCreationDialog extends DialogFragment {
 		
 		int dialogTitleId = 0;
 		
-		if(subcategoryName.isEmpty() && categoryId.isEmpty()){
+		if(subcategoryName.isEmpty() && categoryId.equals("-1")){
 			dialogTitleId = R.string.create_new_category_dialog_title;
 		}else{
 			dialogTitleId = R.string.edit_category_dialog_title;
