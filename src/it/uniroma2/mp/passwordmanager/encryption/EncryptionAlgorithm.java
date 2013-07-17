@@ -15,4 +15,17 @@ public enum EncryptionAlgorithm {
 	public String toString(){
 		return value;
 	}
+	
+	public static EncryptionAlgorithm getEncryptionAlgorithmFromValue(String value){
+		
+		EncryptionAlgorithm result = null;
+		
+		if(value.equals(AES.toString())){
+			result = EncryptionAlgorithm.AES;
+		}else if(value.equals(BLOWFISH.toString())){
+			result = EncryptionAlgorithm.BLOWFISH;
+		}
+		
+		return result;
+	}
 }

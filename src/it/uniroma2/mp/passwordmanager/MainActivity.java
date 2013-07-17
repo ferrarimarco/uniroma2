@@ -27,9 +27,11 @@ public class MainActivity extends Activity {
 
 		if(configurationManager.isMasterPasswordConfigured()){// normal application flow
 			Intent intent = new Intent(this, AuthenticationActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 		}else{// show master password init activity
 			Intent intent = new Intent(this, MasterPasswordInitActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 		}
 	}

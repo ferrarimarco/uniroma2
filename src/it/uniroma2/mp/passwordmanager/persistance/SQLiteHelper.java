@@ -14,6 +14,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_DESCRIPTION = "description";
 	public static final String COLUMN_VALUE = "value";
 	public static final String COLUMN_CATEGORY = "category";
+	public static final String COLUMN_ALGORITHM = "algorithm";
 
 	public static final String TABLE_AUTH = "authentication";
 
@@ -37,7 +38,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 				+ COLUMN_ID + " integer primary key autoincrement, "
 				+ COLUMN_DESCRIPTION + " text not null, "
 				+ COLUMN_VALUE + " text not null, "
-				+ COLUMN_CATEGORY + " text not null);";
+				+ COLUMN_CATEGORY + " text not null, "
+				+ COLUMN_ALGORITHM + " text not null);";
 		
 		database.execSQL(createTable);
 		

@@ -24,6 +24,7 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 
 	private String parentCategoryId;
 	private CategoriesDataSource categoriesDataSource;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +46,8 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 
 				FrameLayout layout = (FrameLayout) v;
 
-				String parentCategoryDescription = ((TextView) layout.getChildAt(1)).getText().toString();
-				String parentCategoryValue = GridItem.getValueFromDescription(parentCategoryDescription, CategoriesActivity.this);
-
-				categoriesDataSource.open();
-				String parentCategoryIdForChild = categoriesDataSource.getCategoryId(parentCategoryValue);
-				categoriesDataSource.close();
+				TextView descriptionTextView = (TextView) layout.getChildAt(1);
+				String parentCategoryIdForChild = (String) descriptionTextView.getTag();
 
 				Intent intent = null;
 
@@ -64,12 +61,6 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 				startActivity(intent);
 			}
 		});
-	}
-
-	private void showSubcategoryCreationDialog() {
-		// Create an instance of the dialog fragment and show it
-		DialogFragment dialog = new SubcategoryCreationDialog();
-		dialog.show(getSupportFragmentManager(), "SubcategoryDialogFragment");
 	}
 
 	private void showSubcategoryCreationDialog(String categoryName, String categoryId) {
@@ -105,11 +96,11 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 		
 		if (subcategoryName == null || subcategoryName.isEmpty()) {
 			Toast.makeText(this, R.string.invalid_category_name, Toast.LENGTH_SHORT).show();
-			showSubcategoryCreationDialog();
+			showSubcategoryCreationDialog("", "");
 		}else if(categoryDrawableId == -1){
 			Toast.makeText(this, R.string.invalid_category_icon, Toast.LENGTH_SHORT).show();
 			showSubcategoryCreationDialog(subcategoryName, categoryId);
-		} else {
+		} else {// Store the new category and update GridView adapter to show changes
 
 			GridItem category = new GridItem(subcategoryName, categoryDrawableId, Integer.parseInt(parentCategoryId), categoryId);
 
@@ -152,7 +143,7 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.new_category_menu_item:
-			showSubcategoryCreationDialog();
+			showSubcategoryCreationDialog("", "");
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -160,7 +151,6 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 		}
 	}
 
-	/** This will be invoked when an item in the listview is long pressed */
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -175,7 +165,6 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 		}
 	}
 
-	/** This will be invoked when a menu item is selected */
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 

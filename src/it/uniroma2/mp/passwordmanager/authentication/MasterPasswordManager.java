@@ -3,6 +3,7 @@ package it.uniroma2.mp.passwordmanager.authentication;
 import android.content.Context;
 import it.uniroma2.mp.passwordmanager.configuration.ConfigurationValue;
 import it.uniroma2.mp.passwordmanager.model.ConfigurationValueType;
+import it.uniroma2.mp.passwordmanager.model.Password;
 import it.uniroma2.mp.passwordmanager.model.PasswordType;
 import it.uniroma2.mp.passwordmanager.persistance.ConfigurationDataSource;
 import it.uniroma2.mp.passwordmanager.persistance.PasswordDataSource;
@@ -26,7 +27,7 @@ public class MasterPasswordManager {
 		return (tentativePassword == null || tentativePassword.isEmpty()) ? false : tentativePassword.equals(masterPassword);
 	}
 	
-	private String loadMasterPassword(){
+	public String loadMasterPassword(){
 		passwordDataSource.open();
 		String masterPassword = passwordDataSource.getPassword(PasswordType.MASTER, PasswordType.MASTER.toString(), "").getValue();
 		passwordDataSource.close();
@@ -34,11 +35,14 @@ public class MasterPasswordManager {
 		return masterPassword;
 	}
 	
-	public void storeMasterPassword(String masterPassword){
+	public void storeMasterPassword(String masterPasswordValue){
 		
 		passwordDataSource.open();
-		passwordDataSource.createPassword(PasswordType.MASTER.toString(), masterPassword, "", PasswordType.MASTER);
-		storeAuthenticationTables(masterPassword);
+		
+		Password masterPassword = new Password(Password.DUMMY_PASSWORD_ID, masterPasswordValue, PasswordType.MASTER.toString(), "", Password.DEFAULT_ENCRYPTION_ALGORITHM);
+		
+		passwordDataSource.createPassword(masterPassword, PasswordType.MASTER);
+		storeAuthenticationTables(masterPasswordValue);
 		passwordDataSource.close();
 		
 		configurationDataSource.open();
@@ -54,7 +58,9 @@ public class MasterPasswordManager {
 			
 			String[][] authenticationTable = authenticationTableGenerator.generateTable(masterPassword.substring(i, i + 1));
 			
-			passwordDataSource.createPassword(PasswordType.AUTH_TABLE.toString() + i, serializeAuthenticationTable(authenticationTable), "", PasswordType.AUTH_TABLE);
+			Password authTable = new Password(Password.DUMMY_PASSWORD_ID, serializeAuthenticationTable(authenticationTable), PasswordType.AUTH_TABLE.toString() + i, "", Password.DEFAULT_ENCRYPTION_ALGORITHM);
+			
+			passwordDataSource.createPassword(authTable, PasswordType.AUTH_TABLE);
 		}
 	}
 	

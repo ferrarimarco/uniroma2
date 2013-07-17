@@ -24,6 +24,7 @@
     <string name="web_category">Web</string>
     <string name="subcategory_name">Subcategory name</string>
     <string name="create_new_category_dialog_title">Create new category</string>
+    <string name="edit_category_dialog_title">Edit category</string>
     <string name="invalid_category_name">Invalid category name</string>
     <string name="invalid_category_icon">Please select an icon for the new category</string>
     <string name="copy_confirmation">The password has been copied to the clipboard</string>
@@ -32,5 +33,11 @@
     <string name="new_category_menu_item">Create new category</string>
     <string name="edit_category_menu_item">Edit</string>
     <string name="delete_category_menu_item">Delete</string>
+    <string name="create_new_password_dialog_title">Create new password entry</string>
+    <string name="edit_password_dialog_title">Edit password entry</string>
+    <string name="user_id_name">Id</string>
+    <string name="password_name">Password</string>
+    <string name="invalid_password_user_id">Invalid id</string>
+    <string name="invalid_password_value">Invalid password</string>
 
 </resources>

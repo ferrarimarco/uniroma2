@@ -52,19 +52,20 @@ public class PasswordAdapter extends BaseAdapter {
 		TextView description;
 		TextView value;
 
+		Password gridItem = (Password) getItem(i);
+		
 		if(v == null) {
 			v = inflater.inflate(R.layout.password_grid_item, viewGroup, false);
 			v.setTag(R.id.description_password_textView, v.findViewById(R.id.description_password_textView));
 			v.setTag(R.id.value_password_textView, v.findViewById(R.id.value_password_textView));
 		}
-	
-		Password gridItem = (Password) getItem(i);
 		
 		description = (TextView) v.getTag(R.id.description_password_textView);
 		description.setText(gridItem.getDescription());
 		
 		value = (TextView) v.getTag(R.id.value_password_textView);
 		value.setText(gridItem.getValue());
+		value.setTag(gridItem.getId());
 
 		return v;
 	}
