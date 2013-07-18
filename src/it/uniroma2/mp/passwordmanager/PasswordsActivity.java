@@ -29,14 +29,30 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
+/***
+ * Activity si occupa di:
+ * 	1) Visualizzare le Password di una Sottocategoria
+ *  2) Creare, modificare ed eliminare Password
+ *  	2.1) PasswordCreationDialog: in caso si voglia creare o modificare una Password
+ *  3) Resettare la Master Password
+ * Direziona l'utente verso le activity:
+ *  1) PasswordsActivity
+ *  3) MasterPasswordInitActivity: nel caso si voglia resettare la Master Password
+ * **/
+
+
 public class PasswordsActivity extends FragmentActivity implements PasswordCreationDialogListener {
 
 	private String parentCategoryId;
+	private ConfigurationManager configurationManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_passwords);
+		
+		configurationManager = new ConfigurationManager(this);
+		configurationManager.setBackButtonPressed(true);
 
 		GridView gridview = (GridView) findViewById(R.id.passwordsGridView);
 
@@ -203,16 +219,23 @@ public class PasswordsActivity extends FragmentActivity implements PasswordCreat
 	@Override
 	protected void onResume() {
 		super.onResume();
-
-		ConfigurationManager configurationManager = new ConfigurationManager(this);
-
+		
 		boolean isMasterPasswordConfigured = configurationManager.isMasterPasswordConfigured();
-
-		if(!isMasterPasswordConfigured){
+		
+		if(!isMasterPasswordConfigured || !configurationManager.isBackButtonPressed()){
 			Intent intent = new Intent(this, MainActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);			
 			finish();
 		}
+		
+		configurationManager.setBackButtonPressed(false);
 	}
+
+    @Override
+    public void onBackPressed() {
+    	super.onBackPressed();
+    	
+    	configurationManager.setBackButtonPressed(true);
+    }
 }

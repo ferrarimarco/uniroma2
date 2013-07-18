@@ -1,6 +1,7 @@
 package it.uniroma2.mp.passwordmanager.persistance;
 
 import it.uniroma2.mp.passwordmanager.R;
+import it.uniroma2.mp.passwordmanager.model.ConfigurationValueType;
 import it.uniroma2.mp.passwordmanager.model.GridItem;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -82,6 +83,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 		
 		categoriesInitialization = "insert into " + TABLE_CATEGORIES + " values(null, '" + GridItem.EMPTY_CATEGORY_VALUE + "','"+ "-1" +"','"+ R.drawable.empty +"')";
 		database.execSQL(categoriesInitialization);
+		
+		String configInit = "insert into " + TABLE_CONFIG + " values(1, '" + ConfigurationValueType.BACK_BUTTON_PRESSED + "','"+ "0" +"')";
+		database.execSQL(configInit);
 	}
 	
 	@Override

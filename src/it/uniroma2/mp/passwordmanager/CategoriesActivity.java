@@ -26,20 +26,32 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/***
+ * Activity si occupa di:
+ * 	1) Visualizzare Categorie e Sottocategorie
+ *  2) Creare, modificare ed eliminare Sottocategorie
+ *  	2.1) SubcategoryCreationDialog: in caso si voglia creare o modificare una Categoria
+ *  3) Resettare la Master Password
+ * Direziona l'utente verso le activity:
+ *  1) CategoriesActivity: se si entra in una Categoria
+ *  2) PasswordsActivity: se si entra in una sottocategoria.
+ *  3) MasterPasswordInitActivity: nel caso si voglia resettare la Master Password
+ * **/
+
 public class CategoriesActivity extends FragmentActivity implements SubcategoryDialogListener {
 
 	private String parentCategoryId;
 	private CategoriesDataSource categoriesDataSource;
-	PasswordDataSource passwordDataSource;
+	private PasswordDataSource passwordDataSource;
+	private ConfigurationManager configurationManager;
 	
-	private boolean isBackPressed;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_categories);
 		
-		isBackPressed = true;
+		configurationManager = new ConfigurationManager(this);
+		configurationManager.setBackButtonPressed(true);
 		
 		categoriesDataSource = new CategoriesDataSource(this);
 
@@ -247,40 +259,22 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 	protected void onResume() {
 		super.onResume();
 		
-		ConfigurationManager configurationManager = new ConfigurationManager(this);
-		
 		boolean isMasterPasswordConfigured = configurationManager.isMasterPasswordConfigured();
 		
-		if(!isMasterPasswordConfigured || !isBackPressed){
+		if(!isMasterPasswordConfigured || !configurationManager.isBackButtonPressed()){
 			Intent intent = new Intent(this, MainActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);			
 			finish();
 		}
 		
-		isBackPressed = false;
+		configurationManager.setBackButtonPressed(false);
 	}
 
     @Override
     public void onBackPressed() {
     	super.onBackPressed();
     	
-    	isBackPressed = true;
+    	configurationManager.setBackButtonPressed(true);
     }
-	
-	@Override
-	protected void onRestart(){
-		super.onRestart();
-		
-//		if (getIntent().getIntExtra(EXTRA_STARTED_FROM_BUTTON, 0) == 0) {
-//			Intent intent = new Intent(this, MainActivity.class);
-//			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//			startActivity(intent);
-//			finish();
-//		}
-	}
-	
-	protected void OnStop(){
-		super.onStop();
-	}
 }

@@ -2,14 +2,21 @@ package it.uniroma2.mp.passwordmanager.model;
 
 import it.uniroma2.mp.passwordmanager.encryption.EncryptionAlgorithm;
 
+/***
+ * Questa classe modella l'entità "Password" esponendo all'esterno
+ * tutti i metodi get e set per i suoi attributi
+ * **/
 
 public class Password {
 	
 	private long id;
 	private String value;
 	private String description;
+	// Contiene l'ID della sottocategoria
 	private String parent;
+	// Contiene il tipo di algoritmo per criptare
 	private EncryptionAlgorithm encryptionAlgorithm;
+	
 	
 	public static final long DUMMY_PASSWORD_ID = -1;
 	public static final EncryptionAlgorithm DEFAULT_ENCRYPTION_ALGORITHM = EncryptionAlgorithm.AES;

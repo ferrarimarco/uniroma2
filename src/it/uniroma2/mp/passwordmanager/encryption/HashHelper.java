@@ -7,7 +7,9 @@ import java.security.NoSuchAlgorithmException;
 
 import android.util.Base64;
 
-
+/***
+ * Classe che fornisce i metodi necessari per hash di stringhe
+ * **/
 public class HashHelper {
 	
 	private static String convertToHex(byte[] data) throws java.io.IOException 
@@ -22,6 +24,11 @@ public class HashHelper {
 		return sb.toString();
 	}
 
+	/***
+	 * Fornisce l'hash SHA1 della stringa fornita
+	 * @param password Stringa di cui effettuare l'hash
+	 * @return hash della stringa fornita in input
+	 * **/
 	public static String computeSHAHash(String password)
 	{
 		MessageDigest mdSha1 = null;

@@ -3,6 +3,16 @@ package it.uniroma2.mp.passwordmanager.model;
 import it.uniroma2.mp.passwordmanager.R;
 import android.content.Context;
 
+
+/***
+ * Questa classe modella le entità Categoria e Sottocategoria.
+ * Le Categorie hanno parent pari a -1
+ * Le Sottocategorie hanno un parent pari all'ID della Categoria Genitore
+ * name indica il nome della Categoria/Sottocategoria
+ * drawableId è l'ID dell'immagine della Categoria/Sottocategoria 
+ * id è l'ID della Categoria/Sottocategoria
+ * **/
+
 public class GridItem {
 
     private final String name;
@@ -33,6 +43,9 @@ public class GridItem {
         this.id = id;
     }
     
+    /***
+	 * Dato il valore ti restituisce la stringa corrispondente dal file delle stringe
+	 * **/  
     public static String getDescription(String value, Context context){
     	
     	int descriptionId = -1;
@@ -60,6 +73,9 @@ public class GridItem {
     	return result;
     }
     
+    /***
+	 * Data la stringa ti restituisce il valore corrispondente
+	 * **/
     public static String getValueFromDescription(String description, Context context){
     	
     	String result = "";

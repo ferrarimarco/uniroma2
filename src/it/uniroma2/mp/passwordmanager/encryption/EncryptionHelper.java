@@ -7,15 +7,32 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+/***
+ * Classe che si occupa di criptare e decriptare le password
+ * **/
 
 public class EncryptionHelper {
 	
+	/***
+	 * Cripta il testo specificato utilizzando il seme e l'agoritmo specificato
+	 * @param seed seme per la generazione della chiave
+	 * @param cleartext testo in chiaro
+	 * @param algorithm tipo algoritmo per criptare
+	 * @return testo criptato
+	 * **/
 	public String encrypt(String seed, String cleartext, EncryptionAlgorithm algorithm) throws Exception {
         byte[] rawKey = getRawKey(seed.getBytes(), algorithm);
         byte[] result = encrypt(rawKey, cleartext.getBytes(), algorithm);
         return EncodingHelper.toHex(result);
     }
 
+	/***
+	 * Decripta il testo specificato utilizzando il seme e l'agoritmo specificato
+	 * @param seed seme per la generazione della chiave
+	 * @param encrypted testo criptato
+	 * @param algorithm tipo algoritmo per criptare
+	 * @return testo in chiaro
+	 * **/
     public String decrypt(String seed, String encrypted, EncryptionAlgorithm algorithm) throws Exception {
         byte[] rawKey = getRawKey(seed.getBytes(), algorithm);
         byte[] enc = EncodingHelper.toByte(encrypted);

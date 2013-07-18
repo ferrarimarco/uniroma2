@@ -13,6 +13,10 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
+/***
+ * Activity che si occupa di ascoltare gli intent di tipo it.uniroma2.mp.passwordmanager.HASH_ACTION
+ * per produrre un hash SHA1 della password inserita grazie alle tabelle di autenticazione fornite come parametri
+ * **/
 public class PasswordHashActivity extends Activity {
 
 	private int authenticationTableIndex;

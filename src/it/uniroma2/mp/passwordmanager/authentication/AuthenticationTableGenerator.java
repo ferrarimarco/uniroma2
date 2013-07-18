@@ -2,7 +2,9 @@ package it.uniroma2.mp.passwordmanager.authentication;
 
 import java.util.Random;
 
-
+/***
+ * Classe che si occupa della generazione e dello scramble delle Tabelle di Autinticazione
+ * **/
 public class AuthenticationTableGenerator {
 
 	public static final int passwordLength = 8;
@@ -12,6 +14,11 @@ public class AuthenticationTableGenerator {
 	private static final String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
 			"abcdefghijklmnopqrstuvwxyz";
 	
+	/***
+	 * Genera una tabella per l'autenticazione a partire da una lettera.
+	 * @param letterToAlwaysShow indica la lettera della MasterPassword da inserire tra quelle della tabella
+	 * @return table tabella di lettere scelte casuali più letterToAlwaysShow
+	 * **/
 	public String[][] generateTable(String letterToAlwaysShow){
 		
 		String[][] table = new String[tableRows][tableColumns];
@@ -51,6 +58,11 @@ public class AuthenticationTableGenerator {
 		return table;
 	}
 	
+	/***
+	 * Mischia le lettere della tabella
+	 * @param tableToScramble tabella di input
+	 * @return scrambledTable tabella di output
+	 * **/
 	public String[][] scrambleTable(String[][] tableToScramble){
 		
 		String[][] scrambledTable = new String[tableToScramble.length][tableToScramble[0].length];

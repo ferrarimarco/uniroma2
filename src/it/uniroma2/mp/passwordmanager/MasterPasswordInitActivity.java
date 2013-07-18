@@ -12,6 +12,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+/***
+ * Activity che permette l'inizializzazione della Master Password.
+ * Direziona l'utente verso le activity:
+ *  1) AuthenticationActivity: se la Master Password inserita è accettata.
+ *  2) MasterPasswordInitActivity: se la Master Password inserita non è accettata.
+ * **/
+
 public class MasterPasswordInitActivity extends Activity {
 	
 	@Override
