@@ -13,6 +13,10 @@ public class ConfigurationManager {
 		configurationDataSource = new ConfigurationDataSource(context);
 	}
 	
+	/***
+	 * Controllo lo stato del flag della MasterPassowrd e restituisce "true" se  è stato settato, oppure  "false" in caso contrario
+	 * @return stato della Flag della MAsterPassword
+	 * **/
 	public boolean isMasterPasswordConfigured(){
 		
 		configurationDataSource.open();

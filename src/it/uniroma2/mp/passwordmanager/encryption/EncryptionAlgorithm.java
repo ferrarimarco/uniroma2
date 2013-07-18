@@ -16,6 +16,11 @@ public enum EncryptionAlgorithm {
 		return value;
 	}
 	
+	/***
+	 * Prende in ingresso un stringa e restituisce un oggetto di tipo EncryptionAlgorithm
+	 * @param value
+	 * @return result
+	 * **/
 	public static EncryptionAlgorithm getEncryptionAlgorithmFromValue(String value){
 		
 		EncryptionAlgorithm result = null;

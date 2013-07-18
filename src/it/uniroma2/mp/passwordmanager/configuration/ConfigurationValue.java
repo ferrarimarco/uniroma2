@@ -1,5 +1,9 @@
 package it.uniroma2.mp.passwordmanager.configuration;
 
+/***
+ * 
+ * 
+ * **/
 
 public enum ConfigurationValue {
 	OK("1"),

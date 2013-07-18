@@ -11,6 +11,11 @@ public class AuthenticationTableGenerator {
 	
 	private static final String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	
+	/***
+	 * Genera la tabella per l'autenticazione.
+	 * @param letterToAlwaysShow indica la lettera della MasterPassword da inserire tra quelle della tabella
+	 * @return table tabella di lettere scelte casuali più letterToAlwaysShow
+	 * **/
 	public String[][] generateTable(String letterToAlwaysShow){
 		
 		String[][] table = new String[tableRows][tableColumns];
@@ -50,6 +55,11 @@ public class AuthenticationTableGenerator {
 		return table;
 	}
 	
+	/***
+	 * Mischia le lettere della tabella
+	 * @param tableToScramble tabella di input
+	 * @return scrambledTable tabella di output
+	 * **/
 	public String[][] scrambleTable(String[][] tableToScramble){
 		
 		String[][] scrambledTable = new String[tableToScramble.length][tableToScramble[0].length];

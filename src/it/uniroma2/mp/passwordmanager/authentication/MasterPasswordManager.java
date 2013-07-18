@@ -16,17 +16,28 @@ public class MasterPasswordManager {
 	
 	private static final String authenticationTableRowSeparator = "-";
 	
+	
 	public MasterPasswordManager(Context context){
 		passwordDataSource = new PasswordDataSource(context);
 		configurationDataSource = new ConfigurationDataSource(context);
 	}
 	
+	/***
+	 * Controlla la correttezza della password.
+	 * @param tentativePassword password da verificare
+	 * @return boolean "true" password corretta, "false" password errata
+	 * **/
 	public boolean checkMasterPassword(String tentativePassword){
 		String masterPassword = loadMasterPassword();
 		
 		return (tentativePassword == null || tentativePassword.isEmpty()) ? false : tentativePassword.equals(masterPassword);
 	}
 	
+	
+	/***
+	 * Restituisce la MasterPassoword.
+	 * @return masterPassword.
+	 ***/
 	public String loadMasterPassword(){
 		passwordDataSource.open();
 		String masterPassword = passwordDataSource.getPassword(PasswordType.MASTER, PasswordType.MASTER.toString(), "").getValue();
@@ -35,6 +46,12 @@ public class MasterPasswordManager {
 		return masterPassword;
 	}
 	
+	
+	/***
+	 * Memorizza la MasterPassword e un flag di inizializzazione relativo alla MaseterPassoword sul Database.
+	 * @param masterPasswordValue password da memorizzare
+	 * @return void
+	 * **/
 	public void storeMasterPassword(String masterPasswordValue){
 		
 		passwordDataSource.open();
@@ -50,6 +67,11 @@ public class MasterPasswordManager {
 		configurationDataSource.close();
 	}
 	
+	/***
+	 * Genera e Memorizza una tabella di autenticazione sul database
+	 * @param masterPassword utilizzata come chiave per criptare
+	 * @return void
+	 * **/
 	private void storeAuthenticationTables(String masterPassword){
 		
 		AuthenticationTableGenerator authenticationTableGenerator = new AuthenticationTableGenerator();
@@ -64,6 +86,11 @@ public class MasterPasswordManager {
 		}
 	}
 	
+	/***
+	 * Restituisce la authenticationTableIndex tabella di autenticazione, prendendola dal database
+	 * @param authenticationTableIndex indica il numero della tabella di autenticazione da recuparare
+	 * @return La tabella di autenticazione specificata
+	 * **/
 	public String[][] loadAuthenticationTable(int authenticationTableIndex){
 		
 		passwordDataSource.open();
