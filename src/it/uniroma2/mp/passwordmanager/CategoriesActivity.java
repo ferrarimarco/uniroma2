@@ -3,6 +3,7 @@ package it.uniroma2.mp.passwordmanager;
 import it.uniroma2.mp.passwordmanager.SubcategoryCreationDialog.SubcategoryDialogListener;
 import it.uniroma2.mp.passwordmanager.model.GridItem;
 import it.uniroma2.mp.passwordmanager.persistance.CategoriesDataSource;
+import it.uniroma2.mp.passwordmanager.persistance.PasswordDataSource;
 import android.os.Bundle;
 import android.content.Intent;
 import android.support.v4.app.DialogFragment;
@@ -24,6 +25,7 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 
 	private String parentCategoryId;
 	private CategoriesDataSource categoriesDataSource;
+	PasswordDataSource passwordDataSource;
 	
 
 	@Override
@@ -32,6 +34,9 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 		setContentView(R.layout.activity_categories);
 
 		categoriesDataSource = new CategoriesDataSource(this);
+		
+		// To delete passwords when deleting a category
+		passwordDataSource = new PasswordDataSource(this);
 
 		GridView gridview = (GridView) findViewById(R.id.categoriesGridView);
 
@@ -186,6 +191,10 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 			categoriesDataSource.open();
 			categoriesDataSource.deleteCategory(categoryId);
 			categoriesDataSource.close();
+			
+			passwordDataSource.open();
+			passwordDataSource.deleteAllPasswordsFromCategory(categoryId);
+			passwordDataSource.close();
 			
 			GridView gridview = (GridView) findViewById(R.id.categoriesGridView);
 			gridview.setAdapter(new ImageAdapter(this, parentCategoryId));
