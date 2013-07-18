@@ -14,6 +14,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.GridView;
 
+/***
+ * Dialog utilizzato per creare o modificare una Sottocategoria
+ * **/
+
 public class SubcategoryCreationDialog extends DialogFragment {	
 
 	private String subcategoryName;

@@ -14,6 +14,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+/***
+ * Adapter che costruisce gli elementi da inserire nei gridview di:
+ * 1) CategoriesActivity
+ * 2) SubcategoryCreationDialog
+ * **/
 
 public class ImageAdapter extends BaseAdapter {
 

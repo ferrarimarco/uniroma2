@@ -4,6 +4,9 @@ import android.content.Context;
 import it.uniroma2.mp.passwordmanager.model.ConfigurationValueType;
 import it.uniroma2.mp.passwordmanager.persistance.ConfigurationDataSource;
 
+/***
+ * Classe che si occupa della gestione dei flag di configurazione
+ * **/
 
 public class ConfigurationManager {
 
@@ -15,7 +18,7 @@ public class ConfigurationManager {
 	
 	/***
 	 * Controllo lo stato del flag della MasterPassowrd e restituisce "true" se  è stato settato, oppure  "false" in caso contrario
-	 * @return stato della Flag della MAsterPassword
+	 * @return stato della Flag della MasterPassword
 	 * **/
 	public boolean isMasterPasswordConfigured(){
 		

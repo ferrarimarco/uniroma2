@@ -10,6 +10,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+/***
+ * Classe per gestire la persistenza delle Categorie e delle Sottocategorie.
+ * **/
 
 public class CategoriesDataSource {
 
@@ -54,6 +57,10 @@ public class CategoriesDataSource {
 		return new GridItem(name, Integer.parseInt(drawableId), Integer.parseInt(parent), id);
 	}
 	
+	/***
+	 * @param parent ID della Categoria padre ( -1 nel caso in cui vogliamo le Categorie radici)
+	 * @return La lista di tutte le Categorie o delle Sottocategorie di una Categoria.
+	 * **/
 	public List<GridItem> getAllCategories(String parent){
 
 		Cursor cursor = database.query(SQLiteHelper.TABLE_CATEGORIES, allColumns, SQLiteHelper.COLUMN_PARENT + " = '" + parent + "' AND " + SQLiteHelper.COLUMN_VALUE + " != '" + GridItem.EMPTY_CATEGORY_VALUE + "'", null, null, null, null);
@@ -72,6 +79,10 @@ public class CategoriesDataSource {
 		return gridItems;
 	}
 	
+	/***
+	 * @param ID della Categoria/Sottocategoria
+	 * @return la Categoria/Sottocategoria corrispondente
+	 * **/
 	public GridItem getGridItem(String id){
 		Cursor cursor = database.query(SQLiteHelper.TABLE_CATEGORIES, allColumns, SQLiteHelper.COLUMN_ID + " = '" + id + "'", null, null, null, null);
 
@@ -86,18 +97,10 @@ public class CategoriesDataSource {
 		return gridItem;
 	}
 
-	public GridItem getEmptyCategory(){
-		Cursor cursor = database.query(SQLiteHelper.TABLE_CATEGORIES, allColumns, SQLiteHelper.COLUMN_VALUE + " = '" + GridItem.EMPTY_CATEGORY_VALUE + "'", null, null, null, null);
-
-		GridItem gridItem = null;
-
-		if(cursor.moveToFirst()){
-			gridItem = cursorToCategory(cursor);
-		}
-
-		return gridItem;
-	}
-
+	/*** Memorizza sul database la Categoria/Sottocategoria che riceve come input 
+	 * @param Categoria/Sottocategoria da salvare
+	 * @return void
+	 * **/
 	public void storeCategory(GridItem gridItem){
 		ContentValues values = new ContentValues();
 
@@ -108,10 +111,16 @@ public class CategoriesDataSource {
 		database.insert(SQLiteHelper.TABLE_CATEGORIES, null, values);
 	}
 
+	/*** Cancella dal database la Categoria/Sottocategoria corispondente all'ID di input 
+	 * **/
 	public void deleteCategory(String categoryId) {
 		database.delete(SQLiteHelper.TABLE_CATEGORIES, SQLiteHelper.COLUMN_ID + " = '" + categoryId + "'", null);
 	}
 	
+	/*** Modifica sul database la Categoria/Sottocategoria che riceve come input 
+	 * @param Categoria/Sottocategoria da salvare
+	 * @return void
+	 * **/
 	public void updateCategory(GridItem gridItem){
 		String where = SQLiteHelper.COLUMN_ID + "=?";
 		String[] whereArgs = new String[] {gridItem.getId()};
@@ -124,6 +133,9 @@ public class CategoriesDataSource {
 		database.update(SQLiteHelper.TABLE_CATEGORIES, dataToInsert, where, whereArgs);
 	}
 
+	/*** Restituisce l'ID della Categoria corrispondente al value
+	 * @param value: nome della Categoria.
+	 * **/
 	public String getCategoryId(String value){
 		Cursor cursor = database.query(SQLiteHelper.TABLE_CATEGORIES, allColumns, SQLiteHelper.COLUMN_VALUE + " = '" + value + "'", null, null, null, null);
 

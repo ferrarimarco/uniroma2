@@ -25,6 +25,18 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/***
+ * Activity si occupa di:
+ * 	1) Visualizzare Categorie e Sottocategorie
+ *  2) Creare, modificare ed eliminare Sottocategorie
+ *  	2.1) SubcategoryCreationDialog: in caso si voglia creare o modificare una Categoria
+ *  3) Resettare la Master Password
+ * Direziona l'utente verso le activity:
+ *  1) CategoriesActivity: se si entra in una Categoria
+ *  2) PasswordsActivity: se si entra in una sottocategoria.
+ *  3) MasterPasswordInitActivity: nel caso si voglia resettare la Master Password
+ * **/
+
 public class CategoriesActivity extends FragmentActivity implements SubcategoryDialogListener {
 
 	private String parentCategoryId;

@@ -7,6 +7,9 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+/***
+ * Classe che si occupa di criptare e decriptare le password
+ * **/
 
 public class EncryptionHelper {
 	

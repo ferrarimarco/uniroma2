@@ -13,6 +13,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+/***
+ * Adapter che costruisce gli elementi da inserire nei gridview di:
+ * 1) PasswordsActivity
+ * **/
 
 public class PasswordAdapter extends BaseAdapter {
 

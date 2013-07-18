@@ -26,6 +26,18 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
+/***
+ * Activity si occupa di:
+ * 	1) Visualizzare le Password di una Sottocategoria
+ *  2) Creare, modificare ed eliminare Password
+ *  	2.1) PasswordCreationDialog: in caso si voglia creare o modificare una Password
+ *  3) Resettare la Master Password
+ * Direziona l'utente verso le activity:
+ *  1) PasswordsActivity
+ *  3) MasterPasswordInitActivity: nel caso si voglia resettare la Master Password
+ * **/
+
+
 public class PasswordsActivity extends FragmentActivity implements PasswordCreationDialogListener {
 
 	private String parentCategoryId;

@@ -14,6 +14,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+/***
+ * Classe per gestire la persistenza delle Password e delle Tabelle di Autenticazione.
+ * **/
 
 public class PasswordDataSource {
 
@@ -49,6 +52,7 @@ public class PasswordDataSource {
 	public void close() {
 		dbHelper.close();
 	}
+	
 	
 	private String getDBTable(PasswordType passwordType){
 		
@@ -101,6 +105,12 @@ public class PasswordDataSource {
 		return result;
 	}
 	
+	/***
+	 * Questo metodo salva sul database una password
+	 * @param password valore della password da salvare sul database.
+	 * @param passwordType specifica il tipo di password da salvare.
+	 * @return void
+	 * **/
 	public void createPassword(Password password, PasswordType passwordType) {
 		
 		ContentValues values = new ContentValues();
@@ -125,6 +135,12 @@ public class PasswordDataSource {
 		database.insert(table, null, values);
 	}
 	
+	/***
+	 * Questo metodo aggiorna una password nel database
+	 * @param password valore della password da aggiornare sul database.
+	 * @param passwordType specifica il tipo di password da aggiornare.
+	 * @return void
+	 * **/
 	public void updatePassword(Password password, PasswordType passwordType) {
 		
 		String where = SQLiteHelper.COLUMN_ID + "=?";
@@ -147,7 +163,13 @@ public class PasswordDataSource {
 		
 		database.update(getDBTable(passwordType), dataToInsert, where, whereArgs);
 	}
-
+	
+	/***
+	 * Questo metodo cancella una password dal database.
+	 * @param id indica la password da cancellare.
+	 * @param passwordType specifica il tipo di password da cancellare.
+	 * @return void
+	 * **/
 	public void deletePassword(String id, PasswordType passwordType) {
 		
 		String table = getDBTable(passwordType);
@@ -155,14 +177,23 @@ public class PasswordDataSource {
 		database.delete(table, SQLiteHelper.COLUMN_ID + " = '" + id + "'", null);
 	}
 	
+	/***
+	 * Questo metodo cancella dal database tutte le password appartenenti a una Categoria
+	 * **/
 	public void deleteAllPasswordsFromCategory(String categoryId, PasswordType passwordType){
 		database.delete(getDBTable(passwordType), SQLiteHelper.COLUMN_CATEGORY + " = '" + categoryId + "'", null);
 	}
 	
+	/***
+	 * Questo metodo cancella dal database tutte le Tabelle di Autenticazione
+	 * **/
 	public void deleteAuthenticationTables(){
 		database.delete(SQLiteHelper.TABLE_AUTH, null, null);
 	}
 	
+	/***
+	 * Questo metodo cancella dal database tutte le Passoword
+	 * **/
 	public void deleteAllPasswords(PasswordType passwordType) {
 		database.delete(getDBTable(passwordType), null, null);
 	}
@@ -180,6 +211,12 @@ public class PasswordDataSource {
 		return allCols;
 	}
 	
+	/***
+	 * Questo metodo restituisce una Password indentificandola grazie ai parametri
+	 * @param passwordType tipo di password
+	 * @param description user ID della password
+	 * @param parent ID della Sottocategoria
+	 * **/
 	public Password getPassword(PasswordType passwordType, String description, String parent){
 		
 		String table = getDBTable(passwordType);
@@ -207,6 +244,9 @@ public class PasswordDataSource {
 		return result;
 	}
 	
+	/***
+	 * Questo metodo restituisce una Password indentificandola grazie al suo ID
+	 * **/
 	public Password getPassword(long id){
 		Cursor cursor = database.query(SQLiteHelper.TABLE_PASSWORDS, allColumns, SQLiteHelper.COLUMN_ID + " = '" + id + "'", null, null, null, null);
 
@@ -221,6 +261,11 @@ public class PasswordDataSource {
 		return gridItem;
 	}
 	
+	/***
+	 * Questo metodo restituisce tutte le Password apparteneti a una Sottocategoria
+	 * @param passwordType tipo di password
+	 * @param parent ID della Sottocategoria
+	 * **/
 	public List<Password> getAllPasswords(PasswordType passwordType, String parent) {
 		
 		List<Password> comments = new ArrayList<Password>();

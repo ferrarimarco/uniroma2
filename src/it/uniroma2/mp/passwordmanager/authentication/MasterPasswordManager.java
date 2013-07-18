@@ -8,7 +8,9 @@ import it.uniroma2.mp.passwordmanager.model.PasswordType;
 import it.uniroma2.mp.passwordmanager.persistance.ConfigurationDataSource;
 import it.uniroma2.mp.passwordmanager.persistance.PasswordDataSource;
 
-
+/***
+ * Classe che si occupa della gestione di tutti i tipi di password
+ * **/
 public class MasterPasswordManager {
 
 	private PasswordDataSource passwordDataSource;

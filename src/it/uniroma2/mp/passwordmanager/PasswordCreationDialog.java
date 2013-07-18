@@ -14,6 +14,10 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+/***
+ * Dialog utilizzato per creare o modificare una Password
+ * **/
+
 public class PasswordCreationDialog extends DialogFragment {	
 
 	private String userId;

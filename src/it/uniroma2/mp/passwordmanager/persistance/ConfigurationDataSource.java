@@ -7,8 +7,11 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+/***
+ * Classe per gestire la persistenza dei valori di configurazione.
+ * **/
+
 public class ConfigurationDataSource {
-	
 	// Database fields
 	private SQLiteDatabase database;
 	private SQLiteHelper dbHelper;
@@ -30,6 +33,9 @@ public class ConfigurationDataSource {
 		dbHelper.close();
 	}
 	
+	/***
+	 * Restituisce il valore del Flag
+	 * **/
 	public String getConfigurationValue(ConfigurationValueType configurationValueType){
 		
 		Cursor cursor = database.query(SQLiteHelper.TABLE_CONFIG, allColumns, SQLiteHelper.COLUMN_DESCRIPTION + " = '" + configurationValueType.toString() + "'", null, null, null, null);
@@ -43,6 +49,9 @@ public class ConfigurationDataSource {
 		return result;
 	}
 	
+	/***
+	 * Salva il valore del flag
+	 * **/
 	public void storeConfigurationValue(ConfigurationValueType configurationValueType, String value){
 		ContentValues values = new ContentValues();
 		
@@ -54,6 +63,9 @@ public class ConfigurationDataSource {
 		database.insert(table, null, values);
 	}
 	
+	/***
+	 * Cancella il valore del flag
+	 * **/
 	public void deleteConfigurationValue(ConfigurationValueType configurationValueType){
 		database.delete(SQLiteHelper.TABLE_CONFIG, SQLiteHelper.COLUMN_DESCRIPTION + " = '" + configurationValueType.toString() + "'", null);
 	}

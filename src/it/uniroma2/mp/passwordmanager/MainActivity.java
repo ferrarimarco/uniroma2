@@ -5,6 +5,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+/***
+ * Activity principale dell'applicazione.
+ * Direziona l'utente verso le activity:
+ *  1) MasterPasswordInitActivity: se la Master Password non è inizializzata
+ *  2) AuthenticationActivity: se la Master Password è inizializzata
+ * **/
+
 public class MainActivity extends Activity {
 
 	//	@Override

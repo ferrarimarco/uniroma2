@@ -45,8 +45,7 @@ public class GridItem {
     
     /***
 	 * Dato il valore ti restituisce la stringa corrispondente dal file delle stringe
-	 * **/
-    
+	 * **/  
     public static String getDescription(String value, Context context){
     	
     	int descriptionId = -1;

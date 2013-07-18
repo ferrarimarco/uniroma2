@@ -1,7 +1,7 @@
 package it.uniroma2.mp.passwordmanager.model;
 
 /***
- * Questa enumera i tipi di password disponibili.
+ * Questa enum contiene i tipi di password disponibili.
  * **/
 
 public enum PasswordType {

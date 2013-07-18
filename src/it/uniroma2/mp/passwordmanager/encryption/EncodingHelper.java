@@ -1,5 +1,8 @@
 package it.uniroma2.mp.passwordmanager.encryption;
 
+/***
+ * Classe utilizzata per effettuare l'encoding di stringhe
+ * **/
 
 public class EncodingHelper {
 	

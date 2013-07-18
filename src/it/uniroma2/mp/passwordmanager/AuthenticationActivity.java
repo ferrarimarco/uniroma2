@@ -18,6 +18,13 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
 
+/***
+ * Activity che permette di inserire la Master Password tramite le otte Tabelle di Autenticazione
+ * Direziona l'utente verso le activity:
+ *  1) AuthenticationActivity: se la Master Password non corrisponde a quella impostata.
+ *  2) CategoriesActivity: se la Master Password inserita corrisponde a quella impostata.
+ * **/
+
 public class AuthenticationActivity extends Activity {
 
 	private int authenticationTableIndex;

@@ -2,7 +2,6 @@ package it.uniroma2.mp.passwordmanager.model;
 
 /***
  * Classe per gestire gli eventuali valori di configurazione: 
- * nel nostro caso è presente soltanto il flag di inizializzazione della MasterPassword
  * **/
 
 public enum ConfigurationValueType {
