@@ -86,18 +86,6 @@ public class CategoriesDataSource {
 		return gridItem;
 	}
 
-	public GridItem getEmptyCategory(){
-		Cursor cursor = database.query(SQLiteHelper.TABLE_CATEGORIES, allColumns, SQLiteHelper.COLUMN_VALUE + " = '" + GridItem.EMPTY_CATEGORY_VALUE + "'", null, null, null, null);
-
-		GridItem gridItem = null;
-
-		if(cursor.moveToFirst()){
-			gridItem = cursorToCategory(cursor);
-		}
-
-		return gridItem;
-	}
-
 	public void storeCategory(GridItem gridItem){
 		ContentValues values = new ContentValues();
 

@@ -9,12 +9,8 @@ public class AuthenticationTableGenerator {
 	private static final int tableRows = 4;
 	private static final int tableColumns = 4;
 	
-//	private static final String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-//			"abcdefghijklmnopqrstuvwxyz" +
-//			"1234567890" +
-//			"|!\\Ј$%&/()=?м^и+тащ,.й*з°§;:_[]@#щ{}°";
-	private static final String letters = "A" +
-			"|\\!Ј$%&/()='?м^и+тащ,.й*з°§;:_[]@#щ{}°";
+	private static final String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+			"abcdefghijklmnopqrstuvwxyz";
 	
 	public String[][] generateTable(String letterToAlwaysShow){
 		

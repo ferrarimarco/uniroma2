@@ -2,6 +2,7 @@ package it.uniroma2.mp.passwordmanager;
 
 import it.uniroma2.mp.passwordmanager.SubcategoryCreationDialog.SubcategoryDialogListener;
 import it.uniroma2.mp.passwordmanager.authentication.MasterPasswordManager;
+import it.uniroma2.mp.passwordmanager.configuration.ConfigurationManager;
 import it.uniroma2.mp.passwordmanager.model.GridItem;
 import it.uniroma2.mp.passwordmanager.model.PasswordType;
 import it.uniroma2.mp.passwordmanager.persistance.CategoriesDataSource;
@@ -31,17 +32,17 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 	private CategoriesDataSource categoriesDataSource;
 	PasswordDataSource passwordDataSource;
 	
-	private boolean notFirstStart;
-	
+	private boolean isBackPressed;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_categories);
 		
-		notFirstStart = false;
+		isBackPressed = true;
 		
 		categoriesDataSource = new CategoriesDataSource(this);
-		
+
 		// To delete passwords when deleting a category
 		passwordDataSource = new PasswordDataSource(this);
 
@@ -68,7 +69,7 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 				}else{
 					intent = new Intent(CategoriesActivity.this, PasswordsActivity.class);
 				}
-
+				
 				intent.putExtra(GridItem.PARENT_PARAMETER_NAME, parentCategoryIdForChild);
 				startActivity(intent);
 			}
@@ -82,7 +83,7 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 		if(!categoryName.isEmpty()){
 			dialog.setSubcategoryName(categoryName);
 		}
-		
+
 		if(!categoryId.isEmpty()){
 			dialog.setCategoryId(categoryId);
 		}else{
@@ -105,7 +106,7 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 		String subcategoryName = creationDialog.getSubcategoryName();
 		int categoryDrawableId = creationDialog.getCategoryDrawableId();
 		String categoryId = creationDialog.getCategoryId();
-		
+
 		if (subcategoryName == null || subcategoryName.isEmpty()) {
 			Toast.makeText(this, R.string.invalid_category_name, Toast.LENGTH_SHORT).show();
 			showSubcategoryCreationDialog("", "");
@@ -117,13 +118,13 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 			GridItem category = new GridItem(subcategoryName, categoryDrawableId, Integer.parseInt(parentCategoryId), categoryId);
 
 			categoriesDataSource.open();
-			
+
 			if(categoryId.equals(GridItem.DUMMY_CATEGORY_ID)){
 				categoriesDataSource.storeCategory(category);
 			}else{
 				categoriesDataSource.updateCategory(category);
 			}
-			
+
 			categoriesDataSource.close();
 
 			GridView gridview = (GridView) findViewById(R.id.categoriesGridView);
@@ -159,29 +160,29 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 			return true;
 		case R.id.reset_master_password_menu_item:
 			new AlertDialog.Builder(this)
-		    .setTitle(getString(R.string.master_password_dialog_title))
-		    .setMessage(getString(R.string.master_password_dialog_text))
-		    .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-		        public void onClick(DialogInterface dialog, int which) { 
-		            // continue with delete
-		        	MasterPasswordManager masterPasswordManager = new MasterPasswordManager(CategoriesActivity.this);
-		        	masterPasswordManager.resetMasterPassword();
-		        	
-		        	// return to the main activity
+			.setTitle(getString(R.string.master_password_dialog_title))
+			.setMessage(getString(R.string.master_password_dialog_text))
+			.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { 
+					// continue with delete
+					MasterPasswordManager masterPasswordManager = new MasterPasswordManager(CategoriesActivity.this);
+					masterPasswordManager.resetMasterPassword();
+
+					// return to the main activity
 					Intent intent = new Intent(CategoriesActivity.this, MainActivity.class);
-				    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				    startActivity(intent);
-				    
-				    finish();
-		        }
-		     })
-		    .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-		        public void onClick(DialogInterface dialog, int which) { 
-		            // do nothing
-		        }
-		     })
-		     .show();
+					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					startActivity(intent);
+
+					finish();
+				}
+			})
+			.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { 
+					// do nothing
+				}
+			})
+			.show();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -193,11 +194,11 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		getMenuInflater().inflate(R.menu.item_contextual_menu , menu);
-		
+
 		if(parentCategoryId.equals(GridItem.NULL_PARENT_VALUE)){
 			MenuItem editCategoryMenuItem = menu.findItem(R.id.edit_category_menu_item);
 			editCategoryMenuItem.setEnabled(false);
-			
+
 			MenuItem deleteCategoryMenuItem = menu.findItem(R.id.delete_category_menu_item);
 			deleteCategoryMenuItem.setEnabled(false);
 		}
@@ -224,16 +225,16 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 			categoriesDataSource.open();
 			categoriesDataSource.deleteCategory(categoryId);
 			categoriesDataSource.close();
-			
+
 			passwordDataSource.open();
 			passwordDataSource.deleteAllPasswordsFromCategory(categoryId, PasswordType.STORED);
 			passwordDataSource.close();
-			
+
 			GridView gridview = (GridView) findViewById(R.id.categoriesGridView);
 			gridview.setAdapter(new ImageAdapter(this, parentCategoryId));
-			
+
 			Toast.makeText(this, getString(R.string.category_deleted_toast), Toast.LENGTH_SHORT).show();
-			
+
 			break;
 		default:
 			return super.onContextItemSelected(item);
@@ -246,13 +247,40 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 	protected void onResume() {
 		super.onResume();
 		
-		if(notFirstStart){
+		ConfigurationManager configurationManager = new ConfigurationManager(this);
+		
+		boolean isMasterPasswordConfigured = configurationManager.isMasterPasswordConfigured();
+		
+		if(!isMasterPasswordConfigured || !isBackPressed){
 			Intent intent = new Intent(this, MainActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);			
 			finish();
 		}
 		
-		notFirstStart = true;
+		isBackPressed = false;
+	}
+
+    @Override
+    public void onBackPressed() {
+    	super.onBackPressed();
+    	
+    	isBackPressed = true;
+    }
+	
+	@Override
+	protected void onRestart(){
+		super.onRestart();
+		
+//		if (getIntent().getIntExtra(EXTRA_STARTED_FROM_BUTTON, 0) == 0) {
+//			Intent intent = new Intent(this, MainActivity.class);
+//			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//			startActivity(intent);
+//			finish();
+//		}
+	}
+	
+	protected void OnStop(){
+		super.onStop();
 	}
 }

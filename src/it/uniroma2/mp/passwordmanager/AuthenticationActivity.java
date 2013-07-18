@@ -14,6 +14,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
@@ -93,6 +94,7 @@ public class AuthenticationActivity extends Activity {
 				intent.putExtra(GridItem.PARENT_PARAMETER_NAME, GridItem.NULL_PARENT_VALUE);
 				startActivity(intent);
 			}else{
+				Toast.makeText(this, getString(R.string.master_password_wrong), Toast.LENGTH_SHORT).show();
 				initializeAuthenticationSequence();
 			}
 		}
