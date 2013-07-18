@@ -105,4 +105,21 @@ public class MasterPasswordManager {
 		return authenticationTable;
 	}
 	
+	public void resetMasterPassword(){
+		
+		configurationDataSource.open();
+		configurationDataSource.deleteConfigurationValue(ConfigurationValueType.MASTER_PASSWORD_INITIALIZED);
+		configurationDataSource.close();
+		
+		deleteMasterPassword();
+	}
+	
+	private void deleteMasterPassword(){
+		Password masterPassword = passwordDataSource.getPassword(PasswordType.MASTER, PasswordType.MASTER.toString(), "");
+		
+		passwordDataSource.open();
+		passwordDataSource.deletePassword(Long.toString(masterPassword.getId()), PasswordType.MASTER);
+		passwordDataSource.close();
+	}
+	
 }

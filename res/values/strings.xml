@@ -45,5 +45,8 @@
     <string name="blowfish">Blowfish</string>
     <string name="title_activity_password_hash">PasswordHashActivity</string>
     <string name="masterPasswordInvalidChars">The password contains invalid characters: - \'</string>
+    <string name="master_password_menu_item">Reset master password</string>
+    <string name="master_password_dialog_title">Reset master password</string>
+    <string name="master_password_dialog_text">Are you sure to reset the master password? This action will delete ALL the passwords!</string>
 
 </resources>

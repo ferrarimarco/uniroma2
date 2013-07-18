@@ -45,5 +45,9 @@
     <string name="blowfish">Blowfish</string>
     <string name="title_activity_password_hash">PasswordHashActivity</string>
     <string name="masterPasswordInvalidChars">La password contiene caratteri non validi: -</string>
+    <string name="master_password_menu_item">Cambia la master password</string>
+    <string name="master_password_dialog_title">Cambia la master password</string>
+    <string name="master_password_dialog_text">Sei sicuro di voler cambiare la master password? Questo comporterà la cancellazione di TUTTE le password!</string>
+
 
 </resources>
