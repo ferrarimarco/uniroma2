@@ -154,6 +154,18 @@ public class PasswordDataSource {
 		
 		database.delete(table, SQLiteHelper.COLUMN_ID + " = '" + id + "'", null);
 	}
+	
+	public void deleteAllPasswordsFromCategory(String categoryId, PasswordType passwordType){
+		database.delete(getDBTable(passwordType), SQLiteHelper.COLUMN_CATEGORY + " = '" + categoryId + "'", null);
+	}
+	
+	public void deleteAuthenticationTables(){
+		database.delete(SQLiteHelper.TABLE_AUTH, null, null);
+	}
+	
+	public void deleteAllPasswords(PasswordType passwordType) {
+		database.delete(getDBTable(passwordType), null, null);
+	}
 
 	private String[] getAllColumns(PasswordType passwordType){
 		

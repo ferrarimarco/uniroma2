@@ -58,6 +58,7 @@ public class PasswordAdapter extends BaseAdapter {
 			v = inflater.inflate(R.layout.password_grid_item, viewGroup, false);
 			v.setTag(R.id.description_password_textView, v.findViewById(R.id.description_password_textView));
 			v.setTag(R.id.value_password_textView, v.findViewById(R.id.value_password_textView));
+			v.setEnabled(false);
 		}
 		
 		description = (TextView) v.getTag(R.id.description_password_textView);

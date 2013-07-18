@@ -1,9 +1,14 @@
 package it.uniroma2.mp.passwordmanager;
 
 import it.uniroma2.mp.passwordmanager.SubcategoryCreationDialog.SubcategoryDialogListener;
+import it.uniroma2.mp.passwordmanager.authentication.MasterPasswordManager;
 import it.uniroma2.mp.passwordmanager.model.GridItem;
+import it.uniroma2.mp.passwordmanager.model.PasswordType;
 import it.uniroma2.mp.passwordmanager.persistance.CategoriesDataSource;
+import it.uniroma2.mp.passwordmanager.persistance.PasswordDataSource;
 import android.os.Bundle;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -24,14 +29,21 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 
 	private String parentCategoryId;
 	private CategoriesDataSource categoriesDataSource;
+	PasswordDataSource passwordDataSource;
 	
-
+	private boolean notFirstStart;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_categories);
-
+		
+		notFirstStart = false;
+		
 		categoriesDataSource = new CategoriesDataSource(this);
+		
+		// To delete passwords when deleting a category
+		passwordDataSource = new PasswordDataSource(this);
 
 		GridView gridview = (GridView) findViewById(R.id.categoriesGridView);
 
@@ -145,6 +157,32 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 		case R.id.new_category_menu_item:
 			showSubcategoryCreationDialog("", "");
 			return true;
+		case R.id.reset_master_password_menu_item:
+			new AlertDialog.Builder(this)
+		    .setTitle(getString(R.string.master_password_dialog_title))
+		    .setMessage(getString(R.string.master_password_dialog_text))
+		    .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int which) { 
+		            // continue with delete
+		        	MasterPasswordManager masterPasswordManager = new MasterPasswordManager(CategoriesActivity.this);
+		        	masterPasswordManager.resetMasterPassword();
+		        	
+		        	// return to the main activity
+					Intent intent = new Intent(CategoriesActivity.this, MainActivity.class);
+				    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				    startActivity(intent);
+				    
+				    finish();
+		        }
+		     })
+		    .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int which) { 
+		            // do nothing
+		        }
+		     })
+		     .show();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 
@@ -187,6 +225,10 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 			categoriesDataSource.deleteCategory(categoryId);
 			categoriesDataSource.close();
 			
+			passwordDataSource.open();
+			passwordDataSource.deleteAllPasswordsFromCategory(categoryId, PasswordType.STORED);
+			passwordDataSource.close();
+			
 			GridView gridview = (GridView) findViewById(R.id.categoriesGridView);
 			gridview.setAdapter(new ImageAdapter(this, parentCategoryId));
 			
@@ -200,4 +242,17 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 		return true;
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		if(notFirstStart){
+			Intent intent = new Intent(this, MainActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);			
+			finish();
+		}
+		
+		notFirstStart = true;
+	}
 }

@@ -14,7 +14,7 @@ public class MasterPasswordManager {
 	private PasswordDataSource passwordDataSource;
 	private ConfigurationDataSource configurationDataSource;
 	
-	private static final String authenticationTableRowSeparator = "-";
+	public static final String authenticationTableRowSeparator = "-";
 	
 	
 	public MasterPasswordManager(Context context){
@@ -117,7 +117,7 @@ public class MasterPasswordManager {
 		return result.toString();
 	}
 	
-	private String[][] deserializeAuthenticationTable(String serializedAuthenticationTable){
+	public String[][] deserializeAuthenticationTable(String serializedAuthenticationTable){
 		
 		String[] splittedString = serializedAuthenticationTable.split(authenticationTableRowSeparator);
 		
@@ -130,6 +130,26 @@ public class MasterPasswordManager {
 		}
 		
 		return authenticationTable;
+	}
+	
+	public void resetMasterPassword(){
+		configurationDataSource.open();
+		configurationDataSource.deleteConfigurationValue(ConfigurationValueType.MASTER_PASSWORD_INITIALIZED);
+		configurationDataSource.close();
+		
+		deleteMasterPassword();
+		
+		passwordDataSource.open();
+		passwordDataSource.deleteAuthenticationTables();
+		passwordDataSource.deleteAllPasswords(PasswordType.STORED);
+		passwordDataSource.close();
+	}
+	
+	private void deleteMasterPassword(){
+		passwordDataSource.open();
+		Password masterPassword = passwordDataSource.getPassword(PasswordType.MASTER, PasswordType.MASTER.toString(), "");
+		passwordDataSource.deletePassword(Long.toString(masterPassword.getId()), PasswordType.MASTER);
+		passwordDataSource.close();
 	}
 	
 }

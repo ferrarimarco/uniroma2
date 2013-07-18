@@ -53,4 +53,8 @@ public class ConfigurationDataSource {
 		
 		database.insert(table, null, values);
 	}
+	
+	public void deleteConfigurationValue(ConfigurationValueType configurationValueType){
+		database.delete(SQLiteHelper.TABLE_CONFIG, SQLiteHelper.COLUMN_DESCRIPTION + " = '" + configurationValueType.toString() + "'", null);
+	}
 }

@@ -78,7 +78,6 @@ public class SubcategoryCreationDialog extends DialogFragment {
 		imageAdapter = new ImageAdapter(view.getContext(), GridItem.CUSTOM_CATEGORY_DRAWABLE_ID);
 
 		imageChooserGridView.setAdapter(imageAdapter);
-		imageChooserGridView.setNumColumns(imageAdapter.getGridItemCount());
 
 		imageChooserGridView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {

@@ -2,11 +2,11 @@ package it.uniroma2.mp.passwordmanager;
 
 import it.uniroma2.mp.passwordmanager.authentication.AuthenticationTableGenerator;
 import it.uniroma2.mp.passwordmanager.authentication.MasterPasswordManager;
+import it.uniroma2.mp.passwordmanager.configuration.ConfigurationManager;
 import it.uniroma2.mp.passwordmanager.model.GridItem;
 import android.os.Bundle;
 import android.app.Activity;
 import android.support.v4.app.NavUtils;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,8 +30,6 @@ public class AuthenticationActivity extends Activity {
 		setContentView(R.layout.activity_authentication);
 		// Show the Up button in the action bar.
 		setupActionBar();
-		
-		initializeAuthenticationSequence();
 	}
 	
 	private void showAuthenticationTable(){
@@ -112,13 +110,6 @@ public class AuthenticationActivity extends Activity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.authentication, menu);
-		return true;
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
@@ -140,7 +131,18 @@ public class AuthenticationActivity extends Activity {
 		//datasource.open();
 		super.onResume();
 		
-		initializeAuthenticationSequence();
+		ConfigurationManager configurationManager = new ConfigurationManager(this);
+		
+		if(configurationManager.isMasterPasswordConfigured()){// normal application flow
+			initializeAuthenticationSequence();
+		}else{
+			// The master password is already initialized
+			// Get back to MainActivity that knows what to do next
+			Intent intent = new Intent(this, MainActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+		}
 	}
 
 }

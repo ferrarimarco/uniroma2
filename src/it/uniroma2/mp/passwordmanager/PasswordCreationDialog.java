@@ -11,6 +11,7 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 public class PasswordCreationDialog extends DialogFragment {	
@@ -101,6 +102,18 @@ public class PasswordCreationDialog extends DialogFragment {
 			EditText passwordEditText = (EditText) view.findViewById(R.id.password_value_edittext);
 			passwordEditText.setText(passwordValue);
 		}
+		
+		RadioButton rb = null;
+		
+		if(algorithm.equals(EncryptionAlgorithm.AES)){
+			rb = (RadioButton) view.findViewById(R.id.aes_radio);
+		}else if(algorithm.equals(EncryptionAlgorithm.BLOWFISH)){
+			rb = (RadioButton) view.findViewById(R.id.blowfish_radio);
+		}else{
+			rb = (RadioButton) view.findViewById(R.id.aes_radio);
+		}
+		
+		rb.setChecked(true);
 		
 		return builder.create();
 	}

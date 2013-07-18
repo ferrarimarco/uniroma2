@@ -18,8 +18,6 @@ public class MainActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		startNextActivity();
 	}
 	
 	private void startNextActivity(){
@@ -40,7 +38,7 @@ public class MainActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		
-//		startNextActivity();
+		startNextActivity();
 	}
 	
 	@Override

@@ -1,11 +1,15 @@
 package it.uniroma2.mp.passwordmanager;
 
 import it.uniroma2.mp.passwordmanager.PasswordCreationDialog.PasswordCreationDialogListener;
+import it.uniroma2.mp.passwordmanager.authentication.MasterPasswordManager;
 import it.uniroma2.mp.passwordmanager.encryption.EncryptionAlgorithm;
 import it.uniroma2.mp.passwordmanager.model.GridItem;
 import it.uniroma2.mp.passwordmanager.model.Password;
 import it.uniroma2.mp.passwordmanager.model.PasswordType;
 import it.uniroma2.mp.passwordmanager.persistance.PasswordDataSource;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -25,12 +29,15 @@ import android.widget.GridView;
 public class PasswordsActivity extends FragmentActivity implements PasswordCreationDialogListener {
 
 	private String parentCategoryId;
+	private boolean notFirstStart;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_passwords);
 
+		notFirstStart = false;
+		
 		GridView gridview = (GridView) findViewById(R.id.passwordsGridView);
 
 		parentCategoryId = getIntent().getStringExtra(GridItem.PARENT_PARAMETER_NAME);
@@ -118,6 +125,32 @@ public class PasswordsActivity extends FragmentActivity implements PasswordCreat
 		case R.id.new_category_menu_item:
 			showPasswordCreationDialog("", "", Password.DUMMY_PASSWORD_ID, EncryptionAlgorithm.AES);
 			return true;
+		case R.id.reset_master_password_menu_item:
+			new AlertDialog.Builder(this)
+		    .setTitle(getString(R.string.master_password_dialog_title))
+		    .setMessage(getString(R.string.master_password_dialog_text))
+		    .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int which) { 
+		            // continue with delete
+		        	MasterPasswordManager masterPasswordManager = new MasterPasswordManager(PasswordsActivity.this);
+		        	masterPasswordManager.resetMasterPassword();
+		        	
+		        	// return to the main activity
+					Intent intent = new Intent(PasswordsActivity.this, MainActivity.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				    startActivity(intent);
+				    
+				    finish();
+		        }
+		     })
+		    .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int which) { 
+		            // do nothing
+		        }
+		     })
+		     .show();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 
@@ -165,6 +198,20 @@ public class PasswordsActivity extends FragmentActivity implements PasswordCreat
 		}
 
 		return true;
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		if(notFirstStart){
+			Intent intent = new Intent(this, MainActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);			
+			finish();
+		}
+		
+		notFirstStart = true;
 	}
 
 }
