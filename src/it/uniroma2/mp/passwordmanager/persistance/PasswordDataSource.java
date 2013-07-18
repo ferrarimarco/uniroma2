@@ -162,6 +162,10 @@ public class PasswordDataSource {
 	public void deleteAuthenticationTables(){
 		database.delete(SQLiteHelper.TABLE_AUTH, null, null);
 	}
+	
+	public void deleteAllPasswords(PasswordType passwordType) {
+		database.delete(getDBTable(passwordType), null, null);
+	}
 
 	private String[] getAllColumns(PasswordType passwordType){
 		

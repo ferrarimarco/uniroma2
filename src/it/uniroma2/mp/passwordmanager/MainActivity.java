@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		
-//		startNextActivity();
+		startNextActivity();
 	}
 	
 	@Override

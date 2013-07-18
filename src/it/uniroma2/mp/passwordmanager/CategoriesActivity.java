@@ -2,6 +2,7 @@ package it.uniroma2.mp.passwordmanager;
 
 import it.uniroma2.mp.passwordmanager.SubcategoryCreationDialog.SubcategoryDialogListener;
 import it.uniroma2.mp.passwordmanager.authentication.MasterPasswordManager;
+import it.uniroma2.mp.passwordmanager.configuration.ConfigurationManager;
 import it.uniroma2.mp.passwordmanager.model.GridItem;
 import it.uniroma2.mp.passwordmanager.model.PasswordType;
 import it.uniroma2.mp.passwordmanager.persistance.CategoriesDataSource;
@@ -163,6 +164,14 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 		            // continue with delete
 		        	MasterPasswordManager masterPasswordManager = new MasterPasswordManager(CategoriesActivity.this);
 		        	masterPasswordManager.resetMasterPassword();
+		        	
+		        	// return to the main activity
+					Intent intent = new Intent(CategoriesActivity.this, MainActivity.class);
+				    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				    startActivity(intent);
+				    
+				    finish();
 		        }
 		     })
 		    .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -229,6 +238,20 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 		}
 
 		return true;
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		ConfigurationManager configurationManager = new ConfigurationManager(this);
+		
+		if(configurationManager.isMasterPasswordConfigured()){
+			Intent intent = new Intent(this, MainActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+		}
 	}
 
 }

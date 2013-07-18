@@ -2,6 +2,7 @@ package it.uniroma2.mp.passwordmanager;
 
 import it.uniroma2.mp.passwordmanager.authentication.AuthenticationTableGenerator;
 import it.uniroma2.mp.passwordmanager.authentication.MasterPasswordManager;
+import it.uniroma2.mp.passwordmanager.configuration.ConfigurationManager;
 import it.uniroma2.mp.passwordmanager.model.GridItem;
 import android.os.Bundle;
 import android.app.Activity;
@@ -132,7 +133,16 @@ public class AuthenticationActivity extends Activity {
 		//datasource.open();
 		super.onResume();
 		
-		initializeAuthenticationSequence();
+		ConfigurationManager configurationManager = new ConfigurationManager(this);
+		
+		if(configurationManager.isMasterPasswordConfigured()){// normal application flow
+			initializeAuthenticationSequence();
+		}else{// show master password init activity
+			Intent intent = new Intent(this, MainActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+		}
 	}
 
 }

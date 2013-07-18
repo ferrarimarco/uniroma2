@@ -2,6 +2,7 @@ package it.uniroma2.mp.passwordmanager;
 
 import it.uniroma2.mp.passwordmanager.authentication.AuthenticationTableGenerator;
 import it.uniroma2.mp.passwordmanager.authentication.MasterPasswordManager;
+import it.uniroma2.mp.passwordmanager.configuration.ConfigurationManager;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -36,8 +37,6 @@ public class MasterPasswordInitActivity extends Activity {
 				if(masterPassword.length() == AuthenticationTableGenerator.passwordLength){
 					if(!masterPassword.equals(masterPasswordConfirmation)){
 						// Wrong master password
-						// TODO: real time check onTextChanged
-						
 						Toast.makeText(MasterPasswordInitActivity.this, getString(R.string.masterPasswordNotConfirmed), Toast.LENGTH_SHORT).show();
 					}else if(masterPassword.contains("-") || masterPassword.contains("'")){
 						Toast.makeText(MasterPasswordInitActivity.this, getString(R.string.masterPasswordInvalidChars), Toast.LENGTH_SHORT).show();
@@ -47,11 +46,13 @@ public class MasterPasswordInitActivity extends Activity {
 						
 						Toast.makeText(MasterPasswordInitActivity.this, getString(R.string.masterPasswordOkConfirmation), Toast.LENGTH_SHORT).show();
 						
+						finish();
+						
 						// return to the main activity
 						Intent intent = new Intent(MasterPasswordInitActivity.this, MainActivity.class);
 					    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);   
 					    startActivity(intent);
-					}				
+					}		
 				}else{
 					Toast.makeText(MasterPasswordInitActivity.this, getString(R.string.masterPasswordLengthError), Toast.LENGTH_SHORT).show();
 				}
@@ -64,6 +65,20 @@ public class MasterPasswordInitActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.master_password_init, menu);
 		return true;
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		ConfigurationManager configurationManager = new ConfigurationManager(this);
+		
+		if(!configurationManager.isMasterPasswordConfigured()){// show master password init activity
+			Intent intent = new Intent(this, MasterPasswordInitActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+		}
 	}
 
 }
