@@ -30,8 +30,6 @@ public class AuthenticationActivity extends Activity {
 		setContentView(R.layout.activity_authentication);
 		// Show the Up button in the action bar.
 		setupActionBar();
-		
-		initializeAuthenticationSequence();
 	}
 	
 	private void showAuthenticationTable(){
@@ -137,7 +135,9 @@ public class AuthenticationActivity extends Activity {
 		
 		if(configurationManager.isMasterPasswordConfigured()){// normal application flow
 			initializeAuthenticationSequence();
-		}else{// show master password init activity
+		}else{
+			// The master password is already initialized
+			// Get back to MainActivity that knows what to do next
 			Intent intent = new Intent(this, MainActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);

@@ -2,7 +2,6 @@ package it.uniroma2.mp.passwordmanager;
 
 import it.uniroma2.mp.passwordmanager.PasswordCreationDialog.PasswordCreationDialogListener;
 import it.uniroma2.mp.passwordmanager.authentication.MasterPasswordManager;
-import it.uniroma2.mp.passwordmanager.configuration.ConfigurationManager;
 import it.uniroma2.mp.passwordmanager.encryption.EncryptionAlgorithm;
 import it.uniroma2.mp.passwordmanager.model.GridItem;
 import it.uniroma2.mp.passwordmanager.model.Password;
@@ -30,12 +29,15 @@ import android.widget.GridView;
 public class PasswordsActivity extends FragmentActivity implements PasswordCreationDialogListener {
 
 	private String parentCategoryId;
+	private boolean notFirstStart;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_passwords);
 
+		notFirstStart = false;
+		
 		GridView gridview = (GridView) findViewById(R.id.passwordsGridView);
 
 		parentCategoryId = getIntent().getStringExtra(GridItem.PARENT_PARAMETER_NAME);
@@ -202,14 +204,14 @@ public class PasswordsActivity extends FragmentActivity implements PasswordCreat
 	protected void onResume() {
 		super.onResume();
 		
-		ConfigurationManager configurationManager = new ConfigurationManager(this);
-		
-		if(!configurationManager.isMasterPasswordConfigured()){// show master password init activity
+		if(notFirstStart){
 			Intent intent = new Intent(this, MainActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
+			startActivity(intent);			
 			finish();
 		}
+		
+		notFirstStart = true;
 	}
 
 }

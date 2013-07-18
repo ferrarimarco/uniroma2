@@ -2,7 +2,6 @@ package it.uniroma2.mp.passwordmanager;
 
 import it.uniroma2.mp.passwordmanager.SubcategoryCreationDialog.SubcategoryDialogListener;
 import it.uniroma2.mp.passwordmanager.authentication.MasterPasswordManager;
-import it.uniroma2.mp.passwordmanager.configuration.ConfigurationManager;
 import it.uniroma2.mp.passwordmanager.model.GridItem;
 import it.uniroma2.mp.passwordmanager.model.PasswordType;
 import it.uniroma2.mp.passwordmanager.persistance.CategoriesDataSource;
@@ -32,12 +31,15 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 	private CategoriesDataSource categoriesDataSource;
 	PasswordDataSource passwordDataSource;
 	
-
+	private boolean notFirstStart;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_categories);
-
+		
+		notFirstStart = false;
+		
 		categoriesDataSource = new CategoriesDataSource(this);
 		
 		// To delete passwords when deleting a category
@@ -239,19 +241,18 @@ public class CategoriesActivity extends FragmentActivity implements SubcategoryD
 
 		return true;
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 		
-		ConfigurationManager configurationManager = new ConfigurationManager(this);
-		
-		if(configurationManager.isMasterPasswordConfigured()){
+		if(notFirstStart){
 			Intent intent = new Intent(this, MainActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
+			startActivity(intent);			
 			finish();
 		}
+		
+		notFirstStart = true;
 	}
-
 }
