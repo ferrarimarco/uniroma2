@@ -1,5 +1,8 @@
 package info.ferrarimarco.uniroma2.sii.heartmonitor.controllers;
 
+import java.util.List;
+
+import info.ferrarimarco.uniroma2.sii.heartmonitor.dao.config.SpringMongoConfig;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.dao.repositories.HeartbeatSessionRepository;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
 
@@ -13,7 +16,7 @@ public class HeartbeatSessionPersistenceController {
 	private HeartbeatSessionRepository repository;
 	
 	public void open(boolean deleteAllExisting){
-		context = new AnnotationConfigApplicationContext(HeartbeatSessionPersistenceController.class);
+		context = new AnnotationConfigApplicationContext(SpringMongoConfig.class);
         repository = context.getBean(HeartbeatSessionRepository.class);
 
         if(deleteAllExisting){
@@ -32,5 +35,9 @@ public class HeartbeatSessionPersistenceController {
 	public HeartbeatSession readHeartbeatSession(String sessionId){
 		return repository.findById(sessionId);
 	}
+	
+	public List<HeartbeatSession> readAllHeartbeatSessions(){
+		return repository.findAll();
+	}	
 	
 }

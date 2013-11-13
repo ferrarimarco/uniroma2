@@ -5,8 +5,9 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-
+@Document(collection = "heartbeatSessions")
 public class HeartbeatSession {
 
 	@Id
@@ -16,8 +17,7 @@ public class HeartbeatSession {
 	
 	private List<Integer> values;
 
-	public HeartbeatSession(String id, DateTime time) {
-		this.id = id;
+	public HeartbeatSession(DateTime time) {
 		this.time = time;
 		
 		values = new ArrayList<Integer>();
