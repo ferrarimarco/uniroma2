@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface HeartbeatSessionRepository extends MongoRepository<HeartbeatSession,String> {
 
-	public HeartbeatSession findById(String id);	
+	public HeartbeatSession findById(String id);
+	
+	public Iterable<HeartbeatSession> findByUser(String user);
 	
 }

@@ -15,6 +15,8 @@ public class HeartbeatSession {
 	
 	private DateTime time;
 	
+	private String user;
+	
 	private List<Integer> values;
 
 	public HeartbeatSession(DateTime time) {
@@ -48,6 +50,14 @@ public class HeartbeatSession {
 	}
 
 
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
 	public List<Integer> getValues() {
 		return values;
 	}
@@ -59,6 +69,6 @@ public class HeartbeatSession {
 
 	@Override
 	public String toString() {
-		return "HeatbeatSession [id=" + id + ", time=" + time + "]";
+		return "HeartbeatSession [id=" + id + ", time=" + time + ", user=" + user + "]";
 	}
 }
