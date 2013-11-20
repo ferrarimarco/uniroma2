@@ -1,26 +1,28 @@
-package info.ferrarimarco.uniroma2.sii.heartmonitor.test.dao.mongodb;
+package info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.persistance.test;
 
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.HeartbeatSessionPersistenceController;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.persistence.HeartbeatSessionPersistenceController;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
 
 @Controller
-@RequestMapping("/mongoDbTest")
-public class MongoDbTest {
+@RequestMapping("/mongo-db")
+public class HeartbeatSessionPersistenceControllerTest {
 	
-	@RequestMapping(method = RequestMethod.GET)
+	@Autowired
+	private HeartbeatSessionPersistenceController controller;
+	
+	@RequestMapping(value="write_read_test_values", method = RequestMethod.GET)
 	@ResponseBody
 	public String writeAndReadTestValues() {
 
-		HeartbeatSessionPersistenceController controller = new HeartbeatSessionPersistenceController();
-		
 		controller.open(true);
 		
 		HeartbeatSession session = new HeartbeatSession(new DateTime());

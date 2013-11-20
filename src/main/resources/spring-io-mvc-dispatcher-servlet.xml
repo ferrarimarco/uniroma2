@@ -10,14 +10,10 @@
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
-<!-- 	<context:component-scan base-package="info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.io.arduino" /> -->
-
 	<mvc:annotation-driven/>
 	
 	<context:component-scan base-package="info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.io.arduino" use-default-filters="false">
 		<context:include-filter expression="org.springframework.stereotype.Controller" type="annotation" />
 	</context:component-scan>
-	
-<!-- 	<mvc:resources mapping="/images/**" location="/images/" /> -->
 	
 </beans>

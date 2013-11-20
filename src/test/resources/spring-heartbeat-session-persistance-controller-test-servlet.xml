@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
@@ -9,8 +10,10 @@
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
-	<context:component-scan base-package="info.ferrarimarco.uniroma2.sii.heartmonitor">
-		<context:exclude-filter expression="org.springframework.stereotype.Controller" type="annotation" />
+	<mvc:annotation-driven/>
+	
+	<context:component-scan base-package="info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.persistance.test" use-default-filters="false">
+		<context:include-filter expression="org.springframework.stereotype.Controller" type="annotation" />
 	</context:component-scan>
-
+	
 </beans>

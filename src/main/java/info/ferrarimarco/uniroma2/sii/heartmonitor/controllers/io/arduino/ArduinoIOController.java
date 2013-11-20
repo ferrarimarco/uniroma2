@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value="/arduino/")
+@RequestMapping(value="/arduino")
 public class ArduinoIOController {
 	
 	public ArduinoIOController() {
