@@ -1,0 +1,15 @@
+<?page title="Test Links Reference" contentType="text/html;charset=UTF-8"?>
+<zk>
+<window title="Test Links Reference" border="normal">
+	
+	<vbox>
+		<a href="http://localhost:8080/sii-heart-monitor/index.zul">Index</a>
+		<a href="http://localhost:8080/sii-heart-monitor/secure/home.zul">Home (secure)</a>
+		<a href="http://localhost:8080/sii-heart-monitor/io/arduino/session_id">Arduino Unique Session ID</a>
+		<a href="http://localhost:8080/sii-heart-monitor/test/services/persistence/heartbeat-session/mongo-db/write_read_test_values">
+			Heartbeat Session Persistence Service Test (MongoDB)
+		</a>
+	</vbox>
+
+</window>
+</zk>
