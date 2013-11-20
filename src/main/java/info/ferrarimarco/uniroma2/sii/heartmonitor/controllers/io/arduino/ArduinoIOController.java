@@ -6,11 +6,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("/arduino_io")
+@RequestMapping(value="/arduino/")
 public class ArduinoIOController {
+	
+	public ArduinoIOController() {
+		super();
+	}
 
-	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
+	@RequestMapping(value="session_id", method = RequestMethod.GET)
 	public String getUniqueSessionId() {
 		return "RESP";
 	}

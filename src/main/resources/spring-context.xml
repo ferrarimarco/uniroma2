@@ -10,7 +10,7 @@
         http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
 	<!-- <context:annotation-config /> -->
-	<!-- <context:component-scan base-package="info.ferrarimarco.uniroma2.sii.heartmonitor"/> -->
+<!-- 	<context:component-scan base-package="info.ferrarimarco.uniroma2.sii.heartmonitor.controller"/> -->
 
 	<context:component-scan base-package="info.ferrarimarco.uniroma2.sii.heartmonitor">
 		<context:exclude-filter expression="org.springframework.stereotype.Controller" type="annotation" />
