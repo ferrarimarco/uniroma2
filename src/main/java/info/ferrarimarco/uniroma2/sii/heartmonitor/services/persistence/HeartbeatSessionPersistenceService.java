@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.persistence;
+package info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence;
 
 import java.util.List;
 
@@ -8,10 +8,10 @@ import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-public class HeartbeatSessionPersistenceController {
+@Service
+public class HeartbeatSessionPersistenceService {
 
 	private AbstractApplicationContext context;
 	private HeartbeatSessionRepository repository;
@@ -39,6 +39,5 @@ public class HeartbeatSessionPersistenceController {
 	
 	public List<HeartbeatSession> readAllHeartbeatSessions(){
 		return repository.findAll();
-	}	
-	
+	}
 }

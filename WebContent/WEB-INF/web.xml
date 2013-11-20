@@ -30,18 +30,18 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>heartbeat-session-persistance-controller-test-mvc-dispatcher</servlet-name>
+		<servlet-name>heartbeat-session-persistance-service-test-mvc-dispatcher</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
-			<param-value>classpath:spring-heartbeat-session-persistance-controller-test-servlet.xml</param-value>
+			<param-value>classpath:spring-heartbeat-session-persistence-service-test-servlet.xml</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>heartbeat-session-persistance-controller-test-mvc-dispatcher</servlet-name>
-		<url-pattern>/test/controllers/persistance/heartbeat-session/*</url-pattern>
+		<servlet-name>heartbeat-session-persistance-service-test-mvc-dispatcher</servlet-name>
+		<url-pattern>/test/services/persistence/heartbeat-session/*</url-pattern>
 	</servlet-mapping>
 
 	<listener>

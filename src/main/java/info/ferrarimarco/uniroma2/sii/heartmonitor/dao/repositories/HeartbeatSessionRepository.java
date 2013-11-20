@@ -8,6 +8,6 @@ public interface HeartbeatSessionRepository extends MongoRepository<HeartbeatSes
 
 	public HeartbeatSession findById(String id);
 	
-	public Iterable<HeartbeatSession> findByUser(String user);
+	public Iterable<HeartbeatSession> findByUserId(String userId);
 	
 }

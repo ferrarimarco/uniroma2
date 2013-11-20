@@ -15,12 +15,15 @@ public class HeartbeatSession {
 	
 	private DateTime time;
 	
-	private String user;
+	private String userId;
 	
 	private List<Integer> values;
+	
+	private boolean isClosed;
 
-	public HeartbeatSession(DateTime time) {
-		this.time = time;
+	public HeartbeatSession(String userId) {
+		this.userId = userId;
+		this.time = new DateTime();
 		
 		values = new ArrayList<Integer>();
 	}
@@ -29,33 +32,28 @@ public class HeartbeatSession {
 		values.add(value);
 	}
 	
-	
 	public String getId() {
 		return id;
 	}
 
-	
 	public void setId(String id) {
 		this.id = id;
 	}
-
 	
 	public DateTime getTime() {
 		return time;
 	}
 
-
 	public void setTime(DateTime time) {
 		this.time = time;
 	}
 
-
-	public String getUser() {
-		return user;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setUser(String user) {
-		this.user = user;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public List<Integer> getValues() {
@@ -67,8 +65,16 @@ public class HeartbeatSession {
 		this.values = values;
 	}
 
+	public boolean isClosed() {
+		return isClosed;
+	}
+
+	public void setClosed(boolean isClosed) {
+		this.isClosed = isClosed;
+	}
+
 	@Override
 	public String toString() {
-		return "HeartbeatSession [id=" + id + ", time=" + time + ", user=" + user + "]";
+		return "HeartbeatSession [id=" + id + ", time=" + time + ", userId=" + userId + "]";
 	}
 }
