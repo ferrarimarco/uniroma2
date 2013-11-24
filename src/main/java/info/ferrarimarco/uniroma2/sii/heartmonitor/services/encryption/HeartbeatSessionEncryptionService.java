@@ -1,12 +1,20 @@
 package info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption;
 
+
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class HeartbeatSessionEncryptionService {
-
+	
+	@Autowired
+	private SecurityProviderManagerService securityProviderManagerService;
+	
+	public HeartbeatSessionEncryptionService(){
+	}
+	
 	public String encryptHeartbeatSession(HeartbeatSession session){
 		return "ENCRYPTED_HB_SESSION";
 	}
