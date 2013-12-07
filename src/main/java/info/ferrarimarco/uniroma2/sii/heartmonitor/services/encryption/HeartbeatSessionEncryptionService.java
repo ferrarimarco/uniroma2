@@ -32,7 +32,7 @@ public class HeartbeatSessionEncryptionService {
 	}
 	
 	public String encryptHeartbeatSessionId(String value){
-		return "ENCRYPTED_HB_S_ID";
+		return value;
 	}
 	
 	public String decryptHeartbeatSessionId(String encryptedValue){
