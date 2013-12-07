@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping(value="/arduino")
 public class ArduinoIOController {
 	
-	private static final String INPUT_SEPARATOR = ";";
-	
 	@Autowired
 	private HeartbeatSessionPersistenceService persistenceService;
 	
@@ -33,21 +31,19 @@ public class ArduinoIOController {
 		
 		HeartbeatSession session = new HeartbeatSession(userId);
 		
+		persistenceService.open(true);
 		persistenceService.storeHeartbeatSession(session);
+		persistenceService.close();
 		
-		String response = encryptionService.encryptHeartbeatSessionId(session.getId());
+		String response = encryptionService.encryptHeartbeatSessionId(session.getShortId());
 		
 		return response;
 	}
 	
-	public void storeHeartbeatValue(String input){
+	@ResponseBody
+	@RequestMapping(value="/session/store/{input}", method = RequestMethod.PUT)
+	public void storeHeartbeatValue(@PathVariable String input){
 		
-		String[] inputElements = input.split(INPUT_SEPARATOR);
-		
-		String encryptedSessionId = inputElements[0];
-		String encryptedValue = inputElements[1];
-		String sequenceNumber = inputElements[2];
-		String checksum = inputElements[3];
 	}
 	
 	public void endSession(String sessionId){
