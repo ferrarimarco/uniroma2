@@ -12,7 +12,7 @@
 
 	<mvc:annotation-driven/>
 	
-	<context:component-scan base-package="info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.io.arduino" use-default-filters="false">
+	<context:component-scan base-package="info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.io" use-default-filters="false">
 		<context:include-filter expression="org.springframework.stereotype.Controller" type="annotation" />
 	</context:component-scan>
 	
