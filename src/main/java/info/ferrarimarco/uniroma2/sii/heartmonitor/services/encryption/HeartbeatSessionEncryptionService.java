@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class HeartbeatSessionEncryptionService {
 	
 	@Autowired
-	private SecurityProviderManagerService securityProviderManagerService;
+	private RawEncryptionService encryptionService;
 	
 	public HeartbeatSessionEncryptionService(){
 	}

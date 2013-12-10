@@ -1,9 +1,16 @@
 package info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.io.arduino;
 
+import java.security.InvalidKeyException;
+
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.ArduinoIOEncryptionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.HeartbeatSessionEncryptionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.HeartbeatSessionPersistenceService;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,11 +22,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping(value="/arduino")
 public class ArduinoIOController {
 	
+	private Logger logger = LoggerFactory.getLogger(ArduinoIOController.class);
+	
+	private static final String SLASH_CHAR_PLACEHOLDER = ";"; 
+	
 	@Autowired
 	private HeartbeatSessionPersistenceService persistenceService;
 	
 	@Autowired
 	private HeartbeatSessionEncryptionService encryptionService;
+	
+	@Autowired
+	private ArduinoIOEncryptionService arduinoIOEncryptionService;
 	
 	public ArduinoIOController() {
 		super();
@@ -29,6 +43,8 @@ public class ArduinoIOController {
 	@RequestMapping(value="/session_id/user/{userId}", method = RequestMethod.GET)
 	public String getUniqueSessionId(@PathVariable String userId) {
 		
+		logger.info("Received GET uniqueSessionId request");
+		
 		HeartbeatSession session = new HeartbeatSession(userId);
 		
 		persistenceService.open(true);
@@ -37,12 +53,38 @@ public class ArduinoIOController {
 		
 		String response = encryptionService.encryptHeartbeatSessionId(session.getShortId());
 		
+		logger.info("GET uniqueSessionId response: {}", response);
+		
 		return response;
 	}
 	
 	@ResponseBody
 	@RequestMapping(value="/session/store/{input}", method = RequestMethod.PUT)
 	public void storeHeartbeatValue(@PathVariable String input){
+		
+		if(input.contains(SLASH_CHAR_PLACEHOLDER)){
+			input = input.replace(SLASH_CHAR_PLACEHOLDER, "/");
+		}
+		
+		logger.info("Received storeHeartbeatValue PUT request with input: {}", input);
+		
+		byte[] decodedInputBytes = Base64.decodeBase64(input);
+		
+		String decodedInput = new String(decodedInputBytes);
+		
+		logger.info("Decoded input: {}", decodedInput);
+		
+		String decryptedInput = null;
+		
+		try {
+			decryptedInput = arduinoIOEncryptionService.decrypt(decodedInput);
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.info("Error {} ({}) while decrypting input {}: {}", e.getMessage(), e.getClass().toString(), input, ExceptionUtils.getStackTrace(e));
+		}
+		
+		logger.info("Input decrypted as: {}", decryptedInput);
 		
 	}
 	
