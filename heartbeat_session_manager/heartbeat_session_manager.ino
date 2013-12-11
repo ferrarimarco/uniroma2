@@ -20,18 +20,31 @@ byte key[] =
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 }; // 32B = 256b
 
+String iv_string = "MY_IV_VECTOR_CBC";
+
+byte iv[] = 
+{
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+} ;
+
+
 String session_id;
 String plain_string;
 
 const int BLOCK_LEN_BYTE = 16;
+const int BLOCKS = 4;
+const int TOTAL_BLOCK_LEN_BYTE = BLOCKS * BLOCK_LEN_BYTE;
 
-byte plain [BLOCK_LEN_BYTE];
-byte cipher [BLOCK_LEN_BYTE];
-byte check [BLOCK_LEN_BYTE];
+byte plain [TOTAL_BLOCK_LEN_BYTE];
+byte cipher [TOTAL_BLOCK_LEN_BYTE];
+byte check [TOTAL_BLOCK_LEN_BYTE];
 
-int KEY_ARRAY_LEN_BYTE = 32;
+const int KEY_ARRAY_LEN_BYTE = 32;
+const int KEY_ARRAY_LEN_BIT = KEY_ARRAY_LEN_BYTE * 8;
+const int IV_ARRAY_LEN_BYTE = 16;
 
-char URL_FRIENDLY_CHAR = ';';
+
+char URL_FRIENDLY_CHAR = '-';
 
 void print_plain_block(){
   
@@ -92,21 +105,97 @@ void print_key(){
   Serial.println();
 }
 
-void init_eth_shield(){
-
-  Serial.println("ETH Shield init start");
+void print_iv(){
   
-  // start the Ethernet connection:
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println("Failed to configure Ethernet using DHCP");
-    // no point in carrying on, so do nothing forevermore:
-    while(true);
+  Serial.print("IV: ");
+  Serial.println(iv_string);
+  
+  Serial.print("IV (byte array): ");
+  
+  for(int i = 0; i < NELEMS(iv); i++){
+    byte val = iv[i];
+    Serial.print(val>>4, HEX);
+    Serial.print(val&15, HEX);
+    Serial.print(" ");
   }
   
-  Serial.println("ETH Shield init OK");
+  Serial.println();
+}
+
+void printByteArrayHexValues(byte * arr, unsigned int len, String array_name){
   
-  // give the Ethernet shield a second to initialize:
-  delay(1000);
+  Serial.print(array_name + " (byte array): ");
+  
+  for(int i = 0; i < len; i++){
+    byte val = arr[i];
+    Serial.print(val>>4, HEX);
+    Serial.print(val&15, HEX);
+    Serial.print(" ");
+  }
+  
+  Serial.println();
+}
+
+void printCharArrayHexValues(char * arr, unsigned int len, String array_name){
+  
+  Serial.print(array_name + " (byte array): ");
+  
+  for(int i = 0; i < len; i++){
+    char c = arr[i];
+    byte val = (byte) c;
+    Serial.print(val>>4, HEX);
+    Serial.print(val&15, HEX);
+    Serial.print(" ");
+  }
+  
+  Serial.println();
+}
+
+void init_key(){
+  for(int i = 0; i < key_string.length(); i++){
+    key[i] = (byte) key_string.charAt(i);
+  }
+}
+
+void init_iv(){
+  for(int i = 0; i < iv_string.length(); i++){
+    iv[i] = (byte) iv_string.charAt(i);
+  }
+}
+
+void init_plain(){
+  clear_plain();
+  
+  plain_string = plain_string + session_id;
+
+  for(int i = 0; i < plain_string.length(); i++){
+    plain[i] = (byte) plain_string.charAt(i);
+  }
+  
+  printByteArrayHexValues(plain, TOTAL_BLOCK_LEN_BYTE, "Plain block before padding");
+  
+  byte pad_element = 0x00;
+  int pad_len = TOTAL_BLOCK_LEN_BYTE - plain_string.length();
+  
+  Serial.print("PAD Len: ");
+  Serial.println(pad_len);
+  
+  for(int i = 0; i < pad_len; i++){
+    pad_element++;
+  }
+  
+  Serial.print("PAD Element: ");
+  Serial.print(pad_element>>4, HEX);
+  Serial.print(pad_element&15, HEX);
+  Serial.println();
+  
+  if(TOTAL_BLOCK_LEN_BYTE - plain_string.length() > 0){
+    for(int i = plain_string.length(); i < TOTAL_BLOCK_LEN_BYTE; i++){
+      plain[i] = 0x00;
+    }
+  }
+  
+  printByteArrayHexValues(plain, TOTAL_BLOCK_LEN_BYTE, "Plain block after padding");
 }
 
 void clear_plain(){
@@ -120,37 +209,11 @@ void clear_plain(){
   }
 }
 
-void init_key(){
-  for(int i = 0; i < key_string.length(); i++){
-    key[i] = (byte) key_string.charAt(i);
-  }    
-}
-
 void init_session_id(){
   
   send_session_id_get_request();
   
   session_id = read_http_response_body();
-}
-
-void init_plain(){
-  clear_plain();
-  
-  plain_string = plain_string + session_id;
-  
-  if(plain_string.length() < BLOCK_LEN_BYTE){
-    for(int i = plain_string.length(); i < BLOCK_LEN_BYTE; i++){
-      plain_string = plain_string + "0";
-    }
-  }
-  
-  for(int i = 0; i < plain_string.length(); i++){
-    plain[i] = (byte) plain_string.charAt(i);
-  }
-  
-  Serial.println("Plain string after padding: " + plain_string);
-  Serial.print("Plain string length after padding: ");
-  Serial.println(plain_string.length());
 }
 
 void send_session_id_get_request(){
@@ -170,47 +233,26 @@ void send_session_id_get_request(){
   }
 }
 
-// for testing we use the plain block
-String cypher_block_to_string(){
-  String s = "";
-  
-  Serial.println("Start block processing");
-
-  for(int i = 0; i < BLOCK_LEN_BYTE; i++){
-    
-    char c = '0';
-    byte b = plain[i];
-    if(b != 0x00){
-      c = (char) cipher[i];
-    }
-
-    s = s + String(c);
-  }
-  
-  Serial.println("Done block processing");
-  
-  return s;
-}
-
 void send_hb_value_put_request(){
   
-  Serial.println("connecting to send PUT request...");
+  int argument_len = TOTAL_BLOCK_LEN_BYTE;
   
-  String put_request_argument = cypher_block_to_string();
+  char put_request_argument[TOTAL_BLOCK_LEN_BYTE];
   
-  Serial.print("PUT request argument: ");
-  Serial.println(put_request_argument);
+  for(int i = 0; i < TOTAL_BLOCK_LEN_BYTE; i++){
+    put_request_argument[i] = (char) cipher[i];
+  }
   
-  int argument_len = put_request_argument.length();
-  
-  char put_request_argument_array[argument_len + 1];
-  put_request_argument.toCharArray(put_request_argument_array, argument_len + 1);
+  printCharArrayHexValues(put_request_argument, argument_len, "PUT request argument");
   
   int encoded_put_request_argument_length = base64_enc_len(argument_len);
+  char encoded_put_request_argument_array[encoded_put_request_argument_length];
+  base64_encode(encoded_put_request_argument_array, put_request_argument, argument_len);
   
-  char encoded_put_request_argument_array[encoded_put_request_argument_length + 1];
+  String encoded_put_request_argument_dirty = String(encoded_put_request_argument_array);
   
-  base64_encode(encoded_put_request_argument_array, put_request_argument_array, argument_len + 1);
+  Serial.println("Encoded PUT request argument (dirty): " + encoded_put_request_argument_dirty);
+  printCharArrayHexValues(encoded_put_request_argument_array, encoded_put_request_argument_length, "Encoded PUT request argument (dirty)");
   
   // cleanup for URL
   for(int i = 0; i < encoded_put_request_argument_length; i++){
@@ -225,6 +267,10 @@ void send_hb_value_put_request(){
   Serial.print(URL_FRIENDLY_CHAR);
   Serial.print(" to be URL friendly): ");
   Serial.println(encoded_put_request_argument);
+  
+  printCharArrayHexValues(encoded_put_request_argument_array, encoded_put_request_argument_length, "Encoded PUT request argument");
+  
+  Serial.println("connecting to send PUT request");
   
   // if you get a connection, report back via serial:
   if (client.connect(server, 8080)) {
@@ -253,8 +299,9 @@ void send_hb_value_put_request(){
 // blocks = 
 void encrypt_plain()
 {
-  int bits = 256;
-  int blocks = 4;
+  int bits = KEY_ARRAY_LEN_BIT;
+  int blocks = BLOCKS;
+  
   long t0 = micros();
   byte succ = aes.set_key(key, bits);
   long t1 = micros() - t0;
@@ -269,7 +316,11 @@ void encrypt_plain()
   
   t0 = micros();
   
-  succ = aes.encrypt(plain, cipher);
+  if(blocks > 1){
+    succ = aes.cbc_encrypt(plain, cipher, blocks, iv);
+  }else{
+    succ = aes.encrypt(plain, cipher);
+  }
   
   t1 = micros() - t0;
 
@@ -280,10 +331,51 @@ void encrypt_plain()
   Serial.println("us");
   
   t0 = micros();
-  succ = aes.decrypt(cipher, check);
+  
+  init_iv();
+  
+  if(blocks > 1){
+    succ = aes.cbc_decrypt(cipher, check, blocks, iv);
+  }else{
+    succ = aes.decrypt(cipher, check);
+  }
+  
   t1 = micros () - t0 ;
   Serial.print ("decrypt ") ; Serial.print ((int) succ) ;
   Serial.print (" took ") ; Serial.print (t1) ; Serial.println ("us") ;
+}
+
+void decrypt_cipher(){
+  int bits = KEY_ARRAY_LEN_BIT;
+  int blocks = BLOCKS;
+  
+  long t0 = micros();
+  byte succ = aes.set_key(key, bits);
+  long t1 = micros() - t0;
+  
+  Serial.print("set_key ");
+  Serial.print(bits);
+  Serial.print(" ->");
+  Serial.print((int) succ);
+  Serial.print(" took ");
+  Serial.print(t1);
+  Serial.println("us");
+  
+  t0 = micros();
+  
+  if(blocks > 1){
+    succ = aes.cbc_decrypt(cipher, check, blocks, iv);
+  }else{
+    succ = aes.decrypt(cipher, check);
+  }
+  
+  t1 = micros () - t0 ;
+  
+  Serial.print ("decrypt ") ;
+  Serial.print ((int) succ) ;
+  Serial.print (" took ") ;
+  Serial.print (t1) ;
+  Serial.println ("us") ;
 }
 
 String read_http_response_body(){
@@ -336,6 +428,23 @@ void stop_eth_client(){
   }
 }
 
+void init_eth_shield(){
+
+  Serial.println("ETH Shield init start");
+  
+  // start the Ethernet connection:
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Failed to configure Ethernet using DHCP");
+    // no point in carrying on, so do nothing forevermore:
+    while(true);
+  }
+  
+  Serial.println("ETH Shield init OK");
+  
+  // give the Ethernet shield a second to initialize:
+  delay(1000);
+}
+
 void setup ()
 {
   Serial.begin(57600);
@@ -343,8 +452,10 @@ void setup ()
   init_eth_shield();
   
   init_key();
+  init_iv();
   
   print_key();
+  print_iv();
   
   clear_plain();
   
@@ -369,5 +480,6 @@ void loop ()
   while(true);
 
 }
+
 
 
