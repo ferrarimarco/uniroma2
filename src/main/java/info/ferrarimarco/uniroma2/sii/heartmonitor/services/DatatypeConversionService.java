@@ -65,7 +65,7 @@ public class DatatypeConversionService {
 			bytes[i] = (byte) input.charAt(i);
 		}
 
-		logger.info("Explicit cast to byte[]. Input: {}, result: {}", input, bytesToHex(bytes, true));
+		logger.debug("Explicit cast to byte[]. Input: {}, result: {}", input, bytesToHex(bytes, true));
 
 		return bytes;
 	}
@@ -78,7 +78,7 @@ public class DatatypeConversionService {
 			result.append((char) bytes[i]);
 		}
 
-		logger.info("Explicit cast to String. Input: {}, result: {}", bytesToHex(bytes, true), result.toString());
+		logger.debug("Explicit cast to String. Input: {}, result: {}", bytesToHex(bytes, true), result.toString());
 
 		return result.toString();
 	}
