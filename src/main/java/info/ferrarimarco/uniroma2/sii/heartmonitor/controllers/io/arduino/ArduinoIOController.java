@@ -3,6 +3,7 @@ package info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.io.arduino;
 import java.security.InvalidKeyException;
 
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.services.DatatypeConversionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.ArduinoIOEncryptionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.HeartbeatSessionEncryptionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.HeartbeatSessionPersistenceService;
@@ -24,7 +25,7 @@ public class ArduinoIOController {
 	
 	private Logger logger = LoggerFactory.getLogger(ArduinoIOController.class);
 	
-	private static final String SLASH_CHAR_PLACEHOLDER = ";"; 
+	private static final String SLASH_CHAR_PLACEHOLDER = "-"; 
 	
 	@Autowired
 	private HeartbeatSessionPersistenceService persistenceService;
@@ -34,6 +35,9 @@ public class ArduinoIOController {
 	
 	@Autowired
 	private ArduinoIOEncryptionService arduinoIOEncryptionService;
+	
+	@Autowired
+	private DatatypeConversionService datatypeConversionService;
 	
 	public ArduinoIOController() {
 		super();
@@ -51,7 +55,7 @@ public class ArduinoIOController {
 		persistenceService.storeHeartbeatSession(session);
 		persistenceService.close();
 		
-		String response = encryptionService.encryptHeartbeatSessionId(session.getShortId());
+		String response = encryptionService.encryptHeartbeatSessionId(session.getId());
 		
 		logger.info("GET uniqueSessionId response: {}", response);
 		
@@ -66,18 +70,18 @@ public class ArduinoIOController {
 			input = input.replace(SLASH_CHAR_PLACEHOLDER, "/");
 		}
 		
-		logger.info("Received storeHeartbeatValue PUT request with input: {}", input);
+		byte[] encodedInputBytes = datatypeConversionService.explicitCastStringToByteArrayConversion(input);
 		
-		byte[] decodedInputBytes = Base64.decodeBase64(input);
+		logger.info("Received storeHeartbeatValue PUT request with input: ASCII: {} , HEX: {}", input, datatypeConversionService.bytesToHex(encodedInputBytes, true));
 		
-		String decodedInput = new String(decodedInputBytes);
+		byte[] decodedInputBytes = Base64.decodeBase64(encodedInputBytes);
 		
-		logger.info("Decoded input: {}", decodedInput);
-		
+		logger.info("Decoded storeHeartbeatValue PUT request with input: HEX: {}", datatypeConversionService.bytesToHex(decodedInputBytes, true));
+
 		String decryptedInput = null;
 		
 		try {
-			decryptedInput = arduinoIOEncryptionService.decrypt(decodedInput);
+			decryptedInput = arduinoIOEncryptionService.decrypt(decodedInputBytes);
 		} catch (InvalidKeyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -13,8 +13,6 @@ public class HeartbeatSession {
 	@Id
 	private String id;
 	
-	private String shortId;
-	
 	private DateTime time;
 	
 	private String userId;
@@ -40,15 +38,6 @@ public class HeartbeatSession {
 
 	public void setId(String id) {
 		this.id = id;
-		setShortId(id.substring(0, 12));
-	}
-	
-	public String getShortId() {
-		return shortId;
-	}
-
-	public void setShortId(String shortId) {
-		this.shortId = shortId;
 	}
 
 	public DateTime getTime() {

@@ -10,6 +10,4 @@ public interface HeartbeatSessionRepository extends MongoRepository<HeartbeatSes
 	
 	public Iterable<HeartbeatSession> findByUserId(String userId);
 	
-	public Iterable<HeartbeatSession> findByShortId(String shortSessionId);
-	
 }

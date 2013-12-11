@@ -22,16 +22,20 @@ public class ArduinoIOEncryptionService {
 	@Autowired
 	private RawEncryptionService encryptionService;
 
+	private String key = "SECRET_KEY_OF_32SECRET_KEY_OF_32";
+	private String iv = "MY_IV_VECTOR_CBC";
+	private byte[] keyBytes;
+	private byte[] ivBytes;
+	
 	@PostConstruct
 	private void init(){
+		keyBytes = datatypeConversionService.explicitCastStringToByteArrayConversion(key);
+		ivBytes = datatypeConversionService.explicitCastStringToByteArrayConversion(iv);
 		
-		String key = "SECRET_KEY_OF_32SECRET_KEY_OF_32";
-		
-		byte[] keyBytes = datatypeConversionService.explicitCastStringToByteArrayConversion(key);
-		
-		encryptionService.setKey(keyBytes);
+		encryptionService.setKeyAndIV(keyBytes, ivBytes);
 		
 		logger.info("Encryption key for Arduino IO: ASCII: {} , HEX: {}", key, datatypeConversionService.bytesToHex(keyBytes, true));
+		logger.info("IV for Arduino IO: ASCII: {} , HEX: {}", iv, datatypeConversionService.bytesToHex(ivBytes, true));
 	}
 
 	public String encrypt(String input) throws InvalidKeyException{
@@ -40,8 +44,6 @@ public class ArduinoIOEncryptionService {
 
 		byte[] output = encryptionService.encrypt(stringBytes);
 		String result = datatypeConversionService.explicitCastByteArrayToStringConversion(output);
-		
-		
 		
 		return result;
 	}
@@ -53,7 +55,21 @@ public class ArduinoIOEncryptionService {
 		byte[] output = encryptionService.decrypt(stringBytes);
 		String result = datatypeConversionService.explicitCastByteArrayToStringConversion(output);
 		
-		logger.info("Decryption. ASCII: {} , HEX: {}", result, datatypeConversionService.bytesToHex(output, true));
+		logger.info("Decryption of ASCII: {} , HEX: {}", input, datatypeConversionService.bytesToHex(stringBytes, true));
+		logger.info("Decryption result ASCII: {} , HEX: {}", result, datatypeConversionService.bytesToHex(output, true));
+		
+		result = result.trim();
+		
+		return result;
+	}
+	
+	public String decrypt(byte[] input) throws InvalidKeyException{
+
+		byte[] output = encryptionService.decrypt(input);
+		String result = datatypeConversionService.explicitCastByteArrayToStringConversion(output);
+		
+		logger.info("Decryption of ASCII: {} , HEX: {}", input, datatypeConversionService.bytesToHex(input, true));
+		logger.info("Decryption result ASCII: {} , HEX: {}", result, datatypeConversionService.bytesToHex(output, true));
 		
 		return result;
 	}
