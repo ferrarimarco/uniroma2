@@ -5,7 +5,8 @@ public enum CryptographyConstant {
 	
 	CRYPTO_PROVIDER("BC"),
 	CRYPTO_ALGORITHM("AES"),
-	CRYPTO_ALGORITHM_STRENGTH("256");
+	CRYPTO_ALGORITHM_STRENGTH("256"),
+	CIPHER_INSTANCE_TRANSFORMATION("AES/CBC/ZeroBytePadding");
 	
 	private String value;
 	
