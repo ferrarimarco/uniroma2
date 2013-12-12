@@ -78,18 +78,55 @@ public class ArduinoIOController {
 		
 		logger.info("Decoded storeHeartbeatValue PUT request with input: HEX: {}", datatypeConversionService.bytesToHex(decodedInputBytes, true));
 
-		String decryptedInput = null;
+		byte[] decryptedInput = null;
 		
 		try {
-			decryptedInput = arduinoIOEncryptionService.decrypt(decodedInputBytes);
+			decryptedInput = arduinoIOEncryptionService.decryptToBytes(decodedInputBytes);
 		} catch (InvalidKeyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			logger.info("Error {} ({}) while decrypting input {}: {}", e.getMessage(), e.getClass().toString(), input, ExceptionUtils.getStackTrace(e));
 		}
 		
-		logger.info("Input decrypted as: {}", decryptedInput);
+		logger.info("Input decrypted as: {}", datatypeConversionService.bytesToHex(decryptedInput, true));
 		
+		byte[] sessionIdBytes = new byte[24];
+		byte[] bpmBytes = new byte[2];
+		byte[] ibiBytes = new byte[2];
+		byte[] seqNumberBytes = new byte[2];
+		
+		int currentPosition = 0;
+		
+		for(int i = 0; i < sessionIdBytes.length; i++) {
+			sessionIdBytes[i] = decryptedInput[i];
+		}
+		
+		currentPosition = sessionIdBytes.length;
+		
+		for(int i = 0; i < bpmBytes.length; i++) {
+			bpmBytes[i] = decryptedInput[i + currentPosition];
+		}
+		
+		currentPosition += bpmBytes.length;
+		
+		for(int i = 0; i < ibiBytes.length; i++) {
+			ibiBytes[i] = decryptedInput[i + currentPosition];
+		}
+		
+		currentPosition += ibiBytes.length;
+		
+		for(int i = 0; i < seqNumberBytes.length; i++) {
+			seqNumberBytes[i] = decryptedInput[i + currentPosition];
+		}
+		
+		String sessionId = datatypeConversionService.explicitCastByteArrayToStringConversion(sessionIdBytes);
+		int bpm = datatypeConversionService.bytesToInt(bpmBytes[0], bpmBytes[1]);
+		int ibi = datatypeConversionService.bytesToInt(ibiBytes[0], ibiBytes[1]);
+		int seqNumber = datatypeConversionService.bytesToInt(seqNumberBytes[0], seqNumberBytes[1]);
+		
+		logger.info("Session ID: " + sessionId);
+		logger.info("BPM: {}, IBI: {}", bpm, ibi);
+		logger.info("Seq number: {}", seqNumber);
 	}
 	
 	public void endSession(String sessionId){

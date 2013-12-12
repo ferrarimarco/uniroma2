@@ -73,4 +73,15 @@ public class ArduinoIOEncryptionService {
 		
 		return result;
 	}
+	
+	public byte[] decryptToBytes(byte[] input) throws InvalidKeyException{
+
+		byte[] output = encryptionService.decrypt(input);
+		String result = datatypeConversionService.explicitCastByteArrayToStringConversion(output);
+		
+		logger.info("Decryption of ASCII: {} , HEX: {}", input, datatypeConversionService.bytesToHex(input, true));
+		logger.info("Decryption result ASCII: {} , HEX: {}", result, datatypeConversionService.bytesToHex(output, true));
+		
+		return output;
+	}
 }
