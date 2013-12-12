@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSessionValue;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.HeartbeatSessionPersistenceService;
 
 @Controller
@@ -26,9 +27,9 @@ public class HeartbeatSessionPersistenceServiceTest {
 		
 		HeartbeatSession session = new HeartbeatSession("TestUser");
 		
-		session.addValue(10);
-		session.addValue(20);
-		session.addValue(54);
+		session.addValue(10, 29);
+		session.addValue(20, 45);
+		session.addValue(54, 56);
 		
 		persistenceService.storeHeartbeatSession(session);
 		
@@ -38,8 +39,8 @@ public class HeartbeatSessionPersistenceServiceTest {
 		
 		for(HeartbeatSession s : sessions){
 			response.append(s.toString() + ": ");
-			for(Integer i : s.getValues()){
-				response.append(i + " ");
+			for(HeartbeatSessionValue h : s.getValues()){
+				response.append(h.toString() + " ");
 			}
 			
 			response.append(System.lineSeparator());

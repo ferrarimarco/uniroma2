@@ -17,19 +17,23 @@ public class HeartbeatSession {
 	
 	private String userId;
 	
-	private List<Integer> values;
+	private List<HeartbeatSessionValue> values;
 	
 	private boolean isClosed;
+	
+	private short expectedSequenceNumber;
 
 	public HeartbeatSession(String userId) {
 		this.userId = userId;
 		this.time = new DateTime();
+		this.expectedSequenceNumber = 0;
 		
-		values = new ArrayList<Integer>();
+		values = new ArrayList<>();
 	}
 
-	public void addValue(Integer value){
-		values.add(value);
+	public void addValue(Integer bpm, Integer ibi){
+		values.add(new HeartbeatSessionValue(bpm, ibi));
+		expectedSequenceNumber++;
 	}
 	
 	public String getId() {
@@ -56,12 +60,11 @@ public class HeartbeatSession {
 		this.userId = userId;
 	}
 
-	public List<Integer> getValues() {
+	public List<HeartbeatSessionValue> getValues() {
 		return values;
 	}
-
 	
-	public void setValues(List<Integer> values) {
+	public void setValues(List<HeartbeatSessionValue> values) {
 		this.values = values;
 	}
 
@@ -71,6 +74,10 @@ public class HeartbeatSession {
 
 	public void setClosed(boolean isClosed) {
 		this.isClosed = isClosed;
+	}
+
+	public short getExpectedSequenceNumber() {
+		return expectedSequenceNumber;
 	}
 
 	@Override

@@ -2,6 +2,8 @@ package info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.io.arduino;
 
 import java.security.InvalidKeyException;
 
+import info.ferrarimarco.uniroma2.sii.heartmonitor.exceptions.InvalidSequenceNumberException;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.exceptions.SessionNotAvailableException;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.DatatypeConversionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.ArduinoIOEncryptionService;
@@ -25,7 +27,7 @@ public class ArduinoIOController {
 	
 	private Logger logger = LoggerFactory.getLogger(ArduinoIOController.class);
 	
-	private static final String SLASH_CHAR_PLACEHOLDER = "-"; 
+	private static final String SLASH_CHAR_PLACEHOLDER = "-";
 	
 	@Autowired
 	private HeartbeatSessionPersistenceService persistenceService;
@@ -41,6 +43,19 @@ public class ArduinoIOController {
 	
 	public ArduinoIOController() {
 		super();
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/current_user", method = RequestMethod.GET)
+	public String getCurrentUser() {
+		
+		logger.info("Received GET username request");
+		
+		String response = "marco";
+		
+		logger.info("GET username response: {}", response);
+		
+		return response;
 	}
 
 	@ResponseBody
@@ -64,7 +79,7 @@ public class ArduinoIOController {
 	
 	@ResponseBody
 	@RequestMapping(value="/session/store/{input}", method = RequestMethod.PUT)
-	public void storeHeartbeatValue(@PathVariable String input){
+	public void storeHeartbeatValue(@PathVariable String input) throws SessionNotAvailableException, InvalidSequenceNumberException{
 		
 		if(input.contains(SLASH_CHAR_PLACEHOLDER)){
 			input = input.replace(SLASH_CHAR_PLACEHOLDER, "/");
@@ -122,11 +137,31 @@ public class ArduinoIOController {
 		String sessionId = datatypeConversionService.explicitCastByteArrayToStringConversion(sessionIdBytes);
 		int bpm = datatypeConversionService.bytesToInt(bpmBytes[0], bpmBytes[1]);
 		int ibi = datatypeConversionService.bytesToInt(ibiBytes[0], ibiBytes[1]);
-		int seqNumber = datatypeConversionService.bytesToInt(seqNumberBytes[0], seqNumberBytes[1]);
+		int receivedSequenceNumber = datatypeConversionService.bytesToInt(seqNumberBytes[0], seqNumberBytes[1]);
 		
 		logger.info("Session ID: " + sessionId);
 		logger.info("BPM: {}, IBI: {}", bpm, ibi);
-		logger.info("Seq number: {}", seqNumber);
+		logger.info("Seq number: {}", receivedSequenceNumber);
+		
+		persistenceService.open(false);
+		HeartbeatSession session = persistenceService.readHeartbeatSession(sessionId);
+		
+		if(session == null) {
+			throw new SessionNotAvailableException("The session " + sessionId + "has not been initialized");
+		}
+		
+		int expectedSequenceNumber = session.getExpectedSequenceNumber();
+		
+		if(receivedSequenceNumber != expectedSequenceNumber) {
+			throw new InvalidSequenceNumberException("Sequence number for session " + sessionId + " is not valid. Received: " + receivedSequenceNumber + " . Expected: " + expectedSequenceNumber);
+		}
+		
+		session.addValue(bpm, ibi);
+		
+		logger.info("Storing BPM: {}, IBI: {} in session {}", bpm, ibi, sessionId);
+		
+		persistenceService.storeHeartbeatSession(session);
+		persistenceService.close();
 	}
 	
 	public void endSession(String sessionId){
