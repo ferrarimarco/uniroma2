@@ -4,7 +4,9 @@ import java.security.InvalidKeyException;
 
 import info.ferrarimarco.uniroma2.sii.heartmonitor.exceptions.InvalidSequenceNumberException;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.exceptions.SessionNotAvailableException;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.model.ArduinoResponseCodes;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.model.SessionParameter;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.DatatypeConversionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.ArduinoIOEncryptionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.HeartbeatSessionEncryptionService;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.zkoss.zk.ui.Sessions;
 
 @Controller
 @RequestMapping(value="/arduino")
@@ -51,6 +54,8 @@ public class ArduinoIOController {
 		
 		logger.info("Received GET username request");
 		
+		String userName = (String) Sessions.getCurrent().getAttribute(SessionParameter.USER_NAME.toString());
+		
 		String response = "marco";
 		
 		logger.info("GET username response: {}", response);
@@ -79,7 +84,7 @@ public class ArduinoIOController {
 	
 	@ResponseBody
 	@RequestMapping(value="/session/store/{input}", method = RequestMethod.PUT)
-	public void storeHeartbeatValue(@PathVariable String input) throws SessionNotAvailableException, InvalidSequenceNumberException{
+	public String storeHeartbeatValue(@PathVariable String input) throws SessionNotAvailableException, InvalidSequenceNumberException{
 		
 		if(input.contains(SLASH_CHAR_PLACEHOLDER)){
 			input = input.replace(SLASH_CHAR_PLACEHOLDER, "/");
@@ -98,8 +103,6 @@ public class ArduinoIOController {
 		try {
 			decryptedInput = arduinoIOEncryptionService.decryptToBytes(decodedInputBytes);
 		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			logger.info("Error {} ({}) while decrypting input {}: {}", e.getMessage(), e.getClass().toString(), input, ExceptionUtils.getStackTrace(e));
 		}
 		
@@ -146,22 +149,36 @@ public class ArduinoIOController {
 		persistenceService.open(false);
 		HeartbeatSession session = persistenceService.readHeartbeatSession(sessionId);
 		
+		int response = ArduinoResponseCodes.OK.ordinal();
+		
 		if(session == null) {
-			throw new SessionNotAvailableException("The session " + sessionId + "has not been initialized");
+			logger.error("The session " + sessionId + "has not been initialized");
+			
+			response = ArduinoResponseCodes.SESSION_NOT_INITIALIZED.ordinal();
 		}
 		
-		int expectedSequenceNumber = session.getExpectedSequenceNumber();
-		
-		if(receivedSequenceNumber != expectedSequenceNumber) {
-			throw new InvalidSequenceNumberException("Sequence number for session " + sessionId + " is not valid. Received: " + receivedSequenceNumber + " . Expected: " + expectedSequenceNumber);
+		if(session != null && !session.isClosed()) {
+			if (session.isClosed()) {
+				response = ArduinoResponseCodes.SESSION_CLOSED.ordinal();
+			}else {
+				int expectedSequenceNumber = session.getExpectedSequenceNumber();
+				
+				if (receivedSequenceNumber != expectedSequenceNumber) {
+					response = ArduinoResponseCodes.INVALID_SEQ_NUMBER.ordinal();
+				}
+				
+				if(response != ArduinoResponseCodes.INVALID_SEQ_NUMBER.ordinal()){
+					session.addValue(bpm, ibi);
+					logger.info("Storing BPM: {}, IBI: {} in session {}", bpm, ibi, sessionId);
+					persistenceService.storeHeartbeatSession(session);
+					persistenceService.close();
+					
+					response = ArduinoResponseCodes.OK.ordinal();					
+				}
+			}
 		}
 		
-		session.addValue(bpm, ibi);
-		
-		logger.info("Storing BPM: {}, IBI: {} in session {}", bpm, ibi, sessionId);
-		
-		persistenceService.storeHeartbeatSession(session);
-		persistenceService.close();
+		return Integer.toString(response);
 	}
 	
 	public void endSession(String sessionId){
