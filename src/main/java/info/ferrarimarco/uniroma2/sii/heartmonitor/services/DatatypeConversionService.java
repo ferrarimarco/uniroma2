@@ -1,5 +1,6 @@
 package info.ferrarimarco.uniroma2.sii.heartmonitor.services;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,4 +84,9 @@ public class DatatypeConversionService {
 		return result.toString();
 	}
 
+	public int bytesToInt(byte high, byte low) {
+	    ByteBuffer bb = ByteBuffer.wrap(new byte[] {high, low});
+	    return bb.getShort(); // Implicitly widened to an int per JVM spec.
+	}
+	
 }
