@@ -9,10 +9,11 @@ public class CurrentHeartbeatSessionPerisistenceService extends AbstractPersiste
 	
 	public CurrentHeartbeatSessionPerisistenceService() {
 		super();
+		open();
 	}
 	
 	@Override
-	public void open() {
+	protected void open() {
 		repository = context.getBean(CurrentHeartbeatSessionRepository.class);
 	}
 

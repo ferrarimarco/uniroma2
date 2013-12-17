@@ -82,7 +82,6 @@ public class ArduinoIOController {
 		
 		HeartbeatSession session = new HeartbeatSession(userId);
 		
-		persistenceService.open();
 		persistenceService.storeHeartbeatSession(session);
 		persistenceService.close();
 		
@@ -157,7 +156,6 @@ public class ArduinoIOController {
 		logger.info("BPM: {}, IBI: {}", bpm, ibi);
 		logger.info("Seq number: {}", receivedSequenceNumber);
 		
-		persistenceService.open();
 		HeartbeatSession session = persistenceService.readHeartbeatSession(sessionId);
 		
 		int response = ArduinoResponseCodes.OK.ordinal();

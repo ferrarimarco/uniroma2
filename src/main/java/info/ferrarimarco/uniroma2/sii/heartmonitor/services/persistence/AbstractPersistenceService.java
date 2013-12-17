@@ -13,7 +13,7 @@ public abstract class AbstractPersistenceService {
 		context = new AnnotationConfigApplicationContext(SpringMongoConfig.class);
 	}
 	
-	public abstract void open();
+	protected abstract void open();
 	
 	public void close(){
 		context.close();

@@ -14,10 +14,11 @@ public class UserPersistenceService extends AbstractPersistenceService{
 	
 	public UserPersistenceService() {
 		super();
+		open();
 	}
 	
 	@Override
-	public void open(){
+	protected void open(){
 		repository = context.getBean(UserRepository.class);
 	}
 	
