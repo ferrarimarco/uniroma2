@@ -29,8 +29,14 @@ public class UserPersistenceService {
 		context.close();
 	}
 	
-	public void storeUser(User user){
-		repository.save(user);
+	public User storeUser(User user){
+		return repository.save(user);
+	}
+	
+	public User storeUser(String userName, String hashedPassword) {
+		User newUser = new User(userName, hashedPassword);
+		
+		return storeUser(newUser);
 	}
 	
 	public User readUser(String userName){

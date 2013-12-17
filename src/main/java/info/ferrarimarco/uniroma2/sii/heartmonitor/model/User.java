@@ -10,6 +10,13 @@ public class User {
 	private String userName;
 	private String hashedPassword;
 	
+	public User() {}
+	
+	public User(String userName, String hashedPassword) {
+		this.userName = userName;
+		this.hashedPassword = hashedPassword;
+	}
+
 	@Override
 	public String toString() {
 		return "User [userName=" + userName + ", hashedPassword=" + hashedPassword + "]";

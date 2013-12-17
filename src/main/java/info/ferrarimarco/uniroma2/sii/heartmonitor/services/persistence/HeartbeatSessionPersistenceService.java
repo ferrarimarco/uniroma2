@@ -29,8 +29,8 @@ public class HeartbeatSessionPersistenceService {
 		context.close();
 	}
 	
-	public void storeHeartbeatSession(HeartbeatSession session){
-		repository.save(session);
+	public HeartbeatSession storeHeartbeatSession(HeartbeatSession session){
+		return repository.save(session);
 	}
 	
 	public HeartbeatSession readHeartbeatSession(String sessionId){

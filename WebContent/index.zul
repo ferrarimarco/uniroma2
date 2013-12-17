@@ -1,4 +1,8 @@
 <?page title="SII Heartbeat Monitor"?>
+
+<!-- protect page by the authentication init  -->
+<?init class="info.ferrarimarco.uniroma2.sii.heartmonitor.zk.initiators.AuthenticationInitiator"?>
+
 <window title="SII Heartbeat Monitor" border="normal" width="100%" height="100%">
 	
 </window>

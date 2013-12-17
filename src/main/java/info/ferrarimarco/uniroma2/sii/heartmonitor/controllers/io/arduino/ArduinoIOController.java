@@ -6,8 +6,9 @@ import info.ferrarimarco.uniroma2.sii.heartmonitor.exceptions.InvalidSequenceNum
 import info.ferrarimarco.uniroma2.sii.heartmonitor.exceptions.SessionNotAvailableException;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.ArduinoResponseCodes;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
-import info.ferrarimarco.uniroma2.sii.heartmonitor.model.SessionParameter;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.model.User;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.DatatypeConversionService;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.services.authentication.UserAuthenticationService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.ArduinoIOEncryptionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.HeartbeatSessionEncryptionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.HeartbeatSessionPersistenceService;
@@ -44,6 +45,9 @@ public class ArduinoIOController {
 	@Autowired
 	private DatatypeConversionService datatypeConversionService;
 	
+	@Autowired
+	private UserAuthenticationService userAuthenticationService;
+	
 	public ArduinoIOController() {
 		super();
 	}
@@ -54,9 +58,11 @@ public class ArduinoIOController {
 		
 		logger.info("Received GET username request");
 		
-		String userName = (String) Sessions.getCurrent().getAttribute(SessionParameter.USER_NAME.toString());
+		User currentUser = userAuthenticationService.getAuthenticatedUser();
 		
-		String response = "marco";
+		String userName = (String) Sessions.getCurrent().getAttribute(currentUser.getUserName());
+		
+		String response = userName;
 		
 		logger.info("GET username response: {}", response);
 		
