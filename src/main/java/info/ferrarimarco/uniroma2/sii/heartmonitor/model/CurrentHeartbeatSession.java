@@ -11,6 +11,13 @@ public class CurrentHeartbeatSession {
 	
 	private String currentSessionId;
 
+	public CurrentHeartbeatSession() {}
+	
+	public CurrentHeartbeatSession(String userName, String currentSessionId) {
+		this.userName = userName;
+		this.currentSessionId = currentSessionId;
+	}
+
 	public String getUserName() {
 		return userName;
 	}
