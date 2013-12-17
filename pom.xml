@@ -115,6 +115,7 @@
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>${testng-version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- Logging dependencies -->
