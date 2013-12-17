@@ -2,49 +2,59 @@ package info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistance.test;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
-import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSessionValue;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.HeartbeatSessionPersistenceService;
 
-@Controller
-@RequestMapping("/mongo-db")
-public class HeartbeatSessionPersistenceServiceTest {
+@ContextConfiguration("classpath:spring-context.xml")
+public class HeartbeatSessionPersistenceServiceTest extends AbstractTestNGSpringContextTests {
+	
+	private static Logger logger = LoggerFactory.getLogger(HeartbeatSessionPersistenceServiceTest.class);
+	
+	@Autowired
+    private ApplicationContext applicationContext;
 	
 	@Autowired
 	private HeartbeatSessionPersistenceService persistenceService;
 	
-	@RequestMapping(value="write_read_test_values", method = RequestMethod.GET)
-	@ResponseBody
-	public String writeAndReadTestValues() {
+	@BeforeClass
+	protected void setup() {
+		Assert.assertNotNull(applicationContext);
+		
+		persistenceService.deleteAll();
+		writeAndReadTestValues();
+	}
+	
+	private void writeAndReadTestValues() {
 
-		HeartbeatSession session = new HeartbeatSession("TestUser");
+		HeartbeatSession session = new HeartbeatSession("marco");
 		
 		session.addValue(10, 29);
 		session.addValue(20, 45);
 		session.addValue(54, 56);
 		
 		persistenceService.storeHeartbeatSession(session);
+	}
+	
+	@Test
+	public void readAllSessionsTest() {
+		logger.info("List of all recorded sessions");
 		
 		List<HeartbeatSession> sessions = persistenceService.readAllHeartbeatSessions();
 		
-		StringBuilder response = new StringBuilder();
+		logger.info("Sessions count: {}", sessions.size());
 		
-		for(HeartbeatSession s : sessions){
-			response.append(s.toString() + ": ");
-			for(HeartbeatSessionValue h : s.getValues()){
-				response.append(h.toString() + " ");
-			}
-			
-			response.append(System.lineSeparator());
+		for(HeartbeatSession session : sessions) {
+			logger.info(session.toString());
 		}
-		
-		return response.toString();
 	}
-
 }
