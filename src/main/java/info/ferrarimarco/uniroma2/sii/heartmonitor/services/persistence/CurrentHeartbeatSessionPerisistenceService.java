@@ -21,6 +21,14 @@ public class CurrentHeartbeatSessionPerisistenceService extends AbstractPersiste
 		repository.deleteAll();
 	}
 	
+	public void deleteCurrentHeartbeatSession(CurrentHeartbeatSession currentHeartbeatSession) {
+		repository.delete(currentHeartbeatSession);
+	}
+	
+	public void deleteCurrentHeartbeatSession(String currentHeartbeatSessionId) {
+		repository.delete(currentHeartbeatSessionId);
+	}
+	
 	public CurrentHeartbeatSession readCurrentHeartbeatSession(String userName) {
 		return repository.findByUserName(userName);
 	}
