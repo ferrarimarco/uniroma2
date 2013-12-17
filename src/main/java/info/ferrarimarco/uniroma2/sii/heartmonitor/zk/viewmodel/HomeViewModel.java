@@ -1,6 +1,5 @@
 package info.ferrarimarco.uniroma2.sii.heartmonitor.zk.viewmodel;
 
-import info.ferrarimarco.uniroma2.sii.heartmonitor.dao.repositories.CurrentHeartbeatSessionRepository;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.CurrentHeartbeatSession;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.User;
