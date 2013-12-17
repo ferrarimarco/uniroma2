@@ -24,7 +24,7 @@ public class ShaHashingService implements HashingService {
 		Security.addProvider(new BouncyCastleProvider());
 		
 		try {
-			mda = MessageDigest.getInstance(CryptographyConstant.SECURE_HASH_ALGORITHM.toString(), CryptographyConstant.CRYPTO_PROVIDER.toString());
+			mda = MessageDigest.getInstance(CryptographyConstant.SECURE_HASH_ALGORITHM.getStringValue(), CryptographyConstant.CRYPTO_PROVIDER.getStringValue());
 		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
 			logger.error("ShaHashingService failed initialisation - {}: {}", e.toString(), ExceptionUtils.getStackTrace(e));
 		}
