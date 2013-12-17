@@ -23,7 +23,7 @@ public class HeartbeatSessionPersistenceServiceTest {
 	@ResponseBody
 	public String writeAndReadTestValues() {
 
-		persistenceService.open(true);
+		persistenceService.open();
 		
 		HeartbeatSession session = new HeartbeatSession("TestUser");
 		

@@ -15,7 +15,7 @@ public class HeartbeatSession {
 	
 	private DateTime time;
 	
-	private String userId;
+	private String userName;
 	
 	private List<HeartbeatSessionValue> values;
 	
@@ -23,17 +23,21 @@ public class HeartbeatSession {
 	
 	private short expectedSequenceNumber;
 
-	public HeartbeatSession(String userId) {
-		this.userId = userId;
+	public HeartbeatSession(String userName) {
+		this.userName = userName;
 		this.time = new DateTime();
 		this.expectedSequenceNumber = 0;
 		
 		values = new ArrayList<>();
 	}
 
-	public void addValue(Integer bpm, Integer ibi){
-		values.add(new HeartbeatSessionValue(bpm, ibi));
+	public HeartbeatSessionValue addValue(Integer bpm, Integer ibi){
+		HeartbeatSessionValue value = new HeartbeatSessionValue(bpm, ibi);
+		
+		values.add(value);
 		expectedSequenceNumber++;
+		
+		return value;
 	}
 	
 	public String getId() {
@@ -52,12 +56,12 @@ public class HeartbeatSession {
 		this.time = time;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 	public List<HeartbeatSessionValue> getValues() {
@@ -82,6 +86,6 @@ public class HeartbeatSession {
 
 	@Override
 	public String toString() {
-		return "HeartbeatSession [id=" + id + ", time=" + time + ", userId=" + userId + "]";
+		return "HeartbeatSession [id=" + id + ", time=" + time + ", userId=" + userName + "]";
 	}
 }

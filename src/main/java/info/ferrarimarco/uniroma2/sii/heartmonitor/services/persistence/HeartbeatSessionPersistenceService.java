@@ -1,32 +1,30 @@
 package info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence;
 
-import java.util.List;
-
-import info.ferrarimarco.uniroma2.sii.heartmonitor.dao.config.SpringMongoConfig;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.dao.repositories.HeartbeatSessionRepository;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.AbstractApplicationContext;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 @Service
-public class HeartbeatSessionPersistenceService {
-
-	private AbstractApplicationContext context;
+public class HeartbeatSessionPersistenceService extends AbstractPersistenceService {
+	
 	private HeartbeatSessionRepository repository;
 	
-	public void open(boolean deleteAllExisting){
-		context = new AnnotationConfigApplicationContext(SpringMongoConfig.class);
-        repository = context.getBean(HeartbeatSessionRepository.class);
+	public HeartbeatSessionPersistenceService() {
+		super();
+	}
 
-        if(deleteAllExisting){
-        	repository.deleteAll();
-        }
+	@Override
+	public void open(){
+        repository = context.getBean(HeartbeatSessionRepository.class);
 	}
 	
-	public void close(){
-		context.close();
+	@Override
+	public void deleteAll() {
+		repository.deleteAll();
 	}
 	
 	public HeartbeatSession storeHeartbeatSession(HeartbeatSession session){
@@ -35,6 +33,19 @@ public class HeartbeatSessionPersistenceService {
 	
 	public HeartbeatSession readHeartbeatSession(String sessionId){
 		return repository.findById(sessionId);
+	}
+	
+	public List<HeartbeatSession> readHeartbeatSessions(String userName){
+		
+		Iterable<HeartbeatSession> sessions = repository.findByUserName(userName);
+		
+		List<HeartbeatSession> result = new ArrayList<>();
+		
+		for(HeartbeatSession session : sessions) {
+			result.add(session);
+		}
+		
+		return result;
 	}
 	
 	public List<HeartbeatSession> readAllHeartbeatSessions(){

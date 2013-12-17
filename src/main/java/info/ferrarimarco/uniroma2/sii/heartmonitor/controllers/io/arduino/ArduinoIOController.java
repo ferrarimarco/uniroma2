@@ -6,8 +6,10 @@ import info.ferrarimarco.uniroma2.sii.heartmonitor.exceptions.InvalidSequenceNum
 import info.ferrarimarco.uniroma2.sii.heartmonitor.exceptions.SessionNotAvailableException;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.ArduinoResponseCodes;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSessionValue;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.User;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.DatatypeConversionService;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.services.SessionManagerService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.authentication.UserAuthenticationService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.ArduinoIOEncryptionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.HeartbeatSessionEncryptionService;
@@ -48,6 +50,9 @@ public class ArduinoIOController {
 	@Autowired
 	private UserAuthenticationService userAuthenticationService;
 	
+	@Autowired
+	private SessionManagerService sessionManagerService;
+	
 	public ArduinoIOController() {
 		super();
 	}
@@ -58,7 +63,7 @@ public class ArduinoIOController {
 		
 		logger.info("Received GET username request");
 		
-		User currentUser = userAuthenticationService.getAuthenticatedUser();
+		User currentUser = sessionManagerService.getAuthenticatedUser();
 		
 		String userName = (String) Sessions.getCurrent().getAttribute(currentUser.getUserName());
 		
@@ -77,7 +82,7 @@ public class ArduinoIOController {
 		
 		HeartbeatSession session = new HeartbeatSession(userId);
 		
-		persistenceService.open(true);
+		persistenceService.open();
 		persistenceService.storeHeartbeatSession(session);
 		persistenceService.close();
 		
@@ -152,7 +157,7 @@ public class ArduinoIOController {
 		logger.info("BPM: {}, IBI: {}", bpm, ibi);
 		logger.info("Seq number: {}", receivedSequenceNumber);
 		
-		persistenceService.open(false);
+		persistenceService.open();
 		HeartbeatSession session = persistenceService.readHeartbeatSession(sessionId);
 		
 		int response = ArduinoResponseCodes.OK.ordinal();
@@ -174,12 +179,14 @@ public class ArduinoIOController {
 				}
 				
 				if(response != ArduinoResponseCodes.INVALID_SEQ_NUMBER.ordinal()){
-					session.addValue(bpm, ibi);
-					logger.info("Storing BPM: {}, IBI: {} in session {}", bpm, ibi, sessionId);
+					HeartbeatSessionValue latestValue = session.addValue(bpm, ibi);
+					logger.info("Storing {} in session {}", latestValue.toString(), sessionId);
 					persistenceService.storeHeartbeatSession(session);
 					persistenceService.close();
 					
-					response = ArduinoResponseCodes.OK.ordinal();					
+					response = ArduinoResponseCodes.OK.ordinal();
+					
+					//sessionManagerService.saveLatestHeartbeatSessionValue(latestValue);					
 				}
 			}
 		}

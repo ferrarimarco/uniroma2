@@ -1,7 +1,7 @@
 package info.ferrarimarco.uniroma2.sii.heartmonitor.zk.initiators;
 
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.User;
-import info.ferrarimarco.uniroma2.sii.heartmonitor.services.authentication.UserAuthenticationService;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.services.SessionManagerService;
 
 import java.util.Map;
 
@@ -13,12 +13,12 @@ import org.zkoss.zk.ui.util.Initiator;
 public class AuthenticationInitiator implements Initiator {
 	
 	@WireVariable
-	private UserAuthenticationService userAuthenticationService;
+	private SessionManagerService sessionManagerService;
 	
 	@Override
 	public void doInit(Page page, Map<String, Object> args) throws Exception {
 		
-        User currentUser = userAuthenticationService.getAuthenticatedUser();
+        User currentUser = sessionManagerService.getAuthenticatedUser();
         
         if(currentUser == null){
             Executions.sendRedirect("/index.zul");

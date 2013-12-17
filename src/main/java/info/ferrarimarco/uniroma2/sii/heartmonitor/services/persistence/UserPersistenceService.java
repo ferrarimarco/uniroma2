@@ -1,48 +1,43 @@
 package info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence;
 
-import info.ferrarimarco.uniroma2.sii.heartmonitor.dao.config.SpringMongoConfig;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.dao.repositories.UserRepository;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.User;
 
 import java.util.List;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserPersistenceService {
-	
+public class UserPersistenceService extends AbstractPersistenceService{
+
 	private AbstractApplicationContext context;
 	private UserRepository repository;
-	
-	public void open(boolean deleteAllExisting){
-		context = new AnnotationConfigApplicationContext(SpringMongoConfig.class);
-        repository = context.getBean(UserRepository.class);
 
-        if(deleteAllExisting){
-        	repository.deleteAll();
-        }
+	@Override
+	public void open(){
+		repository = context.getBean(UserRepository.class);
 	}
 	
-	public void close(){
-		context.close();
+	@Override
+	public void deleteAll() {
+		repository.deleteAll();		
 	}
-	
+
 	public User storeUser(User user){
 		return repository.save(user);
 	}
-	
+
 	public User storeUser(String userName, String hashedPassword) {
 		User newUser = new User(userName, hashedPassword);
-		
+
 		return storeUser(newUser);
 	}
-	
+
 	public User readUser(String userName){
 		return repository.findByUserName(userName);
 	}
-	
+
 	public List<User> readAllUsers(){
 		return repository.findAll();
 	}

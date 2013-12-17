@@ -1,7 +1,7 @@
 package info.ferrarimarco.uniroma2.sii.heartmonitor.services.authentication;
 
-import info.ferrarimarco.uniroma2.sii.heartmonitor.model.SessionParameter;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.User;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.services.SessionManagerService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.hashing.HashingService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.UserPersistenceService;
 
@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zkoss.zk.ui.Sessions;
 
 @Service
 public class UserAuthenticationService {
@@ -23,22 +22,22 @@ public class UserAuthenticationService {
 	@Autowired
 	private HashingService hashingService;
 	
-	public User getAuthenticatedUser() {
-		return (User) Sessions.getCurrent().getAttribute(SessionParameter.CURRENT_USER.toString());
-	}
+	@Autowired
+	private SessionManagerService sessionManagerService;
 	
-	public User login(String userName, String password) {
+	
+	public User login(String userName, String password, boolean storeUserInSession) {
 		User result = authenticate(userName, password);
 		
-		if(result != null) {
-			Sessions.getCurrent().setAttribute(SessionParameter.CURRENT_USER.toString(), result);		
+		if(result != null && storeUserInSession) {
+			sessionManagerService.saveCurrentAuthenticatedUser(result);
 		}
 		
 		return result;
 	}
 	
 	public void logout() {
-		Sessions.getCurrent().removeAttribute(SessionParameter.CURRENT_USER.toString());		
+		sessionManagerService.removeCurrentAuthenticatedUser();
 	}
 	
 	public User authenticate(String userName, String password) {
@@ -46,7 +45,7 @@ public class UserAuthenticationService {
 		User result = null;
 		
 		if(userName != null && !userName.trim().isEmpty() && password != null && !password.trim().isEmpty()) {
-			userPersistenceService.open(false);
+			userPersistenceService.open();
 			
 			User user = userPersistenceService.readUser(userName);
 			
