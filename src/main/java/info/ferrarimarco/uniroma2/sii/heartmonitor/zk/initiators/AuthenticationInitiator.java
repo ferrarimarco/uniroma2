@@ -7,9 +7,12 @@ import java.util.Map;
 
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
+import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Initiator;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class AuthenticationInitiator implements Initiator {
 	
 	@WireVariable
@@ -17,6 +20,8 @@ public class AuthenticationInitiator implements Initiator {
 	
 	@Override
 	public void doInit(Page page, Map<String, Object> args) throws Exception {
+		
+		Selectors.wireVariables(page, this, Selectors.newVariableResolvers(getClass(), null));
 		
         User currentUser = sessionManagerService.getAuthenticatedUser();
         
