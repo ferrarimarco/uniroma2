@@ -14,7 +14,6 @@ public class UserPersistenceService extends AbstractPersistenceService{
 	
 	public UserPersistenceService() {
 		super();
-		open();
 	}
 	
 	@Override

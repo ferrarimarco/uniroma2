@@ -15,7 +15,6 @@ public class HeartbeatSessionPersistenceService extends AbstractPersistenceServi
 	
 	public HeartbeatSessionPersistenceService() {
 		super();
-		open();
 	}
 
 	@Override

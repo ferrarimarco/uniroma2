@@ -9,7 +9,6 @@ public class CurrentHeartbeatSessionPerisistenceService extends AbstractPersiste
 	
 	public CurrentHeartbeatSessionPerisistenceService() {
 		super();
-		open();
 	}
 	
 	@Override
