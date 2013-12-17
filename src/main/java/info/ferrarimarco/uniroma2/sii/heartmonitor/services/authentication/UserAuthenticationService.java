@@ -1,11 +1,11 @@
 package info.ferrarimarco.uniroma2.sii.heartmonitor.services.authentication;
 
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.User;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.services.DatatypeConversionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.SessionManagerService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.hashing.HashingService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.UserPersistenceService;
 
-import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +24,9 @@ public class UserAuthenticationService {
 	
 	@Autowired
 	private SessionManagerService sessionManagerService;
+	
+	@Autowired
+	private DatatypeConversionService datatypeConversionService;
 	
 	
 	public User login(String userName, String password, boolean storeUserInSession) {
@@ -45,8 +48,6 @@ public class UserAuthenticationService {
 		User result = null;
 		
 		if(userName != null && !userName.trim().isEmpty() && password != null && !password.trim().isEmpty()) {
-			userPersistenceService.open();
-			
 			User user = userPersistenceService.readUser(userName);
 			
 			userPersistenceService.close();
@@ -55,9 +56,7 @@ public class UserAuthenticationService {
 			
 			if(user != null) {
 				byte[] hashedPassword = hashingService.hash(password);
-				char[] hexEncodedHash = Hex.encodeHex(hashedPassword);
-				
-				String hexEncodedHashedPassword = new String(hexEncodedHash);
+				String hexEncodedHashedPassword = datatypeConversionService.bytesToHexString(hashedPassword);
 				
 				boolean isMatchingPassword = user.getHashedPassword().equals(hexEncodedHashedPassword);
 				
