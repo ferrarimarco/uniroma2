@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,12 @@ public class DatatypeConversionService {
 
 	private final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
+	public String bytesToHexString(byte[] bytes) {
+		char[] hexEncodedHash = Hex.encodeHex(bytes);
+		
+		return new String(hexEncodedHash);
+	}
+	
 	public String bytesToHex(byte[] bytes, boolean isSpacedHexValues) {
 
 		char[] hexChars = new char[bytes.length * 2];
