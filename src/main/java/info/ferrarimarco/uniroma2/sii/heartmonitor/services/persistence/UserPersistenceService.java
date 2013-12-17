@@ -5,13 +5,11 @@ import info.ferrarimarco.uniroma2.sii.heartmonitor.model.User;
 
 import java.util.List;
 
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserPersistenceService extends AbstractPersistenceService{
 
-	private AbstractApplicationContext context;
 	private UserRepository repository;
 	
 	public UserPersistenceService() {
