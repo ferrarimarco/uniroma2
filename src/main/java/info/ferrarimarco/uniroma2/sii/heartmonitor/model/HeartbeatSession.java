@@ -71,6 +71,10 @@ public class HeartbeatSession {
 	public void setValues(List<HeartbeatSessionValue> values) {
 		this.values = values;
 	}
+	
+	public int getValuesCount() {
+		return values.size();
+	}
 
 	public boolean isClosed() {
 		return isClosed;
