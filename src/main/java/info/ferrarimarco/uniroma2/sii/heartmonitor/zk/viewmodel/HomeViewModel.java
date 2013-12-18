@@ -38,6 +38,9 @@ public class HomeViewModel {
 	
 	private ListModelList<HeartbeatSession> storedSessions;
 	
+	private String currentBPM;
+	private String currentIBI;
+	
 	public HomeViewModel() {
 		setCurrentStatus("Select a session or start a new session");
 	}
