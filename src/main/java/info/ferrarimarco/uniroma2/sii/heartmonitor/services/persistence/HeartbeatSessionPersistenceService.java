@@ -3,7 +3,6 @@ package info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.dao.repositories.HeartbeatSessionRepository;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -36,16 +35,7 @@ public class HeartbeatSessionPersistenceService extends AbstractPersistenceServi
 	}
 	
 	public List<HeartbeatSession> readHeartbeatSessions(String userName){
-		
-		Iterable<HeartbeatSession> sessions = repository.findByUserName(userName);
-		
-		List<HeartbeatSession> result = new ArrayList<>();
-		
-		for(HeartbeatSession session : sessions) {
-			result.add(session);
-		}
-		
-		return result;
+		return repository.findByUserName(userName);
 	}
 	
 	public List<HeartbeatSession> readAllHeartbeatSessions(){
