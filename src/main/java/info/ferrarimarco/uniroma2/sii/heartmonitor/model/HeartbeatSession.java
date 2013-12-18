@@ -32,7 +32,7 @@ public class HeartbeatSession {
 	}
 
 	public HeartbeatSessionValue addValue(Integer bpm, Integer ibi){
-		HeartbeatSessionValue value = new HeartbeatSessionValue(bpm, ibi);
+		HeartbeatSessionValue value = new HeartbeatSessionValue(id, bpm, ibi);
 		
 		values.add(value);
 		expectedSequenceNumber++;
