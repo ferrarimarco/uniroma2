@@ -2,42 +2,49 @@
 <!-- protect page by the authentication init  -->
 <?init class="info.ferrarimarco.uniroma2.sii.heartmonitor.zk.initiators.AuthenticationInitiator"?>
 <zk>
-	<window title="SII Heartbeat Monitor" border="normal" width="100%" height="100%" apply="org.zkoss.bind.BindComposer"
+	<window border="none" width="100%" height="100%" apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('info.ferrarimarco.uniroma2.sii.heartmonitor.zk.viewmodel.HomeViewModel')">
 		<borderlayout vflex="1" hflex="1">
-			<north>
-				<image src="/images/header_banner.jpg" height="301px" />
+			<north vflex="min" hflex="1">
+				<vbox align="center" vflex="min" hflex="1">
+					<image src="/images/header_banner.jpg" height="301px" />
+				</vbox>
 			</north>
-			<center>
+			<center hflex="1">
 				<label value="You are using: ${desktop.webApp.version}" />
 			</center>
-			<west>
-				<vbox>
-					<button label="Start new session" />
-					<button label="End session" />
-					
-					<listbox autopaging="true" model="@load(vm.storedSessions)">
+			<west width="30%">
+				<vbox vflex="1" hflex="1" align="center">
+					<hbox align="center" hflex="1">
+						<button label="Start new session" hflex="3" />
+						<button label="End session" hflex="1"/>
+					</hbox>
+					<listbox autopaging="true" model="@load(vm.storedSessions)" vflex="1" height="100%">
 						<listhead sizable="true">
 							<listheader label="Session Date" sort="auto(time)" />
 							<listheader label="Recorded Values" />
 						</listhead>
 						<template name="model">
 							<listitem>
-								<listcell label="@load(each.time)" />
+								<listcell label="@load(each.time)"/>
 								<listcell label="@load(each.valuesCount)" />
 							</listitem>
 						</template>
 						<listfoot>
 							<listfooter>
-								<button label="Replay selected session" />
-								<button label="Delete selected session" />
+								<hbox>
+									<button label="Replay selected session" />
+									<button label="Delete selected session" />
+								</hbox>
 							</listfooter>
 						</listfoot>
 					</listbox>
 				</vbox>
 			</west>
 			<south>
-				Current status: <label value="@load(vm.currentStatus)" />
+				<hbox>
+					Current status: <label value="@load(vm.currentStatus)" />
+				</hbox>
 			</south>
 		</borderlayout>
 	</window>
