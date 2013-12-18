@@ -16,6 +16,7 @@ import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.ArduinoIO
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.encryption.HeartbeatSessionEncryptionService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.CurrentHeartbeatSessionPerisistenceService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.HeartbeatSessionPersistenceService;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.HeartbeatSessionValuePersistenceService;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.UserPersistenceService;
 
 import org.apache.commons.codec.binary.Base64;
@@ -39,6 +40,9 @@ public class ArduinoIOController {
 
 	@Autowired
 	private HeartbeatSessionPersistenceService heartbeatSessionPersistenceService;
+	
+	@Autowired
+	private HeartbeatSessionValuePersistenceService heartbeatSessionValuePersistenceService;
 
 	@Autowired
 	private CurrentHeartbeatSessionPerisistenceService currentHeartbeatSessionPerisistenceService;
@@ -179,7 +183,7 @@ public class ArduinoIOController {
 			response = ArduinoResponseCodes.SESSION_NOT_INITIALIZED.ordinal();
 		}
 
-		if(session != null && !session.isClosed()) {
+		if(session != null) {
 			if (session.isClosed()) {
 				response = ArduinoResponseCodes.SESSION_CLOSED.ordinal();
 			}else {
@@ -193,7 +197,8 @@ public class ArduinoIOController {
 					HeartbeatSessionValue latestValue = session.addValue(bpm, ibi);
 					logger.info("Storing {} in session {}", latestValue.toString(), sessionId);
 					heartbeatSessionPersistenceService.storeHeartbeatSession(session);
-					heartbeatSessionPersistenceService.close();
+					
+					heartbeatSessionValuePersistenceService.storeHeartbeatSessionValue(latestValue);
 
 					response = ArduinoResponseCodes.OK.ordinal();
 				}
