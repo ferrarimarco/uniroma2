@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import info.ferrarimarco.uniroma2.sii.heartmonitor.dao.repositories.CurrentHeartbeatSessionRepository;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.CurrentHeartbeatSession;
 
+@Service
 public class CurrentHeartbeatSessionPerisistenceService extends AbstractPersistenceService{
 
 	private Logger logger = LoggerFactory.getLogger(CurrentHeartbeatSessionPerisistenceService.class);
