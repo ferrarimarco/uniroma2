@@ -11,7 +11,8 @@ import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.Heartbea
 
 import java.util.List;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import net.sf.jasperreports.engine.type.IncrementTypeEnum;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.bind.annotation.AfterCompose;
@@ -25,6 +26,7 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Timer;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -59,6 +61,11 @@ public class HomeViewModel {
 	private int currentBPM;
 	private int currentIBI;
 	
+	private static final int sleepTimeIncrement = 100;
+	private static final int maxSleepTime = 700;
+	
+	private boolean disableStartSessionButton;
+	
 	private static final String idleStatusLabel = "Select a session to replay or start a new session";
 	
 	public HomeViewModel() {
@@ -76,6 +83,11 @@ public class HomeViewModel {
 		
 		refreshHeartbeatSessionList();
 		clearHeartbeatSession();
+		initInterfaceFlags();
+	}
+	
+	private void initInterfaceFlags() {
+		disableStartSessionButton = false;
 	}
 	
 	private void clearHeartbeatSession() {
@@ -84,8 +96,8 @@ public class HomeViewModel {
 		currentBPM = 0;
 		currentIBI = 0;
 		
-		currentHeartbeatSessionPerisistenceService.deleteAll();
-		heartbeatSessionValuePersistenceService.deleteAll();
+		currentHeartbeatSessionPerisistenceService.deleteCurrentHeartbeatSession(currentUser.getUserName());
+		heartbeatSessionValuePersistenceService.deleteAllHeartbeatSessionValuesByReferringUserName(currentUser.getUserName());
 	}
 	
 	private void updateHeartbeatSessionValues(HeartbeatSessionValue heartbeatSessionValue) {
@@ -96,9 +108,11 @@ public class HomeViewModel {
 		// Increase sequence number to read the next value
 		sequenceNumber = heartbeatSessionValue.getSequenceNumber() + 1;
 	}
-
-	private void refreshHeartbeatSessionList() {
-		List<HeartbeatSession> sessionsForCurrentUser = heartbeatSessionPersistenceService.readHeartbeatSessions(currentUser.getUserName());
+	
+	@Command
+	@NotifyChange("storedSessions")
+	public void refreshHeartbeatSessionList() {
+		List<HeartbeatSession> sessionsForCurrentUser = heartbeatSessionPersistenceService.readClosedHeartbeatSessions(currentUser.getUserName());
 		
 		storedSessions = new ListModelList<>(sessionsForCurrentUser);
 	}
@@ -109,26 +123,27 @@ public class HomeViewModel {
 	}
 	
 	@Command
-	@NotifyChange({"currentBPM","currentIBI","currentStatus","isSessionStarted"})
+	@NotifyChange({"currentBPM","currentIBI","currentStatus","disableStartSessionButton","disableStopSessionButton","disableSessionGrid","disableReplaySessionButton","disableDeleteSessionButton"})
 	public void startNewSession() {
 		
 		clearHeartbeatSession();
 		
+		disableStartSessionButton = true;
+		
 		HeartbeatSession session = new HeartbeatSession(currentUser.getUserName());
-		
 		session = heartbeatSessionPersistenceService.storeHeartbeatSession(session);
-		
 		currentSessionId = session.getId();
 		
 		currentHeartbeatSessionPerisistenceService.storeCurrentHeartbeatSession(new CurrentHeartbeatSession(currentUser.getUserName(), currentSessionId));
 		
 		currentStatus = "Recording a new session. ID: " + currentSessionId;
 		
+		timer.setDelay(sleepTimeIncrement);
 		timer.start();
 	}
 	
 	@Command
-	@NotifyChange({"currentBPM","currentIBI","currentStatus","isSessionStarted"})
+	@NotifyChange({"currentBPM","currentIBI","currentStatus","storedSessions","disableStartSessionButton","disableStopSessionButton","disableSessionGrid","disableReplaySessionButton","disableDeleteSessionButton"})
 	public void stopCurrentSession() {
 		
 		CurrentHeartbeatSession currentHeartbeatSession = currentHeartbeatSessionPerisistenceService.readCurrentHeartbeatSession(currentUser.getUserName());
@@ -138,34 +153,50 @@ public class HomeViewModel {
 		}else { // the interface is currently recording a new session
 			HeartbeatSession session = heartbeatSessionPersistenceService.readHeartbeatSession(currentHeartbeatSession.getCurrentSessionId());
 			session.setClosed(true);
-			
-			heartbeatSessionPersistenceService.storeHeartbeatSession(session);
-			currentHeartbeatSessionPerisistenceService.deleteCurrentHeartbeatSession(currentHeartbeatSession);
-			heartbeatSessionValuePersistenceService.deleteAll();
-			
-			clearHeartbeatSession();
+			session = heartbeatSessionPersistenceService.storeHeartbeatSession(session);
+
+			logger.info("Closed session {}", session.getId());
+			refreshHeartbeatSessionList();
 		}
+		
+		clearHeartbeatSession();
+		
+		disableStartSessionButton = false;
 		
 		currentStatus = idleStatusLabel;
 		timer.stop();
 	}
 	
 	@Command
-	@NotifyChange({"currentBPM","currentIBI"})
+	@NotifyChange({"currentBPM","currentIBI","currentStatus","storedSessions","disableStartSessionButton","disableStopSessionButton","disableSessionGrid","disableReplaySessionButton","disableDeleteSessionButton"})
 	public void heartbeatValuesFlowDisplay() {
 		
-		HeartbeatSessionValue latestValue = null;
-		while (latestValue == null) {
-			latestValue = heartbeatSessionValuePersistenceService.readHeartbeatSessionValue(sequenceNumber);
+		if (timer.isRunning()) {
+			
+			logger.info("Looking for value {} of session {}", sequenceNumber, currentSessionId);
+			
+			HeartbeatSessionValue latestValue = heartbeatSessionValuePersistenceService.readHeartbeatSessionValue(currentSessionId + sequenceNumber);
+			if (latestValue != null) {
+				timer.setDelay(latestValue.getIbi());
+				heartbeatSessionValuePersistenceService.deleteHeartbeatSessionValue(currentSessionId + sequenceNumber);
+				updateHeartbeatSessionValues(latestValue);
+			} else {
+				logger.info("Value {} of session {} not found", sequenceNumber, currentSessionId);
+				
+				timer.setDelay(timer.getDelay() + sleepTimeIncrement);
 
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				logger.error("Error: {}. Stacktrace: {}", e.getMessage(), ExceptionUtils.getStackTrace(e));
+				if (timer.getDelay() > maxSleepTime) {
+					timer.stop();
+					logger.info("Stopped timer (delay too high)", sequenceNumber, currentSessionId);
+				}
+			}
+			
+			// this checks if the timer has been stopped because sleep time is too high
+			if (!timer.isRunning() && timer.getDelay() > maxSleepTime) {
+				stopCurrentSession();
+				Messagebox.show("Current session has been stopped since no values have been received in " + maxSleepTime + " ms", "Session closed", 0, Messagebox.INFORMATION);
 			}
 		}
-		heartbeatSessionValuePersistenceService.deleteHeartbeatSessionValue(sequenceNumber);
-		updateHeartbeatSessionValues(latestValue);
 	}
 
 	public String getCurrentStatus() {
@@ -213,5 +244,33 @@ public class HomeViewModel {
 	
 	public void setStoredSessions(ListModelList<HeartbeatSession> storedSessions) {
 		this.storedSessions = storedSessions;
+	}
+
+	
+	public boolean isDisableStartSessionButton() {
+		return disableStartSessionButton;
+	}
+
+	
+	public void setDisableStartSessionButton(boolean disableStartSessionButton) {
+		this.disableStartSessionButton = disableStartSessionButton;
+	}
+
+	
+	public boolean isDisableStopSessionButton() {
+		return !isDisableStartSessionButton();
+	}
+
+	
+	public boolean isDisableReplaySessionButton() {
+		return isDisableStartSessionButton();
+	}
+	
+	public boolean isDisableDeleteSessionButton() {
+		return isDisableStartSessionButton();
+	}
+	
+	public boolean isDisableSessionGrid() {
+		return isDisableStartSessionButton();
 	}
 }

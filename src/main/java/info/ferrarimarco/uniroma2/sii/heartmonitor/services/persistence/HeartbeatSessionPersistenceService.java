@@ -38,6 +38,10 @@ public class HeartbeatSessionPersistenceService extends AbstractPersistenceServi
 		return repository.findByUserName(userName);
 	}
 	
+	public List<HeartbeatSession> readClosedHeartbeatSessions(String userName){
+		return repository.findByUserNameAndIsClosedTrue(userName);
+	}
+	
 	public List<HeartbeatSession> readAllHeartbeatSessions(){
 		return repository.findAll();
 	}

@@ -66,6 +66,5 @@ public class CurrentHeartbeatSessionPerisistenceService extends AbstractPersiste
 	
 	public List<CurrentHeartbeatSession> readAllCurrentHeartbeatSessions(){
 		return repository.findAll();
-	}
-	
+	}	
 }

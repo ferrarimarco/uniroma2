@@ -32,12 +32,18 @@ public class HeartbeatSession {
 	}
 
 	public HeartbeatSessionValue addValue(Integer bpm, Integer ibi){
-		HeartbeatSessionValue value = new HeartbeatSessionValue(expectedSequenceNumber, id, bpm, ibi);
+		HeartbeatSessionValue value = new HeartbeatSessionValue(expectedSequenceNumber, id, userName, bpm, ibi);
 		
 		values.add(value);
 		expectedSequenceNumber++;
 		
 		return value;
+	}
+	
+	public void incrementSequenceNumber(int expectedSequenceNumber) {
+		while(this.expectedSequenceNumber < expectedSequenceNumber) {
+			this.expectedSequenceNumber++;
+		}
 	}
 	
 	public String getId() {
@@ -87,9 +93,9 @@ public class HeartbeatSession {
 	public short getExpectedSequenceNumber() {
 		return expectedSequenceNumber;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "HeartbeatSession [id=" + id + ", time=" + time + ", userId=" + userName + "]";
+		return "HeartbeatSession [id=" + id + ", time=" + time + ", userId=" + userName + ", getValuesCount()=" + getValuesCount() + "]";
 	}
 }

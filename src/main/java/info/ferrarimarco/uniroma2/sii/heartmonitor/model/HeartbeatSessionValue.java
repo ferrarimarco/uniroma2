@@ -5,20 +5,25 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "latestValues")
 public class HeartbeatSessionValue {
+
+	@Id
+	private String id;
 	
 	private String referringSessionId;
-	
-	@Id
+	private String referringUserName;
 	private int sequenceNumber;
-	
 	private int bpm;
 	private int ibi;
 	
 	public HeartbeatSessionValue() {}
 	
-	public HeartbeatSessionValue(int sequenceNumber, String referringSessionId, int bpm, int ibi) {
+	public HeartbeatSessionValue(int sequenceNumber, String referringSessionId, String referringUserName, int bpm, int ibi) {
 		this.referringSessionId = referringSessionId;
-		this.setSequenceNumber(sequenceNumber);
+		this.referringUserName = referringUserName;
+		this.sequenceNumber = sequenceNumber;
+		
+		id = referringSessionId + sequenceNumber;
+		
 		this.bpm = bpm;
 		this.ibi = ibi;
 	}
@@ -55,8 +60,16 @@ public class HeartbeatSessionValue {
 		this.sequenceNumber = sequenceNumber;
 	}
 
+	public String getReferringUserName() {
+		return referringUserName;
+	}
+
+	public void setReferringUserName(String referringUserName) {
+		this.referringUserName = referringUserName;
+	}
+
 	@Override
 	public String toString() {
-		return "HeartbeatSessionValue [getBpm()=" + getBpm() + ", getIbi()=" + getIbi() + "]";
+		return "HeartbeatSessionValue [id=" + id + ", referringSessionId=" + referringSessionId + ", referringUserName=" + referringUserName + ", sequenceNumber=" + sequenceNumber + ", bpm=" + bpm + ", ibi=" + ibi + "]";
 	}
 }

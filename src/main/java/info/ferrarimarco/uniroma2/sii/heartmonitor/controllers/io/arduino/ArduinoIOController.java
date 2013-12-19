@@ -2,10 +2,11 @@ package info.ferrarimarco.uniroma2.sii.heartmonitor.controllers.io.arduino;
 
 import java.security.InvalidKeyException;
 
-import info.ferrarimarco.uniroma2.sii.heartmonitor.HeartMonitorConstant;
+import javax.annotation.PostConstruct;
+
 import info.ferrarimarco.uniroma2.sii.heartmonitor.exceptions.InvalidSequenceNumberException;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.exceptions.SessionNotAvailableException;
-import info.ferrarimarco.uniroma2.sii.heartmonitor.model.ArduinoResponseCodes;
+import info.ferrarimarco.uniroma2.sii.heartmonitor.model.ArduinoResponseCode;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.CurrentHeartbeatSession;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSession;
 import info.ferrarimarco.uniroma2.sii.heartmonitor.model.HeartbeatSessionValue;
@@ -65,6 +66,12 @@ public class ArduinoIOController {
 	public ArduinoIOController() {
 		super();
 	}
+	
+	@PostConstruct
+	public void init() {
+		currentHeartbeatSessionPerisistenceService.deleteAll();
+		heartbeatSessionValuePersistenceService.deleteAll();
+	}
 
 	@ResponseBody
 	@RequestMapping(value="/current_user", method = RequestMethod.GET)
@@ -74,20 +81,19 @@ public class ArduinoIOController {
 
 		CurrentHeartbeatSession currentHeartbeatSession = currentHeartbeatSessionPerisistenceService.readCurrentHeartbeatSession();
 		
-		if(currentHeartbeatSession == null) {
-			String userName = HeartMonitorConstant.GENERIC_USERNAME.getStringValue();
-
-			logger.error("No session found. Creating a session with a generic username ({})", userName);
-
-			HeartbeatSession session = new HeartbeatSession(userName);
-			session = heartbeatSessionPersistenceService.storeHeartbeatSession(session);
-
-			currentHeartbeatSession = new CurrentHeartbeatSession(userName, session.getId());
-		}
+		String response = null;
 		
-		User currentUser = userPersistenceService.readUser(currentHeartbeatSession.getUserName());
-
-		String response = currentUser.getUserName();
+		if(currentHeartbeatSession != null) {
+			User currentUser = userPersistenceService.readUser(currentHeartbeatSession.getUserName());
+			response = currentUser.getUserName();
+			
+			logger.info("Found a session waiting for values. User: {}", response);
+			
+		}else { // no session has been initialized
+			ArduinoResponseCode arduinoResponseCode = ArduinoResponseCode.USER_NOT_AVAILABLE;
+			logger.info("Cannot find a session waiting for values. Response: {} ({})", arduinoResponseCode.ordinal(), arduinoResponseCode.toString());
+			response = Integer.toString(arduinoResponseCode.ordinal());
+		}
 
 		logger.info("GET current_user response: {}", response);
 
@@ -102,8 +108,19 @@ public class ArduinoIOController {
 
 		CurrentHeartbeatSession currentHeartbeatSession = currentHeartbeatSessionPerisistenceService.readCurrentHeartbeatSession();
 
-		String response = encryptionService.encryptHeartbeatSessionId(currentHeartbeatSession.getCurrentSessionId());
-
+		String response = null;
+		
+		if(currentHeartbeatSession != null) {
+			response = encryptionService.encryptHeartbeatSessionId(currentHeartbeatSession.getCurrentSessionId());
+			
+			logger.info("Found a session waiting for values. User: {}, Session:{}", currentHeartbeatSession.getUserName(), response);
+			
+		}else { // no session has been initialized
+			ArduinoResponseCode arduinoResponseCode = ArduinoResponseCode.SESSION_NOT_INITIALIZED;
+			logger.info("Cannot find a session waiting for values. Response: {} ({})", arduinoResponseCode.ordinal(), arduinoResponseCode.toString());
+			response = Integer.toString(arduinoResponseCode.ordinal());
+		}
+		
 		logger.info("GET uniqueSessionId response: {}", response);
 
 		return response;
@@ -175,40 +192,37 @@ public class ArduinoIOController {
 
 		HeartbeatSession session = heartbeatSessionPersistenceService.readHeartbeatSession(sessionId);
 
-		int response = ArduinoResponseCodes.OK.ordinal();
+		int response = ArduinoResponseCode.OK.ordinal();
 
 		if(session == null) {
-			logger.error("The session " + sessionId + "has not been initialized");
+			logger.error("Session " + sessionId + " has not been initialized");
 
-			response = ArduinoResponseCodes.SESSION_NOT_INITIALIZED.ordinal();
-		}
-
-		if(session != null) {
+			response = ArduinoResponseCode.SESSION_NOT_INITIALIZED.ordinal();
+		} else {
 			if (session.isClosed()) {
-				response = ArduinoResponseCodes.SESSION_CLOSED.ordinal();
-			}else {
-				int expectedSequenceNumber = session.getExpectedSequenceNumber();
-
-				if (receivedSequenceNumber != expectedSequenceNumber) {
-					response = ArduinoResponseCodes.INVALID_SEQ_NUMBER.ordinal();
+				logger.error("Session " + sessionId + " is closed");
+				response = ArduinoResponseCode.SESSION_CLOSED.ordinal();
+			} else {
+				if (receivedSequenceNumber != session.getExpectedSequenceNumber()) {
+					logger.error("Expected seq_number for Session " + sessionId + " is {}, received {}", session.getExpectedSequenceNumber(), receivedSequenceNumber);
+					if (receivedSequenceNumber >= session.getExpectedSequenceNumber()) { // we lost some packets
+						session.incrementSequenceNumber(receivedSequenceNumber);
+						
+						logger.info("Updated expected seq_number to {}", receivedSequenceNumber);
+					} else { // someone is trying a replay attack!
+						response = ArduinoResponseCode.INVALID_SEQ_NUMBER.ordinal();
+					}
 				}
-
-				if(response != ArduinoResponseCodes.INVALID_SEQ_NUMBER.ordinal()){
+				
+				if(response == ArduinoResponseCode.OK.ordinal()){ // everything went good so far
 					HeartbeatSessionValue latestValue = session.addValue(bpm, ibi);
 					logger.info("Storing {} in session {}", latestValue.toString(), sessionId);
 					heartbeatSessionPersistenceService.storeHeartbeatSession(session);
-					
 					heartbeatSessionValuePersistenceService.storeHeartbeatSessionValue(latestValue);
-
-					response = ArduinoResponseCodes.OK.ordinal();
 				}
 			}
 		}
 
 		return Integer.toString(response);
-	}
-
-	public void endSession(String sessionId){
-
 	}
 }
