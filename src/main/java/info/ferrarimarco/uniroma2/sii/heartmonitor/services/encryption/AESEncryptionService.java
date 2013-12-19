@@ -106,7 +106,7 @@ public class AESEncryptionService implements RawEncryptionService {
 
 			dIn.close();
 		} catch(EOFException e) {
-			logger.error("{} while decrypting {}: {}", e.toString(), e.toString(), ExceptionUtils.getStackTrace(e));
+			logger.error("{} while decrypting {}", e.toString(), e.toString());
 		} catch (Exception e) {
 			logger.error("AES failed encryption - {}: {}", e.toString(), ExceptionUtils.getStackTrace(e));
 		}
