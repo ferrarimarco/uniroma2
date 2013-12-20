@@ -11,8 +11,6 @@ import info.ferrarimarco.uniroma2.sii.heartmonitor.services.persistence.Heartbea
 
 import java.util.List;
 
-import net.sf.jasperreports.engine.type.IncrementTypeEnum;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.bind.annotation.AfterCompose;
