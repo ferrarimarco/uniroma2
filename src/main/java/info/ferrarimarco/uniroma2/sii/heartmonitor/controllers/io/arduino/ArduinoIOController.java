@@ -62,10 +62,6 @@ public class ArduinoIOController {
 
 	@Autowired
 	private SessionManagerService sessionManagerService;
-
-	public ArduinoIOController() {
-		super();
-	}
 	
 	@PostConstruct
 	public void init() {
@@ -110,8 +106,10 @@ public class ArduinoIOController {
 
 		String response = null;
 		
-		if(currentHeartbeatSession != null) {
+		if(currentHeartbeatSession != null && !currentHeartbeatSession.isRequested()) {
 			response = encryptionService.encryptHeartbeatSessionId(currentHeartbeatSession.getCurrentSessionId());
+			
+			currentHeartbeatSession.setRequested(true);
 			
 			logger.info("Found a session waiting for values. User: {}, Session:{}", currentHeartbeatSession.getUserName(), response);
 			
