@@ -1,14 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>info.ferrarimarco.uniroma2</groupId>
-  <artifactId>msa-resource-sharing-backend</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  
-  	<properties>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>info.ferrarimarco.uniroma2</groupId>
+	<artifactId>msa-resource-sharing-backend</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<properties>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<spring.version>4.0.0.RELEASE</spring.version>
-		<spring-data-version>1.3.3.RELEASE</spring-data-version>
+		<spring-data-mongodb-version>1.3.3.RELEASE</spring-data-mongodb-version>
+		<mongo-java-driver-version>2.11.3</mongo-java-driver-version>
 		<commons-io>1.3.1</commons-io>
 		<sl4j-version>1.7.5</sl4j-version>
 		<jcl-over-sl4j-version>1.7.5</jcl-over-sl4j-version>
@@ -20,9 +21,57 @@
 		<testng-version>6.8.7</testng-version>
 		<mongo-java-driver-version>2.11.3</mongo-java-driver-version>
 		<joda-time-version>2.3</joda-time-version>
+		<commons-io>1.3.1</commons-io>
+		<reportng-version>1.1.4</reportng-version>
+		<bouncy-castle-version>1.49</bouncy-castle-version>
+		<cobertura-maven-plugin-version>2.6</cobertura-maven-plugin-version>
+		<maven-surefire-plugin-version>2.16</maven-surefire-plugin-version>
+		<maven-surefire-report-plugin-version>2.16</maven-surefire-report-plugin-version>
+		<guice-version>3.0</guice-version>
 	</properties>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>${cobertura-maven-plugin-version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin-version}</version>
+				<configuration>
+					<properties>
+						<property>
+							<name>usedefaultlisteners</name>
+							<value>false</value>
+						</property>
+						<property>
+							<name>listener</name>
+							<value>org.uncommons.reportng.HTMLReporter, org.uncommons.reportng.JUnitXMLReporter</value>
+						</property>
+					</properties>
+					<workingDirectory>target/</workingDirectory>
+					<suiteXmlFiles>
+						<suiteXmlFile>testng.xml</suiteXmlFile>
+					</suiteXmlFiles>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>${maven-surefire-report-plugin-version}</version>
+			</plugin>
+		</plugins>
+	</build>
+
 	<dependencies>
+		<dependency>
+			<groupId>info.ferrarimarco.uniroma2</groupId>
+			<artifactId>msa-resource-sharing-common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
@@ -34,84 +83,94 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<version>${spring.version}</version>
+			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-mongodb</artifactId>
-			<version>${spring-data-version}</version>
+			<version>${spring-data-mongodb-version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
 			<version>${mongo-java-driver-version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>${joda-time-version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 			<version>${commons-lang-version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>${commons-codec-version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${commons-io}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>${bouncy-castle-version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>${testng-version}</version>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.uncommons</groupId>
+			<artifactId>reportng</artifactId>
+			<version>${reportng-version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.testng</groupId>
+					<artifactId>testng</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>${guice-version}</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- Logging dependencies -->
-
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${sl4j-version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
 			<version>${jcl-over-sl4j-version}</version>
 			<scope>runtime</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>log4j-over-slf4j</artifactId>
 			<version>${log4j-over-sl4j-version}</version>
 			<scope>runtime</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>uk.org.lidalia</groupId>
 			<artifactId>sysout-over-slf4j</artifactId>
 			<version>${sysout-over-slf4j-version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
@@ -119,5 +178,5 @@
 		</dependency>
 
 	</dependencies>
-  
+
 </project>
