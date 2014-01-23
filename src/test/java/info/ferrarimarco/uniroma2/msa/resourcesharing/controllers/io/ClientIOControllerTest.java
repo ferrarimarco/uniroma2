@@ -22,7 +22,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.hamcrest.Matchers.*;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -65,15 +64,15 @@ public class ClientIOControllerTest extends AbstractTestNGSpringContextTests {
 		persistenceLayerInitializationService.initializeUserRepository(usersToInitialize);
 	}
 
-	@Test
+	@Test(groups = {"ioServletTestGroup"})
 	public void getUserByEmailTest() throws Exception {
 		
 		String email = PersistenceLayerInitializationService.USER_NAME_PREFIX + "0" + PersistenceLayerInitializationService.EMAIL_SUFFIX;
 		
-		MvcResult mvcResult = mockMvc.perform(get("/io/client/user/" + email))
+		MvcResult mvcResult = mockMvc.perform(get("/client/user/" + email))
 		.andExpect(status().isOk())
 		.andExpect(content().contentType(APPLICATION_JSON_UTF8))
-		.andExpect(jsonPath("$", hasSize(1))).andReturn();
+		.andExpect(jsonPath("$.email", equalToIgnoringCase(email))).andReturn();
 		
 		String resultContent = mvcResult.getResponse().getContentAsString();
 		
