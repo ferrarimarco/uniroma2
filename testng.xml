@@ -1,11 +1,8 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="ResourceSharingCommonTestSuite" verbose="1">
-	<test name="ServiceTests">
+	<test name="ioServletTest">
 		<classes>
-			<class name="info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.ShaHashingServiceTest" />
-			<class name="info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.UserPersistenceServiceTest" />
-			<class name="info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.ResourcePersistenceServiceTest" />
-			<class name="info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.PersistenceLayerInitializationServiceTest" />
+			<class name="info.ferrarimarco.uniroma2.msa.resourcesharing.controllers.io.ClientIOControllerTest" />
 		</classes>
 	</test>
 </suite>

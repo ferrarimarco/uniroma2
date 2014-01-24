@@ -39,7 +39,7 @@ public class ClientIOController {
 		logger.info("ClientIOController init completed");
 	}
 	
-	@RequestMapping(value = "/user/{userName:.+}", method = RequestMethod.GET)
+	@RequestMapping(value="/user/{userName:.+}", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
 	public ResourceSharingUser getUserDetails(@PathVariable("userName") String userName) {
 		List<ResourceSharingUser> users = userPersistenceService.readUsersByEmail(userName);
