@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingSearchCriterion;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.HashingService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.ResourcePersistenceService;
@@ -51,5 +53,9 @@ public class ClientIOController {
 		}
 		
 		return user;
+	}
+	
+	public List<ResourceSharingResource> getResourceListByCriteria(ResourceSharingSearchCriterion criterion){
+		return null;
 	}
 }
