@@ -60,7 +60,7 @@ public class HomeViewModel {
 	private int currentIBI;
 	
 	private static final int sleepTimeIncrement = 100;
-	private static final int maxSleepTime = 700;
+	private static final int maxSleepTime = 10000;
 	
 	private boolean disableStartSessionButton;
 	
