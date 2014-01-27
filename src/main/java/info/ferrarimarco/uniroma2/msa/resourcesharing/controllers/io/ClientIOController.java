@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingMobileNodeData;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.HashingService;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -65,5 +67,11 @@ public class ClientIOController {
 		ResourceSharingResource result = resourcePersistenceService.readResourceById(resourceId);
 		
 		return result;
+	}
+	
+	@RequestMapping(value = "/nodedata/", method = RequestMethod.POST)
+	@ResponseStatus(HttpStatus.OK)
+	public void updateMobileNodeInfo(@RequestBody ResourceSharingMobileNodeData mobileNodeData) {
+		
 	}
 }

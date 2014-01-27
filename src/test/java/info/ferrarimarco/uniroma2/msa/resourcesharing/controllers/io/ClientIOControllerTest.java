@@ -49,6 +49,7 @@ public class ClientIOControllerTest extends AbstractTestNGSpringContextTests {
 
 	private int usersToInitialize;
 	private int resourcesToInitialize;
+	private int mobileNodeDataToInitialize;
 
 	@BeforeClass
 	protected void setup() throws Exception {
@@ -65,18 +66,21 @@ public class ClientIOControllerTest extends AbstractTestNGSpringContextTests {
 
 		usersToInitialize = 10;
 		resourcesToInitialize = 10;
+		mobileNodeDataToInitialize = 10;
 	}
 
 	@BeforeMethod(alwaysRun = true)
 	protected void initMethod() {
 		persistenceLayerInitializationService.initializeUserRepository(usersToInitialize);
 		persistenceLayerInitializationService.initializeResourceRepository(resourcesToInitialize);
+		persistenceLayerInitializationService.initializeMobileNodeDataRepository(mobileNodeDataToInitialize);
 	}
 
 	@AfterMethod(alwaysRun = true)
 	protected void cleanupMethod() {
 		persistenceLayerInitializationService.cleanupUserRepository();
 		persistenceLayerInitializationService.cleanupResourceRepository();
+		persistenceLayerInitializationService.cleanupMobileNodeDataRepository();
 	}
 
 	@Test(groups = {"ioServletTestGroup"})
