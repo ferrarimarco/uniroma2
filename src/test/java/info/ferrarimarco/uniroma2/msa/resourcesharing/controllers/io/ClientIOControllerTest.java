@@ -16,6 +16,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.Assert;
@@ -83,7 +84,7 @@ public class ClientIOControllerTest extends AbstractTestNGSpringContextTests {
 	public void getUserByEmailTest() throws Exception {
 
 		String email = PersistenceLayerInitializationService.USER_NAME_PREFIX + "0" + PersistenceLayerInitializationService.EMAIL_SUFFIX;
-
+		
 		MvcResult mvcResult = mockMvc.perform(get("/client/user/" + email))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -94,21 +95,23 @@ public class ClientIOControllerTest extends AbstractTestNGSpringContextTests {
 		logger.info("User: {}", resultContent);
 	}
 
-	@Test(groups = {"ioServletTestGroup"}, enabled = false)
+	@Test(groups = {"ioServletTestGroup"})
 	public void getResourceByIdTest() throws Exception {
 		
 		List<ResourceSharingResource> resources = resourcePersistenceService.findAll();
+		
+		resourcePersistenceService.close();
 		
 		Assert.assertEquals(resources.size(), resourcesToInitialize);
 		
 		MvcResult mvcResult = mockMvc.perform(get("/client/resource/" + resources.get(0).getId()))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8)).andReturn();
-
+				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+				.andExpect(jsonPath("$.id", is(resources.get(0).getId()))).andReturn();
+		
 		String resultContent = mvcResult.getResponse().getContentAsString();
 
 		logger.info("Resource: {}", resultContent);
 	}
-
 
 }
