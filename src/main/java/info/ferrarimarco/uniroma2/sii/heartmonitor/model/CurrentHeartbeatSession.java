@@ -10,12 +10,15 @@ public class CurrentHeartbeatSession {
 	private String userName;
 	
 	private String currentSessionId;
+	
+	private boolean requested;
 
 	public CurrentHeartbeatSession() {}
 	
 	public CurrentHeartbeatSession(String userName, String currentSessionId) {
 		this.userName = userName;
 		this.currentSessionId = currentSessionId;
+		setRequested(false);
 	}
 
 	public String getUserName() {
@@ -32,6 +35,14 @@ public class CurrentHeartbeatSession {
 
 	public void setCurrentSessionId(String currentSessionId) {
 		this.currentSessionId = currentSessionId;
+	}
+
+	public boolean isRequested() {
+		return requested;
+	}
+
+	public void setRequested(boolean requested) {
+		this.requested = requested;
 	}
 
 	@Override

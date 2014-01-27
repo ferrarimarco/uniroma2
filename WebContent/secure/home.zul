@@ -17,7 +17,7 @@
 						<button label="Stop session" hflex="1" disabled="@load(vm.disableStopSessionButton)" onClick="@command('stopCurrentSession')" />
 						<button label="Refresh list" hflex="1" onClick="@command('refreshHeartbeatSessionList')" />
 					</hbox>
-					<listbox autopaging="true" model="@load(vm.storedSessions)" vflex="1" height="100%" disabled="@load(vm.disableSessionGrid)" >
+					<listbox autopaging="true" model="@load(vm.storedSessions)" vflex="1" height="100%" disabled="@load(vm.disableSessionGrid)" selectedItem="@bind(vm.selectedSession)">
 						<listhead sizable="true">
 							<listheader label="Session Date" sort="auto(time)" />
 							<listheader label="Recorded Values" />

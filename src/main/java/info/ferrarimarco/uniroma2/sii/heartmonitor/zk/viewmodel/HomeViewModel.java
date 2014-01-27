@@ -50,9 +50,8 @@ public class HomeViewModel {
 	private User currentUser;
 	private String currentStatus;
 	
-	private HeartbeatSession selectedHeartbeatSession;
-	
 	private ListModelList<HeartbeatSession> storedSessions;
+	private HeartbeatSession selectedSession;
 	
 	private String currentSessionId;
 	private int sequenceNumber;
@@ -116,26 +115,44 @@ public class HomeViewModel {
 	}
 	
 	@Command
+	@NotifyChange({"currentBPM","currentIBI","currentStatus","disableStartSessionButton","disableStopSessionButton","disableSessionGrid","disableReplaySessionButton","disableDeleteSessionButton"})
 	public void replaySelectedSession() {
 		
+		initNewSession(selectedSession);
+		
+		// load session values from repo
+		for(HeartbeatSessionValue value : selectedSession.getValues()) {
+			heartbeatSessionValuePersistenceService.storeHeartbeatSessionValue(value);
+		}
+		
+		currentStatus = "Replaying session. ID: " + currentSessionId;
 	}
 	
 	@Command
 	@NotifyChange({"currentBPM","currentIBI","currentStatus","disableStartSessionButton","disableStopSessionButton","disableSessionGrid","disableReplaySessionButton","disableDeleteSessionButton"})
 	public void startNewSession() {
 		
-		clearHeartbeatSession();
-		
-		disableStartSessionButton = true;
-		
 		HeartbeatSession session = new HeartbeatSession(currentUser.getUserName());
 		session = heartbeatSessionPersistenceService.storeHeartbeatSession(session);
-		currentSessionId = session.getId();
+		
+		initNewSession(session);
 		
 		currentHeartbeatSessionPerisistenceService.storeCurrentHeartbeatSession(new CurrentHeartbeatSession(currentUser.getUserName(), currentSessionId));
 		
 		currentStatus = "Recording a new session. ID: " + currentSessionId;
 		
+		initTimer();
+	}
+	
+	private void initNewSession(HeartbeatSession session) {
+		clearHeartbeatSession();
+		
+		disableStartSessionButton = true;
+		
+		currentSessionId = session.getId();
+	}
+	
+	private void initTimer() {
 		timer.setDelay(sleepTimeIncrement);
 		timer.start();
 	}
@@ -146,9 +163,7 @@ public class HomeViewModel {
 		
 		CurrentHeartbeatSession currentHeartbeatSession = currentHeartbeatSessionPerisistenceService.readCurrentHeartbeatSession(currentUser.getUserName());
 		
-		if(currentHeartbeatSession == null) { // the interface is replaying a session
-			
-		}else { // the interface is currently recording a new session
+		if(currentHeartbeatSession != null) { // the interface is currently recording a new session
 			HeartbeatSession session = heartbeatSessionPersistenceService.readHeartbeatSession(currentHeartbeatSession.getCurrentSessionId());
 			session.setClosed(true);
 			session = heartbeatSessionPersistenceService.storeHeartbeatSession(session);
@@ -159,7 +174,7 @@ public class HomeViewModel {
 		
 		clearHeartbeatSession();
 		
-		disableStartSessionButton = false;
+		initInterfaceFlags();
 		
 		currentStatus = idleStatusLabel;
 		timer.stop();
@@ -174,6 +189,7 @@ public class HomeViewModel {
 			logger.info("Looking for value {} of session {}", sequenceNumber, currentSessionId);
 			
 			HeartbeatSessionValue latestValue = heartbeatSessionValuePersistenceService.readHeartbeatSessionValue(currentSessionId + sequenceNumber);
+			
 			if (latestValue != null) {
 				timer.setDelay(latestValue.getIbi());
 				heartbeatSessionValuePersistenceService.deleteHeartbeatSessionValue(currentSessionId + sequenceNumber);
@@ -225,16 +241,6 @@ public class HomeViewModel {
 		this.currentIBI = currentIBI;
 	}
 	
-	public HeartbeatSession getSelectedHeartbeatSession() {
-		return selectedHeartbeatSession;
-	}
-
-	
-	public void setSelectedHeartbeatSession(HeartbeatSession selectedHeartbeatSession) {
-		this.selectedHeartbeatSession = selectedHeartbeatSession;
-	}
-
-	
 	public ListModelList<HeartbeatSession> getStoredSessions() {
 		return storedSessions;
 	}
@@ -270,5 +276,19 @@ public class HomeViewModel {
 	
 	public boolean isDisableSessionGrid() {
 		return isDisableStartSessionButton();
+	}
+
+	/**
+	 * @return the selectedSession
+	 */
+	public HeartbeatSession getSelectedSession() {
+		return selectedSession;
+	}
+
+	/**
+	 * @param selectedSession the selectedSession to set
+	 */
+	public void setSelectedSession(HeartbeatSession selectedSession) {
+		this.selectedSession = selectedSession;
 	}
 }
