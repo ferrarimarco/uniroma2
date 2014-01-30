@@ -1729,7 +1729,100 @@
       </eAnnotations>
     </packagedElement>
     <packagedElement xmi:type="uml:UseCase" xmi:id="__gGDsImoEeOEBZMkwS1T_g" name="UC3: View Metric’s Data">
-      <eAnnotations xmi:id="_zZeIwImrEeOEBZMkwS1T_g" source="uml2.diagrams"/>
+      <eAnnotations xmi:id="_zZeIwImrEeOEBZMkwS1T_g" source="uml2.diagrams">
+        <contents xmi:type="umlnotation:UMLDiagram" xmi:id="_NsPmEIm5EeOZsc9l4Crc7g" type="Class" name="UC3: View Metric's Data">
+          <children xmi:type="umlnotation:UMLShape" xmi:id="_F0TqYInCEeOZsc9l4Crc7g" fontName="Segoe UI" fontHeight="8" transparency="0" lineColor="14263149" lineWidth="1" showStereotype="Label">
+            <children xmi:type="notation:DecorationNode" xmi:id="_F0URcInCEeOZsc9l4Crc7g" type="ImageCompartment">
+              <layoutConstraint xmi:type="notation:Size" xmi:id="_F0URcYnCEeOZsc9l4Crc7g" width="1320" height="1320"/>
+            </children>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_F0U4gInCEeOZsc9l4Crc7g" type="Stereotype"/>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_F0U4gYnCEeOZsc9l4Crc7g" type="Name"/>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_F0U4gonCEeOZsc9l4Crc7g" type="Parent"/>
+            <children xmi:type="notation:ListCompartment" xmi:id="_F0VfkInCEeOZsc9l4Crc7g" type="ANNOTATION_COMPARTMENT"/>
+            <children xmi:type="notation:ListCompartment" xmi:id="_F2sQAInCEeOZsc9l4Crc7g" type="ANNOTATED_ATTRIBUTE_COMPARTMENT"/>
+            <children xmi:type="notation:ListCompartment" xmi:id="_F2teIInCEeOZsc9l4Crc7g" type="ANNOTATED_OPERATION_COMPARTMENT"/>
+            <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=MeasurementController%5Bjcu%5Ename=MeasurementController.java%5Bjpack%5Ename=it.uniroma2.gqm.webapp.controller%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=GQM-Blind%5D%5D%5D%5D$uml.Class"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_F0TqYYnCEeOZsc9l4Crc7g" x="13200" y="6600"/>
+          </children>
+          <children xmi:type="umlnotation:UMLShape" xmi:id="_Trif8InCEeOZsc9l4Crc7g" fontName="Segoe UI" fontHeight="8" transparency="0" lineColor="14263149" lineWidth="1" showStereotype="Label">
+            <children xmi:type="notation:DecorationNode" xmi:id="_TrjHAInCEeOZsc9l4Crc7g" type="ImageCompartment">
+              <layoutConstraint xmi:type="notation:Size" xmi:id="_TrjHAYnCEeOZsc9l4Crc7g" width="1320" height="1320"/>
+            </children>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_TrjHAonCEeOZsc9l4Crc7g" type="Stereotype"/>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_TrjuEInCEeOZsc9l4Crc7g" type="Name"/>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_TrkVIInCEeOZsc9l4Crc7g" type="Parent"/>
+            <children xmi:type="notation:ListCompartment" xmi:id="_TrkVIYnCEeOZsc9l4Crc7g" type="ANNOTATION_COMPARTMENT"/>
+            <children xmi:type="notation:ListCompartment" xmi:id="_Trrp4InCEeOZsc9l4Crc7g" type="ANNOTATED_ATTRIBUTE_COMPARTMENT"/>
+            <children xmi:type="notation:ListCompartment" xmi:id="_Trrp4YnCEeOZsc9l4Crc7g" type="ANNOTATED_OPERATION_COMPARTMENT"/>
+            <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=MeasurementManagerImpl%5Bjcu%5Ename=MeasurementManagerImpl.java%5Bjpack%5Ename=it.uniroma2.gqm.service%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=GQM-Blind%5D%5D%5D%5D$uml.Class"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Trif8YnCEeOZsc9l4Crc7g" x="22968" y="1526"/>
+          </children>
+          <children xmi:type="umlnotation:UMLClassifierShape" xmi:id="_XXPVoInCEeOZsc9l4Crc7g" fontName="Segoe UI" fontHeight="8" transparency="0" lineColor="14263149" lineWidth="1" showStereotype="Label" useClassifierShape="true">
+            <children xmi:type="notation:DecorationNode" xmi:id="_XXQjwInCEeOZsc9l4Crc7g" type="ImageCompartment">
+              <layoutConstraint xmi:type="notation:Size" xmi:id="_XXQjwYnCEeOZsc9l4Crc7g" width="530" height="530"/>
+            </children>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_XXQjwonCEeOZsc9l4Crc7g" type="Stereotype"/>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_XXQjw4nCEeOZsc9l4Crc7g" type="Kind"/>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_XXQjxInCEeOZsc9l4Crc7g" type="Name"/>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_XXRK0InCEeOZsc9l4Crc7g" type="Parent"/>
+            <children xmi:type="notation:SemanticListCompartment" xmi:id="_XXRK0YnCEeOZsc9l4Crc7g" type="AttributeCompartment"/>
+            <children xmi:type="notation:SemanticListCompartment" xmi:id="_XXRK0onCEeOZsc9l4Crc7g" type="OperationCompartment"/>
+            <children xmi:type="notation:SemanticListCompartment" xmi:id="_XXRK04nCEeOZsc9l4Crc7g" visible="false" type="SignalCompartment"/>
+            <element xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=MeasurementManager%5Bjcu%5Ename=MeasurementManager.java%5Bjpack%5Ename=it.uniroma2.gqm.service%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=GQM-Blind%5D%5D%5D%5D$uml.Interface"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XXPVoYnCEeOZsc9l4Crc7g" x="32228" y="2094"/>
+          </children>
+          <children xmi:type="umlnotation:UMLClassifierShape" xmi:id="_apB2gInCEeOZsc9l4Crc7g" fontName="Segoe UI" fontHeight="8" transparency="0" lineColor="14263149" lineWidth="1" showStereotype="Label" useClassifierShape="true">
+            <children xmi:type="notation:DecorationNode" xmi:id="_apCdkInCEeOZsc9l4Crc7g" type="ImageCompartment">
+              <layoutConstraint xmi:type="notation:Size" xmi:id="_apCdkYnCEeOZsc9l4Crc7g" width="530" height="530"/>
+            </children>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_apDEoInCEeOZsc9l4Crc7g" type="Stereotype"/>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_apDEoYnCEeOZsc9l4Crc7g" type="Kind"/>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_apDEoonCEeOZsc9l4Crc7g" type="Name"/>
+            <children xmi:type="notation:BasicDecorationNode" xmi:id="_apDrsInCEeOZsc9l4Crc7g" type="Parent"/>
+            <children xmi:type="notation:SemanticListCompartment" xmi:id="_apDrsYnCEeOZsc9l4Crc7g" type="AttributeCompartment"/>
+            <children xmi:type="notation:SemanticListCompartment" xmi:id="_apDrsonCEeOZsc9l4Crc7g" type="OperationCompartment"/>
+            <children xmi:type="notation:SemanticListCompartment" xmi:id="_apESwInCEeOZsc9l4Crc7g" visible="false" type="SignalCompartment"/>
+            <element xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=MeasurementDao%5Bjcu%5Ename=MeasurementDao.java%5Bjpack%5Ename=it.uniroma2.gqm.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=GQM-Blind%5D%5D%5D%5D$uml.Interface"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_apB2gYnCEeOZsc9l4Crc7g" x="30756" y="9372"/>
+          </children>
+          <element xsi:nil="true"/>
+          <edges xmi:type="umlnotation:UMLConnector" xmi:id="_XXwTAInCEeOZsc9l4Crc7g" source="_F0TqYInCEeOZsc9l4Crc7g" target="_XXPVoInCEeOZsc9l4Crc7g" fontName="Segoe UI" fontHeight="8" roundedBendpointsRadius="4" routing="Rectilinear" lineColor="8421504" lineWidth="1" showStereotype="Text">
+            <children xmi:type="notation:DecorationNode" xmi:id="_XXw6EInCEeOZsc9l4Crc7g" type="KindLabel">
+              <children xmi:type="notation:BasicDecorationNode" xmi:id="_XXw6EonCEeOZsc9l4Crc7g" type="Stereotype"/>
+              <children xmi:type="notation:BasicDecorationNode" xmi:id="_XXxhIYnCEeOZsc9l4Crc7g" type="Kind"/>
+              <children xmi:type="notation:BasicDecorationNode" xmi:id="_XXxhIInCEeOZsc9l4Crc7g" type="Name"/>
+              <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XXw6EYnCEeOZsc9l4Crc7g" y="-186"/>
+            </children>
+            <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=MeasurementController%5Bjcu%5Ename=MeasurementController.java%5Bjpack%5Ename=it.uniroma2.gqm.webapp.controller%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=GQM-Blind%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=MeasurementManager%5Bjcu%5Ename=MeasurementManager.java%5Bjpack%5Ename=it.uniroma2.gqm.service%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=GQM-Blind%5D%5D%5D%5D%5D$uml.Usage"/>
+            <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_XXwTAYnCEeOZsc9l4Crc7g" points="[40, 0, -16647, 2888]$[40, -1058, -16647, 1830]$[16727, -1058, 40, 1830]$[16727, -2789, 40, 99]"/>
+            <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_XbCQgInCEeOZsc9l4Crc7g" id="(0.4999999999999996,-3.160162271622405E-16)"/>
+            <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_XbC3kInCEeOZsc9l4Crc7g" id="(0.5,0.942371020856202)"/>
+          </edges>
+          <edges xmi:type="umlnotation:UMLConnector" xmi:id="_XXyvQInCEeOZsc9l4Crc7g" source="_Trif8InCEeOZsc9l4Crc7g" target="_XXPVoInCEeOZsc9l4Crc7g" fontName="Segoe UI" fontHeight="8" roundedBendpointsRadius="4" routing="Rectilinear" lineColor="8421504" lineWidth="1" showStereotype="Text">
+            <children xmi:type="notation:DecorationNode" xmi:id="_XXyvQonCEeOZsc9l4Crc7g" type="NameLabel">
+              <children xmi:type="notation:BasicDecorationNode" xmi:id="_XXzWUInCEeOZsc9l4Crc7g" type="Stereotype"/>
+              <children xmi:type="notation:BasicDecorationNode" xmi:id="_XXzWUYnCEeOZsc9l4Crc7g" type="Name"/>
+              <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XXyvQ4nCEeOZsc9l4Crc7g" y="-186"/>
+            </children>
+            <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=MeasurementManagerImpl%5Bjcu%5Ename=MeasurementManagerImpl.java%5Bjpack%5Ename=it.uniroma2.gqm.service%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=GQM-Blind%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=MeasurementManager%5Bjcu%5Ename=MeasurementManager.java%5Bjpack%5Ename=it.uniroma2.gqm.service%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=GQM-Blind%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+            <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_XXyvQYnCEeOZsc9l4Crc7g" points="[79, 53, -2200, 53]$[2279, 53, 0, 53]"/>
+            <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_XbEswInCEeOZsc9l4Crc7g" id="(0.988934024373161,0.5)"/>
+            <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_XbEswYnCEeOZsc9l4Crc7g" id="(0.0,0.5)"/>
+          </edges>
+          <edges xmi:type="umlnotation:UMLConnector" xmi:id="_apvBIInCEeOZsc9l4Crc7g" source="_Trif8InCEeOZsc9l4Crc7g" target="_apB2gInCEeOZsc9l4Crc7g" fontName="Segoe UI" fontHeight="8" roundedBendpointsRadius="4" routing="Rectilinear" lineColor="8421504" lineWidth="1" showStereotype="Text">
+            <children xmi:type="notation:DecorationNode" xmi:id="_apvoMInCEeOZsc9l4Crc7g" type="KindLabel">
+              <children xmi:type="notation:BasicDecorationNode" xmi:id="_apvoMonCEeOZsc9l4Crc7g" type="Stereotype"/>
+              <children xmi:type="notation:BasicDecorationNode" xmi:id="_apvoNInCEeOZsc9l4Crc7g" type="Kind"/>
+              <children xmi:type="notation:BasicDecorationNode" xmi:id="_apvoM4nCEeOZsc9l4Crc7g" type="Name"/>
+              <layoutConstraint xmi:type="notation:Bounds" xmi:id="_apvoMYnCEeOZsc9l4Crc7g" y="-186"/>
+            </children>
+            <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=MeasurementManagerImpl%5Bjcu%5Ename=MeasurementManagerImpl.java%5Bjpack%5Ename=it.uniroma2.gqm.service%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=GQM-Blind%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=MeasurementDao%5Bjcu%5Ename=MeasurementDao.java%5Bjpack%5Ename=it.uniroma2.gqm.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=GQM-Blind%5D%5D%5D%5D%5D$uml.Usage"/>
+            <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_apvBIYnCEeOZsc9l4Crc7g" points="[39, 102, -14990, 667]$[39, 1265, -14990, 1830]$[15069, 1265, 40, 1830]$[15069, -466, 40, 99]"/>
+            <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_asuqwInCEeOZsc9l4Crc7g" id="(0.5,0.9645030425963486)"/>
+            <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_asuqwYnCEeOZsc9l4Crc7g" id="(0.4999999999999985,0.942371020856202)"/>
+          </edges>
+        </contents>
+      </eAnnotations>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_DstOEImpEeOEBZMkwS1T_g" memberEnd="_Dst1IImpEeOEBZMkwS1T_g _DsvqUImpEeOEBZMkwS1T_g" navigableOwnedEnd="_Dst1IImpEeOEBZMkwS1T_g">
       <ownedEnd xmi:id="_Dst1IImpEeOEBZMkwS1T_g" name="uC3: View Metric’s Data" visibility="private" type="__gGDsImoEeOEBZMkwS1T_g" association="_DstOEImpEeOEBZMkwS1T_g">
