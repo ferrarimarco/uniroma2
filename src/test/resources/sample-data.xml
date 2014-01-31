@@ -1221,7 +1221,8 @@
         <column>operation</column>
         <column>collecting_type</column>
         <column>satisfying_condition_peration</column>
-        <column>satisfying_condition_value</column>                
+        <column>satisfying_condition_value</column>
+        <column>keywords</column>            
         <row>
             <value description="metric_id">1</value>
             <value description="project_id">1</value>
@@ -1238,7 +1239,8 @@
             <null/>
             <value description="collecting_type">SINGLE_VALUE</value>
             <value description="satisfying_condition_peration">LESS_OR_EQUAL</value>
-            <value description="satisfying_condition_value">260</value>            
+            <value description="satisfying_condition_value">260</value>
+            <value description="keywords">testk11,testk12,testk13</value>         
         </row>
 		<row>
             <value description="metric_id">2</value>
@@ -1255,6 +1257,9 @@
             <null/>
             <null/>
             <value description="collecting_type">SINGLE_VALUE</value>
+            <null/>
+            <null/>
+            <value description="keywords">testk21,testk22,testk23</value>  
         </row>                  
 		<row>
             <value description="metric_id">3</value>
@@ -1271,6 +1276,9 @@
             <null/>
             <null/>
             <value description="collecting_type">SINGLE_VALUE</value>
+            <null/>
+            <null/>
+            <value description="keywords">testk31,testk32,testk33</value>  
         </row>
 		<row>
             <value description="metric_id">4</value>
@@ -1288,7 +1296,8 @@
             <value description="operation">DIVISION</value>            
             <value description="collecting_type">SINGLE_VALUE</value>            
             <value description="satisfying_condition_peration">LESS_OR_EQUAL</value>
-            <value description="satisfying_condition_value">0.8</value>     
+            <value description="satisfying_condition_value">0.8</value>
+            <value description="keywords">testk41,testk42,testk43</value>     
         </row>      
 		<row>
             <value description="metric_id">5</value>
@@ -1306,7 +1315,8 @@
             <null/>
             <value description="collecting_type">MULTIPLE_VALUE</value>
             <value description="satisfying_condition_peration">GREATER_OR_EQUAL</value>
-            <value description="satisfying_condition_value">190</value>                        
+            <value description="satisfying_condition_value">190</value>
+            <value description="keywords">testk51,testk52,testk53</value>                        
         </row>            
     </table>	              
     <table name="question_metric">

@@ -1,19 +1,12 @@
 package it.uniroma2.gqm.dao;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import it.uniroma2.gqm.model.Goal;
-import it.uniroma2.gqm.model.GoalQuestion;
 import it.uniroma2.gqm.model.GoalStatus;
-import it.uniroma2.gqm.model.Project;
-import it.uniroma2.gqm.model.Question;
 
 import org.appfuse.dao.BaseDaoTestCase;
-import org.appfuse.dao.GenericDao;
 import org.appfuse.dao.UserDao;
-import org.appfuse.service.UserManager;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -9,7 +9,9 @@ import it.uniroma2.gqm.model.QuestionMetric;
 import it.uniroma2.gqm.model.Scale;
 import it.uniroma2.gqm.model.Unit;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.appfuse.dao.hibernate.GenericDaoHibernate;
 import org.hibernate.Query;
@@ -28,7 +30,23 @@ public class MetricDaoHibernate extends GenericDaoHibernate<Metric, Long>  imple
     	Query q =  getSession().getNamedQuery("findMetricByProject").setLong("project_id", id);
     	return q.list();
     }
-
+    
+	@Override
+	public List<Metric> findByKeywords(List<String> keywords) {
+		
+		Collections.sort(keywords);
+		
+		String keywordCriteria = "%";
+		
+		for(String s : keywords) {
+			keywordCriteria += s + "%";
+		}
+		
+		Query q =  getSession().getNamedQuery("findMetricByKeywords").setString("keywords", keywordCriteria);
+		
+		return q.list();
+	}
+    
 	@Override
 	public Metric save(Metric object) {
 		if(object.getId() != null){			
@@ -54,5 +72,4 @@ public class MetricDaoHibernate extends GenericDaoHibernate<Metric, Long>  imple
         getSession().flush();		
 		return super.save(object);
 	}
-
 }

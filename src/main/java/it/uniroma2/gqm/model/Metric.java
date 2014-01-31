@@ -1,8 +1,11 @@
 package it.uniroma2.gqm.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -15,8 +18,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -25,25 +26,28 @@ import javax.persistence.Transient;
 
 import org.appfuse.model.BaseObject;
 import org.appfuse.model.User;
-import org.hibernate.annotations.Cascade;
 
 @Entity
 @NamedQueries({
-    @NamedQuery(
-            name = "findMetricByProject",
-            query = "select m from Metric m  where m.project.id= :project_id "
-    ),
-    @NamedQuery(
-            name = "findMeasuredMetric",
-            query = "select distinct m from Goal g inner join g.questions gq " +
-            		" inner join gq.pk.question q  " +
-            		" inner join q.metrics qm " +
-            		" inner join qm.pk.metric m " +
-            		" where g.id= :goal_id and m.satisfyingConditionValue <> null"
-    )
+	@NamedQuery(
+			name = "findMetricByProject",
+			query = "select m from Metric m  where m.project.id= :project_id "
+			),
+	@NamedQuery(
+			name = "findMeasuredMetric",
+			query = "select distinct m from Goal g inner join g.questions gq " +
+					" inner join gq.pk.question q  " +
+					" inner join q.metrics qm " +
+					" inner join qm.pk.metric m " +
+					" where g.id= :goal_id and m.satisfyingConditionValue <> null"
+			),
+	@NamedQuery(
+			name = "findMetricByKeywords",
+			query = "select m from Metric m where m.keywords LIKE :keywords "
+			)
 })
-public class Metric   extends BaseObject  implements Serializable {
-	
+public class Metric extends BaseObject  implements Serializable {
+
 	private Long id;
 	private String code;
 	private String name;
@@ -61,9 +65,16 @@ public class Metric   extends BaseObject  implements Serializable {
 	private OperationEnum operation;
 	private Double actualValue;
 	private Double satisfyingConditionValue;
-	private Set<Measurement> measurements= new HashSet<Measurement>();
-	
-	
+	private Set<Measurement> measurements;
+
+	private String keywords;
+
+	public static final String keywordsSeparator = ",";
+
+	public Metric() {
+		measurements = new HashSet<Measurement>();
+	}
+
 	@Id
 	@Column(name="metric_id")
 	@GeneratedValue(strategy = GenerationType.AUTO) 
@@ -73,7 +84,7 @@ public class Metric   extends BaseObject  implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	@Column(name="code", length=50,nullable=false)
 	public String getCode() {
 		return code;
@@ -81,7 +92,7 @@ public class Metric   extends BaseObject  implements Serializable {
 	public void setCode(String code) {
 		this.code = code;
 	}
-	
+
 	@Column(name="name", length=255,nullable=false)
 	public String getName() {
 		return name;
@@ -89,7 +100,7 @@ public class Metric   extends BaseObject  implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	@Column(name="hypothesis", length=255,nullable=true)
 	public String getHypothesis() {
 		return hypothesis;
@@ -124,8 +135,8 @@ public class Metric   extends BaseObject  implements Serializable {
 	public String toString() {
 		return "Metric [id=" + id + ", name=" + name + "]";
 	}
-	
-	
+
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "unit_id", nullable = true)	
 	public Unit getUnit() {
@@ -140,11 +151,11 @@ public class Metric   extends BaseObject  implements Serializable {
 	public Scale getScale() {
 		return scale;
 	}
-	
+
 	public void setScale(Scale scale) {
 		this.scale = scale;
 	}
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project_id", nullable = false)
 	public Project getProject() {
@@ -154,7 +165,7 @@ public class Metric   extends BaseObject  implements Serializable {
 	public void setProject(Project project) {
 		this.project = project;
 	}
-	
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", length = 50)
 	public MetricTypeEnum getType() {
@@ -163,7 +174,7 @@ public class Metric   extends BaseObject  implements Serializable {
 	public void setType(MetricTypeEnum type) {
 		this.type = type;
 	}
-	
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "collecting_type", length = 50)
 	public CollectingTypeEnum getCollectingType() {
@@ -172,8 +183,8 @@ public class Metric   extends BaseObject  implements Serializable {
 	public void setCollectingType(CollectingTypeEnum collectingType) {
 		this.collectingType = collectingType;
 	}
-	
-	
+
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "satisfying_condition_peration", length = 50)
 	public SatisfyingConditionOperationEnum getSatisfyingConditionOperation() {
@@ -191,8 +202,8 @@ public class Metric   extends BaseObject  implements Serializable {
 	public void setMetricOwner(User metricOwner) {
 		this.metricOwner = metricOwner;
 	}
-	
-	
+
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "pk.metric", cascade=CascadeType.ALL)
 	public Set<QuestionMetric> getQuestions() {
 		return questions;
@@ -218,7 +229,7 @@ public class Metric   extends BaseObject  implements Serializable {
 	public void setMetricB(Metric metricB) {
 		this.metricB = metricB;
 	}
-	
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "operation", length = 50,nullable=true)	
 	public OperationEnum getOperation() {
@@ -227,24 +238,25 @@ public class Metric   extends BaseObject  implements Serializable {
 	public void setOperation(OperationEnum operation) {
 		this.operation = operation;
 	}
-	
+
 	@Column(name="actual_value")
 	public Double getActualValue() {
 		return actualValue;
 	}
-	
+
 	public void setActualValue(Double actualValue) {
 		this.actualValue = actualValue;
 	}
-	
+
 	@Column(name="satisfying_condition_value")
 	public Double getSatisfyingConditionValue() {
 		return satisfyingConditionValue;
 	}
+
 	public void setSatisfyingConditionValue(Double satisfyingConditionValue) {
 		this.satisfyingConditionValue = satisfyingConditionValue;
 	}
-	
+
 	@OneToMany(mappedBy="metric")
 	public Set<Measurement> getMeasurements() {
 		return measurements;
@@ -252,36 +264,78 @@ public class Metric   extends BaseObject  implements Serializable {
 	public void setMeasurements(Set<Measurement> measurements) {
 		this.measurements = measurements;
 	}
-	
+
+	private String sortKeywordsString(String keywords) {
+		// Alphabetical ordering
+		String[] keywordsElements = keywords.split(keywordsSeparator);
+
+		Arrays.sort(keywordsElements);
+
+		keywords = "";
+
+		for(int i = 0; i < keywordsElements.length; i++) {
+			keywords += keywordsElements[i] + ",";
+		}
+
+		// Remove last coma
+		keywords = keywords.substring(0, keywords.length() - 1);
+
+		return keywords;
+	}
+
+	public String getKeywords(){
+		keywords = sortKeywordsString(keywords);
+
+		return keywords;
+	}
+
+	public void setKeywords(String keywords) {
+		this.keywords = sortKeywordsString(keywords);
+	}
+
+	public void addKeyword(String newKeyword) {
+		this.keywords = sortKeywordsString(keywords + "," + newKeyword);
+	}
+
+	@Transient
+	public List<String> getKeywordList(){
+		return new ArrayList<String>(Arrays.asList(keywords.split(keywordsSeparator)));
+	}
+
+	@Transient
+	public Integer getKeywordCount() {
+		return getKeywordList().size();
+	}
+
 	@Transient
 	public boolean isConditionReached(){
 		boolean ret = false;
-		Double value = null;
+
 		if(this.satisfyingConditionValue != null  && this.satisfyingConditionOperation != null 
 				&& satisfyingConditionOperation != SatisfyingConditionOperationEnum.NONE){
 			switch (this.satisfyingConditionOperation){
-				case EQUAL:
-					ret = this.getMeasuredValue() == this.satisfyingConditionValue;
-					break;
-				case GREATER_OR_EQUAL:
-					ret = this.getMeasuredValue() >= this.satisfyingConditionValue;
-					break;
-				case GREATHER:
-					ret = this.getMeasuredValue() > this.satisfyingConditionValue;
-					break;
-				case LESS:
-					ret = this.getMeasuredValue() < this.satisfyingConditionValue;
-					break;
-				case LESS_OR_EQUAL:
-					ret = this.getMeasuredValue() <= this.satisfyingConditionValue;
-					break;
-				case NONE:
-					break;
+			case EQUAL:
+				ret = this.getMeasuredValue() == this.satisfyingConditionValue;
+				break;
+			case GREATER_OR_EQUAL:
+				ret = this.getMeasuredValue() >= this.satisfyingConditionValue;
+				break;
+			case GREATHER:
+				ret = this.getMeasuredValue() > this.satisfyingConditionValue;
+				break;
+			case LESS:
+				ret = this.getMeasuredValue() < this.satisfyingConditionValue;
+				break;
+			case LESS_OR_EQUAL:
+				ret = this.getMeasuredValue() <= this.satisfyingConditionValue;
+				break;
+			case NONE:
+				break;
 			}
 		}
 		return ret;
 	}
-	
+
 	@Transient
 	public Double getMeasuredValue(){
 		Double value = Double.NaN;
@@ -330,7 +384,7 @@ public class Metric   extends BaseObject  implements Serializable {
 						int n = 0;
 						double sum = 0;
 						System.out.println("Metric: " + this.getCode() + " 13" + " value= "  + value);
-						
+
 						while (it.hasNext()) {
 							System.out.println("Metric: " + this.getCode() + " 14" + " value= "  + value);
 							Double v = ((Measurement) it.next()).getValue();						
@@ -348,11 +402,11 @@ public class Metric   extends BaseObject  implements Serializable {
 		}catch(Exception ex){
 			return  Double.NaN;
 		}
-		
+
 		System.out.println("Metric: " + this.getCode() + " 17" + " value= "  + value);
 		return value;
 	}
-	
+
 	@Transient
 	public String getFormula(){
 		String formula = "None";
