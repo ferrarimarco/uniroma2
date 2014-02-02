@@ -3,6 +3,7 @@ package it.uniroma2.gqm.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -67,12 +68,13 @@ public class Metric extends BaseObject  implements Serializable {
 	private Double satisfyingConditionValue;
 	private Set<Measurement> measurements;
 
-	private String keywords;
+	private transient List<String> keywordList;
 
 	public static final String keywordsSeparator = ",";
 
 	public Metric() {
 		measurements = new HashSet<Measurement>();
+		keywordList = new ArrayList<String>();
 	}
 
 	@Id
@@ -265,41 +267,43 @@ public class Metric extends BaseObject  implements Serializable {
 		this.measurements = measurements;
 	}
 
-	private String sortKeywordsString(String keywords) {
-		// Alphabetical ordering
-		String[] keywordsElements = keywords.split(keywordsSeparator);
-
-		Arrays.sort(keywordsElements);
-
-		keywords = "";
-
-		for(int i = 0; i < keywordsElements.length; i++) {
-			keywords += keywordsElements[i] + ",";
+	public String getKeywords(){
+		String keywords = "";
+		
+		Collections.sort(keywordList);
+		
+		for(String s : keywordList) {
+			keywords += s + keywordsSeparator;
 		}
-
+		
 		// Remove last coma
 		keywords = keywords.substring(0, keywords.length() - 1);
 
 		return keywords;
 	}
-
-	public String getKeywords(){
-		keywords = sortKeywordsString(keywords);
-
-		return keywords;
-	}
-
+	
 	public void setKeywords(String keywords) {
-		this.keywords = sortKeywordsString(keywords);
+		
+		if(keywordList == null) {
+			keywordList = new ArrayList<String>();
+		}
+		
+		String[] keywordsElements = keywords.split(keywordsSeparator);
+		
+		keywordList.addAll(Arrays.asList(keywordsElements));
+		
+		Collections.sort(keywordList);
 	}
 
-	public void addKeyword(String newKeyword) {
-		this.keywords = sortKeywordsString(keywords + "," + newKeyword);
+	public void addNewKeyword(String newKeyword) {
+		keywordList.add(newKeyword);
+		
+		Collections.sort(keywordList);
 	}
 
 	@Transient
 	public List<String> getKeywordList(){
-		return new ArrayList<String>(Arrays.asList(keywords.split(keywordsSeparator)));
+		return keywordList;
 	}
 
 	@Transient
