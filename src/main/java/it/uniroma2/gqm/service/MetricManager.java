@@ -1,17 +1,11 @@
 package it.uniroma2.gqm.service;
 
-import it.uniroma2.gqm.model.Goal;
-import it.uniroma2.gqm.model.GoalQuestion;
-import it.uniroma2.gqm.model.GoalStatus;
 import it.uniroma2.gqm.model.Metric;
 import it.uniroma2.gqm.model.Project;
 import it.uniroma2.gqm.model.Question;
 import it.uniroma2.gqm.model.QuestionMetric;
-import it.uniroma2.gqm.model.Scale;
-import it.uniroma2.gqm.model.Unit;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.jws.WebService;
 
@@ -20,13 +14,15 @@ import org.appfuse.service.GenericManager;
 
 @WebService
 public interface MetricManager extends GenericManager<Metric, Long> {
-	public List<Metric> findByProject(Project project);
 	
-	public QuestionMetric getQuestionMetric(Metric metric,Question question);
-	public List<String> getAvailableStatus(QuestionMetric questionMetric, User user);
-	public QuestionMetric saveQuestionMetric(QuestionMetric questionMetric);
+	Metric findById(Long id);
+	List<Metric> findByProject(Project project);
+	List<Metric> findByKeywords(List<String> keywords);
 	
-	public Metric findById(Long id);
-	public List<Double> getMeasuredMetricValues(Long metricId);
-	public List<String> getMetricInfo(Long metricId);
+	QuestionMetric getQuestionMetric(Metric metric,Question question);
+	QuestionMetric saveQuestionMetric(QuestionMetric questionMetric);
+	
+	List<Double> getMeasuredMetricValues(Long metricId);
+	List<String> getMetricInfo(Long metricId);
+	List<String> getAvailableStatus(QuestionMetric questionMetric, User user);
 }
