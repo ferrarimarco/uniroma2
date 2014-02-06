@@ -103,6 +103,7 @@ public class MetricFormController  extends BaseFormController {
         	ret = new Metric();
         	ret.setProject(currentProject);
         }
+        
         model.addAttribute("currentProject",currentProject);
         model.addAttribute("currentUser",currentUser);
         model.addAttribute("units",unitManager.getAll());
@@ -112,11 +113,11 @@ public class MetricFormController  extends BaseFormController {
         availablesTypes.add(MetricTypeEnum.OBJECTIVE.toString());
         availablesTypes.add(MetricTypeEnum.SUBJECTIVE.toString());
         model.addAttribute("availablesTypes",availablesTypes);
+        
         model.addAttribute("availableMetrics",metricManager.findByProject(currentProject));
         
-        System.out.println("availableMetrics ------>" + metricManager.findByProject(currentProject));
-        //model.addAttribute("availableGoals",makeAvailableGoals(ret,currentUser));
-        model.addAttribute("availableQuestions",makeAvailableQuestions(ret,projectManager.get(currentProject.getId()),currentUser));
+        model.addAttribute("availableQuestions", makeAvailableQuestions(ret, projectManager.get(currentProject.getId()), currentUser));
+        
         return ret;
     }
 
