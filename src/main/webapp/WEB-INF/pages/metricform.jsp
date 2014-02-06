@@ -72,6 +72,16 @@
 </div>
 </div>
 
+<spring:bind path="metric.keywords">
+	<div class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+</spring:bind>
+<appfuse:label styleClass="control-label" key="metric.keywords" />
+<div class="controls">
+	<form:input path="keywords" id="keywords" maxlength="255" readonly="${metric.metricOwner ne currentUser && not empty metric.id}" />
+	<form:errors path="keywords" cssClass="help-inline" />
+</div>
+</div>
+
 <spring:bind path="metric.type">
 	<div class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
 </spring:bind>

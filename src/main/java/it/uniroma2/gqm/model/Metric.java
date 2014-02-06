@@ -68,13 +68,13 @@ public class Metric extends BaseObject  implements Serializable {
 	private Double satisfyingConditionValue;
 	private Set<Measurement> measurements;
 
-	private transient List<String> keywordList;
+	private transient Set<String> keywordSet;
 
 	public static final String keywordsSeparator = ",";
 
 	public Metric() {
 		measurements = new HashSet<Measurement>();
-		keywordList = new ArrayList<String>();
+		keywordSet = new HashSet<String>();
 	}
 
 	@Id
@@ -266,44 +266,42 @@ public class Metric extends BaseObject  implements Serializable {
 	public void setMeasurements(Set<Measurement> measurements) {
 		this.measurements = measurements;
 	}
+	
+	@Transient
+	public List<String> getKeywordList(){
+		return new ArrayList<String>((Arrays.asList(keywordSet.toArray(new String[keywordSet.size()]))));
+	}
 
 	public String getKeywords(){
 		String keywords = "";
 		
+		List<String> keywordList = getKeywordList();
+		
 		Collections.sort(keywordList);
 		
-		for(String s : keywordList) {
-			keywords += s + keywordsSeparator;
+		if(keywordList.size() > 0) {
+			for(String s : keywordList) {
+				keywords += s + keywordsSeparator;
+			}
+			
+			// Remove last coma
+			keywords = keywords.substring(0, keywords.length() - 1);			
 		}
-		
-		// Remove last coma
-		keywords = keywords.substring(0, keywords.length() - 1);
 
 		return keywords;
 	}
 	
 	public void setKeywords(String keywords) {
 		
-		if(keywordList == null) {
-			keywordList = new ArrayList<String>();
+		if(keywordSet == null) {
+			keywordSet = new HashSet<String>();
 		}
 		
-		String[] keywordsElements = keywords.split(keywordsSeparator);
-		
-		keywordList.addAll(Arrays.asList(keywordsElements));
-		
-		Collections.sort(keywordList);
-	}
-
-	public void addNewKeyword(String newKeyword) {
-		keywordList.add(newKeyword);
-		
-		Collections.sort(keywordList);
-	}
-
-	@Transient
-	public List<String> getKeywordList(){
-		return keywordList;
+		if(keywords != null) {
+			String[] keywordsElements = keywords.split(keywordsSeparator);
+			
+			keywordSet.addAll(Arrays.asList(keywordsElements));
+		}
 	}
 
 	@Transient
