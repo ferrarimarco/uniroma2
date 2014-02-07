@@ -34,11 +34,20 @@ public class MetricManagerTest extends BaseManagerMockTestCase {
 		keywords.add("testKeyword1");
 
 		Metric m = new Metric();
-
+		
+		String keywordsLine = "";
+		
 		for(String s : keywords) {
-			m.addNewKeyword(s);
+			keywordsLine += s + ",";
 		}
-
+		
+		if(!keywordsLine.isEmpty()) {
+			// Remove last coma
+			keywordsLine = keywordsLine.substring(0, keywordsLine.length() - 1);
+		}
+		
+		m.setKeywords(keywordsLine);
+		
 		final List<Metric> metrics = new ArrayList<Metric>();
 		metrics.add(m);
 
