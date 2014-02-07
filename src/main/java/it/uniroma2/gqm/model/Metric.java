@@ -297,9 +297,16 @@ public class Metric extends BaseObject  implements Serializable {
 			keywordSet = new HashSet<String>();
 		}
 		
-		if(keywords != null) {
-			String[] keywordsElements = keywords.split(keywordsSeparator);
-			
+		// Delete old keywords
+		keywordSet.clear();
+		
+		if(keywords == null) {
+			keywords = "";
+		}
+		
+		String[] keywordsElements = keywords.split(keywordsSeparator);
+		
+		if(keywordsElements.length > 0) {
 			keywordSet.addAll(Arrays.asList(keywordsElements));
 		}
 	}
