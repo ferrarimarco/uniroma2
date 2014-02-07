@@ -127,7 +127,7 @@
 <div class="controls">
 	<form:select path="metricA.id" disabled="${metric.metricOwner ne currentUser && not empty metric.id}">
 		<form:option value="" label="None" />
-		<form:options items="${availableMetrics}" itemValue="id" itemLabel="code" />
+		<form:options items="${availableMetrics}" itemValue="id" itemLabel="codeAndKeywords" />
 	</form:select>
 	<form:errors path="metricA" cssClass="help-inline" />
 </div>

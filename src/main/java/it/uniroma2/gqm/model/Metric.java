@@ -76,6 +76,11 @@ public class Metric extends BaseObject  implements Serializable {
 		measurements = new HashSet<Measurement>();
 		keywordSet = new HashSet<String>();
 	}
+	
+	@Transient
+	public String getCodeAndKeywords() {
+		return getCode() + " - " + getKeywords();
+	}
 
 	@Id
 	@Column(name="metric_id")
