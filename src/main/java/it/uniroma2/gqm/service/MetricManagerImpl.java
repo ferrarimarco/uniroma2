@@ -10,6 +10,7 @@ import it.uniroma2.gqm.model.Question;
 import it.uniroma2.gqm.model.QuestionMetric;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -119,5 +120,19 @@ public class MetricManagerImpl extends GenericManagerImpl<Metric, Long> implemen
 	@Override
 	public List<Metric> findByKeywords(List<String> keywords) {
 		return metricDao.findByKeywords(keywords);
+	}
+
+	@Override
+	public List<String> buildKeywordListFromCsvString(String keywordsCsv) {
+		
+		List<String> keywords = new ArrayList<String>();
+		
+		String[] keywordsElements = keywordsCsv.split(Metric.keywordsSeparator);
+		
+		if(keywordsElements.length > 0) {
+			keywords.addAll(Arrays.asList(keywordsElements));
+		}
+		
+		return keywords;
 	}
 }

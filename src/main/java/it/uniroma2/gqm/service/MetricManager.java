@@ -25,4 +25,6 @@ public interface MetricManager extends GenericManager<Metric, Long> {
 	List<Double> getMeasuredMetricValues(Long metricId);
 	List<String> getMetricInfo(Long metricId);
 	List<String> getAvailableStatus(QuestionMetric questionMetric, User user);
+	
+	List<String> buildKeywordListFromCsvString(String keywordsCsv);
 }
