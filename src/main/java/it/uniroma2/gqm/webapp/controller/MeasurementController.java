@@ -6,6 +6,7 @@ import java.util.List;
 
 import it.uniroma2.gqm.model.Measurement;
 import it.uniroma2.gqm.service.MeasurementManager;
+import it.uniroma2.gqm.webapp.util.Statistic;
 
 import org.appfuse.dao.SearchException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,19 +28,29 @@ public class MeasurementController {
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView handleRequest(@RequestParam(required = false, value = "q") String query) throws Exception {
         Model model = new ExtendedModelMap();
+    	List<Measurement> measure = new ArrayList<Measurement>();
         try {
         	System.out.println("Search query start: " + query);
         	if (query != null) {
         		List<String> keywords = Arrays.asList(query.split(" "));
-        		model.addAttribute("measurementList", measurementManager.findMeasurementByKeywords(keywords));
+        		model.addAttribute("measurementList", measure=measurementManager.findMeasurementByKeywords(keywords));
         	}
         	else
-        		model.addAttribute("measurementList", measurementManager.search(query, Measurement.class));
+        		model.addAttribute("measurementList", measure=measurementManager.search(query, Measurement.class));
             System.out.println("Search query end: " + query);
         } catch (SearchException se) {
             model.addAttribute("searchError", se.getMessage());
             model.addAttribute("measurementList",measurementManager.getAll());
         }
+        Statistic stat = new Statistic();
+        double media=0;
+        for(int i=0;i<measure.size();i++) {
+        	media += measure.get(i).getValue();
+        }
+        media /= measure.size();
+        stat.setMedia(media);
+        stat.setVarianza(0);
+        model.addAttribute("StatisticList", stat);
         return new ModelAndView("measurements", model.asMap());
     }	
 }

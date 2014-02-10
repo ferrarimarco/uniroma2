@@ -31,6 +31,7 @@
 
         <a class="btn" href="<c:url value='/mainMenu'/>">
             <i class="icon-ok"></i> <fmt:message key="button.done"/></a>
+
     </div>
 
     <display:table name="measurementList" cellspacing="0" cellpadding="0" requestURI=""
@@ -47,5 +48,12 @@
         <display:setProperty name="export.excel.filename" value="User List.xls"/>
         <display:setProperty name="export.csv.filename" value="User List.csv"/>
         <display:setProperty name="export.pdf.filename" value="User List.pdf"/>
+    </display:table>
+    
+    <display:table name="StatisticList" cellspacing="0" cellpadding="0" requestURI=""
+                   defaultsort="1" id="statistic" pagesize="25" class="table table-condensed table-striped table-hover" export="true">
+        <display:column property="media" escapeXml="true" sortable="true" titleKey="media" 
+                        paramId="media" paramProperty="media"/>
+		<display:column property="varianza" sortable="true" titleKey="varianza"/>      
     </display:table>
 </div>
