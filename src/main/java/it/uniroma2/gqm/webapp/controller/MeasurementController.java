@@ -7,6 +7,7 @@ import java.util.List;
 import it.uniroma2.gqm.model.Measurement;
 import it.uniroma2.gqm.service.MeasurementManager;
 import it.uniroma2.gqm.webapp.util.Statistic;
+import it.uniroma2.gqm.webapp.util.StatisticUtil;
 
 import org.appfuse.dao.SearchException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,15 +43,9 @@ public class MeasurementController {
             model.addAttribute("searchError", se.getMessage());
             model.addAttribute("measurementList",measurementManager.getAll());
         }
-        Statistic stat = new Statistic();
-        double media=0;
-        for(int i=0;i<measure.size();i++) {
-        	media += measure.get(i).getValue();
-        }
-        media /= measure.size();
-        stat.setMedia(media);
-        stat.setVarianza(0);
-        model.addAttribute("StatisticList", stat);
+        
+        model.addAttribute("StatisticList", StatisticUtil.calculatestatistic(measure));
+        
         return new ModelAndView("measurements", model.asMap());
     }	
 }
