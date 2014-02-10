@@ -5,6 +5,7 @@ import it.uniroma2.gqm.dao.MetricDao;
 import it.uniroma2.gqm.model.Measurement;
 import it.uniroma2.gqm.model.Metric;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.appfuse.dao.hibernate.GenericDaoHibernate;
@@ -21,4 +22,17 @@ public class MeasurementDaoHibernate extends GenericDaoHibernate<Measurement, Lo
     	Query q =  getSession().getNamedQuery("findMeasuremntsByMetric").setLong("metric_id", metric.getId());
     	return q.list();
     }
+	@Override
+	public List<Measurement> findMeasurementByKeyword(List<String> keywords) {
+
+		Collections.sort(keywords);
+		
+		String keywordCriteria = "%";
+		
+		for(String s : keywords) {
+			keywordCriteria += s + "%";
+		}
+		Query q = getSession().getNamedQuery("findMeasurementByKeyword").setString("keywords", keywordCriteria);
+		return q.list();
+	}
 }

@@ -1,11 +1,13 @@
 package it.uniroma2.gqm.webapp.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import it.uniroma2.gqm.model.Measurement;
 import it.uniroma2.gqm.service.MeasurementManager;
 
-import org.appfuse.Constants;
 import org.appfuse.dao.SearchException;
-import org.appfuse.service.GenericManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ExtendedModelMap;
@@ -27,7 +29,12 @@ public class MeasurementController {
         Model model = new ExtendedModelMap();
         try {
         	System.out.println("Search query start: " + query);
-            model.addAttribute("measurementList", measurementManager.search(query, Measurement.class));
+        	if (query != null) {
+        		List<String> keywords = Arrays.asList(query.split(" "));
+        		model.addAttribute("measurementList", measurementManager.findMeasurementByKeywords(keywords));
+        	}
+        	else
+        		model.addAttribute("measurementList", measurementManager.search(query, Measurement.class));
             System.out.println("Search query end: " + query);
         } catch (SearchException se) {
             model.addAttribute("searchError", se.getMessage());

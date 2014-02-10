@@ -31,6 +31,10 @@ import org.hibernate.search.annotations.Indexed;
     @NamedQuery(
             name = "findMeasuremntsByMetric",
             query = "select m from Measurement m  where m.metric.id= :metric_id order by m.collectingDate, m.collectingTime "
+    ),
+    @NamedQuery(
+            name = "findMeasurementByKeyword",
+            query = "select m from Measurement m where m.metric.id in (select m.id from Metric m where m.keywords LIKE :keywords ) order by m.collectingDate, m.collectingTime "
     )
 })
 public class Measurement extends BaseObject implements Serializable {

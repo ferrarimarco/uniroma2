@@ -29,4 +29,10 @@ public class MeasurementManagerImpl  extends GenericManagerImpl<Measurement, Lon
     	else
     		return null;
     }
+
+	@Override
+	public List<Measurement> findMeasurementByKeywords(List<String> keywords) {
+		return measurementDao.findMeasurementByKeyword(keywords);
+	}
+    
 }

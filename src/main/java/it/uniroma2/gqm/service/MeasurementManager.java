@@ -9,4 +9,5 @@ import org.appfuse.service.GenericManager;
 
 public interface MeasurementManager extends GenericManager<Measurement, Long> {
 	public List<Measurement> findMeasuremntsByMetric(Metric metric);
+	public List<Measurement> findMeasurementByKeywords(List<String> keywords);
 }
