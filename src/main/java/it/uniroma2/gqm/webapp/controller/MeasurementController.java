@@ -27,20 +27,30 @@ public class MeasurementController {
 	
 	
     @RequestMapping(method = RequestMethod.GET)
-    public ModelAndView handleRequest(@RequestParam(required = false, value = "q") String query) throws Exception {
+    public ModelAndView handleRequest(@RequestParam(required = false, value = "q") String query,
+    									@RequestParam(required = false, value = "min") String minDate,
+    									@RequestParam(required = false, value = "max") String maxDate) throws Exception {
         Model model = new ExtendedModelMap();
     	List<Measurement> measure = new ArrayList<Measurement>();
     	
         try {
         	System.out.println("Search query start: " + query);
-        	if (query != null) {
+        	System.out.println("Search min date: " + minDate);
+        	System.out.println("Search max date: " + maxDate);
+        	if (query != null || minDate != null || maxDate != null) {
         		List<String> keywords = Arrays.asList(query.split(" "));
-        		model.addAttribute("measurementList", measure=measurementManager.findMeasurementByKeywords(keywords));
+        		if(minDate.equals(""))
+        			minDate = "1970-01-01";
+        		if(maxDate.equals(""))
+        			maxDate = "2100-01-01";
+        		model.addAttribute("measurementList", measure=measurementManager.findMeasurementByKeywordsAndDate(keywords,minDate,maxDate));
         	}
         	else
         		model.addAttribute("measurementList", measure=measurementManager.getAll());
         	
             System.out.println("Search query end: " + query);
+        	System.out.println("Search min date: " + minDate);
+        	System.out.println("Search max date: " + maxDate);
         } catch (SearchException se) {
             model.addAttribute("searchError", se.getMessage());
             model.addAttribute("measurementList",measurementManager.getAll());

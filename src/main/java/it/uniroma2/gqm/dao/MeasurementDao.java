@@ -9,5 +9,5 @@ import org.appfuse.dao.GenericDao;
 
 public interface MeasurementDao  extends GenericDao<Measurement, Long> {
 	public List<Measurement> findMeasuremntsByMetric(Metric metric);
-	public List<Measurement> findMeasurementByKeyword(List<String> keywords);
+	public List<Measurement> findMeasurementByKeywordAndDate(List<String> keywords, String min, String max);
 }

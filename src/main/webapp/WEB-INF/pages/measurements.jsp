@@ -15,8 +15,13 @@
 <div class="span10">
     <h2><fmt:message key="measurementList.heading"/></h2>
 
+	
     <form method="get" action="${ctx}/measurements" id="searchForm" class="form-search">
     <div id="search" class="input-append">
+    	<label class="sr-only" for="minDate">Min Date</label>
+	    <input name="min" value="${param.min}" type="date" class="form-control" id="minDate" placeholder="Min Date" style="width: 20%;">
+	    <label class="sr-only" for="maxDate">Max Date</label>
+	    <input name="max" value="${param.max}" type="date" class="form-control" id="maxDate" placeholder="maxDate" style="width: 20%">
         <input type="text" size="20" name="q" id="query" value="${param.q}"
                placeholder="<fmt:message key="search.enterTerms"/>" class="input-medium search-query"/>
         <button id="button.search" class="btn" type="submit">

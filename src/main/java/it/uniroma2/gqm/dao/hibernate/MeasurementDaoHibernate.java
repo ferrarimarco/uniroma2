@@ -22,8 +22,10 @@ public class MeasurementDaoHibernate extends GenericDaoHibernate<Measurement, Lo
     	Query q =  getSession().getNamedQuery("findMeasuremntsByMetric").setLong("metric_id", metric.getId());
     	return q.list();
     }
+
 	@Override
-	public List<Measurement> findMeasurementByKeyword(List<String> keywords) {
+	public List<Measurement> findMeasurementByKeywordAndDate(
+			List<String> keywords, String min, String max) {
 
 		Collections.sort(keywords);
 		
@@ -32,7 +34,8 @@ public class MeasurementDaoHibernate extends GenericDaoHibernate<Measurement, Lo
 		for(String s : keywords) {
 			keywordCriteria += s + "%";
 		}
-		Query q = getSession().getNamedQuery("findMeasurementByKeyword").setString("keywords", keywordCriteria);
+		Query q = getSession().getNamedQuery("findMeasurementByKeywordAndDate").
+				setString("keywords", keywordCriteria).setString("min", min).setString("max", max);
 		return q.list();
 	}
 }

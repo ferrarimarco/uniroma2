@@ -31,8 +31,9 @@ public class MeasurementManagerImpl  extends GenericManagerImpl<Measurement, Lon
     }
 
 	@Override
-	public List<Measurement> findMeasurementByKeywords(List<String> keywords) {
-		return measurementDao.findMeasurementByKeyword(keywords);
+	public List<Measurement> findMeasurementByKeywordsAndDate(
+			List<String> keywords, String min, String max) {
+		return measurementDao.findMeasurementByKeywordAndDate(keywords,min,max);
 	}
     
 }
