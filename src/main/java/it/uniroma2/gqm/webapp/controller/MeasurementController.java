@@ -30,6 +30,7 @@ public class MeasurementController {
     public ModelAndView handleRequest(@RequestParam(required = false, value = "q") String query) throws Exception {
         Model model = new ExtendedModelMap();
     	List<Measurement> measure = new ArrayList<Measurement>();
+    	
         try {
         	System.out.println("Search query start: " + query);
         	if (query != null) {
@@ -37,7 +38,8 @@ public class MeasurementController {
         		model.addAttribute("measurementList", measure=measurementManager.findMeasurementByKeywords(keywords));
         	}
         	else
-        		model.addAttribute("measurementList", measure=measurementManager.search(query, Measurement.class));
+        		model.addAttribute("measurementList", measure=measurementManager.getAll());
+        	
             System.out.println("Search query end: " + query);
         } catch (SearchException se) {
             model.addAttribute("searchError", se.getMessage());

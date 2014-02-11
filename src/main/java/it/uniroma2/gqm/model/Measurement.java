@@ -37,7 +37,7 @@ import org.hibernate.search.annotations.Indexed;
             query = "select m from Measurement m where m.metric.id in (select m.id from Metric m where m.keywords LIKE :keywords ) order by m.collectingDate, m.collectingTime "
     )
 })
-public class Measurement extends BaseObject implements Serializable {
+public class Measurement extends BaseObject implements Serializable, Comparable {
 	private static final long serialVersionUID = 5045073708418494229L;
 	private Long id;
 	private Metric metric;
@@ -170,6 +170,17 @@ public class Measurement extends BaseObject implements Serializable {
 			return this.metric.getCode();
 		else
 			return null;
+	}
+
+	@Override
+	public int compareTo(Object o) {
+		Measurement b = (Measurement) o;
+		if (this.value < b.value)
+			return -1;
+		else if (this.value > b.value)
+			return 1;
+		else
+			return 0;
 	}
 
 }

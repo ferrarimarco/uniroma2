@@ -54,6 +54,8 @@
                    defaultsort="1" id="statistic" pagesize="25" class="table table-condensed table-striped table-hover" export="true">
         <display:column property="media" escapeXml="true" sortable="true" titleKey="media" 
                         paramId="media" paramProperty="media"/>
-		<display:column property="varianza" sortable="true" titleKey="varianza"/>      
+		<display:column property="varianza" sortable="true" titleKey="varianza"/> 
+		<display:column property="mediana" sortable="true" titleKey="mediana"/>
+		<display:column property="moda" sortable="true" titleKey="moda"/>     
     </display:table>
 </div>
