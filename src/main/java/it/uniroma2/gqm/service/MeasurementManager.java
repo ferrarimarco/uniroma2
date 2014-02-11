@@ -7,6 +7,9 @@ import it.uniroma2.gqm.model.Metric;
 
 import org.appfuse.service.GenericManager;
 
+import javax.jws.WebService;
+
+@WebService
 public interface MeasurementManager extends GenericManager<Measurement, Long> {
 	public List<Measurement> findMeasuremntsByMetric(Metric metric);
 	public List<Measurement> findMeasurementByKeywordsAndDate(List<String> keywords,String min, String max);

@@ -12,7 +12,10 @@ import org.appfuse.service.impl.GenericManagerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.jws.WebService;
+
 @Service("measurementManager")
+@WebService(serviceName = "measureService", endpointInterface = "it.uniroma2.gqm.service.MeasurementManager")
 public class MeasurementManagerImpl  extends GenericManagerImpl<Measurement, Long> implements MeasurementManager {
 	
 	private MeasurementDao measurementDao;   
@@ -35,5 +38,6 @@ public class MeasurementManagerImpl  extends GenericManagerImpl<Measurement, Lon
 			List<String> keywords, String min, String max) {
 		return measurementDao.findMeasurementByKeywordAndDate(keywords,min,max);
 	}
+
     
 }
