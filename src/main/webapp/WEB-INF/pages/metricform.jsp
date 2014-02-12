@@ -197,7 +197,7 @@
 </div>
 
 <spring:bind path="metric.satisfyingConditionOperation">
-	<div class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+	<div class="control-group${(not empty status.errorMessage) ? ' error' : ''}" >
 </spring:bind>
 <appfuse:label styleClass="control-label"
 	key="metric.satisfyingConditionOperation" />
@@ -206,11 +206,11 @@
 		disabled="${metric.metricOwner ne currentUser && not empty metric.id}">
 		<form:option value="NONE" label="None" />
 		<form:option value="LESS" label="<" />
-				<form:option value="LESS_OR_EQUAL" label="<="/>
-				<form:option value="EQUAL" label="="/>
-				<form:option value="GREATHER" label=">"/>
-				<form:option value="GREATER_OR_EQUAL" label=">="/>
-		    </form:select>
+		<form:option value="LESS_OR_EQUAL" label="<=" />
+		<form:option value="EQUAL" label="=" />
+		<form:option value="GREATHER" label=">"/>
+		<form:option value="GREATER_OR_EQUAL" label=">=" />
+    </form:select>
 	<form:errors path="satisfyingConditionOperation" cssClass="help-inline" />
 </div>
 </div>
