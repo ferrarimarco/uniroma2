@@ -39,9 +39,9 @@ public class MeasurementController {
         	System.out.println("Search max date: " + maxDate);
         	if (query != null || minDate != null || maxDate != null) {
         		List<String> keywords = Arrays.asList(query.split(" "));
-        		if(minDate.equals(""))
+        		if(minDate == null || minDate.equals(""))
         			minDate = "1970-01-01";
-        		if(maxDate.equals(""))
+        		if(maxDate == null || maxDate.equals(""))
         			maxDate = "2100-01-01";
         		model.addAttribute("measurementList", measure=measurementManager.findMeasurementByKeywordsAndDate(keywords,minDate,maxDate));
         	}
