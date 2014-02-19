@@ -83,7 +83,7 @@ public class ClientIOControllerTest extends AbstractTestNGSpringContextTests {
 		persistenceLayerInitializationService.cleanupMobileNodeDataRepository();
 	}
 
-	@Test(groups = {"ioServletTestGroup"})
+	@Test(groups = {"ioServletTestGroup"}, dependsOnGroups = {"springServicesTestGroup"})
 	public void getUserByEmailTest() throws Exception {
 
 		String email = PersistenceLayerInitializationService.USER_NAME_PREFIX + "0" + PersistenceLayerInitializationService.EMAIL_SUFFIX;
@@ -98,7 +98,7 @@ public class ClientIOControllerTest extends AbstractTestNGSpringContextTests {
 		logger.info("User: {}", resultContent);
 	}
 
-	@Test(groups = {"ioServletTestGroup"})
+	@Test(groups = {"ioServletTestGroup"}, dependsOnGroups = {"springServicesTestGroup"})
 	public void getResourceByIdTest() throws Exception {
 		
 		List<ResourceSharingResource> resources = resourcePersistenceService.findAll();
