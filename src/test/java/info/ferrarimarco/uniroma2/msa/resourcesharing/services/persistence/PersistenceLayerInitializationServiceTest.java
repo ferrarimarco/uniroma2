@@ -1,6 +1,9 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingMobileNodeData;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
@@ -10,21 +13,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @ContextConfiguration("classpath:spring-context.xml")
-public class PersistenceLayerInitializationServiceTest extends AbstractTestNGSpringContextTests{
+public class PersistenceLayerInitializationServiceTest extends BaseSpringTest{
 
 	private static Logger logger = LoggerFactory.getLogger(PersistenceLayerInitializationServiceTest.class);
-	
-	@Autowired
-    private ApplicationContext applicationContext;
 	
 	@Autowired
 	private PersistenceLayerInitializationService persistenceLayerInitializationService;
@@ -40,11 +37,11 @@ public class PersistenceLayerInitializationServiceTest extends AbstractTestNGSpr
 	
     @BeforeClass
     protected void setup() throws Exception {
-    	Assert.assertNotNull(applicationContext);
-    	Assert.assertNotNull(persistenceLayerInitializationService);
-    	Assert.assertNotNull(userPersistenceService);
-    	Assert.assertNotNull(resourcePersistenceService);
-    	Assert.assertNotNull(mobileNodeDataPersistenceService);
+    	super.setup();
+    	assertThat(persistenceLayerInitializationService, notNullValue());
+    	assertThat(userPersistenceService, notNullValue());
+    	assertThat(resourcePersistenceService, notNullValue());
+    	assertThat(mobileNodeDataPersistenceService, notNullValue());
     }
 
 	@AfterMethod(alwaysRun = true)
@@ -63,8 +60,8 @@ public class PersistenceLayerInitializationServiceTest extends AbstractTestNGSpr
     	
     	List<ResourceSharingUser> users = userPersistenceService.findAll();
     	
-    	Assert.assertNotNull(users);
-    	Assert.assertEquals(userCount, users.size());
+    	assertThat(users, notNullValue());
+    	assertThat(userCount, equalTo(users.size()));
     	
 		logger.info("Stored users list:");
 		
@@ -84,8 +81,8 @@ public class PersistenceLayerInitializationServiceTest extends AbstractTestNGSpr
     	
     	List<ResourceSharingResource> resources = resourcePersistenceService.findAll();
     	
-    	Assert.assertNotNull(resources);
-    	Assert.assertEquals(resourceCount, resources.size());
+    	assertThat(resources, notNullValue());
+    	assertThat(resourceCount, equalTo(resources.size()));
     	
 		logger.info("Stored resources list:");
 		
@@ -107,8 +104,8 @@ public class PersistenceLayerInitializationServiceTest extends AbstractTestNGSpr
     	
     	mobileNodeDataPersistenceService.close();
     	
-    	Assert.assertNotNull(resources);
-    	Assert.assertEquals(resourceCount, resources.size());
+    	assertThat(resources, notNullValue());
+    	assertThat(resourceCount, equalTo(resources.size()));
     	
 		logger.info("Stored Mobile nodes data list:");
 		

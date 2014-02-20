@@ -1,7 +1,11 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+
 import java.util.List;
 
+import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
@@ -11,21 +15,15 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @ContextConfiguration("classpath:spring-context.xml")
-public class ResourcePersistenceServiceTest extends AbstractTestNGSpringContextTests{
+public class ResourcePersistenceServiceTest extends BaseSpringTest {
 	
 	private static Logger logger = LoggerFactory.getLogger(ResourcePersistenceServiceTest.class);
-	
-	@Autowired
-    private ApplicationContext applicationContext;
 	
 	@Autowired
 	private ResourcePersistenceService resourcePersistenceService;
@@ -41,11 +39,11 @@ public class ResourcePersistenceServiceTest extends AbstractTestNGSpringContextT
 	
     @BeforeClass
     protected void setup() throws Exception {
-    	Assert.assertNotNull(applicationContext);
-    	Assert.assertNotNull(resourcePersistenceService);
-    	Assert.assertNotNull(hashingService);
-    	Assert.assertNotNull(userPersistenceService);
-    	Assert.assertNotNull(datatypeConversionService);
+    	super.setup();
+    	assertThat(resourcePersistenceService, notNullValue());
+    	assertThat(hashingService, notNullValue());
+    	assertThat(userPersistenceService, notNullValue());
+    	assertThat(datatypeConversionService, notNullValue());
     	
     	logger.info("Cleaning Repositories...");
     	userPersistenceService.dropCollection();
@@ -84,9 +82,9 @@ public class ResourcePersistenceServiceTest extends AbstractTestNGSpringContextT
 		
 		resourcePersistenceService.close();
 		
-		Assert.assertNotNull(resources);
-		Assert.assertEquals(resources.size(), 1);
-		Assert.assertTrue(resource.equals(resources.get(0)));
+		assertThat(resources, notNullValue());
+		assertThat(resources.size(), equalTo(1));
+		assertThat(resource, equalTo(resources.get(0)));
 		
 		logger.info("Stored resources list:");
 		

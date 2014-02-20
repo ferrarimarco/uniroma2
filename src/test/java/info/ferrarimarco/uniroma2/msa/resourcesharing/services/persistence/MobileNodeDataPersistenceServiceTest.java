@@ -1,34 +1,31 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingMobileNodeData;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @ContextConfiguration("classpath:spring-context.xml")
-public class MobileNodeDataPersistenceServiceTest extends AbstractTestNGSpringContextTests {
+public class MobileNodeDataPersistenceServiceTest extends BaseSpringTest {
 
 private static Logger logger = LoggerFactory.getLogger(ResourcePersistenceServiceTest.class);
-	
-	@Autowired
-    private ApplicationContext applicationContext;
 	
 	@Autowired
 	private MobileNodeDataPersistenceService mobileNodeDataPersistenceService;
 	
     @BeforeClass
     protected void setup() throws Exception {
-    	Assert.assertNotNull(applicationContext);
-    	Assert.assertNotNull(mobileNodeDataPersistenceService);
+    	super.setup();
+    	assertThat(mobileNodeDataPersistenceService, notNullValue());
     	
     	logger.info("Cleaning Repositories...");
     	mobileNodeDataPersistenceService.dropCollection();
@@ -53,8 +50,8 @@ private static Logger logger = LoggerFactory.getLogger(ResourcePersistenceServic
 		
 		mobileNodeDataPersistenceService.close();
 		
-		Assert.assertNotNull(mobileNodeDataFromService);
-		Assert.assertTrue(mobileNodeData.equals(mobileNodeDataFromService));
+		assertThat(mobileNodeDataFromService, notNullValue());
+		assertThat(mobileNodeData, equalTo(mobileNodeDataFromService));
 		
 		logger.info("Stored resource: {}", mobileNodeData.toString());
 	}
