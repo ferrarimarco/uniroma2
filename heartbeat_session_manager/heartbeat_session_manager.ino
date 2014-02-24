@@ -7,8 +7,8 @@
 #define NELEMS(x)  (sizeof(x) / sizeof(x[0]))
 
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0x77, 0x25 };
-char server[] = "192.168.0.15";
-String server_string = "192.168.0.15";
+char server[] = "192.168.0.19";
+String server_string = "192.168.0.19";
 EthernetClient client;
 
 AES aes;
