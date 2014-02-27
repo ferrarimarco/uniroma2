@@ -20,9 +20,9 @@ android {
 		compile 'com.squareup.dagger:dagger:1.2.1'
 		compile 'com.squareup.dagger:dagger-compiler:1.2.1'
 
-		testCompile 'junit:junit:4.+'
-		testCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
-		testCompile 'com.squareup:fest-android:1.0.+'
+		//testCompile 'junit:junit:4.+'
+		//testCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
+		//testCompile 'com.squareup:fest-android:1.0.+'
 		instrumentTestCompile 'junit:junit:4.+'
 		instrumentTestCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
 		instrumentTestCompile 'com.squareup:fest-android:1.0.+'
