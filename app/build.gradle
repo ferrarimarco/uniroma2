@@ -1,20 +1,12 @@
 apply plugin: 'android'
+apply from: "${rootDir}/android_common.gradle"
 
 android {
-	compileSdkVersion 19
-	buildToolsVersion "19.0.1"
-
 	defaultConfig {
-		minSdkVersion 19
-		targetSdkVersion 19
 		versionCode 1
 		versionName "1.0"
 	}
 
-	compileOptions {
-		sourceCompatibility JavaVersion.VERSION_1_7
-		targetCompatibility JavaVersion.VERSION_1_7
-	}
 	buildTypes {
 		release {
 			runProguard false
@@ -27,5 +19,12 @@ android {
 		compile 'info.ferrarimarco.uniroma2:msa-resource-sharing-common:+'
 		compile 'com.squareup.dagger:dagger:1.2.1'
 		compile 'com.squareup.dagger:dagger-compiler:1.2.1'
+
+		testCompile 'junit:junit:4.+'
+		testCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
+		testCompile 'com.squareup:fest-android:1.0.+'
+		instrumentTestCompile 'junit:junit:4.+'
+		instrumentTestCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
+		instrumentTestCompile 'com.squareup:fest-android:1.0.+'
 	}
 }
