@@ -1,11 +1,11 @@
 <component name="libraryTable">
   <library name="robolectric-2.3-SNAPSHOT">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.robolectric/robolectric/2.3-SNAPSHOT/cc858ccd7551f292f0ea6f754204241b4a108981/robolectric-2.3-SNAPSHOT.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.robolectric/robolectric/2.3-SNAPSHOT/614da94133d810b069cc85134e2446b9c2d70d1d/robolectric-2.3-SNAPSHOT.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.robolectric/robolectric/2.3-SNAPSHOT/8c6be547725a3a2890973bb654dbd3aaa915eef6/robolectric-2.3-SNAPSHOT-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.robolectric/robolectric/2.3-SNAPSHOT/3cc06aabb54b1bb281aece52f9153301810960c4/robolectric-2.3-SNAPSHOT-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

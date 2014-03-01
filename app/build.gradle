@@ -5,6 +5,7 @@ android {
 	defaultConfig {
 		versionCode 1
 		versionName "1.0"
+		packageName "info.ferrarimarco.uniroma2.msa.resourcesharing.app"
 	}
 
 	buildTypes {
@@ -16,15 +17,24 @@ android {
 
 	dependencies {
 		compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-		compile 'info.ferrarimarco.uniroma2:msa-resource-sharing-common:+'
 		compile 'com.squareup.dagger:dagger:1.2.1'
 		compile 'com.squareup.dagger:dagger-compiler:1.2.1'
+		compile 'com.j256.ormlite:ormlite-android:4.+'
+		compile 'joda-time:joda-time:2.+'
+	}
 
-		//testCompile 'junit:junit:4.+'
-		//testCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
-		//testCompile 'com.squareup:fest-android:1.0.+'
-		instrumentTestCompile 'junit:junit:4.+'
-		instrumentTestCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
-		instrumentTestCompile 'com.squareup:fest-android:1.0.+'
+	sourceSets {
+		instrumentTest.setRoot('src/test')
 	}
 }
+
+apply plugin: 'android-unit-test'
+
+dependencies {
+	instrumentTestCompile 'junit:junit:4.+'
+	instrumentTestCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
+	testCompile 'junit:junit:4.+'
+	testCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
+}
+
+

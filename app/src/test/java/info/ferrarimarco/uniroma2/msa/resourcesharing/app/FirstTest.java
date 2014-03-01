@@ -12,8 +12,8 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricTestRunner.class)
 public class FirstTest {
 
-    @Test
-    public void shouldFail() {
-        assertTrue(false);
-    }
+	@Test
+	public void shouldFail() {
+		assertTrue(false);
+	}
 }
