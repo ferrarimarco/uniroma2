@@ -13,9 +13,6 @@ import dagger.ObjectGraph;
 
 import static org.junit.Assert.assertNotNull;
 
-/**
- * Created by Marco on 26/02/14.
- */
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public abstract class BaseTezt {
