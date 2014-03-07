@@ -5,6 +5,7 @@ import android.content.Context;
 import com.j256.ormlite.dao.Dao;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -42,6 +43,10 @@ public class ResourceDao {
 		checkInitialization();
 
 		return resourceDao.create(resource);
+	}
+
+	public List<Resource> readResource(Resource resource) throws SQLException {
+		return resourceDao.queryForMatching(resource);
 	}
 
 	public int updateResource(Resource resource) throws SQLException {

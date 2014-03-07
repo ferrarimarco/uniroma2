@@ -11,8 +11,8 @@ import org.joda.time.DateTime;
 @DatabaseTable
 public class Resource {
 
-	@DatabaseField(id = true, canBeNull = false, generatedId = true)
-	private String id;
+	@DatabaseField(generatedId = true, canBeNull = false, allowGeneratedIdInsert = true)
+	private Long id;
 
 	@DatabaseField
 	private String title;
@@ -60,25 +60,38 @@ public class Resource {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (!(o instanceof Resource)) return false;
 
 		Resource resource = (Resource) o;
 
-		if (!id.equals(resource.id)) return false;
+		if (acquisitionMode != null ? !acquisitionMode.equals(resource.acquisitionMode) : resource.acquisitionMode != null) return false;
+		if (creationTime != null ? !creationTime.equals(resource.creationTime) : resource.creationTime != null) return false;
+		if (creatorId != null ? !creatorId.equals(resource.creatorId) : resource.creatorId != null) return false;
+		if (description != null ? !description.equals(resource.description) : resource.description != null) return false;
+		if (id != null ? !id.equals(resource.id) : resource.id != null) return false;
+		if (location != null ? !location.equals(resource.location) : resource.location != null) return false;
+		if (title != null ? !title.equals(resource.title) : resource.title != null) return false;
 
 		return true;
 	}
 
 	@Override
 	public int hashCode() {
-		return id.hashCode();
+		int result = id != null ? id.hashCode() : 0;
+		result = 31 * result + (title != null ? title.hashCode() : 0);
+		result = 31 * result + (description != null ? description.hashCode() : 0);
+		result = 31 * result + (location != null ? location.hashCode() : 0);
+		result = 31 * result + (creationTime != null ? creationTime.hashCode() : 0);
+		result = 31 * result + (acquisitionMode != null ? acquisitionMode.hashCode() : 0);
+		result = 31 * result + (creatorId != null ? creatorId.hashCode() : 0);
+		return result;
 	}
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
