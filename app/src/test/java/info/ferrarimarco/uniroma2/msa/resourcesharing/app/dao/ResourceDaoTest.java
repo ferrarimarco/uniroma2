@@ -16,9 +16,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-/**
- * Created by Marco on 03/03/14.
- */
+
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class ResourceDaoTest extends BaseDaoTezt {

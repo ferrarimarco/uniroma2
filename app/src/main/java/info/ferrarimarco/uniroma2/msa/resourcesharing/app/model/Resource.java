@@ -5,9 +5,7 @@ import com.j256.ormlite.table.DatabaseTable;
 
 import org.joda.time.DateTime;
 
-/**
- * Created by Marco on 28/02/14.
- */
+
 @DatabaseTable
 public class Resource {
 

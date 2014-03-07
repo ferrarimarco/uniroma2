@@ -14,9 +14,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHel
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.exceptions.DaoException;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 
-/**
- * Created by Marco on 01/03/14.
- */
+
 public class ResourceDao {
 
 	private DatabaseHelperManager databaseHelperManager;

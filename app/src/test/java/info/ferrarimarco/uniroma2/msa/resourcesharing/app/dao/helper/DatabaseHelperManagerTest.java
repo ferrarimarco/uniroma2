@@ -13,9 +13,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.BaseDaoTezt;
 
 import static org.junit.Assert.assertNotNull;
 
-/**
- * Created by Marco on 28/02/14.
- */
+
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class DatabaseHelperManagerTest extends BaseDaoTezt {

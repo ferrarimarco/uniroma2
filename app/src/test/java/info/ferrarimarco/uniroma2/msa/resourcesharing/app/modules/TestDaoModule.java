@@ -9,9 +9,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.ResourceDaoTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHelperManager;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHelperManagerTest;
 
-/**
- * Created by Marco on 03/03/14.
- */
+
 @Module(injects = {ResourceDao.class, ResourceDaoTest.class, DatabaseHelperManagerTest.class})
 public class TestDaoModule implements DaoModule {
 	@Provides

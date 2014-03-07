@@ -13,9 +13,7 @@ import java.sql.SQLException;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 
-/**
- * Created by Marco on 28/02/14.
- */
+
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	// name of the database file for your application -- change to something appropriate for your app

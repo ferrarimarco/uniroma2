@@ -1,8 +1,6 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.exceptions;
 
-/**
- * Created by Marco on 03/03/14.
- */
+
 public class DaoException extends RuntimeException {
 
 	/**
