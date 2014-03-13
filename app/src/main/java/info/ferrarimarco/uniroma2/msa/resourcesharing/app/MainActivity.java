@@ -1,26 +1,34 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.Button;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.LoginActivity;
 
 public class MainActivity extends Activity {
+
+	@InjectView(R.id.go_to_login_button)
+	Button loginButton;
+
+	@OnClick(R.id.go_to_login_button)
+	public void signInButtonClickListener() {
+		Intent intent = new Intent(this, LoginActivity.class);
+		startActivity(intent);
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment())
-					.commit();
-		}
+		ButterKnife.inject(this);
 	}
 
 
@@ -43,21 +51,4 @@ public class MainActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-								 Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-			return rootView;
-		}
-	}
-
 }

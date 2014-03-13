@@ -15,12 +15,17 @@ android {
 		}
 	}
 
+	packagingOptions {
+		exclude 'META-INF/services/javax.annotation.processing.Processor'
+	}
+
 	dependencies {
 		compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 		compile 'com.squareup.dagger:dagger:1.2.1'
 		compile 'com.squareup.dagger:dagger-compiler:1.2.1'
 		compile 'com.j256.ormlite:ormlite-android:4.+'
 		compile 'joda-time:joda-time:2.+'
+		compile 'com.jakewharton:butterknife:4.+'
 	}
 
 	sourceSets {
