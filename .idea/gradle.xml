@@ -7,8 +7,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="C:\Users\Ferrarim\Dropbox\shared_marco_workstation\Workspaces\android_studio\ferrari-marco-uniroma2.msa-android-client" />
+            <option value="C:\Users\Ferrarim\Dropbox\shared_marco_workstation\Workspaces\android_studio\ferrari-marco-uniroma2.msa-android-client\app" />
           </set>
         </option>
       </GradleProjectSettings>
