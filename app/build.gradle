@@ -26,6 +26,7 @@ android {
 		compile 'com.j256.ormlite:ormlite-android:4.+'
 		compile 'joda-time:joda-time:2.+'
 		compile 'com.jakewharton:butterknife:4.+'
+		compile 'com.squareup.retrofit:retrofit:1.+'
 	}
 
 	sourceSets {
