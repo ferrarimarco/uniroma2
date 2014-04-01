@@ -40,7 +40,7 @@
 				android:maxLines="1"
 				android:singleLine="true"/>
 
-			<EditText
+            <EditText
 				android:id="@+id/password"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
@@ -61,8 +61,17 @@
 				android:text="@string/action_sign_in"
 				android:textStyle="bold"/>
 
-		</LinearLayout>
-	</ScrollView>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/register_new_user_button_text"
+                android:id="@+id/register_new_user_button"
+                android:textStyle="bold"
+                style="?android:textAppearanceSmall" />
+
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
 
