@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<Configuration>
-
-	<string name="resource_sharing_service_endpoint">http://localhost:8080</string>
-
-</Configuration>
