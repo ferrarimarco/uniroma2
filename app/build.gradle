@@ -21,17 +21,24 @@ android {
 
     dependencies {
         compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-        compile 'com.squareup.dagger:dagger:1.2.1'
-        compile 'com.squareup.dagger:dagger-compiler:1.2.1'
+        compile 'com.squareup.dagger:dagger:1.+'
+        compile 'com.squareup.dagger:dagger-compiler:1.+'
         compile 'com.j256.ormlite:ormlite-android:4.+'
         compile 'joda-time:joda-time:2.+'
         compile 'com.jakewharton:butterknife:4.+'
         compile 'com.squareup.retrofit:retrofit:1.+'
         androidTestCompile 'junit:junit:4.+'
-        androidTestCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
+        androidTestCompile 'org.robolectric:robolectric:2.+'
     }
 }
 
-//apply plugin: 'android-test'
+apply plugin: 'android-test'
 
+androidTest {
+    // configure the set of classes for JUnit tests
+    include '**/*Test.class'
+    exclude '**/espresso/**/*.class'
 
+    // configure max heap size of the test JVM
+    maxHeapSize = "2048m"
+}

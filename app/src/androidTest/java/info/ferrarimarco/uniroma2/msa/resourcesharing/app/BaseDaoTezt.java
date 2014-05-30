@@ -1,7 +1,7 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app;
 
 import dagger.ObjectGraph;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.TestDaoModuleImpl;
 
 public abstract class BaseDaoTezt extends BaseTezt {
 
@@ -11,7 +11,7 @@ public abstract class BaseDaoTezt extends BaseTezt {
 
     @Override
     public void initObjectGraph() {
-        objectGraph = ObjectGraph.create(new DaoModuleImpl());
+        objectGraph = ObjectGraph.create(new TestDaoModuleImpl());
         objectGraph.inject(this);
     }
 }

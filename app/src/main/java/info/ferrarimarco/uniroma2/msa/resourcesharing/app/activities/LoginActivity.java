@@ -8,6 +8,7 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
@@ -27,6 +28,8 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.RegisterNewUserAsyncTask;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.UserLoginAsyncTask;
 
 /**
@@ -38,6 +41,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginAsyncTask mAuthTask = null;
+    private RegisterNewUserAsyncTask mRegisterNewUserTask = null;
 
     @InjectView(R.id.email)
     AutoCompleteTextView mEmailView;
@@ -76,6 +80,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
         });
     }
 
+    private void populateAutoComplete() {
+        getLoaderManager().initLoader(0, null, this);
+    }
+
     @OnClick(R.id.email_sign_in_button)
     public void signInButtonClickListener() {
         attemptLogin();
@@ -83,26 +91,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 
     @OnClick(R.id.register_new_user_button)
     public void registerNewUserButtonClickListener() {
-
-
-        if (mEmailView.getText() != null) {
-            email = mEmailView.getText().toString();
-        }
-
-        if (mPasswordView.getText() != null) {
-            password = mPasswordView.getText().toString();
-        }
-
         registerNewUser();
-    }
-
-    private void registerNewUser() {
-
-    }
-
-
-    private void populateAutoComplete() {
-        getLoaderManager().initLoader(0, null, this);
     }
 
     private boolean areFieldsValid() {
@@ -124,7 +113,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
         }
 
         View focusView = null;
-        boolean result = false;
+        boolean result = true;
 
         // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
@@ -134,11 +123,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
         }
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
+        if (result && TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             result = false;
-        } else if (!isEmailValid(email)) {
+        }
+
+        // Check if the user wrote a valid email
+        if (result && !isEmailValid(email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             result = false;
@@ -165,12 +157,28 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
         }
 
         if (areFieldsValid()) {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            showProgress(true);
             mAuthTask = new UserLoginAsyncTask(this, email, password);
-            mAuthTask.execute((Void) null);
+            executeTask(mAuthTask);
         }
+    }
+
+    private void registerNewUser() {
+
+        if (mRegisterNewUserTask != null) {
+            return;
+        }
+
+        if (areFieldsValid()) {
+            mRegisterNewUserTask = new RegisterNewUserAsyncTask(this, email, password);
+            executeTask(mRegisterNewUserTask);
+        }
+    }
+
+    private void executeTask(AsyncTask<Void, Void, UserTaskResult> task) {
+        // Show a progress spinner, and kick off a background task to
+        // perform the user login attempt.
+        showProgress(true);
+        task.execute((Void) null);
     }
 
     private boolean isEmailValid(String email) {
@@ -246,9 +254,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
         mAuthTask = null;
         showProgress(false);
 
-        Boolean success = (Boolean) result;
+        UserTaskResult taskResult = (UserTaskResult) result;
 
-        if (success) {
+        if (taskResult.getUserTaskResultType().equals(UserTaskResult.UserTaskResultType.SUCCESS)) {
             finish();
         } else {
             mPasswordView.setError(getString(R.string.error_incorrect_password));
