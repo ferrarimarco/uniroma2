@@ -1,16 +1,19 @@
 apply plugin: 'com.android.application'
 apply from: "${rootDir}/android_common.gradle"
 
+apply plugin: 'robolectric'
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    compile 'com.squareup.dagger:dagger:1.2.1'
-    compile 'com.squareup.dagger:dagger-compiler:1.2.1'
+    compile 'com.squareup.dagger:dagger:1.+'
+    compile 'com.squareup.dagger:dagger-compiler:1.+'
     compile 'com.j256.ormlite:ormlite-android:4.+'
     compile 'joda-time:joda-time:2.+'
     compile 'com.jakewharton:butterknife:4.+'
     compile 'com.squareup.retrofit:retrofit:1.+'
     androidTestCompile 'junit:junit:4.+'
     androidTestCompile 'org.robolectric:robolectric:2.+'
+    androidTestCompile 'com.squareup:fest-android:1.+'
 }
 
 android {
@@ -33,6 +36,51 @@ android {
 
 }
 
-//apply plugin: 'android-test'
+apply plugin: "jacoco"
+
+jacoco {
+    toolVersion = "0.7.1.201405082137"
+}
+
+// Define coverage source.
+// If you have rs/aidl etc... add them here.
+def coverageSourceDirs = [
+        'src/main/java',
+        'src/gen'
+]
+
+// This differs per what flavors buildTypes etc.
+// But this example shows the 'testDebug'
+// which is standard for Robolectric
+task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
+    // class R is used, but usage will not be covered, so ignore this class from report
+    // This differs per plugin version (0.10 -> 0.11)
+    // have very different fileTrees.
+    // I have added rules to Ignore Dagger/Butterknife
+    classDirectories = fileTree(
+            dir: './build/intermediates/classes/debug',
+            excludes: ['info/ferrarimarco/uniroma2/msa/resourcesharing/app/R*.class',
+                       '**/*$InjectAdapter.class',
+                       '**/*$ModuleAdapter.class',
+                       '**/*$ViewInjector*.class'
+            ])
+    sourceDirectories = files(coverageSourceDirs)
+    executionData = files('build/jacoco/testDebug.exec')
+    // Bit hacky but fixes https://code.google.com/p/android/issues/detail?id=69174.
+    // We iterate through the compiled .class tree and rename $$ to $.
+    doFirst {
+        new File('app/build/intermediates/classes/').eachFileRecurse { file ->
+            if (file.name.contains('$$')) {
+                file.renameTo(file.path.replace('$$', '$'))
+            }
+        }
+    }
+}
 
 
