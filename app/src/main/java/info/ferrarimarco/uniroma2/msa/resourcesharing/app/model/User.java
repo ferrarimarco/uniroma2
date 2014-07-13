@@ -6,7 +6,7 @@ import com.j256.ormlite.table.DatabaseTable;
 import org.joda.time.DateTime;
 
 @DatabaseTable
-public class User{
+public class User implements GenericEntity{
 
     @DatabaseField(generatedId = true, canBeNull = false, allowGeneratedIdInsert = true)
     private Long id;

@@ -16,38 +16,28 @@ import static org.junit.Assert.assertNotNull;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
-public class DatabaseHelperManagerTest extends BaseDaoTezt {
+public class DatabaseHelperManagerTest extends BaseDaoTezt{
 
     @Inject
     DatabaseHelperManager databaseHelperManager;
 
-    public DatabaseHelperManagerTest() {
+    public DatabaseHelperManagerTest(){
         super();
     }
 
     @Override
     @Test
-    public void daoInjectionTest() {
+    public void daoInjectionTest(){
         assertNotNull(databaseHelperManager);
     }
 
     @Test
-    public void getDatabaseHelperTest() {
+    public void getDatabaseHelperTest(){
         DatabaseHelperManager databaseHelperManager = new DatabaseHelperManager();
         DatabaseHelper databaseHelper = databaseHelperManager.getHelper(context);
         assertNotNull(databaseHelper);
+        databaseHelperManager.releaseHelper();
 
         Log.d(DatabaseHelperManagerTest.class.getName(), "Database Path:" + context.getDatabasePath(DatabaseHelper.DATABASE_NAME));
-    }
-
-    @Test
-    public void releaseDatabaseHelperTest() {
-        DatabaseHelperManager databaseHelperManager = new DatabaseHelperManager();
-        DatabaseHelper databaseHelper = databaseHelperManager.getHelper(context);
-        assertNotNull(databaseHelper);
-
-        databaseHelper.close();
-
-        databaseHelperManager.releaseHelper();
     }
 }

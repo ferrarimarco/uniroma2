@@ -19,39 +19,31 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.GenericEntity;
  */
 public class GenericDao<T extends GenericEntity>{
 
+    private Context context;
     private DatabaseHelperManager databaseHelperManager;
     private DatabaseHelper databaseHelper;
 
     private Dao<T, ?> dao;
 
-    private Context context;
-
-    private boolean initialized;
-
     @Inject
     public GenericDao(DatabaseHelperManager databaseHelperManager, Context context){
         this.databaseHelperManager = databaseHelperManager;
         this.context = context;
-        initialized = false;
     }
 
-    protected void checkInitialization(){
-        if(!initialized){
-            throw new DaoException("This DAO has not been initialized");
+    protected void checkInitialization() throws SQLException{
+        if(dao == null){
+            throw new DaoException("This dao is not initialized. Call open() on the GenericDao object before any use.");
         }
     }
 
     public void open(final Class<T> entityClass) throws SQLException{
-        databaseHelper = databaseHelperManager.getHelper(context);
+        databaseHelper = this.databaseHelperManager.getHelper(context);
         dao = databaseHelper.getEntityDao(entityClass);
-        initialized = true;
     }
 
     public void close(){
-        if(initialized){
-            databaseHelper.close();
-            databaseHelperManager.releaseHelper();
-        }
+        databaseHelperManager.releaseHelper();
     }
 
     public int save(T resource) throws SQLException{

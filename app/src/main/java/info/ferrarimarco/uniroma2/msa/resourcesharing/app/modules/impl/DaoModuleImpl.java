@@ -2,8 +2,6 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl;
 
 import android.content.Context;
 
-import java.sql.SQLException;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -11,6 +9,7 @@ import dagger.Provides;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHelperManager;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.DaoModule;
 
 
@@ -26,16 +25,12 @@ public class DaoModuleImpl implements DaoModule{
     @Provides
     @Singleton
     public GenericDao<Resource> provideResourceDao(DatabaseHelperManager databaseHelperManager, Context context){
+        return new GenericDao<>(databaseHelperManager, context);
+    }
 
-        GenericDao<Resource> dao = null;
-        try{
-            dao = new GenericDao<>(databaseHelperManager, context);
-            dao.open(Resource.class);
-        }catch(SQLException e){
-            // TODO: handle this exception
-            e.printStackTrace();
-        }
-
-        return dao;
+    @Provides
+    @Singleton
+    public GenericDao<User> provideUserDao(DatabaseHelperManager databaseHelperManager, Context context){
+        return new GenericDao<>(databaseHelperManager, context);
     }
 }

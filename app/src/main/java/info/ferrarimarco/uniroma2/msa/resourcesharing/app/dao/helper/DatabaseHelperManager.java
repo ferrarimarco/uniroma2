@@ -7,17 +7,17 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 import javax.inject.Inject;
 
 
-public class DatabaseHelperManager {
+public class DatabaseHelperManager{
 
-	@Inject
-	public DatabaseHelperManager() {
-	}
+    @Inject
+    public DatabaseHelperManager(){
+    }
 
-	public DatabaseHelper getHelper(Context context) {
-		return OpenHelperManager.getHelper(context, DatabaseHelper.class);
-	}
+    public DatabaseHelper getHelper(Context context){
+        return OpenHelperManager.getHelper(context, DatabaseHelper.class);
+    }
 
-	public void releaseHelper() {
-		OpenHelperManager.releaseHelper();
-	}
+    public void releaseHelper(){
+        OpenHelperManager.releaseHelper();
+    }
 }

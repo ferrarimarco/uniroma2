@@ -18,7 +18,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 
-    // name of the database file for your application -- change to something appropriate for your app
+    // name of the database file for your application
     public static final String DATABASE_NAME = "resourceSharing.db";
     // any time you make changes to your database objects, you may have to increase the database version
     private static final int DATABASE_VERSION = 1;
@@ -56,7 +56,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
     }
 
     /**
-     * Close the database connections and clear any cached DAOs.
+     * Close the database connections.
      */
     @Override
     public void close(){
