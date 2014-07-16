@@ -20,27 +20,30 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.RegisterNewUserAsyncTask;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.UserLoginAsyncTask;
 
 /**
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, AsyncCaller{
 
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginAsyncTask mAuthTask = null;
     private RegisterNewUserAsyncTask mRegisterNewUserTask = null;
 
     @InjectView(R.id.email)
@@ -58,6 +61,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
     private String email;
     private String password;
 
+    @Inject
+    GenericDao<User> userDao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -65,28 +71,49 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 
         ButterKnife.inject(this);
 
-        // Set up the login form.
-        populateAutoComplete();
+        // Check if there is already a defined user
+        ObjectGraph objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
+        objectGraph.inject(this);
 
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent){
-                if(id == R.id.login || id == EditorInfo.IME_NULL){
-                    attemptLogin();
-                    return true;
+        try{
+            userDao.open(User.class);
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        User registeredUser = new User();
+        registeredUser.setId((long) R.string.registered_user_id);
+
+        List<User> users = null;
+
+        try{
+            users = userDao.read(registeredUser);
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        // Check if there is a registered user
+        if(users != null && !users.isEmpty()){
+
+        }else{
+            // Set up the registration form.
+            populateAutoComplete();
+
+            mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
+                @Override
+                public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent){
+                    if(id == R.id.login || id == EditorInfo.IME_NULL){
+                        registerNewUser();
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
+        }
     }
 
     private void populateAutoComplete(){
         getLoaderManager().initLoader(0, null, this);
-    }
-
-    @OnClick(R.id.email_sign_in_button)
-    public void signInButtonClickListener(){
-        attemptLogin();
     }
 
     @OnClick(R.id.register_new_user_button)
@@ -151,17 +178,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    public void attemptLogin(){
-        if(mAuthTask != null){
-            return;
-        }
-
-        if(areFieldsValid()){
-            mAuthTask = new UserLoginAsyncTask(this, email, password);
-            executeTask(mAuthTask);
-        }
-    }
-
     private void registerNewUser(){
 
         if(mRegisterNewUserTask != null){
@@ -192,7 +208,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
     }
 
     /**
-     * Shows the progress UI and hides the login form.
+     * Shows the progress UI and hides the form.
      */
     public void showProgress(final boolean show){
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
@@ -230,7 +246,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor){
-        List<String> emails = new ArrayList<String>();
+        List<String> emails = new ArrayList<>();
         cursor.moveToFirst();
         while(!cursor.isAfterLast()){
             emails.add(cursor.getString(ProfileQuery.ADDRESS));
@@ -247,7 +263,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 
     @Override
     public void onBackgroundTaskCompleted(Object result){
-        mAuthTask = null;
+        mRegisterNewUserTask = null;
         showProgress(false);
 
         UserTaskResult taskResult = (UserTaskResult) result;
@@ -262,7 +278,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 
     @Override
     public void onBackgroundTaskCancelled(){
-        mAuthTask = null;
+        mRegisterNewUserTask = null;
         showProgress(false);
     }
 
@@ -277,7 +293,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor>, 
 
     private void addEmailsToAutoComplete(List<String> emailAddressCollection){
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(LoginActivity.this, android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(LoginActivity.this, android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         mEmailView.setAdapter(adapter);
     }
