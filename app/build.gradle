@@ -11,6 +11,7 @@ dependencies {
     compile 'joda-time:joda-time:2.+'
     compile 'com.jakewharton:butterknife:4.+'
     compile 'com.squareup.retrofit:retrofit:1.+'
+    compile 'commons-codec:commons-codec:1.+'
     androidTestCompile 'junit:junit:4.+'
     androidTestCompile 'org.robolectric:robolectric:2.+'
     androidTestCompile 'com.squareup:fest-android:1.+'
@@ -32,8 +33,9 @@ android {
 
     packagingOptions {
         exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
     }
-
 }
 
 apply plugin: "jacoco"

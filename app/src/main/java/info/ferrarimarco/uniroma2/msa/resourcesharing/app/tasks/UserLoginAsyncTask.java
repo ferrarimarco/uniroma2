@@ -2,8 +2,13 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks;
 
 import android.os.AsyncTask;
 
+import javax.inject.Inject;
+
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.HashingService;
 
 /**
  * Represents an asynchronous login/registration task used to authenticate
@@ -19,15 +24,21 @@ public class UserLoginAsyncTask extends AsyncTask<Void, Void, UserTaskResult> {
             "foo@example.com:hello", "bar@example.com:world"
     };
 
-    private final String mEmail;
-    private final String mPassword;
+    private String userId;
+    private String password;
 
     private AsyncCaller caller;
 
-    public UserLoginAsyncTask(AsyncCaller caller, String email, String password) {
+    @Inject
+    HashingService hashingService;
+
+    @Inject
+    GenericDao<User> userDao;
+
+    public void initTask(AsyncCaller caller, String userId, String password){
         this.caller = caller;
-        mEmail = email;
-        mPassword = password;
+        this.userId = userId;
+        this.password = password;
     }
 
     @Override
@@ -43,9 +54,9 @@ public class UserLoginAsyncTask extends AsyncTask<Void, Void, UserTaskResult> {
 
         for (String credential : DUMMY_CREDENTIALS) {
             String[] pieces = credential.split(":");
-            if (pieces[0].equals(mEmail)) {
+            if(pieces[0].equals(userId)){
                 // Account exists, return true if the password matches.
-                if (pieces[1].equals(mPassword)) {
+                if(pieces[1].equals(password)){
                     return new UserTaskResult(UserTaskResult.UserTaskType.USER_LOGIN, UserTaskResult.UserTaskResultType.SUCCESS);
                 }
             }
