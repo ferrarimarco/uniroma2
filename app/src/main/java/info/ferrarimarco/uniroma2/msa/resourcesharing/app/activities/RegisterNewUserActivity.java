@@ -103,6 +103,7 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         if(users != null && !users.isEmpty()){
             Toast toast = Toast.makeText(this.getApplicationContext(), "User already registered", Toast.LENGTH_LONG);
             toast.show();
+            finish();
         }else{
             // Set up the registration form (populate auto complete)
             getLoaderManager().initLoader(0, null, this);
