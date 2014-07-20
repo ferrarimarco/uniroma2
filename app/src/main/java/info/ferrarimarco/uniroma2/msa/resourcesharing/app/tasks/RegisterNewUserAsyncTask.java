@@ -6,7 +6,6 @@ import org.joda.time.DateTime;
 import java.sql.SQLException;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
 
@@ -15,36 +14,26 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
  */
 public class RegisterNewUserAsyncTask extends UserLoginAsyncTask {
 
-    private AsyncCaller caller;
-
     @Override
     protected UserTaskResult doInBackground(Void... params) {
         // Register the user in local DB
-        try{
-            userDao.open(User.class);
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
 
+        try {
+            userDao.open(User.class);
+        } catch (SQLException e) {
+            return new UserTaskResult(UserTaskResult.UserTaskType.REGISTER_NEW_USER, UserTaskResult.UserTaskResultType.FAILURE, e.getMessage());
+        }
         String hashedPassword = new String(Hex.encodeHex(hashingService.hash(password)));
         User user = new User(userId, userId, hashedPassword, DateTime.now());
 
         Long registered_user_id = Long.parseLong(context.getResources().getString(R.string.registered_user_id));
         user.setId(registered_user_id);
 
-        try{
-            userDao.save(user);
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-
-        userDao.close();
-
         try {
-            // Simulate network access.
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            return new UserTaskResult(UserTaskResult.UserTaskType.REGISTER_NEW_USER, UserTaskResult.UserTaskResultType.FAILURE);
+            userDao.save(user);
+            userDao.close();
+        } catch (SQLException e) {
+            return new UserTaskResult(UserTaskResult.UserTaskType.REGISTER_NEW_USER, UserTaskResult.UserTaskResultType.FAILURE, e.getMessage());
         }
 
         return new UserTaskResult(UserTaskResult.UserTaskType.REGISTER_NEW_USER, UserTaskResult.UserTaskResultType.SUCCESS);
