@@ -23,6 +23,11 @@ public class UserTaskResult {
         this.details = "";
     }
 
+    public UserTaskResult(UserTaskType taskType, UserTaskResultType userTaskResultType, String details) {
+        this(taskType, userTaskResultType);
+        this.details = details;
+    }
+
     public UserTaskType getTaskType() {
         return taskType;
     }
