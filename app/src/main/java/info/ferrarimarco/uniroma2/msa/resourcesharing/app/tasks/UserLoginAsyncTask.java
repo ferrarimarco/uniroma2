@@ -1,5 +1,6 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import javax.inject.Inject;
@@ -24,10 +25,11 @@ public class UserLoginAsyncTask extends AsyncTask<Void, Void, UserTaskResult> {
             "foo@example.com:hello", "bar@example.com:world"
     };
 
-    private String userId;
-    private String password;
+    protected String userId;
+    protected String password;
 
     private AsyncCaller caller;
+    protected Context context;
 
     @Inject
     HashingService hashingService;
@@ -35,8 +37,9 @@ public class UserLoginAsyncTask extends AsyncTask<Void, Void, UserTaskResult> {
     @Inject
     GenericDao<User> userDao;
 
-    public void initTask(AsyncCaller caller, String userId, String password){
+    public void initTask(AsyncCaller caller, Context context, String userId, String password){
         this.caller = caller;
+        this.context = context;
         this.userId = userId;
         this.password = password;
     }

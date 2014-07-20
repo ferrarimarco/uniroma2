@@ -38,14 +38,13 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ServiceModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.RegisterNewUserAsyncTask;
 
 /**
  * A login screen that offers login via email/password.
  */
 public class RegisterNewUserActivity extends Activity implements LoaderCallbacks<Cursor>, AsyncCaller{
-
-    private RegisterNewUserAsyncTask mRegisterNewUserTask = null;
 
     @InjectView(R.id.email)
     AutoCompleteTextView mEmailView;
@@ -62,11 +61,12 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
     private String email;
     private String password;
 
+    private ObjectGraph objectGraph;
+
     @Inject
     GenericDao<User> userDao;
 
-    @Inject
-    RegisterNewUserAsyncTask registerNewUserAsyncTask;
+    private RegisterNewUserAsyncTask registerNewUserAsyncTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -76,7 +76,7 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         ButterKnife.inject(this);
 
         // Check if there is already a defined user
-        ObjectGraph objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
+        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl(), new ServiceModuleImpl());
         objectGraph.inject(this);
 
         try{
@@ -86,7 +86,8 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         }
 
         User registeredUser = new User();
-        registeredUser.setId((long) R.string.registered_user_id);
+        Long registered_user_id = Long.parseLong(getResources().getString(R.string.registered_user_id));
+        registeredUser.setId(registered_user_id);
 
         List<User> users = null;
 
@@ -131,13 +132,14 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
      */
     private void registerNewUser(){
 
-        if(mRegisterNewUserTask != null){
+        if(registerNewUserAsyncTask != null){
             return;
         }
 
         if(areFieldsValid()){
-            mRegisterNewUserTask.initTask(this, email, password);
-            executeTask(mRegisterNewUserTask);
+            registerNewUserAsyncTask = objectGraph.get(RegisterNewUserAsyncTask.class);
+            registerNewUserAsyncTask.initTask(this, this.getApplicationContext(), email, password);
+            executeTask(registerNewUserAsyncTask);
         }
     }
 
@@ -265,7 +267,7 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
 
     @Override
     public void onBackgroundTaskCompleted(Object result){
-        mRegisterNewUserTask = null;
+        registerNewUserAsyncTask = null;
         showProgress(false);
 
         UserTaskResult taskResult = (UserTaskResult) result;
@@ -280,7 +282,7 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
 
     @Override
     public void onBackgroundTaskCancelled(){
-        mRegisterNewUserTask = null;
+        registerNewUserAsyncTask = null;
         showProgress(false);
     }
 

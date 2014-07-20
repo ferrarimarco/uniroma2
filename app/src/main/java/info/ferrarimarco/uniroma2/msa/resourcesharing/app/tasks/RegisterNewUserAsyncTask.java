@@ -17,9 +17,6 @@ public class RegisterNewUserAsyncTask extends UserLoginAsyncTask {
 
     private AsyncCaller caller;
 
-    private String userId;
-    private String password;
-
     @Override
     protected UserTaskResult doInBackground(Void... params) {
         // Register the user in local DB
@@ -29,9 +26,11 @@ public class RegisterNewUserAsyncTask extends UserLoginAsyncTask {
             e.printStackTrace();
         }
 
-        String hashedPassword = Hex.encodeHexString(hashingService.hash(password));
+        String hashedPassword = new String(Hex.encodeHex(hashingService.hash(password)));
         User user = new User(userId, userId, hashedPassword, DateTime.now());
-        user.setId((long) R.string.registered_user_id);
+
+        Long registered_user_id = Long.parseLong(context.getResources().getString(R.string.registered_user_id));
+        user.setId(registered_user_id);
 
         try{
             userDao.save(user);
