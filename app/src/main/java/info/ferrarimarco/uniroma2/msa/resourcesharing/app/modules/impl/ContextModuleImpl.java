@@ -2,6 +2,8 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl;
 
 import android.content.Context;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
@@ -18,6 +20,7 @@ public class ContextModuleImpl{
     }
 
     @Provides
+    @Singleton
     public Context provideContext(){
         return mContext;
     }
