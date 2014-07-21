@@ -21,11 +21,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -33,8 +30,6 @@ import butterknife.OnClick;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
@@ -63,9 +58,6 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
 
     private ObjectGraph objectGraph;
 
-    @Inject
-    GenericDao<User> userDao;
-
     private RegisterNewUserAsyncTask registerNewUserAsyncTask;
 
     @Override
@@ -79,46 +71,23 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl(), new ServiceModuleImpl());
         objectGraph.inject(this);
 
-        try{
-            userDao.open(User.class);
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
+        Toast toast = Toast.makeText(this.getApplicationContext(), "User already registered", Toast.LENGTH_LONG);
+        toast.show();
+        finish();
+        // Set up the registration form (populate auto complete)
+        getLoaderManager().initLoader(0, null, this);
 
-        User registeredUser = new User();
-        Long registered_user_id = Long.parseLong(getResources().getString(R.string.registered_user_id));
-        registeredUser.setId(registered_user_id);
-
-        List<User> users = null;
-
-        try{
-            users = userDao.read(registeredUser);
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-
-        userDao.close();
-
-        // Check if there is a registered user
-        if(users != null && !users.isEmpty()){
-            Toast toast = Toast.makeText(this.getApplicationContext(), "User already registered", Toast.LENGTH_LONG);
-            toast.show();
-            finish();
-        }else{
-            // Set up the registration form (populate auto complete)
-            getLoaderManager().initLoader(0, null, this);
-
-            mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
-                @Override
-                public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent){
-                    if(id == R.id.register_new_user || id == EditorInfo.IME_NULL){
-                        registerNewUser();
-                        return true;
-                    }
-                    return false;
+        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
+            @Override
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent){
+                if(id == R.id.register_new_user || id == EditorInfo.IME_NULL){
+                    registerNewUser();
+                    return true;
                 }
-            });
-        }
+                return false;
+            }
+        });
+
     }
 
     @OnClick(R.id.register_new_user_button)

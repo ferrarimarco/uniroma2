@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.InitActivity;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.RegisterNewUserActivity;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHelperManager;
@@ -16,7 +17,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.RegisterNewUserA
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.UserLoginAsyncTask;
 
 
-@Module(injects = {GenericDao.class, RegisterNewUserActivity.class, RegisterNewUserAsyncTask.class, UserLoginAsyncTask.class}, complete = false, library = true)
+@Module(injects = {GenericDao.class, InitActivity.class, RegisterNewUserActivity.class, RegisterNewUserAsyncTask.class, UserLoginAsyncTask.class}, complete = false, library = true)
 public class DaoModuleImpl implements DaoModule{
 
     @Provides
