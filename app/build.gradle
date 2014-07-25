@@ -5,6 +5,9 @@ apply plugin: 'robolectric'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    androidTestCompile 'junit:junit:4.+'
+    androidTestCompile 'org.robolectric:robolectric:2.+'
+    androidTestCompile 'com.squareup:fest-android:1.+'
     compile 'com.squareup.dagger:dagger:1.+'
     compile 'com.squareup.dagger:dagger-compiler:1.+'
     compile 'com.j256.ormlite:ormlite-android:4.+'
@@ -12,9 +15,6 @@ dependencies {
     compile 'com.jakewharton:butterknife:4.+'
     compile 'com.squareup.retrofit:retrofit:1.+'
     compile 'commons-codec:commons-codec:1.+'
-    androidTestCompile 'junit:junit:4.+'
-    androidTestCompile 'org.robolectric:robolectric:2.+'
-    androidTestCompile 'com.squareup:fest-android:1.+'
 }
 
 android {
