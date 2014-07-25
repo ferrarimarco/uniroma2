@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -20,13 +19,18 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextMo
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ServiceModuleImpl;
 
-public class InitActivity extends Activity {
+public class InitActivity extends Activity{
 
     @Inject
     GenericDao<User> userDao;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
+
+        if(this.getActionBar() != null){
+            this.getActionBar().hide();
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_init);
 
@@ -34,6 +38,11 @@ public class InitActivity extends Activity {
         ObjectGraph objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl(), new ServiceModuleImpl());
         objectGraph.inject(this);
 
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
         try{
             userDao.open(User.class);
         }catch(SQLException e){
@@ -56,8 +65,8 @@ public class InitActivity extends Activity {
 
         // Check if there is a registered user
         if(users != null && !users.isEmpty()){
-            Toast toast = Toast.makeText(this.getApplicationContext(), "User already registered", Toast.LENGTH_LONG);
-            toast.show();
+            Intent intent = new Intent(this, ShowResourcesActivity.class);
+            startActivity(intent);
         }else{
             Intent intent = new Intent(this, RegisterNewUserActivity.class);
             startActivity(intent);
@@ -65,21 +74,20 @@ public class InitActivity extends Activity {
         finish();
     }
 
-
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu){
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.init, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item){
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if(id == R.id.action_settings){
             return true;
         }
         return super.onOptionsItemSelected(item);

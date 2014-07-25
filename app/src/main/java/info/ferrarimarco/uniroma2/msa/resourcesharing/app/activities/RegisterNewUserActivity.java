@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -19,7 +20,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,9 +71,6 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl(), new ServiceModuleImpl());
         objectGraph.inject(this);
 
-        Toast toast = Toast.makeText(this.getApplicationContext(), "User already registered", Toast.LENGTH_LONG);
-        toast.show();
-        finish();
         // Set up the registration form (populate auto complete)
         getLoaderManager().initLoader(0, null, this);
 
@@ -243,8 +240,11 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         UserTaskResult taskResult = (UserTaskResult) result;
 
         if(taskResult.getUserTaskResultType().equals(UserTaskResult.UserTaskResultType.SUCCESS)){
+            Intent intent = new Intent(this, ShowResourcesActivity.class);
+            startActivity(intent);
             finish();
         }else{
+            // TODO: handle this error condition
             mPasswordView.setError(getString(R.string.error_incorrect_password));
             mPasswordView.requestFocus();
         }
