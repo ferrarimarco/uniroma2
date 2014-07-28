@@ -12,11 +12,14 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
 /**
  * Created by FerrariM on 08/04/2014.
  */
-public class RegisterNewUserAsyncTask extends UserLoginAsyncTask {
+public class RegisterNewUserAsyncTask extends UserAsyncTask {
 
     @Override
-    protected UserTaskResult doInBackground(Void... params) {
+    protected UserTaskResult doInBackground(String... params) {
         // Register the user in local DB
+
+        String userId = params[0];
+        String password = params[1];
 
         try {
             userDao.open(User.class);

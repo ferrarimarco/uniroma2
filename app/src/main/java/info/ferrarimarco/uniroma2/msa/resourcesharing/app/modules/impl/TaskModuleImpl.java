@@ -9,10 +9,10 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.RegisterNewUserA
  * Created by Marco on 17/07/2014.
  */
 @Module(injects = {RegisterNewUserActivity.class}, complete = false, library = true)
-public class TaskModuleImpl{
+public class TaskModuleImpl {
 
     @Provides
-    public RegisterNewUserAsyncTask provideRegisterNewUserAsyncTask(){
+    public RegisterNewUserAsyncTask provideRegisterNewUserAsyncTask() {
         return new RegisterNewUserAsyncTask();
     }
 }

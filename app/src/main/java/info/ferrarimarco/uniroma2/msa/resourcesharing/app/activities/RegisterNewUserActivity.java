@@ -39,7 +39,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.RegisterNewUserA
 /**
  * A login screen that offers login via email/password.
  */
-public class RegisterNewUserActivity extends Activity implements LoaderCallbacks<Cursor>, AsyncCaller{
+public class RegisterNewUserActivity extends Activity implements LoaderCallbacks<Cursor>, AsyncCaller {
 
     @InjectView(R.id.email)
     AutoCompleteTextView mEmailView;
@@ -61,7 +61,7 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
     private RegisterNewUserAsyncTask registerNewUserAsyncTask;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_new_user);
 
@@ -74,10 +74,10 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         // Set up the registration form (populate auto complete)
         getLoaderManager().initLoader(0, null, this);
 
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
+        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent){
-                if(id == R.id.register_new_user || id == EditorInfo.IME_NULL){
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                if (id == R.id.register_new_user || id == EditorInfo.IME_NULL) {
                     registerNewUser();
                     return true;
                 }
@@ -88,7 +88,7 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
     }
 
     @OnClick(R.id.register_new_user_button)
-    public void registerNewUserButtonClickListener(){
+    public void registerNewUserButtonClickListener() {
         registerNewUser();
     }
 
@@ -97,20 +97,20 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void registerNewUser(){
+    private void registerNewUser() {
 
-        if(registerNewUserAsyncTask != null){
+        if (registerNewUserAsyncTask != null) {
             return;
         }
 
-        if(areFieldsValid()){
+        if (areFieldsValid()) {
             registerNewUserAsyncTask = objectGraph.get(RegisterNewUserAsyncTask.class);
-            registerNewUserAsyncTask.initTask(this, this.getApplicationContext(), email, password);
+            registerNewUserAsyncTask.initTask(this, this.getApplicationContext());
             executeTask(registerNewUserAsyncTask);
         }
     }
 
-    private boolean areFieldsValid(){
+    private boolean areFieldsValid() {
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
@@ -120,11 +120,11 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         password = "";
 
         // Store values at the time of the registration attempt.
-        if(mEmailView.getText() != null){
+        if (mEmailView.getText() != null) {
             email = mEmailView.getText().toString();
         }
 
-        if(mPasswordView.getText() != null){
+        if (mPasswordView.getText() != null) {
             password = mPasswordView.getText().toString();
         }
 
@@ -132,27 +132,27 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         boolean result = true;
 
         // Check for a valid password, if the user entered one.
-        if(!TextUtils.isEmpty(password) && !isPasswordValid(password)){
+        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             result = false;
         }
 
         // Check for a valid email address.
-        if(result && TextUtils.isEmpty(email)){
+        if (result && TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             result = false;
         }
 
         // Check if the user wrote a valid email
-        if(result && !isEmailValid(email)){
+        if (result && !isEmailValid(email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             result = false;
         }
 
-        if(!result){
+        if (!result) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
@@ -161,19 +161,19 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         return result;
     }
 
-    private void executeTask(AsyncTask<Void, Void, UserTaskResult> task){
+    private void executeTask(AsyncTask<String, Void, UserTaskResult> task) {
         // Show a progress spinner, and kick off a background task to
         // perform the user login attempt.
         showProgress(true);
-        task.execute((Void) null);
+        task.execute(email, password);
     }
 
-    private boolean isEmailValid(String email){
+    private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
         return email.contains("@");
     }
 
-    private boolean isPasswordValid(String password){
+    private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
         return password.length() > 4;
     }
@@ -181,28 +181,28 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
     /**
      * Shows the progress UI and hides the form.
      */
-    public void showProgress(final boolean show){
+    public void showProgress(final boolean show) {
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
         mRegisterNewUserFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        mRegisterNewUserFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter(){
+        mRegisterNewUserFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationEnd(Animator animation){
+            public void onAnimationEnd(Animator animation) {
                 mRegisterNewUserFormView.setVisibility(show ? View.GONE : View.VISIBLE);
             }
         });
 
         mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter(){
+        mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationEnd(Animator animation){
+            public void onAnimationEnd(Animator animation) {
                 mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             }
         });
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle){
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(this,
                 // Retrieve data rows for the device user's 'profile' contact.
                 Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI, ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
@@ -216,10 +216,10 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor){
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         List<String> emails = new ArrayList<>();
         cursor.moveToFirst();
-        while(!cursor.isAfterLast()){
+        while (!cursor.isAfterLast()) {
             emails.add(cursor.getString(ProfileQuery.ADDRESS));
             cursor.moveToNext();
         }
@@ -228,22 +228,22 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader){
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
 
     }
 
     @Override
-    public void onBackgroundTaskCompleted(Object result){
+    public void onBackgroundTaskCompleted(Object result) {
         registerNewUserAsyncTask = null;
         showProgress(false);
 
         UserTaskResult taskResult = (UserTaskResult) result;
 
-        if(taskResult.getUserTaskResultType().equals(UserTaskResult.UserTaskResultType.SUCCESS)){
+        if (taskResult.getUserTaskResultType().equals(UserTaskResult.UserTaskResultType.SUCCESS)) {
             Intent intent = new Intent(this, ShowResourcesActivity.class);
             startActivity(intent);
             finish();
-        }else{
+        } else {
             // TODO: handle this error condition
             mPasswordView.setError(getString(R.string.error_incorrect_password));
             mPasswordView.requestFocus();
@@ -251,13 +251,13 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
     }
 
     @Override
-    public void onBackgroundTaskCancelled(){
+    public void onBackgroundTaskCancelled() {
         registerNewUserAsyncTask = null;
         showProgress(false);
     }
 
 
-    private interface ProfileQuery{
+    private interface ProfileQuery {
         String[] PROJECTION = {ContactsContract.CommonDataKinds.Email.ADDRESS, ContactsContract.CommonDataKinds.Email.IS_PRIMARY,};
 
         int ADDRESS = 0;
@@ -265,7 +265,7 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
     }
 
 
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection){
+    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         ArrayAdapter<String> adapter = new ArrayAdapter<>(RegisterNewUserActivity.this, android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
