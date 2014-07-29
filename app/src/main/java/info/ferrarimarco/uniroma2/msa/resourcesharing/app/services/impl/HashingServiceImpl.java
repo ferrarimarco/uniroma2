@@ -11,9 +11,8 @@ import java.security.NoSuchProviderException;
 import javax.inject.Inject;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.HashingService;
 
-public class HashingServiceImpl implements HashingService {
+public class HashingServiceImpl {
 
     private MessageDigest mda;
 
@@ -33,7 +32,6 @@ public class HashingServiceImpl implements HashingService {
         }
     }
 
-    @Override
     public byte[] hash(String input) {
         return mda.digest(input.getBytes());
     }

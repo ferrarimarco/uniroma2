@@ -9,7 +9,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.HashingService;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.HashingServiceImpl;
 
 /**
  * Created by Marco on 28/07/2014.
@@ -24,7 +24,7 @@ public abstract class UserAsyncTask extends AsyncTask<String, Void, UserTaskResu
     GenericDao<User> userDao;
 
     @Inject
-    HashingService hashingService;
+    HashingServiceImpl hashingService;
 
     public void initTask(AsyncCaller caller, Context context) {
         this.caller = caller;

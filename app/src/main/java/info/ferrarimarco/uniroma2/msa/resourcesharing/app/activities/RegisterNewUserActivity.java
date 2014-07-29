@@ -33,7 +33,6 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ServiceModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.RegisterNewUserAsyncTask;
 
 /**
@@ -68,7 +67,7 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         ButterKnife.inject(this);
 
         // Check if there is already a defined user
-        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl(), new ServiceModuleImpl());
+        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
         objectGraph.inject(this);
 
         // Set up the registration form (populate auto complete)

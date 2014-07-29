@@ -10,7 +10,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ViewSwitcher;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 
 public class ShowResourcesActivity extends Activity implements ActionBar.OnNavigationListener {
@@ -21,10 +25,15 @@ public class ShowResourcesActivity extends Activity implements ActionBar.OnNavig
      */
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 
+    @InjectView(R.id.resources_view_switcher)
+    ViewSwitcher resourceViewSwitcher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_resources);
+
+        ButterKnife.inject(this);
 
         // Set up the action bar to show a dropdown list.
         final ActionBar actionBar = getActionBar();
@@ -36,7 +45,7 @@ public class ShowResourcesActivity extends Activity implements ActionBar.OnNavig
         // Set up the dropdown list navigation in the action bar.
         actionBar.setListNavigationCallbacks(
                 // Specify a SpinnerAdapter to populate the dropdown list.
-                new ArrayAdapter<String>(
+                new ArrayAdapter<>(
                         actionBar.getThemedContext(),
                         android.R.layout.simple_list_item_1,
                         android.R.id.text1,
@@ -64,6 +73,10 @@ public class ShowResourcesActivity extends Activity implements ActionBar.OnNavig
                 getActionBar().getSelectedNavigationIndex());
     }
 
+    @OnClick(R.id.test_view_switcher_button)
+    public void testViewSwitcherButton() {
+        resourceViewSwitcher.showNext();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

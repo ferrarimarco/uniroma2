@@ -12,7 +12,6 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ServiceModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.RegisteredUserCheckTask;
 
 public class InitActivity extends Activity implements AsyncCaller {
@@ -32,7 +31,7 @@ public class InitActivity extends Activity implements AsyncCaller {
         setContentView(R.layout.activity_init);
 
         // Check if there is already a defined user
-        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl(), new ServiceModuleImpl());
+        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
         objectGraph.inject(this);
 
         // Create an async task to check for reg user, with this param
