@@ -14,11 +14,12 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.DaoModule;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.RegisterNewUserAsyncTask;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.RegisteredUserCheckTask;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.UserAsyncTask;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.UserLoginAsyncTask;
 
 
-@Module(injects = {GenericDao.class, InitActivity.class, RegisterNewUserActivity.class, UserAsyncTask.class, RegisterNewUserAsyncTask.class, UserLoginAsyncTask.class}, complete = false, library = true)
+@Module(injects = {GenericDao.class, InitActivity.class, RegisterNewUserActivity.class, UserAsyncTask.class, RegisterNewUserAsyncTask.class, UserLoginAsyncTask.class, RegisteredUserCheckTask.class}, complete = false, library = true)
 public class DaoModuleImpl implements DaoModule {
 
     @Provides
