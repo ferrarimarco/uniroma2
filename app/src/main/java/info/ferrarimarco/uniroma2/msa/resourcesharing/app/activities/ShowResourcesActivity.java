@@ -1,23 +1,39 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
+
+import org.joda.time.DateTime;
+
+import java.sql.SQLException;
+
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
+import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.ResourceType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.ReadAllResourcesAsyncTask;
 
-public class ShowResourcesActivity extends Activity implements ActionBar.OnNavigationListener {
+public class ShowResourcesActivity extends Activity implements AsyncCaller, ActionBar.OnNavigationListener {
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -27,6 +43,13 @@ public class ShowResourcesActivity extends Activity implements ActionBar.OnNavig
 
     @InjectView(R.id.resources_view_switcher)
     ViewSwitcher resourceViewSwitcher;
+
+    @InjectView(R.id.show_resources_progress)
+    View mProgressView;
+
+    private ObjectGraph objectGraph;
+
+    private ReadAllResourcesAsyncTask readAllResourcesAsyncTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +72,41 @@ public class ShowResourcesActivity extends Activity implements ActionBar.OnNavig
                         actionBar.getThemedContext(),
                         android.R.layout.simple_list_item_1,
                         android.R.id.text1,
-                        new String[] {
+                        new String[]{
+                                // New Resources
                                 getString(R.string.title_section1),
+
+                                // Resources created by me
                                 getString(R.string.title_section2),
+
+                                // Archived Resources
                                 getString(R.string.title_section3),
                         }),
                 this);
+
+        // Check if there is already a defined user
+        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
+        objectGraph.inject(this);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(int position, long id) {
+
+        Toast.makeText(this, "Selected Section: " + (position + 1), Toast.LENGTH_LONG).show();
+
+        switch (position) {
+            case 0:
+                loadResources(ResourceType.NEW);
+                break;
+            case 1:
+                loadResources(ResourceType.CREATED_BY_ME);
+                break;
+            case 2:
+                loadResources(ResourceType.ARCHIVED);
+                break;
+        }
+
+        return true;
     }
 
     @Override
@@ -69,13 +121,7 @@ public class ShowResourcesActivity extends Activity implements ActionBar.OnNavig
     @Override
     public void onSaveInstanceState(Bundle outState) {
         // Serialize the current dropdown position.
-        outState.putInt(STATE_SELECTED_NAVIGATION_ITEM,
-                getActionBar().getSelectedNavigationIndex());
-    }
-
-    @OnClick(R.id.test_view_switcher_button)
-    public void testViewSwitcherButton() {
-        resourceViewSwitcher.showNext();
+        outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getActionBar().getSelectedNavigationIndex());
     }
 
     @Override
@@ -85,59 +131,84 @@ public class ShowResourcesActivity extends Activity implements ActionBar.OnNavig
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+    @Inject
+    GenericDao<Resource> resDao;
 
     @Override
-    public boolean onNavigationItemSelected(int position, long id) {
-        // When the given dropdown item is selected, show its contents in the
-        // container view.
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
-        return true;
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_new_resource:
+                // Test the insertion of a new resource
+                try {
+                    resDao.open(Resource.class);
+                    resDao.save(new Resource("'Title", "Desc", "LOC", DateTime.now(), "ACQ", "CREATOR", ResourceType.CREATED_BY_ME));
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    resDao.close();
+                }
+                return true;
+            case R.id.action_settings:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void loadResources(ResourceType resourceType) {
+
+        showProgress(true);
+
+        readAllResourcesAsyncTask = objectGraph.get(ReadAllResourcesAsyncTask.class);
+        readAllResourcesAsyncTask.initTask(this, this.getApplicationContext());
+
+        switch (resourceType) {
+            case NEW:
+                readAllResourcesAsyncTask.setTaskType(ResourceTaskType.READ_NEW_RESOURCES);
+                break;
+            case CREATED_BY_ME:
+                readAllResourcesAsyncTask.setTaskType(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES);
+                break;
+            case ARCHIVED:
+                readAllResourcesAsyncTask.setTaskType(ResourceTaskType.READ_ARCHIVED_RESOURCES);
+                break;
+        }
+
+        readAllResourcesAsyncTask.execute();
     }
 
     /**
-     * A placeholder fragment containing a simple view.
+     * Shows the progress UI and hides the form.
      */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+    private void showProgress(final boolean show) {
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
+    }
 
-        public PlaceholderFragment() {
-        }
+    @Override
+    public void onBackgroundTaskCompleted(Object result) {
+        readAllResourcesAsyncTask = null;
+        showProgress(false);
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_show_resources, container, false);
-            return rootView;
+        ResourceTaskResult taskResult = (ResourceTaskResult) result;
+
+        if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
+            Toast.makeText(this, "List Loaded", Toast.LENGTH_LONG).show();
+        } else {
+            // TODO: handle this error condition
         }
     }
 
+    @Override
+    public void onBackgroundTaskCancelled() {
+        readAllResourcesAsyncTask = null;
+        showProgress(false);
+    }
 }

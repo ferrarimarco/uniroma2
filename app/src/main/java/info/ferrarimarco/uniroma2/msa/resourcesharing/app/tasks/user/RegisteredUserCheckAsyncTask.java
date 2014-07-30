@@ -1,27 +1,29 @@
-package info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks;
+package info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user;
 
 import java.sql.SQLException;
 import java.util.List;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskType;
 
 /**
  * Created by Marco on 25/07/2014.
  */
-public class RegisteredUserCheckTask extends UserAsyncTask {
+public class RegisteredUserCheckAsyncTask extends AbstractUserAsyncTask {
 
 
     @Override
     protected UserTaskResult doInBackground(String... params) {
 
-        UserTaskResult result = new UserTaskResult(UserTaskResult.UserTaskType.CHECK_REGISTERED_USER);
+        UserTaskResult result = new UserTaskResult(UserTaskType.CHECK_REGISTERED_USER);
 
         try {
             userDao.open(User.class);
         } catch (SQLException e) {
             e.printStackTrace();
-            result.setUserTaskResultType(UserTaskResult.UserTaskResultType.FAILURE);
+            result.setTaskResultType(TaskResultType.FAILURE);
             result.setDetails(e.getMessage());
             return result;
         }
@@ -32,19 +34,19 @@ public class RegisteredUserCheckTask extends UserAsyncTask {
         Long registered_user_id = Long.parseLong(registeredUserId);
         registeredUser.setId(registered_user_id);
 
-        List<User> users = null;
+        List<User> users;
 
         try {
             users = userDao.read(registeredUser);
             userDao.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            result.setUserTaskResultType(UserTaskResult.UserTaskResultType.FAILURE);
+            result.setTaskResultType(TaskResultType.FAILURE);
             result.setDetails(e.getMessage());
             return result;
         }
 
-        result.setUserTaskResultType(UserTaskResult.UserTaskResultType.SUCCESS);
+        result.setTaskResultType(TaskResultType.SUCCESS);
 
         // Check if there is a registered user
         if (users != null && !users.isEmpty()) {

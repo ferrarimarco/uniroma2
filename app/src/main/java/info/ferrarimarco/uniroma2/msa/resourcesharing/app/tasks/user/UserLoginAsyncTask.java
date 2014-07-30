@@ -1,12 +1,14 @@
-package info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks;
+package info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user;
 
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskType;
 
 /**
  * Represents an asynchronous login/registration task used to authenticate
  * the user.
  */
-public class UserLoginAsyncTask extends UserAsyncTask {
+public class UserLoginAsyncTask extends AbstractUserAsyncTask {
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -27,7 +29,7 @@ public class UserLoginAsyncTask extends UserAsyncTask {
             // Simulate network access.
             Thread.sleep(2000);
         } catch (InterruptedException e) {
-            return new UserTaskResult(UserTaskResult.UserTaskType.USER_LOGIN, UserTaskResult.UserTaskResultType.FAILURE);
+            return new UserTaskResult(UserTaskType.USER_LOGIN, TaskResultType.FAILURE);
         }
 
         for (String credential : DUMMY_CREDENTIALS) {
@@ -35,12 +37,12 @@ public class UserLoginAsyncTask extends UserAsyncTask {
             if (pieces[0].equals(userId)) {
                 // Account exists, return true if the password matches.
                 if (pieces[1].equals(password)) {
-                    return new UserTaskResult(UserTaskResult.UserTaskType.USER_LOGIN, UserTaskResult.UserTaskResultType.SUCCESS);
+                    return new UserTaskResult(UserTaskType.USER_LOGIN, TaskResultType.SUCCESS);
                 }
             }
         }
 
-        return new UserTaskResult(UserTaskResult.UserTaskType.USER_LOGIN, UserTaskResult.UserTaskResultType.SUCCESS);
+        return new UserTaskResult(UserTaskType.USER_LOGIN, TaskResultType.SUCCESS);
     }
 
 

@@ -9,16 +9,17 @@ import android.view.MenuItem;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.RegisteredUserCheckTask;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredUserCheckAsyncTask;
 
 public class InitActivity extends Activity implements AsyncCaller {
 
     private ObjectGraph objectGraph;
 
-    private RegisteredUserCheckTask registeredUserCheckTask;
+    private RegisteredUserCheckAsyncTask registeredUserCheckTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +36,7 @@ public class InitActivity extends Activity implements AsyncCaller {
         objectGraph.inject(this);
 
         // Create an async task to check for reg user, with this param
-        chackRegisteredUser();
-
+        checkRegisteredUser();
     }
 
     @Override
@@ -58,13 +58,12 @@ public class InitActivity extends Activity implements AsyncCaller {
         return super.onOptionsItemSelected(item);
     }
 
-    private void chackRegisteredUser() {
-
+    private void checkRegisteredUser() {
         if (registeredUserCheckTask != null) {
             return;
         }
 
-        registeredUserCheckTask = objectGraph.get(RegisteredUserCheckTask.class);
+        registeredUserCheckTask = objectGraph.get(RegisteredUserCheckAsyncTask.class);
         registeredUserCheckTask.initTask(this, this.getApplicationContext());
         registeredUserCheckTask.execute(getResources().getString(R.string.registered_user_id));
     }
@@ -74,7 +73,7 @@ public class InitActivity extends Activity implements AsyncCaller {
 
         UserTaskResult taskResult = (UserTaskResult) result;
 
-        if (taskResult.getUserTaskResultType().equals(UserTaskResult.UserTaskResultType.SUCCESS)) {
+        if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
             if (taskResult.isRegisteredUserPresent()) {
                 Intent intent = new Intent(this, ShowResourcesActivity.class);
                 startActivity(intent);

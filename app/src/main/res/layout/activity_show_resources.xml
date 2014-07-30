@@ -1,7 +1,32 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
+    android:id="@+id/show_resources_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.ShowResourcesActivity"
-    tools:ignore="MergeRootFrame" />
+    tools:context="info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.ShowResourcesActivity">
+
+    <ProgressBar
+        android:id="@+id/show_resources_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
+    <ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/resources_view_switcher"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"></ListView>
+
+        <GridView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"></GridView>
+    </ViewSwitcher>
+</RelativeLayout>

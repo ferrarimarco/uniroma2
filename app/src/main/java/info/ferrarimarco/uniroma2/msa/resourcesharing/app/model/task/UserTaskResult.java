@@ -1,20 +1,9 @@
-package info.ferrarimarco.uniroma2.msa.resourcesharing.app.model;
+package info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task;
 
 public class UserTaskResult {
 
-    public enum UserTaskType {
-        USER_LOGIN,
-        REGISTER_NEW_USER,
-        CHECK_REGISTERED_USER
-    }
-
-    public enum UserTaskResultType {
-        SUCCESS,
-        FAILURE
-    }
-
     private UserTaskType taskType;
-    private UserTaskResultType userTaskResultType;
+    private TaskResultType taskResultType;
 
     private String details;
 
@@ -30,14 +19,14 @@ public class UserTaskResult {
         this.taskType = taskType;
     }
 
-    public UserTaskResult(UserTaskType taskType, UserTaskResultType userTaskResultType) {
+    public UserTaskResult(UserTaskType taskType, TaskResultType taskResultType) {
         this(taskType);
-        this.userTaskResultType = userTaskResultType;
+        this.taskResultType = taskResultType;
 
     }
 
-    public UserTaskResult(UserTaskType taskType, UserTaskResultType userTaskResultType, String details) {
-        this(taskType, userTaskResultType);
+    public UserTaskResult(UserTaskType taskType, TaskResultType taskResultType, String details) {
+        this(taskType, taskResultType);
         this.details = details;
     }
 
@@ -49,12 +38,12 @@ public class UserTaskResult {
         this.taskType = taskType;
     }
 
-    public UserTaskResultType getUserTaskResultType() {
-        return userTaskResultType;
+    public TaskResultType getTaskResultType() {
+        return taskResultType;
     }
 
-    public void setUserTaskResultType(UserTaskResultType userTaskResultType) {
-        this.userTaskResultType = userTaskResultType;
+    public void setTaskResultType(TaskResultType userTaskResultType) {
+        this.taskResultType = userTaskResultType;
     }
 
     public String getDetails() {

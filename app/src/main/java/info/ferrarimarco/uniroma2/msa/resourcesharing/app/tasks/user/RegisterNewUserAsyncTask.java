@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks;
+package info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user;
 
 import org.apache.commons.codec.binary.Hex;
 import org.joda.time.DateTime;
@@ -7,12 +7,14 @@ import java.sql.SQLException;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskType;
 
 /**
  * Created by FerrariM on 08/04/2014.
  */
-public class RegisterNewUserAsyncTask extends UserAsyncTask {
+public class RegisterNewUserAsyncTask extends AbstractUserAsyncTask {
 
     @Override
     protected UserTaskResult doInBackground(String... params) {
@@ -24,7 +26,7 @@ public class RegisterNewUserAsyncTask extends UserAsyncTask {
         try {
             userDao.open(User.class);
         } catch (SQLException e) {
-            return new UserTaskResult(UserTaskResult.UserTaskType.REGISTER_NEW_USER, UserTaskResult.UserTaskResultType.FAILURE, e.getMessage());
+            return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResultType.FAILURE, e.getMessage());
         }
         String hashedPassword = new String(Hex.encodeHex(hashingService.hash(password)));
         User user = new User(userId, userId, hashedPassword, DateTime.now());
@@ -36,9 +38,9 @@ public class RegisterNewUserAsyncTask extends UserAsyncTask {
             userDao.save(user);
             userDao.close();
         } catch (SQLException e) {
-            return new UserTaskResult(UserTaskResult.UserTaskType.REGISTER_NEW_USER, UserTaskResult.UserTaskResultType.FAILURE, e.getMessage());
+            return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResultType.FAILURE, e.getMessage());
         }
 
-        return new UserTaskResult(UserTaskResult.UserTaskType.REGISTER_NEW_USER, UserTaskResult.UserTaskResultType.SUCCESS);
+        return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResultType.SUCCESS);
     }
 }

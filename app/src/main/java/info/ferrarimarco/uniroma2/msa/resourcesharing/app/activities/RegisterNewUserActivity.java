@@ -30,10 +30,11 @@ import butterknife.OnClick;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.UserTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.RegisterNewUserAsyncTask;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisterNewUserAsyncTask;
 
 /**
  * A login screen that offers login via email/password.
@@ -83,7 +84,6 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
                 return false;
             }
         });
-
     }
 
     @OnClick(R.id.register_new_user_button)
@@ -238,7 +238,7 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
 
         UserTaskResult taskResult = (UserTaskResult) result;
 
-        if (taskResult.getUserTaskResultType().equals(UserTaskResult.UserTaskResultType.SUCCESS)) {
+        if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
             Intent intent = new Intent(this, ShowResourcesActivity.class);
             startActivity(intent);
             finish();
