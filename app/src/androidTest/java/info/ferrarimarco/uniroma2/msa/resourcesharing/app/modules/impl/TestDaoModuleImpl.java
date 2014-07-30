@@ -15,26 +15,18 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.DaoModule;
 
 @Module(injects = {GenericDao.class, GenericDaoTest.class, DatabaseHelperManagerTest.class}, complete = false, overrides = true)
-public class TestDaoModuleImpl implements DaoModule{
+public class TestDaoModuleImpl implements DaoModule {
 
     @Override
     @Provides
     @Singleton
-    public DatabaseHelperManager provideDatabaseHelperManager(){
-        return new DatabaseHelperManager();
-    }
-
-    @Override
-    @Provides
-    @Singleton
-    public GenericDao<Resource> provideResourceDao(DatabaseHelperManager databaseHelperManager, Context context){
+    public GenericDao<Resource> provideResourceDao(DatabaseHelperManager databaseHelperManager, Context context) {
         return new GenericDao<>(databaseHelperManager, context);
     }
 
-    @Override
     @Provides
     @Singleton
-    public GenericDao<User> provideUserDao(DatabaseHelperManager databaseHelperManager, Context context){
+    public GenericDao<User> provideUserDao(DatabaseHelperManager databaseHelperManager, Context context) {
         return new GenericDao<>(databaseHelperManager, context);
     }
 }

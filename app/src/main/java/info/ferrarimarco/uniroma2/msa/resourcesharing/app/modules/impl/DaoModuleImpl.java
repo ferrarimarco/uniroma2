@@ -22,18 +22,14 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.UserLoginAsyncTa
 @Module(injects = {GenericDao.class, InitActivity.class, RegisterNewUserActivity.class, UserAsyncTask.class, RegisterNewUserAsyncTask.class, UserLoginAsyncTask.class, RegisteredUserCheckTask.class}, complete = false, library = true)
 public class DaoModuleImpl implements DaoModule {
 
-    @Provides
-    @Singleton
-    public DatabaseHelperManager provideDatabaseHelperManager() {
-        return new DatabaseHelperManager();
-    }
-
+    @Override
     @Provides
     @Singleton
     public GenericDao<Resource> provideResourceDao(DatabaseHelperManager databaseHelperManager, Context context) {
         return new GenericDao<>(databaseHelperManager, context);
     }
 
+    @Override
     @Provides
     @Singleton
     public GenericDao<User> provideUserDao(DatabaseHelperManager databaseHelperManager, Context context) {
