@@ -17,7 +17,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.GenericEntity;
 /**
  * Created by Marco on 12/07/2014.
  */
-public class GenericDao<T extends GenericEntity>{
+public class GenericDao<T extends GenericEntity> {
 
     private Context context;
     private DatabaseHelperManager databaseHelperManager;
@@ -26,42 +26,47 @@ public class GenericDao<T extends GenericEntity>{
     private Dao<T, ?> dao;
 
     @Inject
-    public GenericDao(DatabaseHelperManager databaseHelperManager, Context context){
+    public GenericDao(DatabaseHelperManager databaseHelperManager, Context context) {
         this.databaseHelperManager = databaseHelperManager;
         this.context = context;
     }
 
-    protected void checkInitialization() throws SQLException{
-        if(dao == null){
+    protected void checkInitialization() throws SQLException {
+        if (dao == null) {
             throw new DaoException("This dao is not initialized. Call open() on the GenericDao object before any use.");
         }
     }
 
-    public void open(final Class<T> entityClass) throws SQLException{
+    public void open(final Class<T> entityClass) throws SQLException {
         databaseHelper = this.databaseHelperManager.getHelper(context);
         dao = databaseHelper.getEntityDao(entityClass);
     }
 
-    public void close(){
+    public void close() {
         databaseHelperManager.releaseHelper();
     }
 
-    public int save(T resource) throws SQLException{
+    public int save(T resource) throws SQLException {
         checkInitialization();
         return dao.create(resource);
     }
 
-    public List<T> read(T resource) throws SQLException{
+    public List<T> read(T resource) throws SQLException {
         checkInitialization();
         return dao.queryForMatching(resource);
     }
 
-    public int update(T resource) throws SQLException{
+    public List<T> readAll() throws SQLException {
+        checkInitialization();
+        return dao.queryForAll();
+    }
+
+    public int update(T resource) throws SQLException {
         checkInitialization();
         return dao.update(resource);
     }
 
-    public int delete(T resource) throws SQLException{
+    public int delete(T resource) throws SQLException {
         checkInitialization();
         return dao.delete(resource);
     }
