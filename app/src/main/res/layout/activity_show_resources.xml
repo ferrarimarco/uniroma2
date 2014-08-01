@@ -22,11 +22,12 @@
         <ListView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"></ListView>
+            android:orientation="vertical"
+            android:id="@+id/resources_list_view" />
 
         <GridView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"></GridView>
+            android:orientation="vertical" />
     </ViewSwitcher>
 </RelativeLayout>

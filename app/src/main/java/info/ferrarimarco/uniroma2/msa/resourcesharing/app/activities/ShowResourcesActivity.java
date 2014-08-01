@@ -4,26 +4,23 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
+import android.widget.ListView;
 import android.widget.ViewSwitcher;
 
-import org.joda.time.DateTime;
-
-import java.sql.SQLException;
-
-import javax.inject.Inject;
+import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArrayAdapter;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.ResourceType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
@@ -44,12 +41,17 @@ public class ShowResourcesActivity extends Activity implements AsyncCaller, Acti
     @InjectView(R.id.resources_view_switcher)
     ViewSwitcher resourceViewSwitcher;
 
+    @InjectView(R.id.resources_list_view)
+    ListView resourcesListView;
+
     @InjectView(R.id.show_resources_progress)
     View mProgressView;
 
     private ObjectGraph objectGraph;
 
     private ReadAllResourcesAsyncTask readAllResourcesAsyncTask;
+
+    private ResourceArrayAdapter resourceArrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,13 +89,15 @@ public class ShowResourcesActivity extends Activity implements AsyncCaller, Acti
         // Check if there is already a defined user
         objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
         objectGraph.inject(this);
+
+        // TODO: move this into a dagger module
+        resourceArrayAdapter = new ResourceArrayAdapter(this, R.layout.resource_row_list, new ArrayList<Resource>());
+        resourceArrayAdapter.setNotifyOnChange(true);
+        resourcesListView.setAdapter(resourceArrayAdapter);
     }
 
     @Override
     public boolean onNavigationItemSelected(int position, long id) {
-
-        Toast.makeText(this, "Selected Section: " + (position + 1), Toast.LENGTH_LONG).show();
-
         switch (position) {
             case 0:
                 loadResources(ResourceType.NEW);
@@ -131,22 +135,13 @@ public class ShowResourcesActivity extends Activity implements AsyncCaller, Acti
         return true;
     }
 
-    @Inject
-    GenericDao<Resource> resDao;
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_new_resource:
-                // Test the insertion of a new resource
-                try {
-                    resDao.open(Resource.class);
-                    resDao.save(new Resource("'Title", "Desc", "LOC", DateTime.now(), "ACQ", "CREATOR", ResourceType.CREATED_BY_ME));
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                } finally {
-                    resDao.close();
-                }
+                Intent intent = new Intent(this, CreateNewResourceActivity.class);
+                startActivity(intent);
+
                 return true;
             case R.id.action_settings:
                 return true;
@@ -200,7 +195,8 @@ public class ShowResourcesActivity extends Activity implements AsyncCaller, Acti
         ResourceTaskResult taskResult = (ResourceTaskResult) result;
 
         if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
-            Toast.makeText(this, "List Loaded", Toast.LENGTH_LONG).show();
+            resourceArrayAdapter.clear();
+            resourceArrayAdapter.addAll(taskResult.getResources());
         } else {
             // TODO: handle this error condition
         }

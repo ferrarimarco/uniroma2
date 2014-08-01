@@ -1,0 +1,48 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.CreateNewResourceActivity">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/resourceTitleEditText"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:hint="@string/resource_title_hint" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/resourceDescriptionEditText"
+        android:layout_below="@+id/resourceTitleEditText"
+        android:layout_alignParentStart="true"
+        android:hint="@string/resource_description_hint"
+        android:singleLine="false"
+        android:minLines="5"
+        android:lines="5"
+        android:gravity="top|left"
+        android:scrollbars="vertical" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/resourceLocationEditText"
+        android:layout_below="@+id/resourceDescriptionEditText"
+        android:layout_alignParentStart="true"
+        android:hint="@string/resource_location_hint" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/resourceCreationTimeEditText"
+        android:layout_below="@+id/resourceLocationEditText"
+        android:layout_alignParentStart="true"
+        android:hint="@string/resource_creation_time_hint" />
+
+</RelativeLayout>
