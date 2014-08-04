@@ -1,11 +1,15 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task;
 
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
+
 public class UserTaskResult {
 
     private UserTaskType taskType;
     private TaskResultType taskResultType;
 
     private String details;
+
+    private User resultUser;
 
     private Boolean registeredUserPresent;
 
@@ -60,5 +64,13 @@ public class UserTaskResult {
 
     public void setRegisteredUserPresent(Boolean registeredUserPresent) {
         this.registeredUserPresent = registeredUserPresent;
+    }
+
+    public User getResultUser() {
+        return resultUser;
+    }
+
+    public void setResultUser(User resultUser) {
+        this.resultUser = resultUser;
     }
 }

@@ -51,6 +51,7 @@ public class RegisteredUserCheckAsyncTask extends AbstractUserAsyncTask {
         // Check if there is a registered user
         if (users != null && !users.isEmpty()) {
             result.setRegisteredUserPresent(Boolean.TRUE);
+            result.setResultUser(users.get(0));
         }
 
         return result;

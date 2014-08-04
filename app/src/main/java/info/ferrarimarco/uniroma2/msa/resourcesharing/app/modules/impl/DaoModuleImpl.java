@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.CreateNewResourceActivity;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.InitActivity;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.RegisterNewUserActivity;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.ShowResourcesActivity;
@@ -20,7 +21,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredU
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.UserLoginAsyncTask;
 
 
-@Module(injects = {GenericDao.class, InitActivity.class, RegisterNewUserActivity.class, ShowResourcesActivity.class, ReadAllResourcesAsyncTask.class, RegisterNewUserAsyncTask.class, UserLoginAsyncTask.class, RegisteredUserCheckAsyncTask.class}, complete = false, library = true)
+@Module(injects = {GenericDao.class, InitActivity.class, RegisterNewUserActivity.class, ShowResourcesActivity.class, CreateNewResourceActivity.class, ReadAllResourcesAsyncTask.class, RegisterNewUserAsyncTask.class, UserLoginAsyncTask.class, RegisteredUserCheckAsyncTask.class}, complete = false, library = true)
 public class DaoModuleImpl implements DaoModule {
 
     @Override

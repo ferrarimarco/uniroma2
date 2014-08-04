@@ -141,7 +141,6 @@ public class ShowResourcesActivity extends Activity implements AsyncCaller, Acti
             case R.id.action_new_resource:
                 Intent intent = new Intent(this, CreateNewResourceActivity.class);
                 startActivity(intent);
-
                 return true;
             case R.id.action_settings:
                 return true;
