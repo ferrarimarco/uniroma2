@@ -40,8 +40,8 @@ public class CreateNewResourceActivity  extends AbstractAsyncTaskActivity {
     @InjectView(R.id.resourceLocationEditText)
     EditText locationEditText;
 
-    @InjectView(R.id.resourceCreationTimeEditText)
-    EditText creationTimeEditText;
+    @InjectView(R.id.resourceAcquisitionModeEditText)
+    EditText acquisitionModeEditText;
 
     @InjectView(R.id.create_new_resource_progress)
     View mProgressView;
@@ -64,11 +64,11 @@ public class CreateNewResourceActivity  extends AbstractAsyncTaskActivity {
 
         this.defaultInitialization(mProgressView, mCreateNewResourceFormView);
 
+        showProgress(true);
+
         registeredUserCheckTask = objectGraph.get(RegisteredUserCheckAsyncTask.class);
         registeredUserCheckTask.initTask(this, this.getApplicationContext());
         registeredUserCheckTask.execute(getResources().getString(R.string.registered_user_id));
-
-        showProgress(true);
     }
 
 
@@ -87,23 +87,23 @@ public class CreateNewResourceActivity  extends AbstractAsyncTaskActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_save_new_resource) {
+            showProgress(true);
             try {
                 resDao.open(Resource.class);
 
                 String title = titleEditText.getText().toString();
                 String description = descriptionEditText.getText().toString();
-                String creationTime = creationTimeEditText.getText().toString();
-                //String acquisitionMode = acquisitionModeEditText.getText().toString();
+                String acquisitionMode = acquisitionModeEditText.getText().toString();
                 String location = locationEditText.getText().toString();
 
-                Resource newRes = new Resource(title, description, location, DateTime.now(), "ACQ", currentUser.getName(), ResourceType.CREATED_BY_ME);
+                Resource newRes = new Resource(title, description, location, DateTime.now(), acquisitionMode, currentUser.getName(), ResourceType.CREATED_BY_ME);
                 resDao.save(newRes);
             } catch (SQLException e) {
                 e.printStackTrace();
             } finally {
                 resDao.close();
             }
-
+            showProgress(false);
             finish();
         }
         return super.onOptionsItemSelected(item);

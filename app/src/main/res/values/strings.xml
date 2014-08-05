@@ -9,8 +9,8 @@
     <string name="title_activity_init">InitActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_show_resources">ShowResourcesActivity</string>
-    <string name="title_section1">New Resources</string>
-    <string name="title_section2">Created by me</string>
+    <string name="title_section_new_resource">New Resources</string>
+    <string name="title_section_created_by_me_resource">Created by me</string>
     <string name="title_activity_fullscreen">FullscreenActivity</string>
     <string name="init_splash_text">MSA</string>
     <string name="action_new_resource">New Resource</string>
@@ -20,6 +20,6 @@
     <string name="resource_title_hint">Title</string>
     <string name="resource_description_hint">Description</string>
     <string name="resource_location_hint">Location</string>
-    <string name="resource_creation_time_hint">Creation Time</string>
+    <string name="resource_acquisition_mode_hint">Acquisition Mode</string>
 
 </resources>

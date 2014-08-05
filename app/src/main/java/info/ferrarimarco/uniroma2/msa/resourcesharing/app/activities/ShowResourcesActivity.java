@@ -34,9 +34,6 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
      */
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 
-    @InjectView(R.id.resources_view_switcher)
-    ViewSwitcher resourceViewSwitcher;
-
     @InjectView(R.id.resources_list_view)
     ListView resourcesListView;
 
@@ -54,7 +51,7 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
 
         ButterKnife.inject(this);
 
-        this.defaultInitialization(mProgressView, resourceViewSwitcher);
+        this.defaultInitialization(mProgressView, resourcesListView);
 
         // Set up the action bar to show a dropdown list.
         final ActionBar actionBar = getActionBar();
@@ -64,19 +61,25 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         // Set up the dropdown list navigation in the action bar.
+        ResourceType[] resourceTypes = ResourceType.values();
+        String[] resourceTypeLabels = new String[resourceTypes.length];
+
+        for(ResourceType resourceType : resourceTypes){
+            switch (resourceType){
+                case NEW:
+                    resourceTypeLabels[ResourceType.NEW.ordinal()] = getString(R.string.title_section_new_resource);
+                    break;
+                case CREATED_BY_ME:
+                    resourceTypeLabels[ResourceType.CREATED_BY_ME.ordinal()] = getString(R.string.title_section_created_by_me_resource);
+            }
+        }
+
         actionBar.setListNavigationCallbacks(
-                // Specify a SpinnerAdapter to populate the dropdown list.
                 new ArrayAdapter<>(
                         actionBar.getThemedContext(),
                         android.R.layout.simple_list_item_1,
                         android.R.id.text1,
-                        new String[]{
-                                // New Resources
-                                getString(R.string.title_section1),
-
-                                // Resources created by me
-                                getString(R.string.title_section2),
-                        }),
+                        resourceTypeLabels),
                 this);
 
         // Check if there is already a defined user
@@ -90,13 +93,10 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
 
     @Override
     public boolean onNavigationItemSelected(int position, long id) {
-        switch (position) {
-            case 0:
-                loadResources(ResourceType.NEW);
-                break;
-            case 1:
-                loadResources(ResourceType.CREATED_BY_ME);
-                break;
+        if(ResourceType.CREATED_BY_ME.ordinal() == position){
+            loadResources(ResourceType.CREATED_BY_ME);
+        }else if(ResourceType.NEW.ordinal() == position){
+            loadResources(ResourceType.NEW);
         }
 
         return true;

@@ -53,8 +53,8 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/resourceCreationTimeEditText"
-                android:hint="@string/resource_creation_time_hint" />
+                android:id="@+id/resourceAcquisitionModeEditText"
+                android:hint="@string/resource_acquisition_mode_hint" />
         </LinearLayout>
     </ScrollView>
 

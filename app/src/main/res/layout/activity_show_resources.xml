@@ -13,21 +13,10 @@
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
 
-    <ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/resources_view_switcher"
+    <ListView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/resources_list_view" />
 
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:id="@+id/resources_list_view" />
-
-        <GridView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" />
-    </ViewSwitcher>
 </RelativeLayout>

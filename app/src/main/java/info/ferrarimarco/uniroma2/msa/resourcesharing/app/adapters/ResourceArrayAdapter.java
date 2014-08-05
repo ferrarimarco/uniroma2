@@ -50,10 +50,13 @@ public class ResourceArrayAdapter extends ArrayAdapter<Resource> {
         // object item based on the position
         Resource resource = objects.get(position);
 
-        // get the TextView and then set the text (item name) and tag (item ID) values
-        TextView textViewItem = (TextView) convertView.findViewById(R.id.resource_text_view);
-        textViewItem.setText(resource.getTitle() + " " + resource.getCreationTime().toString());
-        textViewItem.setTag(resource.getId());
+        TextView resourceTitleTextView = (TextView) convertView.findViewById(R.id.resource_title_text_view);
+        resourceTitleTextView.setText(resource.getTitle());
+        resourceTitleTextView.setTag(resource.getId());
+
+        TextView resourceDescriptionTextView = (TextView) convertView.findViewById(R.id.resource_description_text_view);
+        resourceDescriptionTextView.setText(resource.getDescription());
+        resourceDescriptionTextView.setTag(resource.getId());
 
         return convertView;
 
