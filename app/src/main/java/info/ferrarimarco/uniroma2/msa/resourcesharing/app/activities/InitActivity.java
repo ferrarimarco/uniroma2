@@ -15,9 +15,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextMo
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredUserCheckAsyncTask;
 
-public class InitActivity extends Activity implements AsyncCaller {
-
-    private ObjectGraph objectGraph;
+public class InitActivity  extends AbstractAsyncTaskActivity {
 
     private RegisteredUserCheckAsyncTask registeredUserCheckTask;
 

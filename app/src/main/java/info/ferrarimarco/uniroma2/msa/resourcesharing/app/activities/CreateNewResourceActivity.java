@@ -30,9 +30,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextMo
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredUserCheckAsyncTask;
 
-public class CreateNewResourceActivity extends Activity implements AsyncCaller {
-
-    private ObjectGraph objectGraph;
+public class CreateNewResourceActivity  extends AbstractAsyncTaskActivity {
 
     @Inject
     GenericDao<Resource> resDao;
@@ -67,6 +65,8 @@ public class CreateNewResourceActivity extends Activity implements AsyncCaller {
         objectGraph.inject(this);
 
         ButterKnife.inject(this);
+
+        this.defaultInitialization(mProgressView, mCreateNewResourceFormView);
 
         registeredUserCheckTask = objectGraph.get(RegisteredUserCheckAsyncTask.class);
         registeredUserCheckTask.initTask(this, this.getApplicationContext());
@@ -134,26 +134,4 @@ public class CreateNewResourceActivity extends Activity implements AsyncCaller {
         registeredUserCheckTask = null;
     }
 
-    /**
-     * Shows the progress UI and hides the form.
-     */
-    public void showProgress(final boolean show) {
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        mCreateNewResourceFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        mCreateNewResourceFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mCreateNewResourceFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            }
-        });
-
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            }
-        });
-    }
 }

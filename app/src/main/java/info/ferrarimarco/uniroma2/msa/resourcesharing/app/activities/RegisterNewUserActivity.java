@@ -39,7 +39,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisterNew
 /**
  * A login screen that offers login via email/password.
  */
-public class RegisterNewUserActivity extends Activity implements LoaderCallbacks<Cursor>, AsyncCaller {
+public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
 
     @InjectView(R.id.email)
     AutoCompleteTextView mEmailView;
@@ -56,8 +56,6 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
     private String email;
     private String password;
 
-    private ObjectGraph objectGraph;
-
     private RegisterNewUserAsyncTask registerNewUserAsyncTask;
 
     @Override
@@ -67,12 +65,11 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
 
         ButterKnife.inject(this);
 
+        this.defaultInitialization(mProgressView, mRegisterNewUserFormView);
+
         // Check if there is already a defined user
         objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
         objectGraph.inject(this);
-
-        // Set up the registration form (populate auto complete)
-        getLoaderManager().initLoader(0, null, this);
 
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -177,60 +174,6 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         return password.length() > 4;
     }
 
-    /**
-     * Shows the progress UI and hides the form.
-     */
-    public void showProgress(final boolean show) {
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        mRegisterNewUserFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        mRegisterNewUserFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mRegisterNewUserFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            }
-        });
-
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            }
-        });
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI, ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE + " = ?", new String[]{ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-
-        addEmailsToAutoComplete(emails);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-    }
-
     @Override
     public void onBackgroundTaskCompleted(Object result) {
         registerNewUserAsyncTask = null;
@@ -254,24 +197,6 @@ public class RegisterNewUserActivity extends Activity implements LoaderCallbacks
         registerNewUserAsyncTask = null;
         showProgress(false);
     }
-
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {ContactsContract.CommonDataKinds.Email.ADDRESS, ContactsContract.CommonDataKinds.Email.IS_PRIMARY,};
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
-    }
-
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(RegisterNewUserActivity.this, android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mEmailView.setAdapter(adapter);
-    }
-
-
 }
 
 

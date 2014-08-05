@@ -30,7 +30,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextMo
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.ReadAllResourcesAsyncTask;
 
-public class ShowResourcesActivity extends Activity implements AsyncCaller, ActionBar.OnNavigationListener {
+public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements ActionBar.OnNavigationListener {
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -47,8 +47,6 @@ public class ShowResourcesActivity extends Activity implements AsyncCaller, Acti
     @InjectView(R.id.show_resources_progress)
     View mProgressView;
 
-    private ObjectGraph objectGraph;
-
     private ReadAllResourcesAsyncTask readAllResourcesAsyncTask;
 
     private ResourceArrayAdapter resourceArrayAdapter;
@@ -59,6 +57,8 @@ public class ShowResourcesActivity extends Activity implements AsyncCaller, Acti
         setContentView(R.layout.activity_show_resources);
 
         ButterKnife.inject(this);
+
+        this.defaultInitialization(mProgressView, resourceViewSwitcher);
 
         // Set up the action bar to show a dropdown list.
         final ActionBar actionBar = getActionBar();
@@ -171,25 +171,9 @@ public class ShowResourcesActivity extends Activity implements AsyncCaller, Acti
         readAllResourcesAsyncTask.execute();
     }
 
-    /**
-     * Shows the progress UI and hides the form.
-     */
-    private void showProgress(final boolean show) {
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            }
-        });
-    }
-
     @Override
     public void onBackgroundTaskCompleted(Object result) {
         readAllResourcesAsyncTask = null;
-        showProgress(false);
 
         ResourceTaskResult taskResult = (ResourceTaskResult) result;
 
@@ -199,6 +183,8 @@ public class ShowResourcesActivity extends Activity implements AsyncCaller, Acti
         } else {
             // TODO: handle this error condition
         }
+
+        showProgress(false);
     }
 
     @Override
