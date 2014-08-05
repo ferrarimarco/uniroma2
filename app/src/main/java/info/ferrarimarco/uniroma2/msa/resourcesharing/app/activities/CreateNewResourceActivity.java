@@ -1,8 +1,5 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +16,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.ResourceType;

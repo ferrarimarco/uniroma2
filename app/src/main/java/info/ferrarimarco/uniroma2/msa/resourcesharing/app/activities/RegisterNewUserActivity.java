@@ -1,45 +1,36 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.app.Activity;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.FormFieldValidator;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisterNewUserAsyncTask;
 
 /**
  * A login screen that offers login via email/password.
  */
 public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
+
+    @Inject
+    FormFieldValidator formFieldValidator;
 
     @InjectView(R.id.email)
     AutoCompleteTextView mEmailView;
@@ -128,21 +119,21 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
         boolean result = true;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (formFieldValidator.validateNonEmptyTextField(password) && !formFieldValidator.validatePasswordField(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             result = false;
         }
 
         // Check for a valid email address.
-        if (result && TextUtils.isEmpty(email)) {
+        if (result && formFieldValidator.validateNonEmptyTextField(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             result = false;
         }
 
         // Check if the user wrote a valid email
-        if (result && !isEmailValid(email)) {
+        if (result && !formFieldValidator.validateEmailField(email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             result = false;
@@ -162,16 +153,6 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
         // perform the user login attempt.
         showProgress(true);
         task.execute(email, password);
-    }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
     }
 
     @Override

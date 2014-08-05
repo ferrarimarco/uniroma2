@@ -1,9 +1,6 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -20,7 +17,6 @@ import butterknife.InjectView;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArrayAdapter;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.ResourceType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
@@ -80,9 +76,6 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
 
                                 // Resources created by me
                                 getString(R.string.title_section2),
-
-                                // Archived Resources
-                                getString(R.string.title_section3),
                         }),
                 this);
 
@@ -90,7 +83,6 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
         objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
         objectGraph.inject(this);
 
-        // TODO: move this into a dagger module
         resourceArrayAdapter = new ResourceArrayAdapter(this, R.layout.resource_row_list, new ArrayList<Resource>());
         resourceArrayAdapter.setNotifyOnChange(true);
         resourcesListView.setAdapter(resourceArrayAdapter);
@@ -104,9 +96,6 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
                 break;
             case 1:
                 loadResources(ResourceType.CREATED_BY_ME);
-                break;
-            case 2:
-                loadResources(ResourceType.ARCHIVED);
                 break;
         }
 
@@ -162,9 +151,6 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
                 break;
             case CREATED_BY_ME:
                 readAllResourcesAsyncTask.setTaskType(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES);
-                break;
-            case ARCHIVED:
-                readAllResourcesAsyncTask.setTaskType(ResourceTaskType.READ_ARCHIVED_RESOURCES);
                 break;
         }
 
