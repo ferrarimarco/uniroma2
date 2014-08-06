@@ -58,7 +58,7 @@ public class GenericDaoTest extends BaseDaoTezt{
         assertEquals(retrievedEntities.size(), 1);
 
         // To write less assertions
-        resource.setId(retrievedEntities.get(0).getId());
+        resource.setAndroidId(retrievedEntities.get(0).getAndroidId());
         assertEquals(resource, retrievedEntities.get(0));
 
         result = resourceDao.delete(resource);

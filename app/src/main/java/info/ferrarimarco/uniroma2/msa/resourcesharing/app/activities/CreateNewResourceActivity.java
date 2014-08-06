@@ -6,10 +6,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
-import org.joda.time.DateTime;
-
-import java.sql.SQLException;
-
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
@@ -18,18 +14,26 @@ import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.ResourceType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.RestServiceModuleImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.rest.BackendRestService;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.SaveResourceAsyncTask;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredUserCheckAsyncTask;
 
 public class CreateNewResourceActivity  extends AbstractAsyncTaskActivity {
 
     @Inject
     GenericDao<Resource> resDao;
+
+    @Inject
+    BackendRestService backendRestService;
+
+    private SaveResourceAsyncTask saveResourceAsyncTask;
 
     @InjectView(R.id.resourceTitleEditText)
     EditText titleEditText;
@@ -57,7 +61,7 @@ public class CreateNewResourceActivity  extends AbstractAsyncTaskActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_resource);
 
-        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
+        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl(), new RestServiceModuleImpl(getString(R.string.backend_service_endpoint)));
         objectGraph.inject(this);
 
         ButterKnife.inject(this);
@@ -81,30 +85,23 @@ public class CreateNewResourceActivity  extends AbstractAsyncTaskActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        showProgress(true);
+
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         if (id == R.id.action_save_new_resource) {
-            showProgress(true);
-            try {
-                resDao.open(Resource.class);
+            String title = titleEditText.getText().toString();
+            String description = descriptionEditText.getText().toString();
+            String acquisitionMode = acquisitionModeEditText.getText().toString();
+            String location = locationEditText.getText().toString();
+            String currentUserName = currentUser.getName();
 
-                String title = titleEditText.getText().toString();
-                String description = descriptionEditText.getText().toString();
-                String acquisitionMode = acquisitionModeEditText.getText().toString();
-                String location = locationEditText.getText().toString();
-
-                Resource newRes = new Resource(title, description, location, DateTime.now(), acquisitionMode, currentUser.getName(), ResourceType.CREATED_BY_ME);
-                resDao.save(newRes);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                resDao.close();
-            }
-            showProgress(false);
-            finish();
+            saveResourceAsyncTask = objectGraph.get(SaveResourceAsyncTask.class);
+            saveResourceAsyncTask.initTask(this, this.getApplicationContext());
+            saveResourceAsyncTask.execute();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -112,22 +109,37 @@ public class CreateNewResourceActivity  extends AbstractAsyncTaskActivity {
     @Override
     public void onBackgroundTaskCompleted(Object result) {
 
-        UserTaskResult taskResult = (UserTaskResult) result;
+        if(result instanceof UserTaskResult){
+            UserTaskResult taskResult = (UserTaskResult) result;
 
-        if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
-            if (taskResult.isRegisteredUserPresent()) {
-                currentUser = taskResult.getResultUser();
+            if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
+                if (taskResult.isRegisteredUserPresent()) {
+                    currentUser = taskResult.getResultUser();
+                }
+            } else {
+                // TODO: handle error condition
             }
-        } else {
-            // TODO: handle error condition
+        }else if(result instanceof ResourceTaskResult){
+            ResourceTaskResult taskResult = (ResourceTaskResult) result;
+
+            if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
+                // TODO: show a notification (toast)
+                finish();
+            } else {
+                // TODO: handle error condition
+            }
         }
 
         showProgress(false);
     }
 
     @Override
-    public void onBackgroundTaskCancelled() {
-        registeredUserCheckTask = null;
+    public void onBackgroundTaskCancelled(Object cancelledTask) {
+        if(cancelledTask instanceof RegisteredUserCheckAsyncTask){
+            registeredUserCheckTask = null;
+        }else if(cancelledTask instanceof SaveResourceAsyncTask){
+            saveResourceAsyncTask = null;
+        }
     }
 
 }

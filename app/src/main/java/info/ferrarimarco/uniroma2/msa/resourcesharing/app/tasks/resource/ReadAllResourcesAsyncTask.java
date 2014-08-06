@@ -9,39 +9,21 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTas
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 
-/**
- * Created by Ferrarim on 30/07/2014.
- */
 public class ReadAllResourcesAsyncTask extends AbstractResourceAsyncTask {
-
-    private ResourceTaskType taskType;
 
     @Override
     protected ResourceTaskResult doInBackground(String... params) {
 
-        ResourceTaskResult result = new ResourceTaskResult();
-
-        try {
-            resourceDao.open(Resource.class);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            result.setTaskResultType(TaskResultType.FAILURE);
+        // There was a failure while initialization
+        if(result.getTaskResultType().equals(TaskResultType.FAILURE)){
             return result;
         }
 
         List<Resource> resources = result.getResources();
         Resource res = new Resource();
 
-        switch (taskType) {
-            case READ_NEW_RESOURCES:
-                res.setType(ResourceType.NEW);
-                break;
-            case READ_CREATED_BY_ME_RESOURCES:
-                res.setType(ResourceType.CREATED_BY_ME);
-                break;
-            case READ_ARCHIVED_RESOURCES:
-                res.setType(ResourceType.ARCHIVED);
-                break;
+        if(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES.equals(taskType)){
+            res.setType(ResourceType.CREATED_BY_ME);
         }
 
         try {
@@ -58,13 +40,5 @@ public class ReadAllResourcesAsyncTask extends AbstractResourceAsyncTask {
         result.setResources(resources);
 
         return result;
-    }
-
-    public ResourceTaskType getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(ResourceTaskType taskType) {
-        this.taskType = taskType;
     }
 }

@@ -27,7 +27,7 @@ public abstract class AbstractAsyncTask<R> extends AsyncTask<String, Void, R> {
 
     @Override
     protected void onCancelled() {
-        caller.onBackgroundTaskCancelled();
+        caller.onBackgroundTaskCancelled(this);
     }
 
     protected abstract R doInBackground(String... params);

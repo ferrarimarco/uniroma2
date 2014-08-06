@@ -48,11 +48,11 @@ public class ResourceArrayAdapter extends ArrayAdapter<Resource> {
 
         TextView resourceTitleTextView = (TextView) convertView.findViewById(R.id.resource_title_text_view);
         resourceTitleTextView.setText(resource.getTitle());
-        resourceTitleTextView.setTag(resource.getId());
+        resourceTitleTextView.setTag(resource.getAndroidId());
 
         TextView resourceDescriptionTextView = (TextView) convertView.findViewById(R.id.resource_description_text_view);
         resourceDescriptionTextView.setText(resource.getDescription());
-        resourceDescriptionTextView.setTag(resource.getId());
+        resourceDescriptionTextView.setTag(resource.getAndroidId());
 
         return convertView;
 

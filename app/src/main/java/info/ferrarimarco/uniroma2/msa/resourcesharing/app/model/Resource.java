@@ -10,7 +10,7 @@ import org.joda.time.DateTime;
 public class Resource implements GenericEntity {
 
     @DatabaseField(generatedId = true, canBeNull = false, allowGeneratedIdInsert = true)
-    private Long id;
+    private Long androidId;
 
     @DatabaseField
     private String backendId;
@@ -40,10 +40,11 @@ public class Resource implements GenericEntity {
     private Boolean expired;
 
     public Resource() {
+        type = ResourceType.NEW;
+        expired = false;
     }
 
-    public Resource(String backendId, String title, String description, String location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired) {
-        this.backendId = backendId;
+    public Resource(String title, String description, String location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired) {
         this.title = title;
         this.description = description;
         this.location = location;
@@ -57,7 +58,7 @@ public class Resource implements GenericEntity {
     @Override
     public String toString() {
         return "Resource{" +
-                "id='" + id + '\'' +
+                "androidId='" + androidId + '\'' +
                 ", backendId='" + backendId + '\'' +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
@@ -87,7 +88,7 @@ public class Resource implements GenericEntity {
             return false;
         if (description != null ? !description.equals(resource.description) : resource.description != null)
             return false;
-        if (id != null ? !id.equals(resource.id) : resource.id != null)
+        if (androidId != null ? !androidId.equals(resource.androidId) : resource.androidId != null)
             return false;
         if (location != null ? !location.equals(resource.location) : resource.location != null)
             return false;
@@ -105,7 +106,7 @@ public class Resource implements GenericEntity {
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
+        int result = androidId != null ? androidId.hashCode() : 0;
         result = 31 * result + (backendId != null ? backendId.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
@@ -118,12 +119,12 @@ public class Resource implements GenericEntity {
         return result;
     }
 
-    public Long getId() {
-        return id;
+    public Long getAndroidId() {
+        return androidId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setAndroidId(Long androidId) {
+        this.androidId = androidId;
     }
 
     public String getTitle() {

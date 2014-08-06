@@ -3,7 +3,7 @@
 <resources>
     <string name="registered_user_id">1</string>
 
-    <string name="resource_sharing_service_endpoint">http://localhost:8080</string>
+    <string name="backend_service_endpoint">http://localhost:8080</string>
 
     <string name="security_provider">BC</string>
     <string name="security_cryptography_algorithm">AES</string>
