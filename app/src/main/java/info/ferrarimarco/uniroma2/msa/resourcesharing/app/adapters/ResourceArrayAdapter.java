@@ -8,28 +8,27 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 
-/**
- * Created by Ferrarim on 01/08/2014.
- */
 public class ResourceArrayAdapter extends ArrayAdapter<Resource> {
 
     private Context context;
     private int layoutResourceId;
-    private List<Resource> objects;
 
-    public ResourceArrayAdapter(Context context, int layoutResourceId, List<Resource> objects) {
-        super(context, layoutResourceId, objects);
+    public ResourceArrayAdapter(Context context, int layoutResourceId) {
+        this(context, layoutResourceId, new ArrayList<Resource>());
+    }
+
+    public ResourceArrayAdapter(Context context, int layoutResourceId, List<Resource> resources) {
+        super(context, layoutResourceId, resources);
         this.context = context;
         this.layoutResourceId = layoutResourceId;
-        this.objects = objects;
-
-        ButterKnife.inject((Activity) context);
+        this.setNotifyOnChange(true);
     }
 
     @Override
@@ -48,7 +47,7 @@ public class ResourceArrayAdapter extends ArrayAdapter<Resource> {
         }
 
         // object item based on the position
-        Resource resource = objects.get(position);
+        Resource resource = this.getItem(position);
 
         TextView resourceTitleTextView = (TextView) convertView.findViewById(R.id.resource_title_text_view);
         resourceTitleTextView.setText(resource.getTitle());
