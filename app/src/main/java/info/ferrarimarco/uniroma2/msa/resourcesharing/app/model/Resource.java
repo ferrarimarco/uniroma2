@@ -13,6 +13,9 @@ public class Resource implements GenericEntity {
     private Long id;
 
     @DatabaseField
+    private String backendId;
+
+    @DatabaseField
     private String title;
 
     @DatabaseField
@@ -39,7 +42,8 @@ public class Resource implements GenericEntity {
     public Resource() {
     }
 
-    public Resource(String title, String description, String location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired) {
+    public Resource(String backendId, String title, String description, String location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired) {
+        this.backendId = backendId;
         this.title = title;
         this.description = description;
         this.location = location;
@@ -54,6 +58,7 @@ public class Resource implements GenericEntity {
     public String toString() {
         return "Resource{" +
                 "id='" + id + '\'' +
+                ", backendId='" + backendId + '\'' +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", location='" + location + '\'' +
@@ -92,6 +97,8 @@ public class Resource implements GenericEntity {
             return false;
         if (expired != null ? !expired.equals(resource.expired) : resource.expired != null)
             return false;
+        if (backendId != null ? !backendId.equals(resource.backendId) : resource.backendId != null)
+            return false;
 
         return true;
     }
@@ -99,6 +106,7 @@ public class Resource implements GenericEntity {
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (backendId != null ? backendId.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (location != null ? location.hashCode() : 0);
@@ -178,8 +186,15 @@ public class Resource implements GenericEntity {
         return expired;
     }
 
-    public void setIsExpired(Boolean expired) {
+    public void setExpired(Boolean expired) {
         this.expired = expired;
     }
 
+    public String getBackendId() {
+        return backendId;
+    }
+
+    public void setBackendId(String backendId) {
+        this.backendId = backendId;
+    }
 }
