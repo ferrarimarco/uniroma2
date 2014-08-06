@@ -13,16 +13,16 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.Resource
 @Module(injects = {ResourceSharingServiceImpl.class, HashingServiceImpl.class, GenericDao.class})
 public class ContextModuleImpl{
 
-    private final Context mContext;
+    private final Context applicationContext;
 
-    public ContextModuleImpl(Context context){
-        mContext = context;
+    public ContextModuleImpl(Context applicationContext){
+        this.applicationContext = applicationContext;
     }
 
     @Provides
     @Singleton
-    public Context provideContext(){
-        return mContext;
+    public Context provideApplicationContext(){
+        return applicationContext;
     }
 
 }
