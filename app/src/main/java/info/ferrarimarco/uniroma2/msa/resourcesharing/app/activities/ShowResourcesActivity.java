@@ -8,20 +8,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ViewSwitcher;
-
-import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArrayAdapter;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.ResourceType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.AdapterModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.ReadAllResourcesAsyncTask;
@@ -83,11 +80,10 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
                 this);
 
         // Check if there is already a defined user
-        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
+        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl(), new AdapterModuleImpl(this));
         objectGraph.inject(this);
 
-        resourceArrayAdapter = new ResourceArrayAdapter(this, R.layout.resource_row_list, new ArrayList<Resource>());
-        resourceArrayAdapter.setNotifyOnChange(true);
+        resourceArrayAdapter = objectGraph.get(ResourceArrayAdapter.class);
         resourcesListView.setAdapter(resourceArrayAdapter);
     }
 

@@ -9,7 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import javax.inject.Inject;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
@@ -19,14 +20,11 @@ public class ResourceArrayAdapter extends ArrayAdapter<Resource> {
     private Context context;
     private int layoutResourceId;
 
-    public ResourceArrayAdapter(Context context, int layoutResourceId) {
-        this(context, layoutResourceId, new ArrayList<Resource>());
-    }
-
-    public ResourceArrayAdapter(Context context, int layoutResourceId, List<Resource> resources) {
-        super(context, layoutResourceId, resources);
+    @Inject
+    public ResourceArrayAdapter(Context context) {
+        super(context, R.layout.resource_row_list, new ArrayList<Resource>());
         this.context = context;
-        this.layoutResourceId = layoutResourceId;
+        this.layoutResourceId = R.layout.resource_row_list;
         this.setNotifyOnChange(true);
     }
 
