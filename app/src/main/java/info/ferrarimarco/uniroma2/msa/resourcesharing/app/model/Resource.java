@@ -33,10 +33,13 @@ public class Resource implements GenericEntity {
     @DatabaseField
     private ResourceType type;
 
+    @DatabaseField
+    private Boolean expired;
+
     public Resource() {
     }
 
-    public Resource(String title, String description, String location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type) {
+    public Resource(String title, String description, String location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired) {
         this.title = title;
         this.description = description;
         this.location = location;
@@ -44,6 +47,7 @@ public class Resource implements GenericEntity {
         this.acquisitionMode = acquisitionMode;
         this.creatorId = creatorId;
         this.type = type;
+        this.expired = expired;
     }
 
     @Override
@@ -57,6 +61,7 @@ public class Resource implements GenericEntity {
                 ", acquisitionMode='" + acquisitionMode + '\'' +
                 ", creatorId='" + creatorId + '\'' +
                 ", type='" + type.toString() + '\'' +
+                ", IsExpired='" + expired.toString() + '\'' +
                 '}';
     }
 
@@ -85,6 +90,8 @@ public class Resource implements GenericEntity {
             return false;
         if (type != null ? !type.equals(resource.type) : resource.type != null)
             return false;
+        if (expired != null ? !expired.equals(resource.expired) : resource.expired != null)
+            return false;
 
         return true;
     }
@@ -99,6 +106,7 @@ public class Resource implements GenericEntity {
         result = 31 * result + (acquisitionMode != null ? acquisitionMode.hashCode() : 0);
         result = 31 * result + (creatorId != null ? creatorId.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (expired != null ? expired.hashCode() : 0);
         return result;
     }
 
@@ -165,4 +173,13 @@ public class Resource implements GenericEntity {
     public void setType(ResourceType type) {
         this.type = type;
     }
+
+    public Boolean isExpired() {
+        return expired;
+    }
+
+    public void setIsExpired(Boolean expired) {
+        this.expired = expired;
+    }
+
 }
