@@ -2,8 +2,12 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
@@ -16,6 +20,8 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredU
 public class InitActivity  extends AbstractAsyncTaskActivity {
 
     private RegisteredUserCheckAsyncTask registeredUserCheckTask;
+
+    private static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +68,20 @@ public class InitActivity  extends AbstractAsyncTaskActivity {
         registeredUserCheckTask = objectGraph.get(RegisteredUserCheckAsyncTask.class);
         registeredUserCheckTask.initTask(this, this.getApplicationContext());
         registeredUserCheckTask.execute(getResources().getString(R.string.registered_user_id));
+    }
+
+    public void checkGooglePlayServicesInstallationStatus(){
+        // Check status of Google Play Services
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+
+        // Check Google Play Service Available
+        try {
+            if (status != ConnectionResult.SUCCESS) {
+                GooglePlayServicesUtil.getErrorDialog(status, this, REQUEST_CODE_RECOVER_PLAY_SERVICES).show();
+            }
+        } catch (Exception e) {
+            Log.e("Error: GooglePlayServiceUtil: ", "" + e);
+        }
     }
 
     @Override
