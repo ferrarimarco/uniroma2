@@ -1,15 +1,14 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl;
 
 import android.text.TextUtils;
-import android.widget.EditText;
 
 import javax.inject.Inject;
 
 
-public class FormFieldValidator {
+public class FormFieldValidatorImpl {
 
     @Inject
-    public FormFieldValidator(){}
+    public FormFieldValidatorImpl(){}
 
     public Boolean validateNonEmptyTextField(String text){
         return !TextUtils.isEmpty(text);

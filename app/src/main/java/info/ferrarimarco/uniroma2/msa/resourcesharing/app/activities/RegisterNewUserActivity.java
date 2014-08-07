@@ -21,7 +21,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultT
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.FormFieldValidator;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.FormFieldValidatorImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisterNewUserAsyncTask;
 
 /**
@@ -30,7 +30,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisterNew
 public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
 
     @Inject
-    FormFieldValidator formFieldValidator;
+    FormFieldValidatorImpl formFieldValidatorImpl;
 
     @InjectView(R.id.email)
     AutoCompleteTextView mEmailView;
@@ -119,21 +119,21 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
         boolean result = true;
 
         // Check for a valid password, if the user entered one.
-        if (formFieldValidator.validateNonEmptyTextField(password) && !formFieldValidator.validatePasswordField(password)) {
+        if (formFieldValidatorImpl.validateNonEmptyTextField(password) && !formFieldValidatorImpl.validatePasswordField(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             result = false;
         }
 
         // Check for a valid email address.
-        if (result && formFieldValidator.validateNonEmptyTextField(email)) {
+        if (result && formFieldValidatorImpl.validateNonEmptyTextField(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             result = false;
         }
 
         // Check if the user wrote a valid email
-        if (result && !formFieldValidator.validateEmailField(email)) {
+        if (result && !formFieldValidatorImpl.validateEmailField(email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             result = false;
@@ -174,7 +174,7 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
     }
 
     @Override
-    public void onBackgroundTaskCancelled() {
+    public void onBackgroundTaskCancelled(Object cancelledTask) {
         registerNewUserAsyncTask = null;
         showProgress(false);
     }

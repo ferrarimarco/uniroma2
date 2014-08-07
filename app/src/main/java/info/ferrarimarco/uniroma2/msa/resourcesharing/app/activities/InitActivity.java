@@ -85,7 +85,7 @@ public class InitActivity  extends AbstractAsyncTaskActivity {
     }
 
     @Override
-    public void onBackgroundTaskCancelled() {
+    public void onBackgroundTaskCancelled(Object cancelledTask) {
         registeredUserCheckTask = null;
     }
 }

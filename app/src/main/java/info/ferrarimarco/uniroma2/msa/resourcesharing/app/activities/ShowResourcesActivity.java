@@ -170,7 +170,7 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
     }
 
     @Override
-    public void onBackgroundTaskCancelled() {
+    public void onBackgroundTaskCancelled(Object cancelledTask) {
         readAllResourcesAsyncTask = null;
         showProgress(false);
     }
