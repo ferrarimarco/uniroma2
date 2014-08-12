@@ -6,16 +6,21 @@ import android.util.Log;
 
 import javax.inject.Inject;
 
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
+
 /**
  * Created by Marco on 11/08/2014.
  */
 public class SharedPreferencesServiceImpl {
 
-    private Context applicationContext;
+    private SharedPreferences gcmSharedPreferences;
+    private String gcmRegistrationIdKey;
 
     @Inject
     public SharedPreferencesServiceImpl(Context applicationContext) {
-        this.applicationContext = applicationContext;
+        gcmRegistrationIdKey = applicationContext.getResources().getString(R.string.gcm_registration_id_key);
+        String gcmSharedPreferencesId = applicationContext.getResources().getString(R.string.gcm_shared_preferences_id);
+        gcmSharedPreferences = applicationContext.getSharedPreferences(gcmSharedPreferencesId, Context.MODE_PRIVATE);
     }
 
     /**
@@ -27,11 +32,10 @@ public class SharedPreferencesServiceImpl {
      * @return registration ID, or empty string if there is no existing
      * registration ID.
      */
-    private String getRegistrationId() {
-        final SharedPreferences prefs = getGcmPreferences();
-        String registrationId = prefs.getString(Globals.PREFS_PROPERTY_REG_ID, "");
+    public String getRegistrationId() {
+        String registrationId = gcmSharedPreferences.getString(gcmRegistrationIdKey, "");
         if (registrationId == null || registrationId.equals("")) {
-            Log.i(Globals.TAG, "Registration not found.");
+            Log.i(SharedPreferencesServiceImpl.class.getName(), "Registration not found.");
             return "";
         }
 
@@ -45,10 +49,9 @@ public class SharedPreferencesServiceImpl {
      * @param regId registration ID
      */
     public void storeGcmRegistrationId(String regId) {
-        final SharedPreferences prefs = getGcmPreferences(context);
-        Log.i(Globals.TAG, "Saving GCM Registration ID in Shared Preferencies. ID: " + regId);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(Globals.PREFS_PROPERTY_REG_ID, regId);
+        Log.i(SharedPreferencesServiceImpl.class.getName(), "Saving GCM Registration ID in Shared Preferencies. ID: " + regId);
+        SharedPreferences.Editor editor = gcmSharedPreferences.edit();
+        editor.putString(gcmRegistrationIdKey, regId);
         editor.commit();
     }
 
@@ -57,20 +60,9 @@ public class SharedPreferencesServiceImpl {
      * {@code SharedPreferences}.
      */
     public void removeGcmRegistrationId() {
-        final SharedPreferences prefs = getGcmPreferences();
-        Log.i(Globals.TAG, "Removig regId from Shared Preferencies");
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.remove(Globals.PREFS_PROPERTY_REG_ID);
+        Log.i(SharedPreferencesServiceImpl.class.getName(), "Removig regId from Shared Preferencies");
+        SharedPreferences.Editor editor = gcmSharedPreferences.edit();
+        editor.remove(gcmRegistrationIdKey);
         editor.commit();
-        gcmRegId = null;
-    }
-
-    /**
-     * @return Application's {@code SharedPreferences}.
-     */
-    private SharedPreferences getGcmPreferences() {
-        // This sample app persists the registration ID in shared preferences,
-        // but how you store the regID in your app is up to you.
-        return applicationContext.getSharedPreferences(Globals.PREFS_NAME, Context.MODE_PRIVATE);
     }
 }
