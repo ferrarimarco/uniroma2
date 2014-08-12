@@ -10,8 +10,12 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import dagger.ObjectGraph;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.TestDaoModuleImpl;
 
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNull.notNullValue;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
@@ -30,20 +34,27 @@ public abstract class BaseTezt {
         context = Robolectric.application.getApplicationContext();
     }
 
-    public abstract void initObjectGraph();
+    public void initObjectGraph() {
+        objectGraph = ObjectGraph.create(new ContextModuleImpl(context), new DaoModuleImpl(), new TestDaoModuleImpl());
+        objectGraph.inject(this);
+    }
 
     @Test
     public void contextTest() {
-        assertNotNull(context);
+        assertThat(context, notNullValue());
     }
 
     @Test
     public void objectGraphTest() {
-        assertNotNull(objectGraph);
+        assertThat(objectGraph, notNullValue());
     }
 
     @Test
-    public abstract void daoInjectionTest();
+    public abstract void dependencyInjectionTest();
+
+    protected void singleDependencyCheck(Object dependency) {
+        assertThat(dependency, notNullValue());
+    }
 
     @BeforeClass
     public static void setup() {

@@ -9,30 +9,30 @@ import org.robolectric.annotation.Config;
 
 import javax.inject.Inject;
 
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.BaseDaoTezt;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.BaseTezt;
 
 import static org.junit.Assert.assertNotNull;
 
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
-public class DatabaseHelperManagerTest extends BaseDaoTezt{
+public class DatabaseHelperManagerTest extends BaseTezt {
 
     @Inject
     DatabaseHelperManager databaseHelperManager;
 
-    public DatabaseHelperManagerTest(){
+    public DatabaseHelperManagerTest() {
         super();
     }
 
     @Override
     @Test
-    public void daoInjectionTest(){
+    public void dependencyInjectionTest() {
         assertNotNull(databaseHelperManager);
     }
 
     @Test
-    public void getDatabaseHelperTest(){
+    public void getDatabaseHelperTest() {
         DatabaseHelperManager databaseHelperManager = new DatabaseHelperManager();
         DatabaseHelper databaseHelper = databaseHelperManager.getHelper(context);
         assertNotNull(databaseHelper);

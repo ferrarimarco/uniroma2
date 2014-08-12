@@ -10,18 +10,17 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.BaseDaoTezt;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.BaseTezt;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHelperManager;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
-public class GenericDaoTest extends BaseDaoTezt{
+public class GenericDaoTest extends BaseTezt {
 
     @Inject
     DatabaseHelperManager databaseHelperManager;
@@ -32,19 +31,20 @@ public class GenericDaoTest extends BaseDaoTezt{
     @Inject
     GenericDao<User> userDao;
 
-    public GenericDaoTest(){
+    public GenericDaoTest() {
         super();
     }
 
+    @Override
     @Test
-    public void daoInjectionTest(){
-        assertNotNull(databaseHelperManager);
-        assertNotNull(resourceDao);
-        assertNotNull(userDao);
+    public void dependencyInjectionTest() {
+        this.singleDependencyCheck(databaseHelperManager);
+        this.singleDependencyCheck(resourceDao);
+        this.singleDependencyCheck(userDao);
     }
 
     @Test
-    public void resourceDaoTest() throws SQLException{
+    public void resourceDaoTest() throws SQLException {
         resourceDao.open(Resource.class);
 
         Resource resource = new Resource();
@@ -68,7 +68,7 @@ public class GenericDaoTest extends BaseDaoTezt{
     }
 
     @Test
-    public void userDaoTest() throws SQLException{
+    public void userDaoTest() throws SQLException {
         userDao.open(User.class);
 
         User user = new User();
