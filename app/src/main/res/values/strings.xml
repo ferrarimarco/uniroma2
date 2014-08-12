@@ -6,9 +6,9 @@
     <string name="title_activity_register_new_user">Register New User</string>
     <string name="user_name">Name</string>
     <string name="Name">Name</string>
-    <string name="title_activity_init">InitActivity</string>
+    <string name="title_activity_init">Loading</string>
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_show_resources">ShowResourcesActivity</string>
+    <string name="title_activity_show_resources">Available Resources</string>
     <string name="title_section_new_resource">New Resources</string>
     <string name="title_section_created_by_me_resource">Created by me</string>
     <string name="title_activity_fullscreen">FullscreenActivity</string>
@@ -21,5 +21,9 @@
     <string name="resource_description_hint">Description</string>
     <string name="resource_location_hint">Location</string>
     <string name="resource_acquisition_mode_hint">Acquisition Mode</string>
+
+    <!-- -->
+    <string name="gcm_shared_preferences_id">gcm_shared_preferences</string>
+    <string name="gcm_registration_id_key">gcm_registration_id</string>
 
 </resources>
