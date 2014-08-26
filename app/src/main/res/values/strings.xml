@@ -22,8 +22,4 @@
     <string name="resource_location_hint">Location</string>
     <string name="resource_acquisition_mode_hint">Acquisition Mode</string>
 
-    <!-- -->
-    <string name="gcm_shared_preferences_id">gcm_shared_preferences</string>
-    <string name="gcm_registration_id_key">gcm_registration_id</string>
-
 </resources>

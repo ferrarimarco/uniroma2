@@ -9,4 +9,10 @@
     <string name="security_cryptography_algorithm">AES</string>
     <string name="security_cryptography_transformation">AES/CBC/PKCS7Padding</string>
     <string name="security_hashing_algorithm">SHA-512</string>
+
+    <!-- 86400 = 1 Day -->
+    <string name="gcm_project_id">uniroma2-msa-ferrarimarco</string>
+    <string name="gcm_ttl">86400</string>
+    <string name="gcm_shared_preferences_id">gcm_shared_preferences</string>
+    <string name="gcm_registration_id_key">gcm_registration_id</string>
 </resources>
