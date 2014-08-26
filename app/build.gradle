@@ -6,16 +6,16 @@ apply plugin: 'robolectric'
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     compile 'com.google.android.gms:play-services:5.+'
-    androidTestCompile 'junit:junit:4.+'
-    androidTestCompile 'org.robolectric:robolectric:2.+'
-    androidTestCompile 'com.squareup:fest-android:1.+'
-    compile 'com.squareup.dagger:dagger:1.+'
-    compile 'com.squareup.dagger:dagger-compiler:1.+'
-    compile 'com.j256.ormlite:ormlite-android:4.+'
-    compile 'joda-time:joda-time:2.+'
-    compile 'com.jakewharton:butterknife:4.+'
-    compile 'com.squareup.retrofit:retrofit:1.+'
-    compile 'commons-codec:commons-codec:1.+'
+    androidTestCompile 'junit:junit:4.11'
+    androidTestCompile 'org.robolectric:robolectric:2.3'
+    androidTestCompile 'com.squareup:fest-android:1.0.8'
+    compile 'com.squareup.dagger:dagger:1.2.2'
+    compile 'com.squareup.dagger:dagger-compiler:1.2.2'
+    compile 'com.j256.ormlite:ormlite-android:4.48'
+    compile 'joda-time:joda-time:2.4'
+    compile 'com.jakewharton:butterknife:5.1.2'
+    compile 'com.squareup.retrofit:retrofit:1.6.1'
+    compile 'commons-codec:commons-codec:1.9'
 }
 
 android {
