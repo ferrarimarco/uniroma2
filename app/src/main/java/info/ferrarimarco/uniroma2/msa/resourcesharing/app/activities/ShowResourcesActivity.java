@@ -17,7 +17,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArray
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.ResourceType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.AdapterModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
@@ -61,8 +61,8 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
         ResourceType[] resourceTypes = ResourceType.values();
         String[] resourceTypeLabels = new String[resourceTypes.length];
 
-        for(ResourceType resourceType : resourceTypes){
-            switch (resourceType){
+        for (ResourceType resourceType : resourceTypes) {
+            switch (resourceType) {
                 case NEW:
                     resourceTypeLabels[ResourceType.NEW.ordinal()] = getString(R.string.title_section_new_resource);
                     break;
@@ -89,9 +89,9 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
 
     @Override
     public boolean onNavigationItemSelected(int position, long id) {
-        if(ResourceType.CREATED_BY_ME.ordinal() == position){
+        if (ResourceType.CREATED_BY_ME.ordinal() == position) {
             loadResources(ResourceType.CREATED_BY_ME);
-        }else if(ResourceType.NEW.ordinal() == position){
+        } else if (ResourceType.NEW.ordinal() == position) {
             loadResources(ResourceType.NEW);
         }
 
@@ -159,7 +159,7 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
 
         ResourceTaskResult taskResult = (ResourceTaskResult) result;
 
-        if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
+        if (taskResult.getTaskResult().equals(TaskResult.SUCCESS)) {
             resourceArrayAdapter.clear();
             resourceArrayAdapter.addAll(taskResult.getResources());
         } else {

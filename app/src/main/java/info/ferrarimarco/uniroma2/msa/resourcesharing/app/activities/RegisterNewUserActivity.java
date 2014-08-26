@@ -17,7 +17,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
@@ -162,7 +162,7 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
 
         UserTaskResult taskResult = (UserTaskResult) result;
 
-        if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
+        if (taskResult.getTaskResult().equals(TaskResult.SUCCESS)) {
             Intent intent = new Intent(this, ShowResourcesActivity.class);
             startActivity(intent);
             finish();

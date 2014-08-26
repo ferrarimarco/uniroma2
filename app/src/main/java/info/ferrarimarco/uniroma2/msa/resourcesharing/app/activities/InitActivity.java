@@ -11,13 +11,13 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredUserCheckAsyncTask;
 
-public class InitActivity  extends AbstractAsyncTaskActivity {
+public class InitActivity extends AbstractAsyncTaskActivity {
 
     private RegisteredUserCheckAsyncTask registeredUserCheckTask;
 
@@ -33,7 +33,9 @@ public class InitActivity  extends AbstractAsyncTaskActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_init);
 
-        // Check if there is already a defined user
+        // check for Google Play Services
+        checkGooglePlayServicesInstallationStatus();
+
         objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
         objectGraph.inject(this);
 
@@ -70,11 +72,10 @@ public class InitActivity  extends AbstractAsyncTaskActivity {
         registeredUserCheckTask.execute(getResources().getString(R.string.registered_user_id));
     }
 
-    public void checkGooglePlayServicesInstallationStatus(){
+    public void checkGooglePlayServicesInstallationStatus() {
         // Check status of Google Play Services
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
-        // Check Google Play Service Available
         try {
             if (status != ConnectionResult.SUCCESS) {
                 GooglePlayServicesUtil.getErrorDialog(status, this, REQUEST_CODE_RECOVER_PLAY_SERVICES).show();
@@ -89,7 +90,7 @@ public class InitActivity  extends AbstractAsyncTaskActivity {
 
         UserTaskResult taskResult = (UserTaskResult) result;
 
-        if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
+        if (taskResult.getTaskResult().equals(TaskResult.SUCCESS)) {
             if (taskResult.isRegisteredUserPresent()) {
                 Intent intent = new Intent(this, ShowResourcesActivity.class);
                 startActivity(intent);

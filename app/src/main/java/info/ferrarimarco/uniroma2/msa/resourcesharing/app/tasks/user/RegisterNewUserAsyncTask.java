@@ -7,13 +7,10 @@ import java.sql.SQLException;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskType;
 
-/**
- * Created by FerrariM on 08/04/2014.
- */
 public class RegisterNewUserAsyncTask extends AbstractUserAsyncTask {
 
     @Override
@@ -26,7 +23,7 @@ public class RegisterNewUserAsyncTask extends AbstractUserAsyncTask {
         try {
             userDao.open(User.class);
         } catch (SQLException e) {
-            return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResultType.FAILURE, e.getMessage());
+            return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResult.FAILURE, e.getMessage());
         }
         String hashedPassword = new String(Hex.encodeHex(hashingService.hash(password)));
         User user = new User(userId, userId, hashedPassword, DateTime.now());
@@ -38,9 +35,9 @@ public class RegisterNewUserAsyncTask extends AbstractUserAsyncTask {
             userDao.save(user);
             userDao.close();
         } catch (SQLException e) {
-            return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResultType.FAILURE, e.getMessage());
+            return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResult.FAILURE, e.getMessage());
         }
 
-        return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResultType.SUCCESS);
+        return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResult.SUCCESS);
     }
 }

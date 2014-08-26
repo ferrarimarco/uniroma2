@@ -2,19 +2,16 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 
-public class UserTaskResult {
+public class UserTaskResult extends AbstractTaskResult {
 
     private UserTaskType taskType;
-    private TaskResultType taskResultType;
-
-    private String details;
 
     private User resultUser;
 
     private Boolean registeredUserPresent;
 
     public UserTaskResult() {
-        this.details = "";
+        super();
         this.registeredUserPresent = Boolean.FALSE;
     }
 
@@ -23,15 +20,14 @@ public class UserTaskResult {
         this.taskType = taskType;
     }
 
-    public UserTaskResult(UserTaskType taskType, TaskResultType taskResultType) {
+    public UserTaskResult(UserTaskType taskType, TaskResult taskResult) {
         this(taskType);
-        this.taskResultType = taskResultType;
-
+        this.taskResult = taskResult;
     }
 
-    public UserTaskResult(UserTaskType taskType, TaskResultType taskResultType, String details) {
-        this(taskType, taskResultType);
-        this.details = details;
+    public UserTaskResult(UserTaskType taskType, TaskResult taskResult, String message) {
+        this(taskType, taskResult);
+        this.message = message;
     }
 
     public UserTaskType getTaskType() {
@@ -40,22 +36,6 @@ public class UserTaskResult {
 
     public void setTaskType(UserTaskType taskType) {
         this.taskType = taskType;
-    }
-
-    public TaskResultType getTaskResultType() {
-        return taskResultType;
-    }
-
-    public void setTaskResultType(TaskResultType userTaskResultType) {
-        this.taskResultType = userTaskResultType;
-    }
-
-    public String getDetails() {
-        return details;
-    }
-
-    public void setDetails(String details) {
-        this.details = details;
     }
 
     public Boolean isRegisteredUserPresent() {

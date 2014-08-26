@@ -16,22 +16,17 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.RestServiceModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.rest.BackendRestService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.SaveResourceAsyncTask;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredUserCheckAsyncTask;
 
-public class CreateNewResourceActivity  extends AbstractAsyncTaskActivity {
+public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
 
     @Inject
-    GenericDao<Resource> resDao;
-
-    @Inject
-    BackendRestService backendRestService;
+    GenericDao<Resource> resourceDao;
 
     private SaveResourceAsyncTask saveResourceAsyncTask;
 
@@ -61,7 +56,7 @@ public class CreateNewResourceActivity  extends AbstractAsyncTaskActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_resource);
 
-        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl(), new RestServiceModuleImpl(getString(R.string.backend_service_endpoint)));
+        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
         objectGraph.inject(this);
 
         ButterKnife.inject(this);
@@ -109,20 +104,20 @@ public class CreateNewResourceActivity  extends AbstractAsyncTaskActivity {
     @Override
     public void onBackgroundTaskCompleted(Object result) {
 
-        if(result instanceof UserTaskResult){
+        if (result instanceof UserTaskResult) {
             UserTaskResult taskResult = (UserTaskResult) result;
 
-            if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
+            if (taskResult.getTaskResult().equals(TaskResult.SUCCESS)) {
                 if (taskResult.isRegisteredUserPresent()) {
                     currentUser = taskResult.getResultUser();
                 }
             } else {
                 // TODO: handle error condition
             }
-        }else if(result instanceof ResourceTaskResult){
+        } else if (result instanceof ResourceTaskResult) {
             ResourceTaskResult taskResult = (ResourceTaskResult) result;
 
-            if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
+            if (taskResult.getTaskResult().equals(TaskResult.SUCCESS)) {
                 // TODO: show a notification (toast)
                 finish();
             } else {
@@ -135,9 +130,9 @@ public class CreateNewResourceActivity  extends AbstractAsyncTaskActivity {
 
     @Override
     public void onBackgroundTaskCancelled(Object cancelledTask) {
-        if(cancelledTask instanceof RegisteredUserCheckAsyncTask){
+        if (cancelledTask instanceof RegisteredUserCheckAsyncTask) {
             registeredUserCheckTask = null;
-        }else if(cancelledTask instanceof SaveResourceAsyncTask){
+        } else if (cancelledTask instanceof SaveResourceAsyncTask) {
             saveResourceAsyncTask = null;
         }
     }

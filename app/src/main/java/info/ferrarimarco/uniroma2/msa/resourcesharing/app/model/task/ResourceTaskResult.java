@@ -5,16 +5,13 @@ import java.util.List;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 
-/**
- * Created by Ferrarim on 30/07/2014.
- */
-public class ResourceTaskResult {
+public class ResourceTaskResult extends AbstractTaskResult {
     private ResourceTaskType taskType;
-    private TaskResultType taskResultType;
 
     private List<Resource> resources;
 
     public ResourceTaskResult() {
+        super();
         this.resources = new ArrayList<>();
     }
 
@@ -23,14 +20,14 @@ public class ResourceTaskResult {
         this.taskType = taskType;
     }
 
-    public ResourceTaskResult(ResourceTaskType taskType, TaskResultType taskResultType) {
+    public ResourceTaskResult(ResourceTaskType taskType, TaskResult taskResult) {
         this(taskType);
-        this.taskResultType = taskResultType;
+        this.taskResult = taskResult;
 
     }
 
-    public ResourceTaskResult(ResourceTaskType taskType, TaskResultType taskResultType, List<Resource> resources) {
-        this(taskType, taskResultType);
+    public ResourceTaskResult(ResourceTaskType taskType, TaskResult taskResult, List<Resource> resources) {
+        this(taskType, taskResult);
         this.resources = resources;
     }
 
@@ -42,12 +39,12 @@ public class ResourceTaskResult {
         this.taskType = taskType;
     }
 
-    public TaskResultType getTaskResultType() {
-        return taskResultType;
+    public TaskResult getTaskResult() {
+        return taskResult;
     }
 
-    public void setTaskResultType(TaskResultType taskResultType) {
-        this.taskResultType = taskResultType;
+    public void setTaskResult(TaskResult taskResult) {
+        this.taskResult = taskResult;
     }
 
     public List<Resource> getResources() {

@@ -5,11 +5,7 @@ import android.os.AsyncTask;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
 
-
-/**
- * Created by Ferrarim on 30/07/2014.
- */
-public abstract class AbstractAsyncTask<R> extends AsyncTask<String, Void, R> {
+public abstract class AbstractAsyncTask<I, R> extends AsyncTask<I, Void, R> {
 
     private AsyncCaller caller;
 
@@ -30,5 +26,5 @@ public abstract class AbstractAsyncTask<R> extends AsyncTask<String, Void, R> {
         caller.onBackgroundTaskCancelled(this);
     }
 
-    protected abstract R doInBackground(String... params);
+    protected abstract R doInBackground(I... params);
 }

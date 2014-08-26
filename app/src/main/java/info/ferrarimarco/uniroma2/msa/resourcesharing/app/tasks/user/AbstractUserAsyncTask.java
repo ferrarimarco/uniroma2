@@ -8,10 +8,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskRes
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.HashingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.AbstractAsyncTask;
 
-/**
- * Created by Marco on 28/07/2014.
- */
-public abstract class AbstractUserAsyncTask extends AbstractAsyncTask<UserTaskResult> {
+public abstract class AbstractUserAsyncTask extends AbstractAsyncTask<String, UserTaskResult> {
 
     @Inject
     GenericDao<User> userDao;

@@ -7,7 +7,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.ResourceType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
 
 public class ReadAllResourcesAsyncTask extends AbstractResourceAsyncTask {
 
@@ -15,14 +15,14 @@ public class ReadAllResourcesAsyncTask extends AbstractResourceAsyncTask {
     protected ResourceTaskResult doInBackground(String... params) {
 
         // There was a failure while initialization
-        if(result.getTaskResultType().equals(TaskResultType.FAILURE)){
+        if (result.getTaskResult().equals(TaskResult.FAILURE)) {
             return result;
         }
 
         List<Resource> resources = result.getResources();
         Resource res = new Resource();
 
-        if(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES.equals(taskType)){
+        if (ResourceTaskType.READ_CREATED_BY_ME_RESOURCES.equals(taskType)) {
             res.setType(ResourceType.CREATED_BY_ME);
         }
 
@@ -30,13 +30,13 @@ public class ReadAllResourcesAsyncTask extends AbstractResourceAsyncTask {
             resources = resourceDao.read(res);
         } catch (SQLException e) {
             e.printStackTrace();
-            result.setTaskResultType(TaskResultType.FAILURE);
+            result.setTaskResult(TaskResult.FAILURE);
             return result;
         } finally {
             resourceDao.close();
         }
 
-        result.setTaskResultType(TaskResultType.SUCCESS);
+        result.setTaskResult(TaskResult.SUCCESS);
         result.setResources(resources);
 
         return result;
