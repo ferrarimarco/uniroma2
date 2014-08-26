@@ -98,10 +98,8 @@ public class Resource implements GenericEntity {
             return false;
         if (expired != null ? !expired.equals(resource.expired) : resource.expired != null)
             return false;
-        if (backendId != null ? !backendId.equals(resource.backendId) : resource.backendId != null)
-            return false;
+        return !(backendId != null ? !backendId.equals(resource.backendId) : resource.backendId != null);
 
-        return true;
     }
 
     @Override

@@ -7,9 +7,6 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHel
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 
-/**
- * Created by Marco on 13/07/2014.
- */
 public interface DaoModule {
     GenericDao<Resource> provideResourceDao(DatabaseHelperManager databaseHelperManager, Context context);
 

@@ -8,9 +8,6 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.ResourceType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 
-/**
- * Created by faoadmin on 06/08/14.
- */
 public class SaveResourceAsyncTask extends AbstractResourceAsyncTask {
 
     @Override

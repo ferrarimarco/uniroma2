@@ -8,9 +8,6 @@ import javax.inject.Inject;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 
-/**
- * Created by Marco on 11/08/2014.
- */
 public class SharedPreferencesServiceImpl {
 
     private SharedPreferences gcmSharedPreferences;

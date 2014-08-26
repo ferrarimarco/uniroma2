@@ -14,14 +14,10 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHel
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.exceptions.DaoException;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.GenericEntity;
 
-/**
- * Created by Marco on 12/07/2014.
- */
 public class GenericDao<T extends GenericEntity> {
 
     private Context context;
     private DatabaseHelperManager databaseHelperManager;
-    private DatabaseHelper databaseHelper;
 
     private Dao<T, ?> dao;
 
@@ -31,14 +27,14 @@ public class GenericDao<T extends GenericEntity> {
         this.context = context;
     }
 
-    protected void checkInitialization() throws SQLException {
+    protected void checkInitialization() {
         if (dao == null) {
             throw new DaoException("This dao is not initialized. Call open() on the GenericDao object before any use.");
         }
     }
 
     public void open(final Class<T> entityClass) throws SQLException {
-        databaseHelper = this.databaseHelperManager.getHelper(context);
+        DatabaseHelper databaseHelper = this.databaseHelperManager.getHelper(context);
         dao = databaseHelper.getEntityDao(entityClass);
     }
 
