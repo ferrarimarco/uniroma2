@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.services.GcmIntentServiceImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmIntentServiceImpl;
 
 public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
     @Override

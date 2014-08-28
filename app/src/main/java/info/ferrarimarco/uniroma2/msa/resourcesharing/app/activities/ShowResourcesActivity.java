@@ -14,7 +14,7 @@ import butterknife.InjectView;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArrayAdapter;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.ResourceType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
@@ -22,6 +22,9 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.AdapterMo
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.ReadAllResourcesAsyncTask;
+
+import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.CREATED_BY_ME;
+import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.NEW;
 
 public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements ActionBar.OnNavigationListener {
 
@@ -58,16 +61,16 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         // Set up the dropdown list navigation in the action bar.
-        ResourceType[] resourceTypes = ResourceType.values();
+        Resource.ResourceType[] resourceTypes = Resource.ResourceType.values();
         String[] resourceTypeLabels = new String[resourceTypes.length];
 
-        for (ResourceType resourceType : resourceTypes) {
+        for (Resource.ResourceType resourceType : resourceTypes) {
             switch (resourceType) {
                 case NEW:
-                    resourceTypeLabels[ResourceType.NEW.ordinal()] = getString(R.string.title_section_new_resource);
+                    resourceTypeLabels[Resource.ResourceType.NEW.ordinal()] = getString(R.string.title_section_new_resource);
                     break;
                 case CREATED_BY_ME:
-                    resourceTypeLabels[ResourceType.CREATED_BY_ME.ordinal()] = getString(R.string.title_section_created_by_me_resource);
+                    resourceTypeLabels[Resource.ResourceType.CREATED_BY_ME.ordinal()] = getString(R.string.title_section_created_by_me_resource);
             }
         }
 
@@ -89,10 +92,10 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
 
     @Override
     public boolean onNavigationItemSelected(int position, long id) {
-        if (ResourceType.CREATED_BY_ME.ordinal() == position) {
-            loadResources(ResourceType.CREATED_BY_ME);
-        } else if (ResourceType.NEW.ordinal() == position) {
-            loadResources(ResourceType.NEW);
+        if (CREATED_BY_ME.ordinal() == position) {
+            loadResources(CREATED_BY_ME);
+        } else if (NEW.ordinal() == position) {
+            loadResources(NEW);
         }
 
         return true;
@@ -134,7 +137,7 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
         }
     }
 
-    private void loadResources(ResourceType resourceType) {
+    private void loadResources(Resource.ResourceType resourceType) {
 
         showProgress(true);
 

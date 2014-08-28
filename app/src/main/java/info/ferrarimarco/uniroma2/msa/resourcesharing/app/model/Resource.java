@@ -9,6 +9,11 @@ import org.joda.time.DateTime;
 @DatabaseTable
 public class Resource implements GenericEntity {
 
+    public enum ResourceType {
+        NEW,
+        CREATED_BY_ME
+    }
+
     @DatabaseField(generatedId = true, canBeNull = false, allowGeneratedIdInsert = true)
     private Long androidId;
 

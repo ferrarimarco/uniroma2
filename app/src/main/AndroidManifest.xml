@@ -65,7 +65,7 @@
                 <category android:name="com.antoinecampbell.gcmdemo" />
             </intent-filter>
         </receiver>
-        <service android:name=".gcm.services.GcmIntentServiceImpl" />
+        <service android:name=".services.gcm.GcmIntentServiceImpl" />
     </application>
 
 </manifest>

@@ -7,7 +7,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.services.GcmMessagingServiceImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.HashingServiceImpl;
 
 @Module(injects = {HashingServiceImpl.class, GenericDao.class, GcmMessagingServiceImpl.class})
