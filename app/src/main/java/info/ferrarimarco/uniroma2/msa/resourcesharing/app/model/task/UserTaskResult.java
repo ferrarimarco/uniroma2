@@ -8,25 +8,22 @@ public class UserTaskResult extends AbstractTaskResult {
 
     private User resultUser;
 
-    private Boolean registeredUserPresent;
-
-    public UserTaskResult() {
-        super();
-        this.registeredUserPresent = Boolean.FALSE;
+    public UserTaskResult(Integer completedTaskId) {
+        super(completedTaskId);
     }
 
-    public UserTaskResult(UserTaskType taskType) {
-        this();
+    public UserTaskResult(UserTaskType taskType, Integer completedTaskId) {
+        this(completedTaskId);
         this.taskType = taskType;
     }
 
-    public UserTaskResult(UserTaskType taskType, TaskResult taskResult) {
-        this(taskType);
+    public UserTaskResult(UserTaskType taskType, TaskResult taskResult, Integer completedTaskId) {
+        this(taskType, completedTaskId);
         this.taskResult = taskResult;
     }
 
-    public UserTaskResult(UserTaskType taskType, TaskResult taskResult, String message) {
-        this(taskType, taskResult);
+    public UserTaskResult(UserTaskType taskType, TaskResult taskResult, Integer completedTaskId, String message) {
+        this(taskType, taskResult, completedTaskId);
         this.message = message;
     }
 
@@ -36,14 +33,6 @@ public class UserTaskResult extends AbstractTaskResult {
 
     public void setTaskType(UserTaskType taskType) {
         this.taskType = taskType;
-    }
-
-    public Boolean isRegisteredUserPresent() {
-        return registeredUserPresent;
-    }
-
-    public void setRegisteredUserPresent(Boolean registeredUserPresent) {
-        this.registeredUserPresent = registeredUserPresent;
     }
 
     public User getResultUser() {

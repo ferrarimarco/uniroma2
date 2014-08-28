@@ -21,7 +21,7 @@ public abstract class AbstractResourceAsyncTask extends AbstractAsyncTask<String
     protected ResourceTaskResult result;
 
     public AbstractResourceAsyncTask() {
-        result = new ResourceTaskResult();
+        result = new ResourceTaskResult(this.getTaskId());
 
         try {
             resourceDao.open(Resource.class);

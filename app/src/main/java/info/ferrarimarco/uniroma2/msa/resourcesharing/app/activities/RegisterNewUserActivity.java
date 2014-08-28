@@ -15,12 +15,9 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.FormFieldValidatorImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisterNewUserAsyncTask;
 
@@ -58,8 +55,6 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
 
         this.defaultInitialization(mProgressView, mRegisterNewUserFormView);
 
-        // Check if there is already a defined user
-        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
         objectGraph.inject(this);
 
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -92,7 +87,7 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
 
         if (areFieldsValid()) {
             registerNewUserAsyncTask = objectGraph.get(RegisterNewUserAsyncTask.class);
-            registerNewUserAsyncTask.initTask(this, this.getApplicationContext());
+            registerNewUserAsyncTask.initTask(this);
             executeTask(registerNewUserAsyncTask);
         }
     }

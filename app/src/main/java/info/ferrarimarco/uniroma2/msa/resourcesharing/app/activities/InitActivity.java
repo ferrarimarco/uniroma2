@@ -9,22 +9,22 @@ import android.view.MenuItem;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import dagger.ObjectGraph;
+import javax.inject.Inject;
+
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredUserCheckAsyncTask;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 
 public class InitActivity extends AbstractAsyncTaskActivity {
 
-    private RegisteredUserCheckAsyncTask registeredUserCheckTask;
-
     private static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
+
+    @Inject
+    UserService userService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         if (this.getActionBar() != null) {
             this.getActionBar().hide();
@@ -36,7 +36,6 @@ public class InitActivity extends AbstractAsyncTaskActivity {
         // check for Google Play Services
         checkGooglePlayServicesInstallationStatus();
 
-        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
         objectGraph.inject(this);
 
         // Create an async task to check for reg user, with this param
@@ -63,13 +62,7 @@ public class InitActivity extends AbstractAsyncTaskActivity {
     }
 
     private void checkRegisteredUser() {
-        if (registeredUserCheckTask != null) {
-            return;
-        }
-
-        registeredUserCheckTask = objectGraph.get(RegisteredUserCheckAsyncTask.class);
-        registeredUserCheckTask.initTask(this, this.getApplicationContext());
-        registeredUserCheckTask.execute(getResources().getString(R.string.registered_user_id));
+        userService.readRegisteredUserAsync(this);
     }
 
     public void checkGooglePlayServicesInstallationStatus() {
@@ -88,18 +81,14 @@ public class InitActivity extends AbstractAsyncTaskActivity {
     @Override
     public void onBackgroundTaskCompleted(Object result) {
 
-        UserTaskResult taskResult = (UserTaskResult) result;
+        User registeredUser = (User) result;
 
-        if (taskResult.getTaskResult().equals(TaskResult.SUCCESS)) {
-            if (taskResult.isRegisteredUserPresent()) {
-                Intent intent = new Intent(this, ShowResourcesActivity.class);
-                startActivity(intent);
-            } else {
-                Intent intent = new Intent(this, RegisterNewUserActivity.class);
-                startActivity(intent);
-            }
+        if (registeredUser != null) {
+            Intent intent = new Intent(this, ShowResourcesActivity.class);
+            startActivity(intent);
         } else {
-            // TODO: handle error condition
+            Intent intent = new Intent(this, RegisterNewUserActivity.class);
+            startActivity(intent);
         }
 
         finish();
@@ -107,6 +96,6 @@ public class InitActivity extends AbstractAsyncTaskActivity {
 
     @Override
     public void onBackgroundTaskCancelled(Object cancelledTask) {
-        registeredUserCheckTask = null;
+        // TODO: handle error condition
     }
 }

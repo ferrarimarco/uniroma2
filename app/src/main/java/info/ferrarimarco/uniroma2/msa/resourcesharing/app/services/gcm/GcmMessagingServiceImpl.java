@@ -16,6 +16,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.SharedPreferencesServiceImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 
 public class GcmMessagingServiceImpl {
 
@@ -57,6 +58,9 @@ public class GcmMessagingServiceImpl {
     SharedPreferencesServiceImpl sharedPreferencesService;
 
     @Inject
+    UserService userService;
+
+    @Inject
     Context context;
 
     private Long gcmTtl;
@@ -65,6 +69,7 @@ public class GcmMessagingServiceImpl {
     private String gcmRegistrationId;
     private String gcmProjectRecipient;
 
+    @Inject
     public GcmMessagingServiceImpl() {
         gcmTtl = Long.parseLong(String.valueOf(context.getResources().getString(R.string.gcm_ttl)));
         String gcmProjectId = context.getResources().getString(R.string.gcm_project_id);
@@ -115,8 +120,10 @@ public class GcmMessagingServiceImpl {
         }.execute(currentUser);
     }
 
-    public void sendNewResource(Resource resource, User currentUser) {
+    public void sendNewResource(Resource resource) {
         Bundle data = new Bundle();
+
+        User currentUser = userService.readRegisteredUserSync();
 
         data.putString("action", GcmMessage.NEW_RESOURCE_FROM_ME.getStringValue());
         data.putString("title", resource.getTitle());
@@ -130,8 +137,10 @@ public class GcmMessagingServiceImpl {
         sendGcmMessage(data);
     }
 
-    public void deleteResource(Resource resource, User currentUser) {
+    public void deleteResource(Resource resource) {
         Bundle data = new Bundle();
+
+        User currentUser = userService.readRegisteredUserSync();
 
         data.putString("action", GcmMessage.DELETE_MY_RESOURCE.getStringValue());
         data.putLong("creationTime", resource.getCreationTime().getMillis());
@@ -159,27 +168,29 @@ public class GcmMessagingServiceImpl {
             return;
         }
 
-        new AsyncTask<Bundle, Void, Void>() {
+        new AsyncTask<Bundle, Void, Integer>() {
             @Override
-            protected Void doInBackground(Bundle... params) {
+            protected Integer doInBackground(Bundle... params) {
                 if (params.length != 1) {
                     throw new IllegalArgumentException("No (or wrong) bundle specified while sending GCM message to backend");
                 }
 
                 Bundle data = params[0];
 
+                Integer returnCode = 0;
+
                 try {
                     String id = Integer.toString(messageId.incrementAndGet());
                     gcm.send(gcmProjectRecipient, id, gcmTtl, data);
                 } catch (IOException ex) {
                     Log.e(GcmMessagingServiceImpl.class.getName(), "Error :" + ex.getMessage());
-                    // TODO: handle this error
+                    returnCode = 1;
                 }
-                return null;
+                return returnCode;
             }
 
             @Override
-            protected void onPostExecute(Void v) {
+            protected void onPostExecute(Integer returnCode) {
                 // TODO: is this needed?
                 // Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }

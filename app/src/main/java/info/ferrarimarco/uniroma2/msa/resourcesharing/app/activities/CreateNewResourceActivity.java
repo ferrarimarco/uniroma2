@@ -10,7 +10,6 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
@@ -18,8 +17,6 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.SaveResourceAsyncTask;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredUserCheckAsyncTask;
 
@@ -56,7 +53,6 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_resource);
 
-        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl());
         objectGraph.inject(this);
 
         ButterKnife.inject(this);
@@ -66,7 +62,7 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
         showProgress(true);
 
         registeredUserCheckTask = objectGraph.get(RegisteredUserCheckAsyncTask.class);
-        registeredUserCheckTask.initTask(this, this.getApplicationContext());
+        registeredUserCheckTask.initTask(this);
         registeredUserCheckTask.execute(getResources().getString(R.string.registered_user_id));
     }
 
@@ -92,11 +88,11 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
             String description = descriptionEditText.getText().toString();
             String acquisitionMode = acquisitionModeEditText.getText().toString();
             String location = locationEditText.getText().toString();
-            String currentUserName = currentUser.getName();
+            String currentUserId = currentUser.getEmail();
 
             saveResourceAsyncTask = objectGraph.get(SaveResourceAsyncTask.class);
-            saveResourceAsyncTask.initTask(this, this.getApplicationContext());
-            saveResourceAsyncTask.execute();
+            saveResourceAsyncTask.initTask(this);
+            saveResourceAsyncTask.execute(title, description, acquisitionMode, location, currentUserId);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -108,7 +104,7 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
             UserTaskResult taskResult = (UserTaskResult) result;
 
             if (taskResult.getTaskResult().equals(TaskResult.SUCCESS)) {
-                if (taskResult.isRegisteredUserPresent()) {
+                if (taskResult.getResultUser() != null) {
                     currentUser = taskResult.getResultUser();
                 }
             } else {

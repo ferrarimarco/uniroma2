@@ -23,7 +23,7 @@ public class RegisterNewUserAsyncTask extends AbstractUserAsyncTask {
         try {
             userDao.open(User.class);
         } catch (SQLException e) {
-            return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResult.FAILURE, e.getMessage());
+            return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResult.FAILURE, this.getTaskId(), e.getMessage());
         }
         String hashedPassword = new String(Hex.encodeHex(hashingService.hash(password)));
         User user = new User(userId, userId, hashedPassword, DateTime.now());
@@ -35,9 +35,9 @@ public class RegisterNewUserAsyncTask extends AbstractUserAsyncTask {
             userDao.save(user);
             userDao.close();
         } catch (SQLException e) {
-            return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResult.FAILURE, e.getMessage());
+            return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResult.FAILURE, this.getTaskId(), e.getMessage());
         }
 
-        return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResult.SUCCESS);
+        return new UserTaskResult(UserTaskType.REGISTER_NEW_USER, TaskResult.SUCCESS, this.getTaskId());
     }
 }

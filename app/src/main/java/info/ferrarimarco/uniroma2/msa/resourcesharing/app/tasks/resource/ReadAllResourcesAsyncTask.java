@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.ResourceType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
@@ -23,7 +22,7 @@ public class ReadAllResourcesAsyncTask extends AbstractResourceAsyncTask {
         Resource res = new Resource();
 
         if (ResourceTaskType.READ_CREATED_BY_ME_RESOURCES.equals(taskType)) {
-            res.setType(ResourceType.CREATED_BY_ME);
+            res.setType(Resource.ResourceType.CREATED_BY_ME);
         }
 
         try {

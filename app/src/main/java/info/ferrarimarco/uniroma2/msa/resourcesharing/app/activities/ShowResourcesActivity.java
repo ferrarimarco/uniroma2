@@ -11,7 +11,6 @@ import android.widget.ListView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArrayAdapter;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
@@ -19,8 +18,6 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTas
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.AdapterModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.ReadAllResourcesAsyncTask;
 
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.CREATED_BY_ME;
@@ -83,7 +80,7 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
                 this);
 
         // Check if there is already a defined user
-        objectGraph = ObjectGraph.create(new ContextModuleImpl(this.getApplicationContext()), new DaoModuleImpl(), new AdapterModuleImpl(this));
+        objectGraph = objectGraph.plus(new AdapterModuleImpl(this));
         objectGraph.inject(this);
 
         resourceArrayAdapter = objectGraph.get(ResourceArrayAdapter.class);
@@ -142,7 +139,7 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
         showProgress(true);
 
         readAllResourcesAsyncTask = objectGraph.get(ReadAllResourcesAsyncTask.class);
-        readAllResourcesAsyncTask.initTask(this, this.getApplicationContext());
+        readAllResourcesAsyncTask.initTask(this);
 
         switch (resourceType) {
             case NEW:

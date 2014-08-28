@@ -10,11 +10,10 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskTyp
 
 public class RegisteredUserCheckAsyncTask extends AbstractUserAsyncTask {
 
-
     @Override
     protected UserTaskResult doInBackground(String... params) {
 
-        UserTaskResult result = new UserTaskResult(UserTaskType.CHECK_REGISTERED_USER);
+        UserTaskResult result = new UserTaskResult(UserTaskType.CHECK_REGISTERED_USER, this.getTaskId());
 
         try {
             userDao.open(User.class);
@@ -47,10 +46,39 @@ public class RegisteredUserCheckAsyncTask extends AbstractUserAsyncTask {
 
         // Check if there is a registered user
         if (users != null && !users.isEmpty()) {
-            result.setRegisteredUserPresent(Boolean.TRUE);
             result.setResultUser(users.get(0));
         }
 
         return result;
+    }
+
+    public User readRegisteredUserSync(String registeredUserId) {
+
+        try {
+            userDao.open(User.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        User registeredUser = new User();
+
+        Long registered_user_id = Long.parseLong(registeredUserId);
+        registeredUser.setId(registered_user_id);
+
+        List<User> users = null;
+
+        try {
+            users = userDao.read(registeredUser);
+            userDao.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Check if there is a registered user
+        if (users != null && !users.isEmpty()) {
+            registeredUser = users.get(0);
+        }
+
+        return registeredUser;
     }
 }

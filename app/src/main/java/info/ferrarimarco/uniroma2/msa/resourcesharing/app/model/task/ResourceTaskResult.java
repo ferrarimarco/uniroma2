@@ -10,24 +10,23 @@ public class ResourceTaskResult extends AbstractTaskResult {
 
     private List<Resource> resources;
 
-    public ResourceTaskResult() {
-        super();
+    public ResourceTaskResult(Integer completedTaskId) {
+        super(completedTaskId);
         this.resources = new ArrayList<>();
     }
 
-    public ResourceTaskResult(ResourceTaskType taskType) {
-        this();
+    public ResourceTaskResult(ResourceTaskType taskType, Integer completedTaskId) {
+        this(completedTaskId);
         this.taskType = taskType;
     }
 
-    public ResourceTaskResult(ResourceTaskType taskType, TaskResult taskResult) {
-        this(taskType);
+    public ResourceTaskResult(ResourceTaskType taskType, Integer completedTaskId, TaskResult taskResult) {
+        this(taskType, completedTaskId);
         this.taskResult = taskResult;
-
     }
 
-    public ResourceTaskResult(ResourceTaskType taskType, TaskResult taskResult, List<Resource> resources) {
-        this(taskType, taskResult);
+    public ResourceTaskResult(ResourceTaskType taskType, Integer completedTaskId, TaskResult taskResult, List<Resource> resources) {
+        this(taskType, completedTaskId, taskResult);
         this.resources = resources;
     }
 

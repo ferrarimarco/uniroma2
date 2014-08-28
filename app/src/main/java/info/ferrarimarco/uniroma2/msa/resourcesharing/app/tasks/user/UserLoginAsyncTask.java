@@ -29,7 +29,7 @@ public class UserLoginAsyncTask extends AbstractUserAsyncTask {
             // Simulate network access.
             Thread.sleep(2000);
         } catch (InterruptedException e) {
-            return new UserTaskResult(UserTaskType.USER_LOGIN, TaskResult.FAILURE);
+            return new UserTaskResult(UserTaskType.USER_LOGIN, TaskResult.FAILURE, this.getTaskId());
         }
 
         for (String credential : DUMMY_CREDENTIALS) {
@@ -37,12 +37,12 @@ public class UserLoginAsyncTask extends AbstractUserAsyncTask {
             if (pieces[0].equals(userId)) {
                 // Account exists, return true if the password matches.
                 if (pieces[1].equals(password)) {
-                    return new UserTaskResult(UserTaskType.USER_LOGIN, TaskResult.SUCCESS);
+                    return new UserTaskResult(UserTaskType.USER_LOGIN, TaskResult.SUCCESS, this.getTaskId());
                 }
             }
         }
 
-        return new UserTaskResult(UserTaskType.USER_LOGIN, TaskResult.SUCCESS);
+        return new UserTaskResult(UserTaskType.USER_LOGIN, TaskResult.SUCCESS, this.getTaskId());
     }
 
 

@@ -5,6 +5,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,6 +17,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.AccountUtils;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
 public abstract class AbstractAsyncTaskActivity extends Activity implements AsyncCaller {
 
@@ -27,7 +29,7 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Asyn
     private static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
     private static final int REQUEST_CODE_PICK_ACCOUNT = 1002;
 
-    protected void defaultInitialization(View progressBarView, View mainView){
+    protected void defaultInitialization(View progressBarView, View mainView) {
         this.progressBarView = progressBarView;
         this.mainView = mainView;
     }
@@ -37,7 +39,7 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Asyn
      */
     public void showProgress(final boolean show) {
 
-        if(mainView == null || progressBarView == null){
+        if (mainView == null || progressBarView == null) {
             throw new IllegalStateException("The activity is not correctly initialized. Main view or progress bar view is null");
         }
 
@@ -58,6 +60,12 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Asyn
                 progressBarView.setVisibility(show ? View.VISIBLE : View.GONE);
             }
         });
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        objectGraph = ObjectGraphUtils.getObjectGraph(this.getApplicationContext());
     }
 
     @Override
