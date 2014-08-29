@@ -1,7 +1,6 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -16,10 +15,10 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.FormFieldValidatorImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisterNewUserAsyncTask;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 
 /**
  * A login screen that offers login via email/password.
@@ -28,6 +27,9 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
 
     @Inject
     FormFieldValidatorImpl formFieldValidatorImpl;
+
+    @Inject
+    UserService userService;
 
     @InjectView(R.id.email)
     AutoCompleteTextView mEmailView;
@@ -43,8 +45,6 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
 
     private String email;
     private String password;
-
-    private RegisterNewUserAsyncTask registerNewUserAsyncTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,15 +80,8 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void registerNewUser() {
-
-        if (registerNewUserAsyncTask != null) {
-            return;
-        }
-
         if (areFieldsValid()) {
-            registerNewUserAsyncTask = objectGraph.get(RegisterNewUserAsyncTask.class);
-            registerNewUserAsyncTask.initTask(this);
-            executeTask(registerNewUserAsyncTask);
+            executeTask();
         }
     }
 
@@ -143,34 +136,30 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
         return result;
     }
 
-    private void executeTask(AsyncTask<String, Void, UserTaskResult> task) {
+    private void executeTask() {
         // Show a progress spinner, and kick off a background task to
         // perform the user login attempt.
         showProgress(true);
-        task.execute(email, password);
+        userService.registerNewUser(this, email, password);
     }
 
     @Override
     public void onBackgroundTaskCompleted(Object result) {
-        registerNewUserAsyncTask = null;
         showProgress(false);
 
         UserTaskResult taskResult = (UserTaskResult) result;
 
-        if (taskResult.getTaskResult().equals(TaskResult.SUCCESS)) {
+        if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
             Intent intent = new Intent(this, ShowResourcesActivity.class);
             startActivity(intent);
             finish();
         } else {
             // TODO: handle this error condition
-            mPasswordView.setError(getString(R.string.error_incorrect_password));
-            mPasswordView.requestFocus();
         }
     }
 
     @Override
     public void onBackgroundTaskCancelled(Object cancelledTask) {
-        registerNewUserAsyncTask = null;
         showProgress(false);
     }
 }

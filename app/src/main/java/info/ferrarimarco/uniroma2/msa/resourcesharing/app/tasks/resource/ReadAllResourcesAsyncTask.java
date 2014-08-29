@@ -6,7 +6,7 @@ import java.util.List;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 
 public class ReadAllResourcesAsyncTask extends AbstractResourceAsyncTask {
 
@@ -14,7 +14,7 @@ public class ReadAllResourcesAsyncTask extends AbstractResourceAsyncTask {
     protected ResourceTaskResult doInBackground(String... params) {
 
         // There was a failure while initialization
-        if (result.getTaskResult().equals(TaskResult.FAILURE)) {
+        if (result.getTaskResultType().equals(TaskResultType.FAILURE)) {
             return result;
         }
 
@@ -29,13 +29,13 @@ public class ReadAllResourcesAsyncTask extends AbstractResourceAsyncTask {
             resources = resourceDao.read(res);
         } catch (SQLException e) {
             e.printStackTrace();
-            result.setTaskResult(TaskResult.FAILURE);
+            result.setTaskResultType(TaskResultType.FAILURE);
             return result;
         } finally {
             resourceDao.close();
         }
 
-        result.setTaskResult(TaskResult.SUCCESS);
+        result.setTaskResultType(TaskResultType.SUCCESS);
         result.setResources(resources);
 
         return result;

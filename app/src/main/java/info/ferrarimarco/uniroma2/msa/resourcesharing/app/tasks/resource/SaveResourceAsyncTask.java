@@ -4,22 +4,12 @@ import org.joda.time.DateTime;
 
 import java.sql.SQLException;
 
-import javax.inject.Inject;
-
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 
 public class SaveResourceAsyncTask extends AbstractResourceAsyncTask {
-
-    @Inject
-    GcmMessagingServiceImpl gcmMessagingService;
-
-    @Inject
-    UserService userService;
 
     @Override
     protected ResourceTaskResult doInBackground(String... params) {
@@ -36,13 +26,13 @@ public class SaveResourceAsyncTask extends AbstractResourceAsyncTask {
             resourceDao.save(newRes);
         } catch (SQLException e) {
             e.printStackTrace();
-            return new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE, this.getTaskId(), TaskResult.FAILURE);
+            return new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE, this.getTaskId(), TaskResultType.FAILURE);
         } finally {
             resourceDao.close();
         }
 
         gcmMessagingService.sendNewResource(newRes);
 
-        return new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE, this.getTaskId(), TaskResult.SUCCESS);
+        return new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE, this.getTaskId(), TaskResultType.SUCCESS);
     }
 }

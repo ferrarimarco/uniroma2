@@ -20,13 +20,13 @@ public class ResourceTaskResult extends AbstractTaskResult {
         this.taskType = taskType;
     }
 
-    public ResourceTaskResult(ResourceTaskType taskType, Integer completedTaskId, TaskResult taskResult) {
+    public ResourceTaskResult(ResourceTaskType taskType, Integer completedTaskId, TaskResultType taskResultType) {
         this(taskType, completedTaskId);
-        this.taskResult = taskResult;
+        this.taskResultType = taskResultType;
     }
 
-    public ResourceTaskResult(ResourceTaskType taskType, Integer completedTaskId, TaskResult taskResult, List<Resource> resources) {
-        this(taskType, completedTaskId, taskResult);
+    public ResourceTaskResult(ResourceTaskType taskType, Integer completedTaskId, TaskResultType taskResultType, List<Resource> resources) {
+        this(taskType, completedTaskId, taskResultType);
         this.resources = resources;
     }
 
@@ -38,12 +38,12 @@ public class ResourceTaskResult extends AbstractTaskResult {
         this.taskType = taskType;
     }
 
-    public TaskResult getTaskResult() {
-        return taskResult;
+    public TaskResultType getTaskResultType() {
+        return taskResultType;
     }
 
-    public void setTaskResult(TaskResult taskResult) {
-        this.taskResult = taskResult;
+    public void setTaskResultType(TaskResultType taskResultType) {
+        this.taskResultType = taskResultType;
     }
 
     public List<Resource> getResources() {

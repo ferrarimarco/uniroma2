@@ -9,6 +9,10 @@ import org.joda.time.DateTime;
 @DatabaseTable
 public class Resource implements GenericEntity {
 
+    public void setSentToBackend(Boolean sentToBackend) {
+        this.sentToBackend = sentToBackend;
+    }
+
     public enum ResourceType {
         NEW,
         CREATED_BY_ME
@@ -44,12 +48,17 @@ public class Resource implements GenericEntity {
     @DatabaseField
     private Boolean expired;
 
+    @DatabaseField
+    private Boolean sentToBackend;
+
     public Resource() {
         type = ResourceType.NEW;
         expired = false;
+        sentToBackend = false;
     }
 
     public Resource(String title, String description, String location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired) {
+        this();
         this.title = title;
         this.description = description;
         this.location = location;
@@ -73,6 +82,7 @@ public class Resource implements GenericEntity {
                 ", creatorId='" + creatorId + '\'' +
                 ", type='" + type.toString() + '\'' +
                 ", IsExpired='" + expired.toString() + '\'' +
+                ", IsSentToBackend='" + sentToBackend.toString() + '\'' +
                 '}';
     }
 
@@ -102,6 +112,8 @@ public class Resource implements GenericEntity {
         if (type != null ? !type.equals(resource.type) : resource.type != null)
             return false;
         if (expired != null ? !expired.equals(resource.expired) : resource.expired != null)
+            return false;
+        if (sentToBackend != null ? !sentToBackend.equals(resource.sentToBackend) : resource.sentToBackend != null)
             return false;
         return !(backendId != null ? !backendId.equals(resource.backendId) : resource.backendId != null);
 

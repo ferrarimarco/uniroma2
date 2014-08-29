@@ -8,7 +8,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.AbstractAsyncTask;
 
 public abstract class AbstractResourceAsyncTask extends AbstractAsyncTask<String, ResourceTaskResult> {
@@ -27,7 +27,7 @@ public abstract class AbstractResourceAsyncTask extends AbstractAsyncTask<String
             resourceDao.open(Resource.class);
         } catch (SQLException e) {
             e.printStackTrace();
-            result.setTaskResult(TaskResult.FAILURE);
+            result.setTaskResultType(TaskResultType.FAILURE);
         }
     }
 

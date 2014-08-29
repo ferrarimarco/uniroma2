@@ -2,6 +2,8 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl;
 
 import android.content.Context;
 
+import com.squareup.otto.Bus;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -23,6 +25,12 @@ public class ContextModuleImpl {
     @Singleton
     public Context provideApplicationContext() {
         return applicationContext;
+    }
+
+    @Provides
+    @Singleton
+    public Bus provideBus() {
+        return new Bus();
     }
 
 }

@@ -15,7 +15,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.SaveResourceAsyncTask;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredUserCheckAsyncTask;
@@ -103,7 +103,7 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
         if (result instanceof UserTaskResult) {
             UserTaskResult taskResult = (UserTaskResult) result;
 
-            if (taskResult.getTaskResult().equals(TaskResult.SUCCESS)) {
+            if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
                 if (taskResult.getResultUser() != null) {
                     currentUser = taskResult.getResultUser();
                 }
@@ -113,7 +113,7 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
         } else if (result instanceof ResourceTaskResult) {
             ResourceTaskResult taskResult = (ResourceTaskResult) result;
 
-            if (taskResult.getTaskResult().equals(TaskResult.SUCCESS)) {
+            if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
                 // TODO: show a notification (toast)
                 finish();
             } else {

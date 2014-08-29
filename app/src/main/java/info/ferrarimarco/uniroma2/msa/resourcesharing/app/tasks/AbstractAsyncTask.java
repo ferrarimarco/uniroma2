@@ -8,10 +8,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 
 public abstract class AbstractAsyncTask<I, R> extends AsyncTask<I, Void, R> {
 
     private AsyncCaller caller;
+
+    @Inject
+    protected GcmMessagingServiceImpl gcmMessagingService;
 
     @Inject
     protected

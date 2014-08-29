@@ -61,8 +61,9 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <action android:name="info.ferrarimarco.uniroma2.msa.resourcesharing.ACK_REQUEST" />
 
-                <category android:name="com.antoinecampbell.gcmdemo" />
+                <category android:name="info.ferrarimarco.uniroma2.msa.resourcesharing" />
             </intent-filter>
         </receiver>
         <service android:name=".services.gcm.GcmIntentServiceImpl" />

@@ -16,7 +16,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArray
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.AdapterModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.ReadAllResourcesAsyncTask;
 
@@ -159,7 +159,7 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
 
         ResourceTaskResult taskResult = (ResourceTaskResult) result;
 
-        if (taskResult.getTaskResult().equals(TaskResult.SUCCESS)) {
+        if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
             resourceArrayAdapter.clear();
             resourceArrayAdapter.addAll(taskResult.getResources());
         } else {

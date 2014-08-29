@@ -22,23 +22,16 @@ public class GcmMessagingServiceImpl {
 
     enum GcmMessage {
 
-        // D2C = Device to Cloud
-        REGISTRATION_REQUEST("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.REGISTER"),
+        USER_ID_CHECK("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.USER_ID_CHECK"),
+        REGISTRATION("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.REGISTRATION"),
         NEW_RESOURCE_FROM_ME("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.CREATE_NEW_RESOURCE"),
         DELETE_MY_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.DELETE_RESOURCE"),
         UPDATE_USER_DETAILS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.UPDATE_USER_DETAILS"),
-
-        // C2D = Cloud to Device
         NEW_RESOURCE_FROM_OTHERS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.NEW_RESOURCE_BY_OTHERS"),
         DELETE_RESOURCE_BY_OTHERS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.DELETE_RESOURCE_BY_OTHERS"),
 
         // D2D = Device to Device
-        CLEAR_RESOURCE_NOTIFICATION("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.CLEAR_RESOURCE"),
-
-        // Replies
-        C2D_RESPONSE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.C2D_RESPONSE"),
-        D2C_RESPONSE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.D2C_RESPONSE"),
-        D2D_RESPONSE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.D2D_RESPONSE");
+        CLEAR_RESOURCE_NOTIFICATION("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.CLEAR_RESOURCE");
 
         private String stringValue;
 
@@ -51,8 +44,7 @@ public class GcmMessagingServiceImpl {
         }
     }
 
-    @Inject
-    GoogleCloudMessaging gcm;
+    private GoogleCloudMessaging gcm;
 
     @Inject
     SharedPreferencesServiceImpl sharedPreferencesService;
@@ -95,13 +87,15 @@ public class GcmMessagingServiceImpl {
                 Log.d(GcmMessagingServiceImpl.class.getName(), "Send GCM registration Id to backend for: " + userId);
 
                 try {
+                    gcm = GoogleCloudMessaging.getInstance(context);
                     gcmRegistrationId = gcm.register(context.getResources().getString(R.string.gcm_project_id));
 
                     Log.d(GcmMessagingServiceImpl.class.getName(), "GCM Registration ID: " + gcmRegistrationId);
 
                     Bundle data = new Bundle();
                     data.putString("userId", userId);
-                    data.putString("action", GcmMessage.REGISTRATION_REQUEST.getStringValue());
+                    data.putString("action", GcmMessage.REGISTRATION.getStringValue());
+                    data.putBoolean("needsAck", true);
 
                     sendGcmMessage(data);
 
@@ -133,6 +127,7 @@ public class GcmMessagingServiceImpl {
         data.putString("acquisitionMode", resource.getAcquisitionMode());
         data.putString("creatorId", currentUser.getEmail());
         data.putString("creatorPassword", currentUser.getHashedPassword());
+        data.putBoolean("needsAck", true);
 
         sendGcmMessage(data);
     }
@@ -146,18 +141,38 @@ public class GcmMessagingServiceImpl {
         data.putLong("creationTime", resource.getCreationTime().getMillis());
         data.putString("creatorId", currentUser.getEmail());
         data.putString("creatorPassword", currentUser.getHashedPassword());
+        data.putBoolean("needsAck", true);
 
         sendGcmMessage(data);
     }
 
     public void updateUserDetails(User currentUser, String currentPosition) {
         Bundle data = new Bundle();
-
         data.putString("action", GcmMessage.UPDATE_USER_DETAILS.getStringValue());
         data.putString("userName", currentUser.getName());
         data.putString("userId", currentUser.getEmail());
         data.putString("hashedPassword", currentUser.getHashedPassword());
         data.putString("currentPosition", currentPosition);
+
+        sendGcmMessage(data);
+    }
+
+    public void checkUserIdValidity(String userId) {
+        Bundle data = new Bundle();
+        data.putString("action", GcmMessage.USER_ID_CHECK.getStringValue());
+        data.putString("userId", userId);
+        data.putBoolean("needsAck", true);
+
+        sendGcmMessage(data);
+    }
+
+    public void registerNewUser(User currentUser) {
+        Bundle data = new Bundle();
+        data.putString("action", GcmMessage.REGISTRATION.getStringValue());
+        data.putString("userName", currentUser.getName());
+        data.putString("userId", currentUser.getEmail());
+        data.putString("hashedPassword", currentUser.getHashedPassword());
+        data.putBoolean("needsAck", true);
 
         sendGcmMessage(data);
     }
@@ -177,16 +192,21 @@ public class GcmMessagingServiceImpl {
 
                 Bundle data = params[0];
 
-                Integer returnCode = 0;
+                if (!data.containsKey("needsAck")) {
+                    data.putBoolean("needsAck", false);
+                }
+
+                String id = Integer.toString(messageId.incrementAndGet());
 
                 try {
-                    String id = Integer.toString(messageId.incrementAndGet());
+                    gcm = GoogleCloudMessaging.getInstance(context);
                     gcm.send(gcmProjectRecipient, id, gcmTtl, data);
                 } catch (IOException ex) {
                     Log.e(GcmMessagingServiceImpl.class.getName(), "Error :" + ex.getMessage());
-                    returnCode = 1;
+                    return -1;
                 }
-                return returnCode;
+
+                return Integer.parseInt(id);
             }
 
             @Override

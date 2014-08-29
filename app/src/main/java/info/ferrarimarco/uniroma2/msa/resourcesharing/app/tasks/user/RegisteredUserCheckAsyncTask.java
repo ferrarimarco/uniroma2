@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskType;
 
@@ -19,7 +19,7 @@ public class RegisteredUserCheckAsyncTask extends AbstractUserAsyncTask {
             userDao.open(User.class);
         } catch (SQLException e) {
             e.printStackTrace();
-            result.setTaskResult(TaskResult.FAILURE);
+            result.setTaskResultType(TaskResultType.FAILURE);
             result.setMessage(e.getMessage());
             return result;
         }
@@ -37,12 +37,12 @@ public class RegisteredUserCheckAsyncTask extends AbstractUserAsyncTask {
             userDao.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            result.setTaskResult(TaskResult.FAILURE);
+            result.setTaskResultType(TaskResultType.FAILURE);
             result.setMessage(e.getMessage());
             return result;
         }
 
-        result.setTaskResult(TaskResult.SUCCESS);
+        result.setTaskResultType(TaskResultType.SUCCESS);
 
         // Check if there is a registered user
         if (users != null && !users.isEmpty()) {

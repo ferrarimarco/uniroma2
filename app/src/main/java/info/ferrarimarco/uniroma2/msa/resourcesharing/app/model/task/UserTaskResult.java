@@ -17,13 +17,13 @@ public class UserTaskResult extends AbstractTaskResult {
         this.taskType = taskType;
     }
 
-    public UserTaskResult(UserTaskType taskType, TaskResult taskResult, Integer completedTaskId) {
+    public UserTaskResult(UserTaskType taskType, TaskResultType taskResultType, Integer completedTaskId) {
         this(taskType, completedTaskId);
-        this.taskResult = taskResult;
+        this.taskResultType = taskResultType;
     }
 
-    public UserTaskResult(UserTaskType taskType, TaskResult taskResult, Integer completedTaskId, String message) {
-        this(taskType, taskResult, completedTaskId);
+    public UserTaskResult(UserTaskType taskType, TaskResultType taskResultType, Integer completedTaskId, String message) {
+        this(taskType, taskResultType, completedTaskId);
         this.message = message;
     }
 

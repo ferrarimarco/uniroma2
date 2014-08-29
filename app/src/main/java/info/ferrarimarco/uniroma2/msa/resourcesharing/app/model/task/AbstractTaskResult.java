@@ -3,7 +3,7 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task;
 public class AbstractTaskResult {
 
     protected String message;
-    protected TaskResult taskResult;
+    protected TaskResultType taskResultType;
     protected Integer completedTaskId;
 
     public AbstractTaskResult(Integer completedTaskId) {
@@ -19,12 +19,12 @@ public class AbstractTaskResult {
         this.message = message;
     }
 
-    public TaskResult getTaskResult() {
-        return taskResult;
+    public TaskResultType getTaskResultType() {
+        return taskResultType;
     }
 
-    public void setTaskResult(TaskResult taskResult) {
-        this.taskResult = taskResult;
+    public void setTaskResultType(TaskResultType taskResultType) {
+        this.taskResultType = taskResultType;
     }
 
     public Integer getCompletedTaskId() {
