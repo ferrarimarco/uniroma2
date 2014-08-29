@@ -33,6 +33,11 @@
     @com.google.android.gms.common.annotation.KeepName *;
 }
 
+-keepclassmembers class ** {
+    @com.squareup.otto.Subscribe public *;
+    @com.squareup.otto.Produce public *;
+}
+
 -keepnames class * implements android.os.Parcelable {
     public static final ** CREATOR;
 }
