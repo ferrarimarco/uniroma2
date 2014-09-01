@@ -168,7 +168,7 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
 
         if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
             User registeredUser = userService.readRegisteredUserSync();
-            gcmMessagingService.registerNewUser(registeredUser);
+            gcmMessagingService.checkUserIdValidity(registeredUser.getEmail());
         } else {
             showProgress(false);
             // TODO: handle this error condition
