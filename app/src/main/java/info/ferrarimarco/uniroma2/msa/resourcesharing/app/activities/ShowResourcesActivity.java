@@ -52,10 +52,13 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
 
         // Set up the action bar to show a dropdown list.
         final ActionBar actionBar = getActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        // Show the Up button in the action bar.
-        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+            // Show the Up button in the action bar.
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         // Set up the dropdown list navigation in the action bar.
         Resource.ResourceType[] resourceTypes = Resource.ResourceType.values();
