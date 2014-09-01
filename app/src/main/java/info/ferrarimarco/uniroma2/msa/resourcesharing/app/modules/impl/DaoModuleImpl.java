@@ -15,10 +15,9 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHel
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.DaoModule;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.ReadAllResourcesAsyncTask;
 
 
-@Module(injects = {GenericDao.class, InitActivity.class, RegisterNewUserActivity.class, ShowResourcesActivity.class, CreateNewResourceActivity.class, ReadAllResourcesAsyncTask.class}, complete = false, library = true)
+@Module(injects = {GenericDao.class, InitActivity.class, RegisterNewUserActivity.class, ShowResourcesActivity.class, CreateNewResourceActivity.class}, complete = false, library = true)
 public class DaoModuleImpl implements DaoModule {
 
     @Override
