@@ -9,14 +9,18 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.squareup.otto.Subscribe;
+
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.AckAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.FormFieldValidatorImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 
@@ -37,7 +41,7 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
     @InjectView(R.id.password)
     EditText mPasswordView;
 
-    @InjectView(R.id.login_progress)
+    @InjectView(R.id.register_new_user_progress)
     View mProgressView;
 
     @InjectView(R.id.register_new_user_form)
@@ -81,7 +85,8 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
      */
     private void registerNewUser() {
         if (areFieldsValid()) {
-            executeTask();
+            showProgress(true);
+            userService.registerNewUser(this, email, password);
         }
     }
 
@@ -136,25 +141,37 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
         return result;
     }
 
-    private void executeTask() {
-        // Show a progress spinner, and kick off a background task to
-        // perform the user login attempt.
-        showProgress(true);
-        userService.registerNewUser(this, email, password);
+    @Subscribe
+    public void ackAvailable(AckAvailableEvent event) {
+        showProgress(false);
+
+        if (TaskResultType.USER_ID_OK.equals(event.getResult())) {
+            Intent intent = new Intent(this, ShowResourcesActivity.class);
+            startActivity(intent);
+            finish();
+        } else if (TaskResultType.USER_ID_NOT_FREE.equals(event.getResult())) {
+            userService.deleteRegisteredUser(this);
+        }
     }
 
     @Override
     public void onBackgroundTaskCompleted(Object result) {
-        showProgress(false);
-
         UserTaskResult taskResult = (UserTaskResult) result;
 
-        if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
-            Intent intent = new Intent(this, ShowResourcesActivity.class);
-            startActivity(intent);
-            finish();
-        } else {
-            // TODO: handle this error condition
+        if (UserTaskType.DELETE_REGISTERED_USER.equals(taskResult.getTaskType())) {
+            if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
+                // TODO: user successfully deleted from local DB. Anything else to do?
+            } else {
+                showProgress(false);
+                // TODO: handle this error condition
+            }
+        } else if (UserTaskType.REGISTER_NEW_USER.equals(taskResult.getTaskType())) {
+            if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
+                // TODO: registration message sent. What to do?
+            } else {
+                showProgress(false);
+                // TODO: handle this error condition
+            }
         }
     }
 
