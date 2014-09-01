@@ -77,7 +77,7 @@ public class InitActivity extends AbstractAsyncTaskActivity {
     }
 
     private void checkRegisteredUser() {
-        super.showProgress(true);
+        showProgress(true);
         userService.readRegisteredUserAsync(this);
     }
 
@@ -99,7 +99,7 @@ public class InitActivity extends AbstractAsyncTaskActivity {
 
         User registeredUser = (User) result;
 
-        super.showProgress(false);
+        showProgress(false);
 
         if (registeredUser != null) {
             Intent intent = new Intent(this, ShowResourcesActivity.class);
