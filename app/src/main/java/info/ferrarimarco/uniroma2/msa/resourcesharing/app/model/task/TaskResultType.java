@@ -4,7 +4,11 @@ public enum TaskResultType {
     SUCCESS,
     FAILURE,
 
-    // For UserIdCheckAsyncTask
     USER_ID_OK,
-    USER_ID_NOT_FREE;
+    USER_ID_NOT_FREE,
+    USER_SAVED,
+    USER_NOT_SAVED,
+
+    RESOURCE_SAVED,
+    RESOURCE_NOT_SAVED;
 }
