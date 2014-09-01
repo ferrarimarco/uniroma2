@@ -21,6 +21,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.UserDeletionCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.UserLocalRegistrationCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.UserIdCheckAckAvailableEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.UserSavedAckAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.FormFieldValidatorImpl;
@@ -140,15 +141,19 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
     }
 
     @Subscribe
-    // TODO: split into different methods or it will not work
-    public void ackAvailable(UserIdCheckAckAvailableEvent event) {
+    public void userIdCheckAckAvailable(UserIdCheckAckAvailableEvent event) {
         if (TaskResultType.USER_ID_OK.equals(event.getResult())) {
             userService.registerNewUser(email, password);
         } else if (TaskResultType.USER_ID_NOT_FREE.equals(event.getResult())) {
             userService.deleteRegisteredUser();
             mEmailView.setError(getString(R.string.error_user_id_already_taken));
             mEmailView.requestFocus();
-        } else if (TaskResultType.USER_SAVED.equals(event.getResult())) {
+        }
+    }
+
+    @Subscribe
+    public void userSavedAckAvailable(UserSavedAckAvailableEvent event) {
+        if (TaskResultType.USER_SAVED.equals(event.getResult())) {
             Intent intent = new Intent(this, ShowResourcesActivity.class);
             startActivity(intent);
             finish();
