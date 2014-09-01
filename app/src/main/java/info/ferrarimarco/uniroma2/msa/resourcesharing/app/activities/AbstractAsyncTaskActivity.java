@@ -13,18 +13,35 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.squareup.otto.Bus;
+
+import javax.inject.Inject;
 
 import dagger.ObjectGraph;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.AccountUtils;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
-public abstract class AbstractAsyncTaskActivity extends Activity implements AsyncCaller {
+public abstract class AbstractAsyncTaskActivity extends Activity {
 
     private View progressBarView;
     private View mainView;
 
     protected ObjectGraph objectGraph;
+
+    @Inject
+    GcmMessagingServiceImpl gcmMessagingService;
+
+    @Inject
+    UserService userService;
+
+    @Inject
+    ResourceService resourceService;
+
+    @Inject
+    Bus bus;
 
     private static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
     private static final int REQUEST_CODE_PICK_ACCOUNT = 1002;
@@ -66,6 +83,7 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Asyn
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         objectGraph = ObjectGraphUtils.getObjectGraph(this.getApplicationContext());
+        bus.register(this);
     }
 
     @Override

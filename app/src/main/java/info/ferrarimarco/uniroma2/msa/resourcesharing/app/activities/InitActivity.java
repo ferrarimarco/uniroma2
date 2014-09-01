@@ -9,20 +9,16 @@ import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-
-import javax.inject.Inject;
+import com.squareup.otto.Subscribe;
 
 import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.RegisteredUserAvailableEvent;
 
 public class InitActivity extends AbstractAsyncTaskActivity {
 
     private static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
-
-    @Inject
-    UserService userService;
 
     @InjectView(R.id.init_progress)
     View mProgressView;
@@ -53,7 +49,7 @@ public class InitActivity extends AbstractAsyncTaskActivity {
     protected void onStart() {
         super.onStart();
 
-        // Create an async task to check for reg user, with this param
+        // Create an async task to check for reg user
         checkRegisteredUser();
     }
 
@@ -75,7 +71,7 @@ public class InitActivity extends AbstractAsyncTaskActivity {
 
     private void checkRegisteredUser() {
         showProgress(true);
-        userService.readRegisteredUserAsync(this);
+        userService.readRegisteredUserAsync();
     }
 
     public void checkGooglePlayServicesInstallationStatus() {
@@ -91,12 +87,10 @@ public class InitActivity extends AbstractAsyncTaskActivity {
         }
     }
 
-    @Override
-    public void onBackgroundTaskCompleted(Object result) {
-
-        User registeredUser = (User) result;
-
+    @Subscribe
+    public void registeredUserAvailable(RegisteredUserAvailableEvent event) {
         showProgress(false);
+        User registeredUser = event.getRegisteredUser();
 
         if (registeredUser != null) {
             Intent intent = new Intent(this, ShowResourcesActivity.class);
@@ -107,10 +101,5 @@ public class InitActivity extends AbstractAsyncTaskActivity {
         }
 
         finish();
-    }
-
-    @Override
-    public void onBackgroundTaskCancelled(Object cancelledTask) {
-        // TODO: handle error condition
     }
 }

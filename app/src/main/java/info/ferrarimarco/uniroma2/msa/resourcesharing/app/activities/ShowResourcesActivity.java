@@ -9,16 +9,21 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.squareup.otto.Subscribe;
+
+import javax.inject.Inject;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArrayAdapter;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceListAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.AdapterModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.ReadAllResourcesAsyncTask;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
 
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.CREATED_BY_ME;
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.NEW;
@@ -37,7 +42,8 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
     @InjectView(R.id.show_resources_progress)
     View mProgressView;
 
-    private ReadAllResourcesAsyncTask readAllResourcesAsyncTask;
+    @Inject
+    ResourceService resourceService;
 
     private ResourceArrayAdapter resourceArrayAdapter;
 
@@ -138,43 +144,29 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
     }
 
     private void loadResources(Resource.ResourceType resourceType) {
-
         showProgress(true);
-
-        readAllResourcesAsyncTask = objectGraph.get(ReadAllResourcesAsyncTask.class);
-        readAllResourcesAsyncTask.initTask(this);
 
         switch (resourceType) {
             case NEW:
-                readAllResourcesAsyncTask.setTaskType(ResourceTaskType.READ_NEW_RESOURCES);
+                resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_NEW_RESOURCES);
                 break;
             case CREATED_BY_ME:
-                readAllResourcesAsyncTask.setTaskType(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES);
+                resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES);
                 break;
         }
-
-        readAllResourcesAsyncTask.execute();
     }
 
-    @Override
-    public void onBackgroundTaskCompleted(Object result) {
-        readAllResourcesAsyncTask = null;
+    @Subscribe
+    public void resourceListAvailable(ResourceListAvailableEvent event) {
+        ResourceTaskResult result = event.getResult();
 
-        ResourceTaskResult taskResult = (ResourceTaskResult) result;
-
-        if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
+        if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
             resourceArrayAdapter.clear();
-            resourceArrayAdapter.addAll(taskResult.getResources());
+            resourceArrayAdapter.addAll(result.getResources());
         } else {
             // TODO: handle this error condition
         }
 
-        showProgress(false);
-    }
-
-    @Override
-    public void onBackgroundTaskCancelled(Object cancelledTask) {
-        readAllResourcesAsyncTask = null;
         showProgress(false);
     }
 }

@@ -6,26 +6,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
-import javax.inject.Inject;
+import com.squareup.otto.Subscribe;
+
+import org.joda.time.DateTime;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceSaveCompletedEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.ResourceSavedAckAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.resource.SaveResourceAsyncTask;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredUserCheckAsyncTask;
 
 public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
-
-    @Inject
-    GenericDao<Resource> resourceDao;
-
-    private SaveResourceAsyncTask saveResourceAsyncTask;
 
     @InjectView(R.id.resourceTitleEditText)
     EditText titleEditText;
@@ -45,27 +40,25 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
     @InjectView(R.id.create_new_resource_form)
     View mCreateNewResourceFormView;
 
-    private RegisteredUserCheckAsyncTask registeredUserCheckTask;
     private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_resource);
-
-        objectGraph.inject(this);
-
-        ButterKnife.inject(this);
-
         this.defaultInitialization(mProgressView, mCreateNewResourceFormView);
 
-        showProgress(true);
-
-        registeredUserCheckTask = objectGraph.get(RegisteredUserCheckAsyncTask.class);
-        registeredUserCheckTask.initTask(this);
-        registeredUserCheckTask.execute(getResources().getString(R.string.registered_user_id));
+        objectGraph.inject(this);
+        ButterKnife.inject(this);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        showProgress(true);
+        currentUser = userService.readRegisteredUserSync();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -90,47 +83,36 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
             String location = locationEditText.getText().toString();
             String currentUserId = currentUser.getEmail();
 
-            saveResourceAsyncTask = objectGraph.get(SaveResourceAsyncTask.class);
-            saveResourceAsyncTask.initTask(this);
-            saveResourceAsyncTask.execute(title, description, acquisitionMode, location, currentUserId);
+            Resource resource = new Resource(title, description, location, DateTime.now(), acquisitionMode, currentUserId, Resource.ResourceType.CREATED_BY_ME, false);
+            resourceService.saveResource(resource, false);
         }
+
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onBackgroundTaskCompleted(Object result) {
+    @Subscribe
+    public void ackAvailable(ResourceSavedAckAvailableEvent event) {
+        finish();
 
-        if (result instanceof UserTaskResult) {
-            UserTaskResult taskResult = (UserTaskResult) result;
+        if (TaskResultType.RESOURCE_SAVED.equals(event.getResult())) {
+            // TODO: show a notification (toast)
 
-            if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
-                if (taskResult.getResultUser() != null) {
-                    currentUser = taskResult.getResultUser();
-                }
-            } else {
-                // TODO: handle error condition
-            }
-        } else if (result instanceof ResourceTaskResult) {
-            ResourceTaskResult taskResult = (ResourceTaskResult) result;
-
-            if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
-                // TODO: show a notification (toast)
-                finish();
-            } else {
-                // TODO: handle error condition
-            }
-        }
-
-        showProgress(false);
-    }
-
-    @Override
-    public void onBackgroundTaskCancelled(Object cancelledTask) {
-        if (cancelledTask instanceof RegisteredUserCheckAsyncTask) {
-            registeredUserCheckTask = null;
-        } else if (cancelledTask instanceof SaveResourceAsyncTask) {
-            saveResourceAsyncTask = null;
+            // save the updated resource
+            resourceService.saveResource(event.getResource(), true);
+            finish();
+        } else if (TaskResultType.RESOURCE_NOT_SAVED.equals(event.getResult())) {
+            // TODO: handle this error condition
         }
     }
 
+    @Subscribe
+    public void resourceSaveCompletedAvailable(ResourceSaveCompletedEvent event) {
+        ResourceTaskResult taskResult = event.getResult();
+
+        if (TaskResultType.SUCCESS.equals(taskResult.getTaskResultType())) {
+            gcmMessagingService.sendNewResource(taskResult.getResources().get(0));
+        } else {
+            // TODO: handle this error condition
+        }
+    }
 }

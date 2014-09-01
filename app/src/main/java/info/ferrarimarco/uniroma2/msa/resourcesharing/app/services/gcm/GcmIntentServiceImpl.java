@@ -7,26 +7,20 @@ import android.os.Bundle;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.squareup.otto.Bus;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.inject.Inject;
 
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.GcmBroadcastReceiver;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.AckAvailableEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.UserIdCheckAckAvailableEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.UserSavedAckAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 
 public class GcmIntentServiceImpl extends IntentService {
-
-    private Map<AsyncCaller, Integer> callerToMessageIdMap;
 
     @Inject
     Bus bus;
 
     public GcmIntentServiceImpl() {
         super("GcmIntentService");
-        callerToMessageIdMap = new HashMap<>();
     }
 
     @Override
@@ -43,8 +37,13 @@ public class GcmIntentServiceImpl extends IntentService {
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
                 //sendNotification("Deleted messages on server: " + extras.toString(), null);
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                if (GcmMessagingServiceImpl.GcmMessage.USER_ID_CHECK.equals(intent.getExtras().getString("action"))) {
-                    bus.post(new AckAvailableEvent(TaskResultType.valueOf(extras.getString("result"))));
+                String receivedAction = intent.getExtras().getString("action");
+                if (GcmMessagingServiceImpl.GcmMessage.USER_ID_CHECK.getStringValue().equals(receivedAction)) {
+                    bus.post(new UserIdCheckAckAvailableEvent(TaskResultType.valueOf(extras.getString("result"))));
+                } else if (GcmMessagingServiceImpl.GcmMessage.REGISTRATION.getStringValue().equals(receivedAction)) {
+                    bus.post(new UserSavedAckAvailableEvent(TaskResultType.valueOf(extras.getString("result"))));
+                } else if (GcmMessagingServiceImpl.GcmMessage.NEW_RESOURCE_FROM_ME.getStringValue().equals(intent.getExtras().getString("action"))) {
+
                 }
             }
 

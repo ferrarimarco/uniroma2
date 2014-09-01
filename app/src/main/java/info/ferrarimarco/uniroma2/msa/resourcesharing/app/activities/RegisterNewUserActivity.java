@@ -17,12 +17,13 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.AckAvailableEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.UserDeletionCompletedEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.UserLocalRegistrationCompletedEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.UserIdCheckAckAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.FormFieldValidatorImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 
 /**
  * A login screen that offers login via email/password.
@@ -31,9 +32,6 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
 
     @Inject
     FormFieldValidatorImpl formFieldValidatorImpl;
-
-    @Inject
-    UserService userService;
 
     @InjectView(R.id.email)
     AutoCompleteTextView mEmailView;
@@ -86,7 +84,7 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
     private void registerNewUser() {
         if (areFieldsValid()) {
             showProgress(true);
-            userService.registerNewUser(this, email, password);
+            userService.registerNewUser(email, password);
         }
     }
 
@@ -142,42 +140,47 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
     }
 
     @Subscribe
-    public void ackAvailable(AckAvailableEvent event) {
-        showProgress(false);
-
+    // TODO: split into different methods or it will not work
+    public void ackAvailable(UserIdCheckAckAvailableEvent event) {
         if (TaskResultType.USER_ID_OK.equals(event.getResult())) {
+            userService.registerNewUser(email, password);
+        } else if (TaskResultType.USER_ID_NOT_FREE.equals(event.getResult())) {
+            userService.deleteRegisteredUser();
+            mEmailView.setError(getString(R.string.error_user_id_already_taken));
+            mEmailView.requestFocus();
+        } else if (TaskResultType.USER_SAVED.equals(event.getResult())) {
             Intent intent = new Intent(this, ShowResourcesActivity.class);
             startActivity(intent);
             finish();
-        } else if (TaskResultType.USER_ID_NOT_FREE.equals(event.getResult())) {
-            userService.deleteRegisteredUser(this);
+        } else if (TaskResultType.USER_NOT_SAVED.equals(event.getResult())) {
+            // TODO: handle this error condition
         }
     }
 
-    @Override
-    public void onBackgroundTaskCompleted(Object result) {
-        UserTaskResult taskResult = (UserTaskResult) result;
+    @Subscribe
+    public void userLocalRegistrationCompletedAvailable(UserLocalRegistrationCompletedEvent event) {
+        UserTaskResult result = event.getResult();
 
-        if (UserTaskType.DELETE_REGISTERED_USER.equals(taskResult.getTaskType())) {
-            if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
-                // TODO: user successfully deleted from local DB. Anything else to do?
-            } else {
-                showProgress(false);
-                // TODO: handle this error condition
-            }
-        } else if (UserTaskType.REGISTER_NEW_USER.equals(taskResult.getTaskType())) {
-            if (taskResult.getTaskResultType().equals(TaskResultType.SUCCESS)) {
-                // TODO: registration message sent. What to do?
-            } else {
-                showProgress(false);
-                // TODO: handle this error condition
-            }
+        if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
+            User registeredUser = userService.readRegisteredUserSync();
+            gcmMessagingService.registerNewUser(registeredUser);
+        } else {
+            showProgress(false);
+            // TODO: handle this error condition
         }
     }
 
-    @Override
-    public void onBackgroundTaskCancelled(Object cancelledTask) {
+    @Subscribe
+    public void userDeletionCompletedAvailable(UserDeletionCompletedEvent event) {
+        UserTaskResult result = event.getResult();
+
         showProgress(false);
+
+        if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
+            // TODO: user successfully deleted from local DB. Anything else to do?
+        } else {
+            // TODO: handle this error condition
+        }
     }
 }
 
