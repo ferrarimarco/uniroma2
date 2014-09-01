@@ -10,32 +10,28 @@ public class ResourceTaskResult extends AbstractTaskResult {
 
     private List<Resource> resources;
 
-    public ResourceTaskResult(Integer completedTaskId) {
-        super(completedTaskId);
+    public ResourceTaskResult() {
+        super();
         this.resources = new ArrayList<>();
     }
 
-    public ResourceTaskResult(ResourceTaskType taskType, Integer completedTaskId) {
-        this(completedTaskId);
+    public ResourceTaskResult(ResourceTaskType taskType) {
+        this();
         this.taskType = taskType;
     }
 
-    public ResourceTaskResult(ResourceTaskType taskType, Integer completedTaskId, TaskResultType taskResultType) {
-        this(taskType, completedTaskId);
+    public ResourceTaskResult(ResourceTaskType taskType, TaskResultType taskResultType) {
+        this(taskType);
         this.taskResultType = taskResultType;
     }
 
-    public ResourceTaskResult(ResourceTaskType taskType, Integer completedTaskId, TaskResultType taskResultType, List<Resource> resources) {
-        this(taskType, completedTaskId, taskResultType);
+    public ResourceTaskResult(ResourceTaskType taskType, TaskResultType taskResultType, List<Resource> resources) {
+        this(taskType, taskResultType);
         this.resources = resources;
     }
 
     public ResourceTaskType getTaskType() {
         return taskType;
-    }
-
-    public void setTaskType(ResourceTaskType taskType) {
-        this.taskType = taskType;
     }
 
     public TaskResultType getTaskResultType() {
@@ -52,5 +48,9 @@ public class ResourceTaskResult extends AbstractTaskResult {
 
     public void setResources(List<Resource> resources) {
         this.resources = resources;
+    }
+
+    public void addResource(Resource resource) {
+        resources.add(resource);
     }
 }

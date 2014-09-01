@@ -1,29 +1,25 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task;
 
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
-
 public class UserTaskResult extends AbstractTaskResult {
 
     private UserTaskType taskType;
 
-    private User resultUser;
-
-    public UserTaskResult(Integer completedTaskId) {
-        super(completedTaskId);
+    public UserTaskResult() {
+        super();
     }
 
-    public UserTaskResult(UserTaskType taskType, Integer completedTaskId) {
-        this(completedTaskId);
+    public UserTaskResult(UserTaskType taskType) {
+        this();
         this.taskType = taskType;
     }
 
-    public UserTaskResult(UserTaskType taskType, TaskResultType taskResultType, Integer completedTaskId) {
-        this(taskType, completedTaskId);
+    public UserTaskResult(UserTaskType taskType, TaskResultType taskResultType) {
+        this(taskType);
         this.taskResultType = taskResultType;
     }
 
-    public UserTaskResult(UserTaskType taskType, TaskResultType taskResultType, Integer completedTaskId, String message) {
-        this(taskType, taskResultType, completedTaskId);
+    public UserTaskResult(UserTaskType taskType, TaskResultType taskResultType, String message) {
+        this(taskType, taskResultType);
         this.message = message;
     }
 
@@ -33,13 +29,5 @@ public class UserTaskResult extends AbstractTaskResult {
 
     public void setTaskType(UserTaskType taskType) {
         this.taskType = taskType;
-    }
-
-    public User getResultUser() {
-        return resultUser;
-    }
-
-    public void setResultUser(User resultUser) {
-        this.resultUser = resultUser;
     }
 }

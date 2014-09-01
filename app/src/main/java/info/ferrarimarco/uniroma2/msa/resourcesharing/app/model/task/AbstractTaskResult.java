@@ -4,11 +4,9 @@ public class AbstractTaskResult {
 
     protected String message;
     protected TaskResultType taskResultType;
-    protected Integer completedTaskId;
 
-    public AbstractTaskResult(Integer completedTaskId) {
+    public AbstractTaskResult() {
         message = "";
-        this.completedTaskId = completedTaskId;
     }
 
     public String getMessage() {
@@ -25,13 +23,5 @@ public class AbstractTaskResult {
 
     public void setTaskResultType(TaskResultType taskResultType) {
         this.taskResultType = taskResultType;
-    }
-
-    public Integer getCompletedTaskId() {
-        return completedTaskId;
-    }
-
-    public void setCompletedTaskId(Integer completedTaskId) {
-        this.completedTaskId = completedTaskId;
     }
 }
