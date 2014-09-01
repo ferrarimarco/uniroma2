@@ -9,6 +9,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.callers.AsyncCaller;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.UserTaskType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.DeleteRegisteredUserAsyncTask;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisterNewUserAsyncTask;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.RegisteredUserCheckAsyncTask;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.tasks.user.UserLoginAsyncTask;
@@ -43,15 +44,18 @@ public class UserService extends AbstractPersistenceService {
         return currentUser;
     }
 
-    public void checkForUserValidity(AsyncCaller caller, String userId) {
-
-    }
-
     public void registerNewUser(AsyncCaller caller, String userId, String password) {
         RegisterNewUserAsyncTask registerNewUserAsyncTask = objectGraph.get(RegisterNewUserAsyncTask.class);
         registerNewUserAsyncTask.initTask(this);
         taskIdToCallerMap.put(registerNewUserAsyncTask.getTaskId(), caller);
         registerNewUserAsyncTask.execute(userId, password);
+    }
+
+    public void deleteRegisteredUser(AsyncCaller caller) {
+        DeleteRegisteredUserAsyncTask task = objectGraph.get(DeleteRegisteredUserAsyncTask.class);
+        task.initTask(this);
+        taskIdToCallerMap.put(task.getTaskId(), caller);
+        task.execute();
     }
 
     public void loginExistingUser(AsyncCaller caller, String userId, String hashedPassword) {
