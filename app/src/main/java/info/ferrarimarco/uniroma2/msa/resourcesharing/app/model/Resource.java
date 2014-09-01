@@ -9,10 +9,6 @@ import org.joda.time.DateTime;
 @DatabaseTable
 public class Resource implements GenericEntity {
 
-    public void setSentToBackend(Boolean sentToBackend) {
-        this.sentToBackend = sentToBackend;
-    }
-
     public enum ResourceType {
         NEW,
         CREATED_BY_ME
@@ -212,5 +208,9 @@ public class Resource implements GenericEntity {
 
     public void setBackendId(String backendId) {
         this.backendId = backendId;
+    }
+
+    public void setSentToBackend(Boolean sentToBackend) {
+        this.sentToBackend = sentToBackend;
     }
 }
