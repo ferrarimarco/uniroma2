@@ -5,12 +5,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import javax.inject.Inject;
 
+import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
@@ -21,6 +23,12 @@ public class InitActivity extends AbstractAsyncTaskActivity {
 
     @Inject
     UserService userService;
+
+    @InjectView(R.id.init_progress)
+    View mProgressView;
+
+    @InjectView(R.id.init_content)
+    View mInitContentView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,10 +41,17 @@ public class InitActivity extends AbstractAsyncTaskActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_init);
 
+        this.defaultInitialization(mProgressView, mInitContentView);
+
         // check for Google Play Services
         checkGooglePlayServicesInstallationStatus();
 
         objectGraph.inject(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
 
         // Create an async task to check for reg user, with this param
         checkRegisteredUser();
@@ -62,6 +77,7 @@ public class InitActivity extends AbstractAsyncTaskActivity {
     }
 
     private void checkRegisteredUser() {
+        super.showProgress(true);
         userService.readRegisteredUserAsync(this);
     }
 
@@ -82,6 +98,8 @@ public class InitActivity extends AbstractAsyncTaskActivity {
     public void onBackgroundTaskCompleted(Object result) {
 
         User registeredUser = (User) result;
+
+        super.showProgress(false);
 
         if (registeredUser != null) {
             Intent intent = new Intent(this, ShowResourcesActivity.class);
