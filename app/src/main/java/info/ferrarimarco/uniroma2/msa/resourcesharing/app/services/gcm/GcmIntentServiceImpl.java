@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.squareup.otto.Bus;
-import com.squareup.otto.Produce;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,45 +27,29 @@ public class GcmIntentServiceImpl extends IntentService {
     public GcmIntentServiceImpl() {
         super("GcmIntentService");
         callerToMessageIdMap = new HashMap<>();
-        bus.register(this);
-    }
-
-    @Produce
-    private AckAvailableEvent produceAck(String messageIdToAck, TaskResultType result) {
-        return new AckAvailableEvent(messageIdToAck, result);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
         Bundle extras = intent.getExtras();
 
-        if ("info.ferrarimarco.uniroma2.msa.resourcesharing.ACK_REQUEST".equals(intent.getAction())) {
-            // A caller is requesting an ACK
-            // TODO: extract params
-            bus.post(produceAck());
-
-        } else {
+        // The getMessageType() intent parameter must be the intent you received
+        // in your BroadcastReceiver.
+        if (extras != null && !extras.isEmpty()) {
             GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-            // The getMessageType() intent parameter must be the intent you received
-            // in your BroadcastReceiver.
-            if (extras != null && !extras.isEmpty()) {
-                String messageType = gcm.getMessageType(intent);
-                if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                    //sendNotification("Send error: " + extras.toString(), null);
-                } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-                    //sendNotification("Deleted messages on server: " + extras.toString(), null);
-                } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                    if (GcmMessagingServiceImpl.GcmMessage.USER_ID_CHECK.equals(intent.getExtras().getString("action"))) {
-
-                    } else {
-                        //sendNotification("Received: " + message, extras);
-                    }
+            String messageType = gcm.getMessageType(intent);
+            if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
+                //sendNotification("Send error: " + extras.toString(), null);
+            } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
+                //sendNotification("Deleted messages on server: " + extras.toString(), null);
+            } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+                if (GcmMessagingServiceImpl.GcmMessage.USER_ID_CHECK.equals(intent.getExtras().getString("action"))) {
+                    bus.post(new AckAvailableEvent(TaskResultType.valueOf(extras.getString("result"))));
                 }
-
-                // Release the wake lock provided by the WakefulBroadcastReceiver.
-                GcmBroadcastReceiver.completeWakefulIntent(intent);
             }
+
+            // Release the wake lock provided by the WakefulBroadcastReceiver.
+            GcmBroadcastReceiver.completeWakefulIntent(intent);
         }
     }
 }
