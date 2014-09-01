@@ -143,7 +143,7 @@ public class RegisterNewUserActivity extends AbstractAsyncTaskActivity {
     @Subscribe
     public void userIdCheckAckAvailable(UserIdCheckAckAvailableEvent event) {
         if (TaskResultType.USER_ID_OK.equals(event.getResult())) {
-            userService.registerNewUser(email, password);
+            gcmMessagingService.registerNewUser(userService.readRegisteredUserSync());
         } else if (TaskResultType.USER_ID_NOT_FREE.equals(event.getResult())) {
             userService.deleteRegisteredUser();
             mEmailView.setError(getString(R.string.error_user_id_already_taken));
