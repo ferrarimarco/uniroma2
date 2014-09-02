@@ -15,7 +15,7 @@ import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceSaveCompletedEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceLocalSaveCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.ResourceSavedAckAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
@@ -56,7 +56,6 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
     protected void onStart() {
         super.onStart();
 
-        showProgress(true);
         currentUser = userService.readRegisteredUserSync();
     }
 
@@ -84,21 +83,21 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
             String currentUserId = currentUser.getEmail();
 
             Resource resource = new Resource(title, description, location, DateTime.now(), acquisitionMode, currentUserId, Resource.ResourceType.CREATED_BY_ME, false);
-            resourceService.saveResource(resource, false);
+            resourceService.saveResourceLocal(resource, false);
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     @Subscribe
-    public void ackAvailable(ResourceSavedAckAvailableEvent event) {
+    public void resourceSavedAckAvailableEvent(ResourceSavedAckAvailableEvent event) {
         finish();
 
         if (TaskResultType.RESOURCE_SAVED.equals(event.getResult())) {
             // TODO: show a notification (toast)
 
             // save the updated resource
-            resourceService.saveResource(event.getResource(), true);
+            resourceService.saveResourceLocal(event.getResource(), true);
             finish();
         } else if (TaskResultType.RESOURCE_NOT_SAVED.equals(event.getResult())) {
             // TODO: handle this error condition
@@ -106,10 +105,10 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
     }
 
     @Subscribe
-    public void resourceSaveCompletedAvailable(ResourceSaveCompletedEvent event) {
+    public void resourceLocalSaveCompletedAvailable(ResourceLocalSaveCompletedEvent event) {
         ResourceTaskResult taskResult = event.getResult();
 
-        if (TaskResultType.SUCCESS.equals(taskResult.getTaskResultType())) {
+        if (TaskResultType.RESOURCE_SAVED.equals(taskResult.getTaskResultType())) {
             gcmMessagingService.sendNewResource(taskResult.getResources().get(0));
         } else {
             // TODO: handle this error condition

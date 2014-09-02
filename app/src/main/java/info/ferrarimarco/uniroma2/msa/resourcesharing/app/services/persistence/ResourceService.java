@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceListAvailableEvent;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceSaveCompletedEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceLocalSaveCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
@@ -39,10 +39,6 @@ public class ResourceService extends AbstractPersistenceService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                     result.setTaskResultType(TaskResultType.FAILURE);
-                }
-
-                // There was a failure while initialization
-                if (result.getTaskResultType().equals(TaskResultType.FAILURE)) {
                     return result;
                 }
 
@@ -76,7 +72,7 @@ public class ResourceService extends AbstractPersistenceService {
         }.execute(resourceTaskType);
     }
 
-    public void saveResource(Resource resource, final Boolean sentToBackend) {
+    public void saveResourceLocal(Resource resource, final Boolean sentToBackend) {
         new AsyncTask<Resource, Void, ResourceTaskResult>() {
             @Override
             protected ResourceTaskResult doInBackground(Resource... params) {
@@ -88,10 +84,10 @@ public class ResourceService extends AbstractPersistenceService {
                     res.setSentToBackend(sentToBackend);
 
                     resourceDao.save(params[0]);
-                    result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE, TaskResultType.SUCCESS);
+                    result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_LOCAL, TaskResultType.RESOURCE_SAVED);
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE, TaskResultType.FAILURE);
+                    result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_LOCAL, TaskResultType.RESOURCE_NOT_SAVED);
                 } finally {
                     resourceDao.close();
                 }
@@ -103,7 +99,7 @@ public class ResourceService extends AbstractPersistenceService {
 
             @Override
             protected void onPostExecute(ResourceTaskResult result) {
-                bus.post(new ResourceSaveCompletedEvent(result));
+                bus.post(new ResourceLocalSaveCompletedEvent(result));
             }
         }.execute(resource);
     }

@@ -43,7 +43,8 @@ public class GcmIntentServiceImpl extends IntentService {
                 } else if (GcmMessagingServiceImpl.GcmMessage.REGISTRATION.getStringValue().equals(receivedAction)) {
                     bus.post(new UserSavedAckAvailableEvent(TaskResultType.valueOf(extras.getString("result"))));
                 } else if (GcmMessagingServiceImpl.GcmMessage.NEW_RESOURCE_FROM_ME.getStringValue().equals(intent.getExtras().getString("action"))) {
-
+                    //bus.post(new ResourceSavedAckAvailableEvent(TaskResultType.valueOf(extras.getString("result"),)));
+                    // TODO: get the resource (perhaps by local id?)
                 }
             }
 
