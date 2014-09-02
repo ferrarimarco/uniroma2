@@ -90,7 +90,7 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
     }
 
     @Subscribe
-    public void resourceSavedAckAvailableEvent(ResourceSavedAckAvailableEvent event) {
+    public void resourceSavedAckAvailable(ResourceSavedAckAvailableEvent event) {
         finish();
 
         if (TaskResultType.RESOURCE_SAVED.equals(event.getResult())) {
