@@ -10,14 +10,18 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 
 public class SharedPreferencesServiceImpl {
 
-    private SharedPreferences gcmSharedPreferences;
+    private SharedPreferences applicationSharedPreferences;
     private String gcmRegistrationIdKey;
+    private String googleSignInCompletedKey;
+    private String googleAccountNameKey;
 
     @Inject
     public SharedPreferencesServiceImpl(Context applicationContext) {
         gcmRegistrationIdKey = applicationContext.getResources().getString(R.string.gcm_registration_id_key);
-        String gcmSharedPreferencesId = applicationContext.getResources().getString(R.string.gcm_shared_preferences_id);
-        gcmSharedPreferences = applicationContext.getSharedPreferences(gcmSharedPreferencesId, Context.MODE_PRIVATE);
+        googleSignInCompletedKey = applicationContext.getResources().getString(R.string.google_sign_in_completed_key);
+        googleAccountNameKey = applicationContext.getResources().getString(R.string.google_account_name_key);
+        String sharedPreferencesId = applicationContext.getResources().getString(R.string.shared_preferences_id);
+        applicationSharedPreferences = applicationContext.getSharedPreferences(sharedPreferencesId, Context.MODE_PRIVATE);
     }
 
     /**
@@ -30,7 +34,7 @@ public class SharedPreferencesServiceImpl {
      * registration ID.
      */
     public String getRegistrationId() {
-        String registrationId = gcmSharedPreferences.getString(gcmRegistrationIdKey, "");
+        String registrationId = applicationSharedPreferences.getString(gcmRegistrationIdKey, "");
         if (registrationId == null || registrationId.equals("")) {
             Log.i(SharedPreferencesServiceImpl.class.getName(), "Registration not found.");
             return "";
@@ -47,7 +51,7 @@ public class SharedPreferencesServiceImpl {
      */
     public void storeGcmRegistrationId(String regId) {
         Log.i(SharedPreferencesServiceImpl.class.getName(), "Saving GCM Registration ID in Shared Preferencies. ID: " + regId);
-        SharedPreferences.Editor editor = gcmSharedPreferences.edit();
+        SharedPreferences.Editor editor = applicationSharedPreferences.edit();
         editor.putString(gcmRegistrationIdKey, regId);
         editor.commit();
     }
@@ -58,8 +62,28 @@ public class SharedPreferencesServiceImpl {
      */
     public void removeGcmRegistrationId() {
         Log.i(SharedPreferencesServiceImpl.class.getName(), "Removig regId from Shared Preferencies");
-        SharedPreferences.Editor editor = gcmSharedPreferences.edit();
+        SharedPreferences.Editor editor = applicationSharedPreferences.edit();
         editor.remove(gcmRegistrationIdKey);
+        editor.commit();
+    }
+
+    public Boolean getGoogleSignInCompleted() {
+        return applicationSharedPreferences.getBoolean(googleSignInCompletedKey, false);
+    }
+
+    public void storeGoogleSignInCompleted(Boolean registrationCompleted) {
+        SharedPreferences.Editor editor = applicationSharedPreferences.edit();
+        editor.putBoolean(googleSignInCompletedKey, registrationCompleted);
+        editor.commit();
+    }
+
+    public String getGoogleAccountName() {
+        return applicationSharedPreferences.getString(googleAccountNameKey, "");
+    }
+
+    public void storeGoogleAccountName(String googleAccountName) {
+        SharedPreferences.Editor editor = applicationSharedPreferences.edit();
+        editor.putString(googleAccountNameKey, googleAccountName);
         editor.commit();
     }
 }

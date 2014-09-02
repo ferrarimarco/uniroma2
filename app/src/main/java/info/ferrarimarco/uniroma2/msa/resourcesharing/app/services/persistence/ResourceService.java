@@ -103,4 +103,43 @@ public class ResourceService extends AbstractPersistenceService {
             }
         }.execute(resource);
     }
+
+    public void readResourceById(Long id) {
+        new AsyncTask<Long, Void, ResourceTaskResult>() {
+            @Override
+            protected ResourceTaskResult doInBackground(Long... params) {
+                ResourceTaskResult result;
+
+                List<Resource> resources = null;
+
+                try {
+                    resourceDao.open(Resource.class);
+
+                    Resource res = new Resource();
+                    res.setAndroidId(params[0]);
+
+                    resources = resourceDao.read(res);
+                    result = new ResourceTaskResult(ResourceTaskType.READ_RESOURCE_LOCAL, TaskResultType.SUCCESS);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    result = new ResourceTaskResult(ResourceTaskType.READ_RESOURCE_LOCAL, TaskResultType.FAILURE);
+                } finally {
+                    resourceDao.close();
+                }
+
+                if (resources == null || resources.size() > 1) {
+                    throw new IllegalStateException("Error while reading resource from DB");
+                }
+
+                result.addResource(resources.get(0));
+
+                return result;
+            }
+
+            @Override
+            protected void onPostExecute(ResourceTaskResult result) {
+                bus.post(new ResourceListAvailableEvent(result));
+            }
+        }.execute(id);
+    }
 }

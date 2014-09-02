@@ -1,17 +1,16 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack;
 
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 
 public class ResourceSavedAckAvailableEvent extends AbstractAckAvailableEvent {
-    private Resource resource;
+    private Long androidId;
 
-    public ResourceSavedAckAvailableEvent(TaskResultType result, Resource resource) {
+    public ResourceSavedAckAvailableEvent(TaskResultType result, Long androidId) {
         super(result);
-        this.resource = resource;
+        this.androidId = androidId;
     }
 
-    public Resource getResource() {
-        return resource;
+    public Long getAndroidId() {
+        return androidId;
     }
 }

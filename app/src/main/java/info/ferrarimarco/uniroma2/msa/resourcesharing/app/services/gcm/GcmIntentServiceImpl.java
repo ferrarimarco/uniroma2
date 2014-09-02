@@ -10,7 +10,7 @@ import com.squareup.otto.Bus;
 import javax.inject.Inject;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.GcmBroadcastReceiver;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.UserIdCheckAckAvailableEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.ResourceSavedAckAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.UserSavedAckAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 
@@ -38,13 +38,11 @@ public class GcmIntentServiceImpl extends IntentService {
                 //sendNotification("Deleted messages on server: " + extras.toString(), null);
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 String receivedAction = intent.getExtras().getString("action");
-                if (GcmMessagingServiceImpl.GcmMessage.USER_ID_CHECK.getStringValue().equals(receivedAction)) {
-                    bus.post(new UserIdCheckAckAvailableEvent(TaskResultType.valueOf(extras.getString("result"))));
-                } else if (GcmMessagingServiceImpl.GcmMessage.REGISTRATION.getStringValue().equals(receivedAction)) {
+                if (GcmMessagingServiceImpl.GcmMessage.REGISTRATION.getStringValue().equals(receivedAction)) {
                     bus.post(new UserSavedAckAvailableEvent(TaskResultType.valueOf(extras.getString("result"))));
                 } else if (GcmMessagingServiceImpl.GcmMessage.NEW_RESOURCE_FROM_ME.getStringValue().equals(intent.getExtras().getString("action"))) {
-                    //bus.post(new ResourceSavedAckAvailableEvent(TaskResultType.valueOf(extras.getString("result"),)));
-                    // TODO: get the resource (perhaps by local id?)
+                    String androidId = extras.getString("androidId");
+                    bus.post(new ResourceSavedAckAvailableEvent(TaskResultType.valueOf(extras.getString("result")), Long.parseLong(androidId)));
                 }
             }
 

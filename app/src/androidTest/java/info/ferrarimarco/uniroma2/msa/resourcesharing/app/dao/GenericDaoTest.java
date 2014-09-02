@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.BaseTezt;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHelperManager;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,9 +27,6 @@ public class GenericDaoTest extends BaseTezt {
     @Inject
     GenericDao<Resource> resourceDao;
 
-    @Inject
-    GenericDao<User> userDao;
-
     public GenericDaoTest() {
         super();
     }
@@ -40,7 +36,6 @@ public class GenericDaoTest extends BaseTezt {
     public void dependencyInjectionTest() {
         this.singleDependencyCheck(databaseHelperManager);
         this.singleDependencyCheck(resourceDao);
-        this.singleDependencyCheck(userDao);
     }
 
     @Test
@@ -65,29 +60,5 @@ public class GenericDaoTest extends BaseTezt {
         assertEquals(result, 1);
 
         resourceDao.close();
-    }
-
-    @Test
-    public void userDaoTest() throws SQLException {
-        userDao.open(User.class);
-
-        User user = new User();
-        user.setEmail("testEmail");
-        user.setName("testName");
-
-        int result = userDao.save(user);
-        assertEquals(result, 1);
-
-        List<User> retrievedEntities = userDao.read(user);
-        assertEquals(retrievedEntities.size(), 1);
-
-        // To write less assertions
-        user.setId(retrievedEntities.get(0).getId());
-        assertEquals(user, retrievedEntities.get(0));
-
-        result = userDao.delete(user);
-        assertEquals(result, 1);
-
-        userDao.close();
     }
 }

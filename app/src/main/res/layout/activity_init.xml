@@ -26,5 +26,4 @@
         android:textSize="50sp"
         android:gravity="center"
         android:text="@string/init_splash_text" />
-
 </FrameLayout>

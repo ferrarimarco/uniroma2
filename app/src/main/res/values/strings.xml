@@ -7,7 +7,6 @@
     <string name="user_name">Name</string>
     <string name="Name">Name</string>
     <string name="title_activity_init">Loading</string>
-    <string name="hello_world">Hello world!</string>
     <string name="title_activity_show_resources">Available Resources</string>
     <string name="title_section_new_resource">New Resources</string>
     <string name="title_section_created_by_me_resource">Created by me</string>
@@ -34,5 +33,11 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="error_user_id_already_taken">This email address is already in use. Choose a different one</string>
+
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="plus_sign_out">Switch Google+ account</string>
+    <string name="plus_disconnect">Disconnect from Google+</string>
 
 </resources>

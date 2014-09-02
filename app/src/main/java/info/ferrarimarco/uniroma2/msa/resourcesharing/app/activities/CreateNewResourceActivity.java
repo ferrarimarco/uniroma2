@@ -14,7 +14,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceListAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceLocalSaveCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.ResourceSavedAckAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
@@ -40,8 +40,6 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
     @InjectView(R.id.create_new_resource_form)
     View mCreateNewResourceFormView;
 
-    private User currentUser;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,13 +48,6 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
 
         objectGraph.inject(this);
         ButterKnife.inject(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        currentUser = userService.readRegisteredUserSync();
     }
 
     @Override
@@ -80,9 +71,8 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
             String description = descriptionEditText.getText().toString();
             String acquisitionMode = acquisitionModeEditText.getText().toString();
             String location = locationEditText.getText().toString();
-            String currentUserId = currentUser.getEmail();
 
-            Resource resource = new Resource(title, description, location, DateTime.now(), acquisitionMode, currentUserId, Resource.ResourceType.CREATED_BY_ME, false);
+            Resource resource = new Resource(title, description, location, DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false);
             resourceService.saveResourceLocal(resource, false);
         }
 
@@ -91,15 +81,22 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
 
     @Subscribe
     public void resourceSavedAckAvailable(ResourceSavedAckAvailableEvent event) {
-        finish();
-
         if (TaskResultType.RESOURCE_SAVED.equals(event.getResult())) {
-            // TODO: show a notification (toast)
-
-            // save the updated resource
-            resourceService.saveResourceLocal(event.getResource(), true);
-            finish();
+            resourceService.readResourceById(event.getAndroidId());
         } else if (TaskResultType.RESOURCE_NOT_SAVED.equals(event.getResult())) {
+            // TODO: handle this error condition
+        }
+    }
+
+    @Subscribe
+    public void resourceListAvailable(ResourceListAvailableEvent event) {
+        ResourceTaskResult result = event.getResult();
+        if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
+            // TODO: show a notification (toast)
+            // save the updated resource
+            resourceService.saveResourceLocal(result.getResources().get(0), true);
+            finish();
+        } else if (TaskResultType.FAILURE.equals(result.getTaskResultType())) {
             // TODO: handle this error condition
         }
     }
@@ -109,7 +106,10 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
         ResourceTaskResult taskResult = event.getResult();
 
         if (TaskResultType.RESOURCE_SAVED.equals(taskResult.getTaskResultType())) {
-            gcmMessagingService.sendNewResource(taskResult.getResources().get(0));
+            Resource resource = taskResult.getResources().get(0);
+            if (!resource.isSentToBackend()) {
+                gcmMessagingService.sendNewResource(taskResult.getResources().get(0));
+            }
         } else {
             // TODO: handle this error condition
         }

@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-    <!-- For Google Cloud Messaging  -->
+    <!-- For Google Cloud Messaging -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
@@ -15,6 +15,7 @@
     <permission
         android:name="info.ferrarimarco.uniroma2.msa.resourcesharing.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="info.ferrarimarco.uniroma2.msa.resourcesharing.permission.C2D_MESSAGE" />
 
     <application
@@ -37,7 +38,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.RegisterNewUserActivity" />
         <activity
             android:name=".activities.ShowResourcesActivity"
             android:label="@string/title_activity_show_resources"
@@ -66,6 +66,7 @@
                 <category android:name="info.ferrarimarco.uniroma2.msa.resourcesharing" />
             </intent-filter>
         </receiver>
+
         <service android:name=".services.gcm.GcmIntentServiceImpl" />
     </application>
 

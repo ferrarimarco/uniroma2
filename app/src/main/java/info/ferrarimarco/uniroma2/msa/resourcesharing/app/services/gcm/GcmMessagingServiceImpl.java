@@ -14,7 +14,6 @@ import javax.inject.Inject;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.SharedPreferencesServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 
@@ -23,7 +22,7 @@ public class GcmMessagingServiceImpl {
     enum GcmMessage {
 
         USER_ID_CHECK("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.USER_ID_CHECK"),
-        REGISTRATION("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.REGISTRATION"),
+        GCM_REGISTRATION("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.GCM_REGISTRATION"),
         NEW_RESOURCE_FROM_ME("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.CREATE_NEW_RESOURCE"),
         DELETE_MY_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.DELETE_RESOURCE"),
         UPDATE_USER_DETAILS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.UPDATE_USER_DETAILS"),
@@ -75,15 +74,15 @@ public class GcmMessagingServiceImpl {
      * Stores the registration ID in the application's
      * shared preferences.
      */
-    public void registerWithGcm(User currentUser) {
-        new AsyncTask<User, Void, Void>() {
+    public void registerWithGcm() {
+        new AsyncTask<String, Void, Void>() {
             @Override
-            protected Void doInBackground(User... params) {
+            protected Void doInBackground(String... params) {
                 if (params.length != 1) {
                     throw new IllegalArgumentException("No user specified while registering with backend");
                 }
 
-                String userId = params[0].getEmail();
+                String userId = params[0];
                 Log.d(GcmMessagingServiceImpl.class.getName(), "Send GCM registration Id to backend for: " + userId);
 
                 try {
@@ -94,7 +93,7 @@ public class GcmMessagingServiceImpl {
 
                     Bundle data = new Bundle();
                     data.putString("userId", userId);
-                    data.putString("action", GcmMessage.REGISTRATION.getStringValue());
+                    data.putString("action", GcmMessage.GCM_REGISTRATION.getStringValue());
                     data.putBoolean("needsAck", true);
 
                     sendGcmMessage(data);
@@ -111,22 +110,18 @@ public class GcmMessagingServiceImpl {
 
                 return null;
             }
-        }.execute(currentUser);
+        }.execute(userService.readRegisteredUserId());
     }
 
     public void sendNewResource(Resource resource) {
         Bundle data = new Bundle();
-
-        User currentUser = userService.readRegisteredUserSync();
-
         data.putString("action", GcmMessage.NEW_RESOURCE_FROM_ME.getStringValue());
         data.putString("title", resource.getTitle());
         data.putString("description", resource.getDescription());
         data.putString("location", resource.getLocation());
         data.putLong("creationTime", resource.getCreationTime().getMillis());
         data.putString("acquisitionMode", resource.getAcquisitionMode());
-        data.putString("creatorId", currentUser.getEmail());
-        data.putString("creatorPassword", currentUser.getHashedPassword());
+        data.putString("creatorId", userService.readRegisteredUserId());
         data.putBoolean("needsAck", true);
 
         sendGcmMessage(data);
@@ -134,45 +129,19 @@ public class GcmMessagingServiceImpl {
 
     public void deleteResource(Resource resource) {
         Bundle data = new Bundle();
-
-        User currentUser = userService.readRegisteredUserSync();
-
         data.putString("action", GcmMessage.DELETE_MY_RESOURCE.getStringValue());
         data.putLong("creationTime", resource.getCreationTime().getMillis());
-        data.putString("creatorId", currentUser.getEmail());
-        data.putString("creatorPassword", currentUser.getHashedPassword());
+        data.putString("creatorId", userService.readRegisteredUserId());
         data.putBoolean("needsAck", true);
 
         sendGcmMessage(data);
     }
 
-    public void updateUserDetails(User currentUser, String currentPosition) {
+    public void updateUserDetails(String currentPosition) {
         Bundle data = new Bundle();
         data.putString("action", GcmMessage.UPDATE_USER_DETAILS.getStringValue());
-        data.putString("userName", currentUser.getName());
-        data.putString("userId", currentUser.getEmail());
-        data.putString("hashedPassword", currentUser.getHashedPassword());
+        data.putString("userId", userService.readRegisteredUserId());
         data.putString("currentPosition", currentPosition);
-
-        sendGcmMessage(data);
-    }
-
-    public void checkUserIdValidity(String userId) {
-        Bundle data = new Bundle();
-        data.putString("action", GcmMessage.USER_ID_CHECK.getStringValue());
-        data.putString("userId", userId);
-        data.putBoolean("needsAck", true);
-
-        sendGcmMessage(data);
-    }
-
-    public void registerNewUser(User currentUser) {
-        Bundle data = new Bundle();
-        data.putString("action", GcmMessage.REGISTRATION.getStringValue());
-        data.putString("userName", currentUser.getName());
-        data.putString("userId", currentUser.getEmail());
-        data.putString("hashedPassword", currentUser.getHashedPassword());
-        data.putBoolean("needsAck", true);
 
         sendGcmMessage(data);
     }

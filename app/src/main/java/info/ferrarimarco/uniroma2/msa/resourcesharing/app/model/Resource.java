@@ -210,6 +210,10 @@ public class Resource implements GenericEntity {
         this.backendId = backendId;
     }
 
+    public Boolean isSentToBackend() {
+        return sentToBackend;
+    }
+
     public void setSentToBackend(Boolean sentToBackend) {
         this.sentToBackend = sentToBackend;
     }

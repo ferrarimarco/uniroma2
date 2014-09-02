@@ -13,17 +13,16 @@ import java.sql.SQLException;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.GenericEntity;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.User;
 
 
-public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
+public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     // name of the database file for your application
     public static final String DATABASE_NAME = "resourceSharing.db";
     // any time you make changes to your database objects, you may have to increase the database version
     private static final int DATABASE_VERSION = 1;
 
-    public DatabaseHelper(Context context){
+    public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -32,12 +31,11 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
      * the tables that will store your data.
      */
     @Override
-    public void onCreate(SQLiteDatabase db, ConnectionSource connectionSource){
-        try{
+    public void onCreate(SQLiteDatabase db, ConnectionSource connectionSource) {
+        try {
             Log.i(DatabaseHelper.class.getName(), "onCreate");
             TableUtils.createTable(connectionSource, Resource.class);
-            TableUtils.createTable(connectionSource, User.class);
-        }catch(SQLException e){
+        } catch (SQLException e) {
             Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
             throw new RuntimeException(e);
         }
@@ -48,10 +46,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
      * the various data to match the new version number.
      */
     @Override
-    public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion){
+    public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
     }
 
-    public <T extends GenericEntity> Dao<T, ?> getEntityDao(final Class<T> entityClass) throws SQLException{
+    public <T extends GenericEntity> Dao<T, ?> getEntityDao(final Class<T> entityClass) throws SQLException {
         return getDao(entityClass);
     }
 
@@ -59,7 +57,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
      * Close the database connections.
      */
     @Override
-    public void close(){
+    public void close() {
         super.close();
     }
 }
