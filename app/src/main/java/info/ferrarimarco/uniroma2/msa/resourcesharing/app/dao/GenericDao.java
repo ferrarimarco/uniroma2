@@ -9,9 +9,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.exceptions.DaoException;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHelper;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHelperManager;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.exceptions.DaoException;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.GenericEntity;
 
 public class GenericDao<T extends GenericEntity> {

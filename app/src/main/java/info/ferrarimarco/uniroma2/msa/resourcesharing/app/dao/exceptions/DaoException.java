@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.msa.resourcesharing.app.exceptions;
+package info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.exceptions;
 
 
 public class DaoException extends RuntimeException {
