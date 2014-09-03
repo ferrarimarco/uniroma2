@@ -48,7 +48,9 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        objectGraph = objectGraph.plus(new AdapterModuleImpl(this));
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_show_resources);
 
         this.defaultInitialization(mProgressView, resourcesListView);
@@ -84,10 +86,6 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
                             resourceTypeLabels),
                     this);
         }
-
-        // Check if there is already a defined user
-        objectGraph = objectGraph.plus(new AdapterModuleImpl(this));
-        objectGraph.inject(this);
 
         resourceArrayAdapter = objectGraph.get(ResourceArrayAdapter.class);
         resourcesListView.setAdapter(resourceArrayAdapter);

@@ -44,8 +44,6 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_resource);
         this.defaultInitialization(mProgressView, mCreateNewResourceFormView);
-
-        objectGraph.inject(this);
     }
 
     @Override

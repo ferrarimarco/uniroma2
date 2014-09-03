@@ -67,9 +67,14 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         ButterKnife.inject(this);
+
         objectGraph = ObjectGraphUtils.getObjectGraph(this.getApplicationContext());
+        objectGraph.inject(this);
+
         bus.register(this);
+
         googlePlayServiceUtils.checkGooglePlayServicesInstallationStatus(this);
 
         // Initializing google plus api client

@@ -19,7 +19,6 @@ public class InitActivity extends AbstractAsyncTaskActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        objectGraph.inject(this);
 
         if (this.getActionBar() != null) {
             this.getActionBar().hide();
