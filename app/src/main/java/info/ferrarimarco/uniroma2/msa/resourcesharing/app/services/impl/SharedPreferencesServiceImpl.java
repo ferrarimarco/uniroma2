@@ -33,7 +33,7 @@ public class SharedPreferencesServiceImpl {
      * @return registration ID, or empty string if there is no existing
      * registration ID.
      */
-    public String getRegistrationId() {
+    public String getGcmRegistrationId() {
         String registrationId = applicationSharedPreferences.getString(gcmRegistrationIdKey, "");
         if (registrationId == null || registrationId.equals("")) {
             Log.i(SharedPreferencesServiceImpl.class.getName(), "Registration not found.");

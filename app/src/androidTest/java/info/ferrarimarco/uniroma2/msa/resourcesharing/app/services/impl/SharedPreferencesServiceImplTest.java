@@ -33,14 +33,14 @@ public class SharedPreferencesServiceImplTest extends BaseTezt {
     public void storeGcmRegistrationIdTest() {
         String registrationId = "test_gcm_id";
         sharedPreferencesService.storeGcmRegistrationId(registrationId);
-        String registrationIdFromPrefs = sharedPreferencesService.getRegistrationId();
+        String registrationIdFromPrefs = sharedPreferencesService.getGcmRegistrationId();
         assertThat(registrationId, equalTo(registrationIdFromPrefs));
     }
 
     @Test
     public void removeGcmRegistrationIdTest() {
         sharedPreferencesService.removeGcmRegistrationId();
-        String registrationIdFromPrefs = sharedPreferencesService.getRegistrationId();
+        String registrationIdFromPrefs = sharedPreferencesService.getGcmRegistrationId();
         // TODO: use hamcrest matcher in the Hamcrest library to check if this is null or empty
         //assertThat(registrationIdFromPrefs, );
     }
