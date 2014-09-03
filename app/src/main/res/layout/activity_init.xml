@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#0099cc"
+    android:theme="@style/FullscreenTheme"
     tools:context="info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.InitActivity">
 
     <ProgressBar
