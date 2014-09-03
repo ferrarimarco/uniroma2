@@ -44,11 +44,12 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
     @Inject
     Bus bus;
 
-    private static final int SIGN_IN_ERROR_RESOLUTION = 0;
-
     @Inject
     GooglePlayServiceUtils googlePlayServiceUtils;
+
     private GoogleApiClient googleApiClient;
+
+    private static final int SIGN_IN_ERROR_RESOLUTION = 1002;
 
     /**
      * A flag indicating that a PendingIntent is in progress and prevents us
@@ -206,6 +207,7 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
         } else {
             // Sign-in into google
             if (!googleApiClient.isConnecting()) {
+                intentInProgress = true;
                 resolveSignInError();
             }
         }
@@ -214,7 +216,6 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
     private void resolveSignInError() {
         if (connectionResult.hasResolution()) {
             try {
-                intentInProgress = true;
                 connectionResult.startResolutionForResult(this, SIGN_IN_ERROR_RESOLUTION);
             } catch (IntentSender.SendIntentException e) {
                 intentInProgress = false;
