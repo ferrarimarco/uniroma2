@@ -57,33 +57,33 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
         final ActionBar actionBar = getActionBar();
 
         if (actionBar != null) {
+            // Set up the dropdown list navigation in the action bar.
+            Resource.ResourceType[] resourceTypes = Resource.ResourceType.values();
+            String[] resourceTypeLabels = new String[resourceTypes.length];
+
+            for (Resource.ResourceType resourceType : resourceTypes) {
+                switch (resourceType) {
+                    case NEW:
+                        resourceTypeLabels[Resource.ResourceType.NEW.ordinal()] = getString(R.string.title_section_new_resource);
+                        break;
+                    case CREATED_BY_ME:
+                        resourceTypeLabels[Resource.ResourceType.CREATED_BY_ME.ordinal()] = getString(R.string.title_section_created_by_me_resource);
+                }
+            }
+
             actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
+
+            actionBar.setListNavigationCallbacks(
+                    new ArrayAdapter<>(
+                            actionBar.getThemedContext(),
+                            android.R.layout.simple_list_item_1,
+                            android.R.id.text1,
+                            resourceTypeLabels),
+                    this);
         }
-
-        // Set up the dropdown list navigation in the action bar.
-        Resource.ResourceType[] resourceTypes = Resource.ResourceType.values();
-        String[] resourceTypeLabels = new String[resourceTypes.length];
-
-        for (Resource.ResourceType resourceType : resourceTypes) {
-            switch (resourceType) {
-                case NEW:
-                    resourceTypeLabels[Resource.ResourceType.NEW.ordinal()] = getString(R.string.title_section_new_resource);
-                    break;
-                case CREATED_BY_ME:
-                    resourceTypeLabels[Resource.ResourceType.CREATED_BY_ME.ordinal()] = getString(R.string.title_section_created_by_me_resource);
-            }
-        }
-
-        actionBar.setListNavigationCallbacks(
-                new ArrayAdapter<>(
-                        actionBar.getThemedContext(),
-                        android.R.layout.simple_list_item_1,
-                        android.R.id.text1,
-                        resourceTypeLabels),
-                this);
 
         // Check if there is already a defined user
         objectGraph = objectGraph.plus(new AdapterModuleImpl(this));
