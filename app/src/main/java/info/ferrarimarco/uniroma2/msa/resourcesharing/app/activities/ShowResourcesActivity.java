@@ -13,7 +13,6 @@ import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArrayAdapter;
@@ -51,8 +50,6 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_resources);
-
-        ButterKnife.inject(this);
 
         this.defaultInitialization(mProgressView, resourcesListView);
 

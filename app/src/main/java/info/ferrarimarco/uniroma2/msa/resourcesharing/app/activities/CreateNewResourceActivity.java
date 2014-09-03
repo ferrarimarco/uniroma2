@@ -10,7 +10,6 @@ import com.squareup.otto.Subscribe;
 
 import org.joda.time.DateTime;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
@@ -47,7 +46,6 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
         this.defaultInitialization(mProgressView, mCreateNewResourceFormView);
 
         objectGraph.inject(this);
-        ButterKnife.inject(this);
     }
 
     @Override
