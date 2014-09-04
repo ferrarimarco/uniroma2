@@ -2,7 +2,6 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import javax.inject.Inject;
 
@@ -32,13 +31,7 @@ public class SharedPreferencesServiceImpl {
      * registration ID.
      */
     public String getGcmRegistrationId() {
-        String registrationId = applicationSharedPreferences.getString(gcmRegistrationIdKey, "");
-        if (registrationId == null || registrationId.equals("")) {
-            Log.i(SharedPreferencesServiceImpl.class.getName(), "Registration not found.");
-            return "";
-        }
-
-        return registrationId;
+        return applicationSharedPreferences.getString(gcmRegistrationIdKey, "");
     }
 
     /**
@@ -48,10 +41,9 @@ public class SharedPreferencesServiceImpl {
      * @param regId registration ID
      */
     public void storeGcmRegistrationId(String regId) {
-        Log.i(SharedPreferencesServiceImpl.class.getName(), "Saving GCM Registration ID in Shared Preferencies. ID: " + regId);
         SharedPreferences.Editor editor = applicationSharedPreferences.edit();
         editor.putString(gcmRegistrationIdKey, regId);
-        editor.commit();
+        editor.apply();
     }
 
     public Boolean isGoogleSignInCompleted() {
@@ -65,7 +57,7 @@ public class SharedPreferencesServiceImpl {
     public void storeGoogleAccountName(String googleAccountName) {
         SharedPreferences.Editor editor = applicationSharedPreferences.edit();
         editor.putString(googleAccountNameKey, googleAccountName);
-        editor.commit();
+        editor.apply();
     }
 
     public boolean isGcmRegistrationCompleted() {
