@@ -54,17 +54,6 @@ public class SharedPreferencesServiceImpl {
         editor.commit();
     }
 
-    /**
-     * Removes the registration ID from the application's
-     * {@code SharedPreferences}.
-     */
-    public void removeGcmRegistrationId() {
-        Log.i(SharedPreferencesServiceImpl.class.getName(), "Removig regId from Shared Preferencies");
-        SharedPreferences.Editor editor = applicationSharedPreferences.edit();
-        editor.remove(gcmRegistrationIdKey);
-        editor.commit();
-    }
-
     public Boolean isGoogleSignInCompleted() {
         return applicationSharedPreferences.contains(googleAccountNameKey);
     }
@@ -77,5 +66,9 @@ public class SharedPreferencesServiceImpl {
         SharedPreferences.Editor editor = applicationSharedPreferences.edit();
         editor.putString(googleAccountNameKey, googleAccountName);
         editor.commit();
+    }
+
+    public boolean isGcmRegistrationCompleted() {
+        return applicationSharedPreferences.contains(gcmRegistrationIdKey);
     }
 }

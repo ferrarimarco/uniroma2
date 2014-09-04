@@ -22,7 +22,6 @@ public class GcmMessagingServiceImpl {
     enum GcmMessage {
 
         USER_ID_CHECK("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.USER_ID_CHECK"),
-        GCM_REGISTRATION("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.GCM_REGISTRATION"),
         NEW_RESOURCE_FROM_ME("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.CREATE_NEW_RESOURCE"),
         DELETE_MY_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.DELETE_RESOURCE"),
         UPDATE_USER_DETAILS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.UPDATE_USER_DETAILS"),
@@ -91,13 +90,6 @@ public class GcmMessagingServiceImpl {
 
                     Log.d(GcmMessagingServiceImpl.class.getName(), "GCM Registration ID: " + gcmRegistrationId);
 
-                    Bundle data = new Bundle();
-                    data.putString("userId", userId);
-                    data.putString("action", GcmMessage.GCM_REGISTRATION.getStringValue());
-                    data.putBoolean("needsAck", true);
-
-                    sendGcmMessage(data);
-
                     // Persist the regID - no need to register again.
                     sharedPreferencesService.storeGcmRegistrationId(gcmRegistrationId);
                 } catch (IOException ex) {
@@ -111,6 +103,10 @@ public class GcmMessagingServiceImpl {
                 return null;
             }
         }.execute(userService.readRegisteredUserId());
+    }
+
+    public boolean isGcmRegistrationCompleted() {
+        return sharedPreferencesService.isGcmRegistrationCompleted();
     }
 
     public void sendNewResource(Resource resource) {
