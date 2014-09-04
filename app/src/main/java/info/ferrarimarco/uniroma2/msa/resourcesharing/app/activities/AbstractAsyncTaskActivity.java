@@ -83,16 +83,13 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
 
         googlePlayServiceUtils.checkGooglePlayServicesInstallationStatus(this);
         checkRegisteredUser();
-
-        if (!googleApiClient.isConnected()) {
-            googleApiClient.connect();
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         googlePlayServiceUtils.checkGooglePlayServicesInstallationStatus(this);
+        checkGcmRegistration();
         checkRegisteredUser();
     }
 
@@ -134,8 +131,6 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
 
     @Override
     public void onConnected(Bundle arg0) {
-        Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
-
         // Get user's information
         try {
             if (Plus.PeopleApi.getCurrentPerson(googleApiClient) != null) {
@@ -193,11 +188,7 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
     }
 
     private void checkRegisteredUser() {
-        showProgress(true);
-
-        Boolean userRegistrationCompleted = userService.isRegistrationCompleted();
-
-        if (userRegistrationCompleted) {
+        if (userService.isRegistrationCompleted()) {
             Intent intent = new Intent(this, ShowResourcesActivity.class);
             startActivity(intent);
             finish();
@@ -218,6 +209,12 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
                 intentInProgress = false;
                 googleApiClient.connect();
             }
+        }
+    }
+
+    private void checkGcmRegistration() {
+        if (!gcmMessagingService.isGcmRegistrationCompleted()) {
+            gcmMessagingService.registerWithGcm();
         }
     }
 
