@@ -31,16 +31,20 @@ public class GcmIntentServiceImpl extends IntentService {
         if (extras != null && !extras.isEmpty()) {
             GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
             String messageType = gcm.getMessageType(intent);
-            if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                //sendNotification("Send error: " + extras.toString(), null);
-            } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-                //sendNotification("Deleted messages on server: " + extras.toString(), null);
-            } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                String receivedAction = intent.getExtras().getString("action");
-                if (GcmMessagingServiceImpl.GcmMessage.NEW_RESOURCE_FROM_ME.getStringValue().equals(receivedAction)) {
-                    String androidId = extras.getString("androidId");
-                    bus.post(new ResourceSavedAckAvailableEvent(TaskResultType.valueOf(extras.getString("result")), Long.parseLong(androidId)));
-                }
+            switch (messageType) {
+                case GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR:
+                    //sendNotification("Send error: " + extras.toString(), null);
+                    break;
+                case GoogleCloudMessaging.MESSAGE_TYPE_DELETED:
+                    //sendNotification("Deleted messages on server: " + extras.toString(), null);
+                    break;
+                case GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE:
+                    String receivedAction = intent.getExtras().getString("action");
+                    if (GcmMessagingServiceImpl.GcmMessage.NEW_RESOURCE_FROM_ME.getStringValue().equals(receivedAction)) {
+                        String androidId = extras.getString("androidId");
+                        bus.post(new ResourceSavedAckAvailableEvent(TaskResultType.valueOf(extras.getString("result")), Long.parseLong(androidId)));
+                    }
+                    break;
             }
 
             // Release the wake lock provided by the WakefulBroadcastReceiver.
