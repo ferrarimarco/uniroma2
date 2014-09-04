@@ -21,11 +21,10 @@ public class UserService extends AbstractPersistenceService {
     }
 
     public Boolean isRegistrationCompleted() {
-        return sharedPreferencesService.getGoogleSignInCompleted();
+        return sharedPreferencesService.isGoogleSignInCompleted();
     }
 
     public void registerNewUser(String userId) {
         sharedPreferencesService.storeGoogleAccountName(userId);
-        sharedPreferencesService.storeGoogleSignInCompleted(Boolean.TRUE);
     }
 }

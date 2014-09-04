@@ -12,13 +12,11 @@ public class SharedPreferencesServiceImpl {
 
     private SharedPreferences applicationSharedPreferences;
     private String gcmRegistrationIdKey;
-    private String googleSignInCompletedKey;
     private String googleAccountNameKey;
 
     @Inject
     public SharedPreferencesServiceImpl(Context applicationContext) {
         gcmRegistrationIdKey = applicationContext.getResources().getString(R.string.gcm_registration_id_key);
-        googleSignInCompletedKey = applicationContext.getResources().getString(R.string.google_sign_in_completed_key);
         googleAccountNameKey = applicationContext.getResources().getString(R.string.google_account_name_key);
         String sharedPreferencesId = applicationContext.getResources().getString(R.string.shared_preferences_id);
         applicationSharedPreferences = applicationContext.getSharedPreferences(sharedPreferencesId, Context.MODE_PRIVATE);
@@ -67,14 +65,8 @@ public class SharedPreferencesServiceImpl {
         editor.commit();
     }
 
-    public Boolean getGoogleSignInCompleted() {
-        return applicationSharedPreferences.getBoolean(googleSignInCompletedKey, false);
-    }
-
-    public void storeGoogleSignInCompleted(Boolean registrationCompleted) {
-        SharedPreferences.Editor editor = applicationSharedPreferences.edit();
-        editor.putBoolean(googleSignInCompletedKey, registrationCompleted);
-        editor.commit();
+    public Boolean isGoogleSignInCompleted() {
+        return applicationSharedPreferences.contains(googleAccountNameKey);
     }
 
     public String getGoogleAccountName() {
