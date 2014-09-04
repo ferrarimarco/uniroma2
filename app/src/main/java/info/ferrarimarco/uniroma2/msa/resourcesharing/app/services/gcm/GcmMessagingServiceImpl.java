@@ -21,7 +21,6 @@ public class GcmMessagingServiceImpl {
 
     enum GcmMessage {
 
-        USER_ID_CHECK("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.USER_ID_CHECK"),
         NEW_RESOURCE_FROM_ME("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.CREATE_NEW_RESOURCE"),
         DELETE_MY_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.DELETE_RESOURCE"),
         UPDATE_USER_DETAILS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.UPDATE_USER_DETAILS"),
