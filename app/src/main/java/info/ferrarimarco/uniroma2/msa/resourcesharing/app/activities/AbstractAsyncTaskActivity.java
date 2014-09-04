@@ -19,6 +19,7 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import dagger.ObjectGraph;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gms.GooglePlayServiceUtils;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
@@ -26,9 +27,6 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.U
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
 public abstract class AbstractAsyncTaskActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-
-    private View progressBarView;
-    private View mainView;
 
     protected ObjectGraph objectGraph;
 
@@ -58,11 +56,6 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
     private boolean intentInProgress;
 
     private ConnectionResult connectionResult;
-
-    protected void defaultInitialization(View progressBarView, View mainView) {
-        this.progressBarView = progressBarView;
-        this.mainView = mainView;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,8 +109,7 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
         switch (requestCode) {
             case GooglePlayServiceUtils.REQUEST_CODE_RECOVER_PLAY_SERVICES:
                 if (resultCode == RESULT_CANCELED) {
-                    Toast.makeText(this, "Google Play Services must be installed.", Toast.LENGTH_SHORT).show();
-                    // TODO: write this message in strings.xml
+                    Toast.makeText(this, getResources().getString(R.string.google_play_services_missing_text), Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 return;
@@ -177,25 +169,25 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
      */
     public void showProgress(final boolean show) {
 
-        if (mainView == null || progressBarView == null) {
+        if (getContentView() == null || getProgressView() == null) {
             throw new IllegalStateException("The activity is not correctly initialized. Main view or progress bar view is null");
         }
 
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-        mainView.setVisibility(show ? View.GONE : View.VISIBLE);
-        mainView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+        getContentView().setVisibility(show ? View.GONE : View.VISIBLE);
+        getContentView().animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mainView.setVisibility(show ? View.GONE : View.VISIBLE);
+                getContentView().setVisibility(show ? View.GONE : View.VISIBLE);
             }
         });
 
-        progressBarView.setVisibility(show ? View.VISIBLE : View.GONE);
-        progressBarView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+        getProgressView().setVisibility(show ? View.VISIBLE : View.GONE);
+        getProgressView().animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                progressBarView.setVisibility(show ? View.VISIBLE : View.GONE);
+                getProgressView().setVisibility(show ? View.VISIBLE : View.GONE);
             }
         });
     }
@@ -228,4 +220,9 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
             }
         }
     }
+
+    public abstract View getProgressView();
+
+    public abstract View getContentView();
+
 }

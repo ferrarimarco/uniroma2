@@ -34,16 +34,15 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
     EditText acquisitionModeEditText;
 
     @InjectView(R.id.create_new_resource_progress)
-    View mProgressView;
+    View progressView;
 
     @InjectView(R.id.create_new_resource_form)
-    View mCreateNewResourceFormView;
+    View createNewResourceFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_resource);
-        this.defaultInitialization(mProgressView, mCreateNewResourceFormView);
     }
 
     @Override
@@ -109,5 +108,15 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
         } else {
             // TODO: handle this error condition
         }
+    }
+
+    @Override
+    public View getProgressView() {
+        return progressView;
+    }
+
+    @Override
+    public View getContentView() {
+        return createNewResourceFormView;
     }
 }

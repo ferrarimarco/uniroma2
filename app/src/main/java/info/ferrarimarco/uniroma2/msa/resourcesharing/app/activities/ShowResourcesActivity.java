@@ -39,7 +39,7 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
     ListView resourcesListView;
 
     @InjectView(R.id.show_resources_progress)
-    View mProgressView;
+    View progressView;
 
     @Inject
     ResourceService resourceService;
@@ -49,10 +49,10 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         objectGraph = objectGraph.plus(new AdapterModuleImpl(this));
-        setContentView(R.layout.activity_show_resources);
+
         super.onCreate(savedInstanceState);
 
-        this.defaultInitialization(mProgressView, resourcesListView);
+        setContentView(R.layout.activity_show_resources);
 
         // Set up the action bar to show a dropdown list.
         final ActionBar actionBar = getActionBar();
@@ -162,5 +162,16 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
         }
 
         showProgress(false);
+    }
+
+
+    @Override
+    public View getProgressView() {
+        return progressView;
+    }
+
+    @Override
+    public View getContentView() {
+        return resourcesListView;
     }
 }
