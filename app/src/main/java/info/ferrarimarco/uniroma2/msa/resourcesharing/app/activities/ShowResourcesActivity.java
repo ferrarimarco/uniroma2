@@ -48,9 +48,8 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        objectGraph = objectGraph.plus(new AdapterModuleImpl(this));
-
         super.onCreate(savedInstanceState);
+        objectGraph = objectGraph.plus(new AdapterModuleImpl(this));
 
         setContentView(R.layout.activity_show_resources);
 
