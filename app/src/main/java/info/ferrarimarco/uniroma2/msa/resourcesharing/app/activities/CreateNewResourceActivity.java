@@ -13,10 +13,9 @@ import org.joda.time.DateTime;
 import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceListAvailableEvent;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceLocalSaveCompletedEvent;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.ResourceSavedAckAvailableEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceSaveCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 
 public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
@@ -67,46 +66,38 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
             String acquisitionMode = acquisitionModeEditText.getText().toString();
             String location = locationEditText.getText().toString();
 
-            Resource resource = new Resource(title, description, location, DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false);
-            resourceService.saveResourceLocal(resource, false);
+            Resource resource = new Resource(title, description, location, DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, false);
+            resourceService.saveResourceLocal(resource);
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     @Subscribe
-    public void resourceSavedAckAvailable(ResourceSavedAckAvailableEvent event) {
-        if (TaskResultType.RESOURCE_SAVED.equals(event.getResult())) {
-            resourceService.readResourceById(event.getAndroidId());
-        } else if (TaskResultType.RESOURCE_NOT_SAVED.equals(event.getResult())) {
-            // TODO: handle this error condition
-        }
-    }
-
-    @Subscribe
-    public void resourceListAvailable(ResourceListAvailableEvent event) {
-        ResourceTaskResult result = event.getResult();
-        if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
-            // TODO: show a notification (toast)
-            // save the updated resource
-            resourceService.saveResourceLocal(result.getResources().get(0), true);
-            finish();
-        } else if (TaskResultType.FAILURE.equals(result.getTaskResultType())) {
-            // TODO: handle this error condition
-        }
-    }
-
-    @Subscribe
-    public void resourceLocalSaveCompletedAvailable(ResourceLocalSaveCompletedEvent event) {
+    public void resourceSaveCompletedAvailable(ResourceSaveCompletedEvent event) {
         ResourceTaskResult taskResult = event.getResult();
 
-        if (TaskResultType.RESOURCE_SAVED.equals(taskResult.getTaskResultType())) {
-            Resource resource = taskResult.getResources().get(0);
-            if (!resource.isSentToBackend()) {
-                gcmMessagingService.sendNewResource(taskResult.getResources().get(0));
+        if (ResourceTaskType.SAVE_RESOURCE_FROM_ME_LOCAL.equals(taskResult.getTaskType())) {
+            if (TaskResultType.RESOURCE_SAVED.equals(taskResult.getTaskResultType())) {
+                Resource resource = taskResult.getResources().get(0);
+                if (!resource.isSentToBackend()) {
+                    gcmMessagingService.sendNewResource(taskResult.getResources().get(0));
+                }
+            } else if (TaskResultType.RESOURCE_NOT_SAVED.equals(taskResult.getTaskResultType())) {
+                // TODO: handle this error condition
             }
-        } else {
-            // TODO: handle this error condition
+        } else if (ResourceTaskType.SAVE_RESOURCE_FROM_ME_BACKEND.equals(taskResult.getTaskType())) {
+            if (TaskResultType.RESOURCE_SAVED.equals(taskResult.getTaskResultType())) {
+                resourceService.updateResourceSentToBackend(taskResult.getAndroidId());
+            } else if (TaskResultType.RESOURCE_NOT_SAVED.equals(taskResult.getTaskResultType())) {
+                // TODO: handle this error condition
+            }
+        } else if (ResourceTaskType.UPDATE_RESOURCE_SENT_TO_BACKEND.equals(taskResult.getTaskType())) {
+            if (TaskResultType.RESOURCE_SAVED.equals(taskResult.getTaskResultType())) {
+                finish();
+            } else if (TaskResultType.RESOURCE_NOT_SAVED.equals(taskResult.getTaskResultType())) {
+                // TODO: handle this error condition
+            }
         }
     }
 

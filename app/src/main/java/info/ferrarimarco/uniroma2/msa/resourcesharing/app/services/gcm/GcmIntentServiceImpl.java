@@ -10,7 +10,9 @@ import com.squareup.otto.Bus;
 import javax.inject.Inject;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.GcmBroadcastReceiver;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ack.ResourceSavedAckAvailableEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceSaveCompletedEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 
 public class GcmIntentServiceImpl extends IntentService {
@@ -42,7 +44,9 @@ public class GcmIntentServiceImpl extends IntentService {
                     String receivedAction = intent.getExtras().getString("action");
                     if (GcmMessagingServiceImpl.GcmMessage.NEW_RESOURCE_FROM_ME.getStringValue().equals(receivedAction)) {
                         String androidId = extras.getString("androidId");
-                        bus.post(new ResourceSavedAckAvailableEvent(TaskResultType.valueOf(extras.getString("result")), Long.parseLong(androidId)));
+
+                        ResourceTaskResult result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_FROM_ME_BACKEND, TaskResultType.valueOf(extras.getString("result")), Long.parseLong(androidId));
+                        bus.post(new ResourceSaveCompletedEvent(result));
                     }
                     break;
             }

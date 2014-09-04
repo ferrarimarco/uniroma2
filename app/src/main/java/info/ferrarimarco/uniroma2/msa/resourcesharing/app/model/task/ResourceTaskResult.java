@@ -9,6 +9,7 @@ public class ResourceTaskResult extends AbstractTaskResult {
     private ResourceTaskType taskType;
 
     private List<Resource> resources;
+    private Long androidId;
 
     public ResourceTaskResult() {
         super();
@@ -25,9 +26,9 @@ public class ResourceTaskResult extends AbstractTaskResult {
         this.taskResultType = taskResultType;
     }
 
-    public ResourceTaskResult(ResourceTaskType taskType, TaskResultType taskResultType, List<Resource> resources) {
+    public ResourceTaskResult(ResourceTaskType taskType, TaskResultType taskResultType, Long androidId) {
         this(taskType, taskResultType);
-        this.resources = resources;
+        this.androidId = androidId;
     }
 
     public ResourceTaskType getTaskType() {
@@ -52,5 +53,9 @@ public class ResourceTaskResult extends AbstractTaskResult {
 
     public void addResource(Resource resource) {
         resources.add(resource);
+    }
+
+    public Long getAndroidId() {
+        return androidId;
     }
 }

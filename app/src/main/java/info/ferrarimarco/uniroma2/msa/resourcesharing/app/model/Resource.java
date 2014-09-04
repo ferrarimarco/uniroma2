@@ -53,7 +53,7 @@ public class Resource implements GenericEntity {
         sentToBackend = false;
     }
 
-    public Resource(String title, String description, String location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired) {
+    public Resource(String title, String description, String location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired, Boolean sentToBackend) {
         this();
         this.title = title;
         this.description = description;
@@ -63,6 +63,7 @@ public class Resource implements GenericEntity {
         this.creatorId = creatorId;
         this.type = type;
         this.expired = expired;
+        this.sentToBackend = sentToBackend;
     }
 
     @Override

@@ -18,6 +18,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArrayAdapter;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceListAvailableEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceSaveCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
@@ -153,14 +154,31 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
     public void resourceListAvailable(ResourceListAvailableEvent event) {
         ResourceTaskResult result = event.getResult();
 
-        if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
-            resourceArrayAdapter.clear();
-            resourceArrayAdapter.addAll(result.getResources());
+        if (ResourceTaskType.READ_NEW_RESOURCES.equals(result.getTaskType()) ||
+                ResourceTaskType.READ_CREATED_BY_ME_RESOURCES.equals(result.getTaskType())) {
+            if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
+                resourceArrayAdapter.clear();
+                resourceArrayAdapter.addAll(result.getResources());
+                resourceArrayAdapter.notifyDataSetChanged();
+            } else if (TaskResultType.FAILURE.equals(result.getTaskResultType())) {
+                // TODO: handle this error condition
+            }
+        }
+        showProgress(false);
+    }
+
+    @Subscribe
+    public void resourceLocalSaveCompletedAvailable(ResourceSaveCompletedEvent event) {
+        ResourceTaskResult taskResult = event.getResult();
+
+        if (TaskResultType.RESOURCE_SAVED.equals(taskResult.getTaskResultType())) {
+            Resource resource = taskResult.getResources().get(0);
+            if (!resource.isSentToBackend()) {
+                gcmMessagingService.sendNewResource(taskResult.getResources().get(0));
+            }
         } else {
             // TODO: handle this error condition
         }
-
-        showProgress(false);
     }
 
 

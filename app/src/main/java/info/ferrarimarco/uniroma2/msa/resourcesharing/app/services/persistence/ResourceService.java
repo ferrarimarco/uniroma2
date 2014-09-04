@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceListAvailableEvent;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceLocalSaveCompletedEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceSaveCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
@@ -32,7 +32,7 @@ public class ResourceService extends AbstractPersistenceService {
             protected ResourceTaskResult doInBackground(ResourceTaskType... params) {
 
                 // TODO: provide this with Dagger
-                ResourceTaskResult result = new ResourceTaskResult();
+                ResourceTaskResult result = new ResourceTaskResult(params[0]);
 
                 try {
                     resourceDao.open(Resource.class);
@@ -44,10 +44,6 @@ public class ResourceService extends AbstractPersistenceService {
 
                 List<Resource> resources = result.getResources();
                 Resource res = new Resource();
-
-                if (ResourceTaskType.READ_CREATED_BY_ME_RESOURCES.equals(params[0])) {
-                    res.setType(Resource.ResourceType.CREATED_BY_ME);
-                }
 
                 try {
                     resources = resourceDao.read(res);
@@ -72,22 +68,18 @@ public class ResourceService extends AbstractPersistenceService {
         }.execute(resourceTaskType);
     }
 
-    public void saveResourceLocal(Resource resource, final Boolean sentToBackend) {
+    public void saveResourceLocal(Resource resource) {
         new AsyncTask<Resource, Void, ResourceTaskResult>() {
             @Override
             protected ResourceTaskResult doInBackground(Resource... params) {
                 ResourceTaskResult result;
                 try {
                     resourceDao.open(Resource.class);
-
-                    Resource res = params[0];
-                    res.setSentToBackend(sentToBackend);
-
                     resourceDao.save(params[0]);
-                    result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_LOCAL, TaskResultType.RESOURCE_SAVED);
+                    result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_FROM_ME_LOCAL, TaskResultType.RESOURCE_SAVED);
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_LOCAL, TaskResultType.RESOURCE_NOT_SAVED);
+                    result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_FROM_ME_LOCAL, TaskResultType.RESOURCE_NOT_SAVED);
                 } finally {
                     resourceDao.close();
                 }
@@ -99,12 +91,12 @@ public class ResourceService extends AbstractPersistenceService {
 
             @Override
             protected void onPostExecute(ResourceTaskResult result) {
-                bus.post(new ResourceLocalSaveCompletedEvent(result));
+                bus.post(new ResourceSaveCompletedEvent(result));
             }
         }.execute(resource);
     }
 
-    public void readResourceById(Long id) {
+    public void updateResourceSentToBackend(Long id) {
         new AsyncTask<Long, Void, ResourceTaskResult>() {
             @Override
             protected ResourceTaskResult doInBackground(Long... params) {
@@ -119,26 +111,33 @@ public class ResourceService extends AbstractPersistenceService {
                     res.setAndroidId(params[0]);
 
                     resources = resourceDao.read(res);
-                    result = new ResourceTaskResult(ResourceTaskType.READ_RESOURCE_LOCAL, TaskResultType.SUCCESS);
+
+                    if (resources == null || resources.size() > 1) {
+                        throw new IllegalStateException("Error while reading resource from DB");
+                    }
+
+                    res = resources.get(0);
+                    res.setSentToBackend(true);
+                    resourceDao.update(res);
+
+                    result = new ResourceTaskResult(ResourceTaskType.UPDATE_RESOURCE_SENT_TO_BACKEND, TaskResultType.SUCCESS);
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    result = new ResourceTaskResult(ResourceTaskType.READ_RESOURCE_LOCAL, TaskResultType.FAILURE);
+                    result = new ResourceTaskResult(ResourceTaskType.UPDATE_RESOURCE_SENT_TO_BACKEND, TaskResultType.FAILURE);
                 } finally {
                     resourceDao.close();
                 }
 
-                if (resources == null || resources.size() > 1) {
-                    throw new IllegalStateException("Error while reading resource from DB");
+                if (resources != null) {
+                    result.addResource(resources.get(0));
                 }
-
-                result.addResource(resources.get(0));
 
                 return result;
             }
 
             @Override
             protected void onPostExecute(ResourceTaskResult result) {
-                bus.post(new ResourceListAvailableEvent(result));
+                bus.post(new ResourceSaveCompletedEvent(result));
             }
         }.execute(id);
     }
