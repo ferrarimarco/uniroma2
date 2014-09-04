@@ -5,5 +5,5 @@ public enum TaskResultType {
     FAILURE,
 
     RESOURCE_SAVED,
-    RESOURCE_NOT_SAVED;
+    RESOURCE_NOT_SAVED
 }
