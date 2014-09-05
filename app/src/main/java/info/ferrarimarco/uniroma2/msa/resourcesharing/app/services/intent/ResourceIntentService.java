@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
@@ -96,6 +97,8 @@ public class ResourceIntentService extends IntentService {
             throw new RuntimeException("Unable to save the resource into local storage");
         }
 
+        resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL);
+
         gcmMessagingService.sendNewResource(resource);
     }
 
@@ -113,5 +116,7 @@ public class ResourceIntentService extends IntentService {
         if (TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())) {
             throw new RuntimeException("Unable to ACK saved resource");
         }
+
+        resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL);
     }
 }
