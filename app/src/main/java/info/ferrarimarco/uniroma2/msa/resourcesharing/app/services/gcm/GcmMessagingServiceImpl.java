@@ -14,7 +14,7 @@ import javax.inject.Inject;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.SharedPreferencesServiceImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.config.SharedPreferencesServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 
 public class GcmMessagingServiceImpl {

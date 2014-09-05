@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl;
+package info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.config;
 
 import android.content.Context;
 import android.content.SharedPreferences;

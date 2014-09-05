@@ -7,6 +7,7 @@ import org.robolectric.annotation.Config;
 import javax.inject.Inject;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.BaseTezt;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.config.SharedPreferencesServiceImpl;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)

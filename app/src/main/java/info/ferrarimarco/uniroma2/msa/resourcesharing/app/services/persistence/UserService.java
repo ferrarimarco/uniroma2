@@ -4,7 +4,7 @@ import android.content.Context;
 
 import javax.inject.Inject;
 
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.SharedPreferencesServiceImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.config.SharedPreferencesServiceImpl;
 
 public class UserService extends AbstractPersistenceService {
 
