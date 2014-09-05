@@ -1,19 +1,17 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence;
 
-import android.content.Context;
-
 import javax.inject.Inject;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.config.SharedPreferencesServiceImpl;
 
-public class UserService extends AbstractPersistenceService {
+public class UserService {
 
     @Inject
     SharedPreferencesServiceImpl sharedPreferencesService;
 
     @Inject
-    public UserService(Context context) {
-        super(context);
+    public UserService() {
+        super();
     }
 
     public String readRegisteredUserId() {
