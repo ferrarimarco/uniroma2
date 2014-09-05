@@ -169,12 +169,6 @@ public class GcmMessagingServiceImpl {
 
                 return Integer.parseInt(id);
             }
-
-            @Override
-            protected void onPostExecute(Integer returnCode) {
-                // TODO: is this needed?
-                // Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-            }
         }.execute(data);
     }
 }
