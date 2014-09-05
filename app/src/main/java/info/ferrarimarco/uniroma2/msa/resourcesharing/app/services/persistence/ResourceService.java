@@ -3,11 +3,14 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.squareup.otto.Bus;
+
 import java.sql.SQLException;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceListAvailableEvent;
@@ -15,15 +18,21 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceSa
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
-public class ResourceService extends AbstractPersistenceService {
+public class ResourceService {
+
+    protected ObjectGraph objectGraph;
+
+    @Inject
+    Bus bus;
 
     @Inject
     GenericDao<Resource> resourceDao;
 
     @Inject
     public ResourceService(Context context) {
-        super(context);
+        objectGraph = ObjectGraphUtils.getObjectGraph(context);
     }
 
     public void readResourcesFromLocalStorage(ResourceTaskType resourceTaskType) {
