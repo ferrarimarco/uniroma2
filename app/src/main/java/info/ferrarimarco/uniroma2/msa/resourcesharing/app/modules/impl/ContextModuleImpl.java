@@ -10,9 +10,8 @@ import dagger.Module;
 import dagger.Provides;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.impl.HashingServiceImpl;
 
-@Module(injects = {HashingServiceImpl.class, GenericDao.class, GcmMessagingServiceImpl.class})
+@Module(injects = {GenericDao.class, GcmMessagingServiceImpl.class})
 public class ContextModuleImpl {
 
     private final Context applicationContext;
