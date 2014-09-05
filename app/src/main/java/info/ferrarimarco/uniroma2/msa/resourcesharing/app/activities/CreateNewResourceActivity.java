@@ -13,7 +13,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.ResourceIntentService;
 
-public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
+public class CreateNewResourceActivity extends AbstractActivity {
 
     @InjectView(R.id.resourceTitleEditText)
     EditText titleEditText;
@@ -48,8 +48,6 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        showProgress(true);
-
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -62,19 +60,10 @@ public class CreateNewResourceActivity extends AbstractAsyncTaskActivity {
             String location = locationEditText.getText().toString();
 
             Resource resource = new Resource(title, description, location, DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, false);
-            ResourceIntentService.startActionSaveResource(this, resource);
+            ResourceIntentService.startActionSaveResource(getApplicationContext(), resource);
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public View getProgressView() {
-        return progressView;
-    }
-
-    @Override
-    public View getContentView() {
-        return createNewResourceFormView;
     }
 }

@@ -1,12 +1,9 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -25,7 +22,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gms.GooglePla
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
-public abstract class AbstractAsyncTaskActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public abstract class AbstractActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     protected ObjectGraph objectGraph;
 
@@ -162,34 +159,6 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
         }
     }
 
-    /**
-     * Shows the progress UI and hides the form.
-     */
-    public void showProgress(final boolean show) {
-
-        if (getContentView() == null || getProgressView() == null) {
-            throw new IllegalStateException("The activity is not correctly initialized. Main view or progress bar view is null");
-        }
-
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        getContentView().setVisibility(show ? View.GONE : View.VISIBLE);
-        getContentView().animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                getContentView().setVisibility(show ? View.GONE : View.VISIBLE);
-            }
-        });
-
-        getProgressView().setVisibility(show ? View.VISIBLE : View.GONE);
-        getProgressView().animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                getProgressView().setVisibility(show ? View.VISIBLE : View.GONE);
-            }
-        });
-    }
-
     private void checkRegisteredUser() {
         if (userService.isRegistrationCompleted()) {
             Intent intent = new Intent(this, ShowResourcesActivity.class);
@@ -220,9 +189,4 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
             gcmMessagingService.registerWithGcm();
         }
     }
-
-    public abstract View getProgressView();
-
-    public abstract View getContentView();
-
 }

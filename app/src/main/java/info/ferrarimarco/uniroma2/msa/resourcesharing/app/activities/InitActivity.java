@@ -6,7 +6,7 @@ import android.view.View;
 import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 
-public class InitActivity extends AbstractAsyncTaskActivity {
+public class InitActivity extends AbstractActivity {
 
     @InjectView(R.id.init_progress)
     View progressView;
@@ -18,15 +18,5 @@ public class InitActivity extends AbstractAsyncTaskActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_init);
-    }
-
-    @Override
-    public View getProgressView() {
-        return progressView;
-    }
-
-    @Override
-    public View getContentView() {
-        return contentView;
     }
 }

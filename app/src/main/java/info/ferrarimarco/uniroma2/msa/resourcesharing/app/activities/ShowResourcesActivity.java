@@ -3,9 +3,9 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -27,7 +27,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.R
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.CREATED_BY_ME;
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.NEW;
 
-public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements ActionBar.OnNavigationListener {
+public class ShowResourcesActivity extends AbstractActivity implements ActionBar.OnNavigationListener, SwipeRefreshLayout.OnRefreshListener {
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -38,8 +38,8 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
     @InjectView(R.id.resources_list_view)
     ListView resourcesListView;
 
-    @InjectView(R.id.show_resources_progress)
-    View progressView;
+    @InjectView(R.id.show_resources_layout)
+    SwipeRefreshLayout swipeLayout;
 
     @Inject
     ResourceService resourceService;
@@ -87,23 +87,33 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
 
         resourceArrayAdapter = objectGraph.get(ResourceArrayAdapter.class);
         resourcesListView.setAdapter(resourceArrayAdapter);
+
+        swipeLayout.setOnRefreshListener(this);
+        swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+    }
+
+
+    @Override
+    public void onRefresh() {
+        if (getActionBar() != null) {
+            swipeLayout.setRefreshing(true);
+            loadResources(getActionBar().getSelectedNavigationIndex());
+        }
     }
 
     @Override
     public boolean onNavigationItemSelected(int position, long id) {
-        if (CREATED_BY_ME.ordinal() == position) {
-            loadResources(CREATED_BY_ME);
-        } else if (NEW.ordinal() == position) {
-            loadResources(NEW);
-        }
-
+        loadResources(position);
         return true;
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         // Restore the previously serialized current dropdown position.
-        if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
+        if (getActionBar() != null && savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
             getActionBar().setSelectedNavigationItem(
                     savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
         }
@@ -111,8 +121,10 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        // Serialize the current dropdown position.
-        outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getActionBar().getSelectedNavigationIndex());
+        if (getActionBar() != null) {
+            // Serialize the current dropdown position.
+            outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getActionBar().getSelectedNavigationIndex());
+        }
     }
 
     @Override
@@ -136,8 +148,16 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
         }
     }
 
-    private void loadResources(Resource.ResourceType resourceType) {
-        showProgress(true);
+    private void loadResources(int resourceTypeId) {
+        swipeLayout.setRefreshing(true);
+
+        Resource.ResourceType resourceType = NEW;
+
+        if (CREATED_BY_ME.ordinal() == resourceTypeId) {
+            resourceType = CREATED_BY_ME;
+        } else if (NEW.ordinal() == resourceTypeId) {
+            resourceType = NEW;
+        }
 
         switch (resourceType) {
             case NEW:
@@ -153,26 +173,19 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
     public void resourceListAvailable(ResourceListAvailableEvent event) {
         ResourceTaskResult result = event.getResult();
 
-        if (ResourceTaskType.READ_NEW_RESOURCES.equals(result.getTaskType()) ||
-                ResourceTaskType.READ_CREATED_BY_ME_RESOURCES.equals(result.getTaskType())) {
-            if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
-                resourceArrayAdapter.clear();
-                resourceArrayAdapter.addAll(result.getResources());
-                resourceArrayAdapter.notifyDataSetChanged();
-            } else if (TaskResultType.FAILURE.equals(result.getTaskResultType())) {
-                // TODO: handle this error condition
+        if (getActionBar() != null) {
+            if (ResourceTaskType.READ_NEW_RESOURCES.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.NEW.ordinal()
+                    || ResourceTaskType.READ_CREATED_BY_ME_RESOURCES.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.CREATED_BY_ME.ordinal()) {
+                if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
+                    resourceArrayAdapter.clear();
+                    resourceArrayAdapter.addAll(result.getResources());
+                    resourceArrayAdapter.notifyDataSetChanged();
+                } else if (TaskResultType.FAILURE.equals(result.getTaskResultType())) {
+                    // TODO: handle this error condition
+                }
             }
         }
-        showProgress(false);
-    }
 
-    @Override
-    public View getProgressView() {
-        return progressView;
-    }
-
-    @Override
-    public View getContentView() {
-        return resourcesListView;
+        swipeLayout.setRefreshing(false);
     }
 }
