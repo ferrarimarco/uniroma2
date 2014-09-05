@@ -3,7 +3,6 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 
 import org.joda.time.DateTime;
@@ -26,12 +25,6 @@ public class CreateNewResourceActivity extends AbstractActivity {
 
     @InjectView(R.id.resourceAcquisitionModeEditText)
     EditText acquisitionModeEditText;
-
-    @InjectView(R.id.create_new_resource_progress)
-    View progressView;
-
-    @InjectView(R.id.create_new_resource_form)
-    View createNewResourceFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
