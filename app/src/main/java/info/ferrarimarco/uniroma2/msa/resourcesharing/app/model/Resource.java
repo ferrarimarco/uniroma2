@@ -1,5 +1,8 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -7,12 +10,24 @@ import org.joda.time.DateTime;
 
 
 @DatabaseTable
-public class Resource implements GenericEntity {
+public class Resource implements GenericEntity, Parcelable {
 
     public enum ResourceType {
         NEW,
         CREATED_BY_ME
     }
+
+    public final static Parcelable.Creator<Resource> CREATOR = new Parcelable.Creator<Resource>() {
+        @Override
+        public Resource createFromParcel(Parcel source) {
+            return new Resource(source);
+        }
+
+        @Override
+        public Resource[] newArray(int size) {
+            return new Resource[size];
+        }
+    };
 
     @DatabaseField(generatedId = true, canBeNull = false, allowGeneratedIdInsert = true)
     private Long androidId;
@@ -64,6 +79,40 @@ public class Resource implements GenericEntity {
         this.type = type;
         this.expired = expired;
         this.sentToBackend = sentToBackend;
+    }
+
+    public Resource(Parcel in) {
+        this.androidId = in.readLong();
+        this.backendId = in.readString();
+        this.title = in.readString();
+        this.description = in.readString();
+        this.location = in.readString();
+        this.creationTime = (DateTime) in.readSerializable();
+        this.acquisitionMode = in.readString();
+        this.creatorId = in.readString();
+        this.type = (ResourceType) in.readSerializable();
+        this.expired = in.readByte() != 0;
+        this.sentToBackend = in.readByte() != 0;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(androidId);
+        dest.writeString(backendId);
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(location);
+        dest.writeSerializable(creationTime);
+        dest.writeString(acquisitionMode);
+        dest.writeString(creatorId);
+        dest.writeSerializable(type);
+        dest.writeByte((byte) (expired ? 1 : 0));
+        dest.writeByte((byte) (sentToBackend ? 1 : 0));
     }
 
     @Override
