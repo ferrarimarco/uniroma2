@@ -18,7 +18,6 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArrayAdapter;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceListAvailableEvent;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceSaveCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
@@ -166,21 +165,6 @@ public class ShowResourcesActivity extends AbstractAsyncTaskActivity implements 
         }
         showProgress(false);
     }
-
-    @Subscribe
-    public void resourceLocalSaveCompletedAvailable(ResourceSaveCompletedEvent event) {
-        ResourceTaskResult taskResult = event.getResult();
-
-        if (TaskResultType.RESOURCE_SAVED.equals(taskResult.getTaskResultType())) {
-            Resource resource = taskResult.getResources().get(0);
-            if (!resource.isSentToBackend()) {
-                gcmMessagingService.sendNewResource(taskResult.getResources().get(0));
-            }
-        } else {
-            // TODO: handle this error condition
-        }
-    }
-
 
     @Override
     public View getProgressView() {

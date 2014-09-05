@@ -22,7 +22,6 @@ import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gms.GooglePlayServiceUtils;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
@@ -35,9 +34,6 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
 
     @Inject
     UserService userService;
-
-    @Inject
-    ResourceService resourceService;
 
     @Inject
     Bus bus;

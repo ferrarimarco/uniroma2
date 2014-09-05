@@ -68,6 +68,9 @@
         </receiver>
 
         <service android:name=".services.intent.GcmIntentServiceImpl" />
+        <service
+            android:name=".services.intent.ResourceIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

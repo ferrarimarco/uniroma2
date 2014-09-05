@@ -9,12 +9,10 @@ import com.squareup.otto.Bus;
 
 import javax.inject.Inject;
 
+import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.GcmBroadcastReceiver;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceSaveCompletedEvent;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
 public class GcmIntentServiceImpl extends IntentService {
 
@@ -23,6 +21,12 @@ public class GcmIntentServiceImpl extends IntentService {
 
     public GcmIntentServiceImpl() {
         super("GcmIntentService");
+    }
+
+    @Override
+    public void onCreate() {
+        ObjectGraph objectGraph = ObjectGraphUtils.getObjectGraph(this);
+        objectGraph.inject(this);
     }
 
     @Override
@@ -46,8 +50,7 @@ public class GcmIntentServiceImpl extends IntentService {
                     if (GcmMessagingServiceImpl.GcmMessage.NEW_RESOURCE_FROM_ME.getStringValue().equals(receivedAction)) {
                         String androidId = extras.getString("androidId");
 
-                        ResourceTaskResult result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_FROM_ME_BACKEND, TaskResultType.valueOf(extras.getString("result")), Long.parseLong(androidId));
-                        bus.post(new ResourceSaveCompletedEvent(result));
+                        ResourceIntentService.startActionAckSavedResource(this, Long.parseLong(androidId));
                     }
                     break;
             }
