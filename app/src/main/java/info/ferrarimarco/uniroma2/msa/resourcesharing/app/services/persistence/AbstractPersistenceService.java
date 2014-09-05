@@ -14,9 +14,6 @@ public abstract class AbstractPersistenceService {
     protected ObjectGraph objectGraph;
 
     @Inject
-    Context context;
-
-    @Inject
     Bus bus;
 
     @Inject
