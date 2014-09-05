@@ -99,7 +99,6 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     @Override
     public void onRefresh() {
         if (getActionBar() != null) {
-            swipeLayout.setRefreshing(true);
             loadResources(getActionBar().getSelectedNavigationIndex());
         }
     }
@@ -161,10 +160,10 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
 
         switch (resourceType) {
             case NEW:
-                resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_NEW_RESOURCES);
+                resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_NEW_RESOURCES_LOCAL);
                 break;
             case CREATED_BY_ME:
-                resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES);
+                resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL);
                 break;
         }
     }
@@ -174,8 +173,8 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
         ResourceTaskResult result = event.getResult();
 
         if (getActionBar() != null) {
-            if (ResourceTaskType.READ_NEW_RESOURCES.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.NEW.ordinal()
-                    || ResourceTaskType.READ_CREATED_BY_ME_RESOURCES.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.CREATED_BY_ME.ordinal()) {
+            if (ResourceTaskType.READ_NEW_RESOURCES_LOCAL.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.NEW.ordinal()
+                    || ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.CREATED_BY_ME.ordinal()) {
                 if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
                     resourceArrayAdapter.clear();
                     resourceArrayAdapter.addAll(result.getResources());
