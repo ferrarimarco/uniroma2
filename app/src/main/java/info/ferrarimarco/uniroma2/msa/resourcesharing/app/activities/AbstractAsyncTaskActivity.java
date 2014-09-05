@@ -66,8 +66,6 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
         objectGraph = ObjectGraphUtils.getObjectGraph(this.getApplicationContext());
         objectGraph.inject(this);
 
-        bus.register(this);
-
         googlePlayServiceUtils.checkGooglePlayServicesInstallationStatus(this);
 
         // Initializing google plus api client
@@ -91,6 +89,7 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
         googlePlayServiceUtils.checkGooglePlayServicesInstallationStatus(this);
         checkGcmRegistration();
         checkRegisteredUser();
+        bus.register(this);
     }
 
     @Override
@@ -99,6 +98,14 @@ public abstract class AbstractAsyncTaskActivity extends Activity implements Goog
         if (googleApiClient.isConnected()) {
             googleApiClient.disconnect();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Always unregister when an object no longer should be on the bus.
+        bus.unregister(this);
     }
 
     @Override
