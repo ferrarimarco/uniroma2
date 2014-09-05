@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm;
+package info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -14,6 +14,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceSa
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 
 public class GcmIntentServiceImpl extends IntentService {
 

@@ -67,7 +67,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".services.gcm.GcmIntentServiceImpl" />
+        <service android:name=".services.intent.GcmIntentServiceImpl" />
     </application>
 
 </manifest>
