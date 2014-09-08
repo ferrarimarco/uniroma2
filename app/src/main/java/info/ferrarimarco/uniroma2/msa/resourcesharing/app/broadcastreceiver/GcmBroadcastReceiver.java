@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm;
+package info.ferrarimarco.uniroma2.msa.resourcesharing.app.broadcastreceiver;
 
 import android.app.Activity;
 import android.content.ComponentName;

@@ -10,7 +10,7 @@ import com.squareup.otto.Bus;
 import javax.inject.Inject;
 
 import dagger.ObjectGraph;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.GcmBroadcastReceiver;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.broadcastreceiver.GcmBroadcastReceiver;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
