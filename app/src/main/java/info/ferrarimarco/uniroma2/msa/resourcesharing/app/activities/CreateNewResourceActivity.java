@@ -33,6 +33,16 @@ public class CreateNewResourceActivity extends AbstractActivity {
     }
 
     @Override
+    protected Class getRedirectActivityClass() {
+        return null;
+    }
+
+    @Override
+    protected boolean terminateActivityAfterRedirect() {
+        return false;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.create_new_resource, menu);

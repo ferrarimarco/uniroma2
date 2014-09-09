@@ -2,6 +2,7 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
@@ -9,6 +10,9 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
@@ -27,7 +31,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.R
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.CREATED_BY_ME;
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.NEW;
 
-public class ShowResourcesActivity extends AbstractActivity implements ActionBar.OnNavigationListener, SwipeRefreshLayout.OnRefreshListener {
+public class ShowResourcesActivity extends AbstractActivity implements ActionBar.OnNavigationListener, SwipeRefreshLayout.OnRefreshListener, LocationListener {
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -93,6 +97,24 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
+
+        // Request for location updates
+        // TODO: configure this request
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setInterval(1000); // Update location every second
+        locationRequest.setFastestInterval(500);
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+    }
+
+    @Override
+    protected Class getRedirectActivityClass() {
+        return null;
+    }
+
+    @Override
+    protected boolean terminateActivityAfterRedirect() {
+        return false;
     }
 
 
@@ -186,5 +208,10 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
         }
 
         swipeLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        //TODO: implement this
     }
 }

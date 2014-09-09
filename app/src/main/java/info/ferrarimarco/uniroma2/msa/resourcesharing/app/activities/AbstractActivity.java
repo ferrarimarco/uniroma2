@@ -3,12 +3,15 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.plus.Plus;
 import com.squareup.otto.Bus;
 
@@ -38,17 +41,9 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
     @Inject
     GooglePlayServiceUtils googlePlayServiceUtils;
 
-    private GoogleApiClient googleApiClient;
+    GoogleApiClient googleApiClient;
 
-    private static final int SIGN_IN_ERROR_RESOLUTION = 1002;
-
-    /**
-     * A flag indicating that a PendingIntent is in progress and prevents us
-     * from starting further intents.
-     */
-    private boolean intentInProgress;
-
-    private ConnectionResult connectionResult;
+    private static final int CONNECTION_FAILURE_ERROR_RESOLUTION = 1002;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,25 +59,28 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
         // Initializing google plus api client
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this).addApi(Plus.API, null)
+                .addOnConnectionFailedListener(this)
+                .addApi(Plus.API)
+                .addApi(LocationServices.API)
                 .addScope(Plus.SCOPE_PLUS_LOGIN).build();
+        googleApiClient.connect();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
         googlePlayServiceUtils.checkGooglePlayServicesInstallationStatus(this);
-        checkRegisteredUser();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         googlePlayServiceUtils.checkGooglePlayServicesInstallationStatus(this);
-        checkGcmRegistration();
-        checkRegisteredUser();
         bus.register(this);
+
+        if (!googleApiClient.isConnecting() && !googleApiClient.isConnected()) {
+            googleApiClient.connect();
+        }
     }
 
     @Override
@@ -110,13 +108,9 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
                     finish();
                 }
                 return;
-            case SIGN_IN_ERROR_RESOLUTION:
-                intentInProgress = false;
-                if (resultCode != RESULT_OK) {
-                    // TODO: handle this error condition
-                }
-
-                if (!googleApiClient.isConnecting()) {
+            case CONNECTION_FAILURE_ERROR_RESOLUTION:
+                if (resultCode == RESULT_OK) {
+                    // Try again
                     googleApiClient.connect();
                 }
                 return;
@@ -126,67 +120,68 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
 
     @Override
     public void onConnectionSuspended(int arg0) {
-        googleApiClient.connect();
+        Log.i(AbstractActivity.class.getName(), "GoogleApiClient connection has been suspended");
+
+        // Reconnecting as we need the google api client for location updates
+        if (!googleApiClient.isConnecting()) {
+            googleApiClient.connect();
+        }
     }
 
     @Override
     public void onConnected(Bundle arg0) {
-        // Get user's information
-        try {
-            if (Plus.PeopleApi.getCurrentPerson(googleApiClient) != null) {
-                String accountName = Plus.AccountApi.getAccountName(googleApiClient);
-                userService.registerNewUser(accountName);
-            } else {
-                // TODO: handle this error condition
+        // Google API client is connected
+
+        // Check user registration
+        if (!userService.isRegistrationCompleted() || !gcmMessagingService.isGcmRegistrationCompleted()) {
+            if (!userService.isRegistrationCompleted()) {
+                // Get user's information
+                if (Plus.PeopleApi.getCurrentPerson(googleApiClient) != null) {
+                    String accountName = Plus.AccountApi.getAccountName(googleApiClient);
+                    userService.registerNewUser(accountName);
+                } else {
+                    throw new IllegalArgumentException("No account name defined");
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            // TODO: handle this error condition
+
+            if (!gcmMessagingService.isGcmRegistrationCompleted()) {
+                gcmMessagingService.registerWithGcm();
+            }
+        } else {
+            // Registration is completed
+
+            if (getRedirectActivityClass() != null) {
+                Intent startDestinationActivity = new Intent(this, getRedirectActivityClass());
+                startActivity(startDestinationActivity);
+            }
+
+            if (terminateActivityAfterRedirect()) {
+                finish();
+            }
         }
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
+        // Google API client encountered an error while connecting
+
         if (!result.hasResolution()) {
             GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this, 0).show();
-            return;
-        }
-
-        if (!intentInProgress) {
-            // Store the ConnectionResult for later usage
-            connectionResult = result;
-            resolveSignInError();
-        }
-    }
-
-    private void checkRegisteredUser() {
-        if (userService.isRegistrationCompleted()) {
-            Intent intent = new Intent(this, ShowResourcesActivity.class);
-            startActivity(intent);
-            finish();
         } else {
-            // Sign-in into google
-            if (!googleApiClient.isConnecting()) {
-                intentInProgress = true;
-                resolveSignInError();
-            }
-        }
-    }
-
-    private void resolveSignInError() {
-        if (connectionResult.hasResolution()) {
             try {
-                connectionResult.startResolutionForResult(this, SIGN_IN_ERROR_RESOLUTION);
+                result.startResolutionForResult(this, CONNECTION_FAILURE_ERROR_RESOLUTION);
             } catch (IntentSender.SendIntentException e) {
-                intentInProgress = false;
+                // Try again
                 googleApiClient.connect();
             }
         }
     }
 
-    private void checkGcmRegistration() {
-        if (!gcmMessagingService.isGcmRegistrationCompleted()) {
-            gcmMessagingService.registerWithGcm();
-        }
+    protected Location getLastKnownLocation() {
+        return LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
     }
+
+    protected abstract Class getRedirectActivityClass();
+
+    protected abstract boolean terminateActivityAfterRedirect();
 }

@@ -11,4 +11,14 @@ public class InitActivity extends AbstractActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_init);
     }
+
+    @Override
+    protected Class getRedirectActivityClass() {
+        return ShowResourcesActivity.class;
+    }
+
+    @Override
+    protected boolean terminateActivityAfterRedirect() {
+        return true;
+    }
 }

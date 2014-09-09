@@ -1,6 +1,7 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -129,11 +130,13 @@ public class GcmMessagingServiceImpl {
         sendGcmMessage(data);
     }
 
-    public void updateUserDetails(String currentPosition) {
+    public void updateUserDetails(Location location) {
         Bundle data = new Bundle();
         data.putString("action", GcmMessage.UPDATE_USER_DETAILS.getStringValue());
         data.putString("userId", userService.readRegisteredUserId());
-        data.putString("currentPosition", currentPosition);
+
+        // TODO: handle location update
+        //data.putString("currentPosition", currentPosition);
 
         sendGcmMessage(data);
     }
