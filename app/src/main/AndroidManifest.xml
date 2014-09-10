@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="info.ferrarimarco.uniroma2.msa.resourcesharing.app">
+          package="info.ferrarimarco.uniroma2.msa.resourcesharing.app">
 
-    <uses-permission android:name="android.permission.READ_PROFILE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PROFILE"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <!-- For Google Cloud Messaging -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <!-- This permission prevents other applications from receiving the GCM message for your application -->
     <permission
         android:name="info.ferrarimarco.uniroma2.msa.resourcesharing.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
+        android:protectionLevel="signature"/>
 
-    <uses-permission android:name="info.ferrarimarco.uniroma2.msa.resourcesharing.permission.C2D_MESSAGE" />
+    <uses-permission android:name="info.ferrarimarco.uniroma2.msa.resourcesharing.permission.C2D_MESSAGE"/>
 
     <application
         android:allowBackup="true"
@@ -27,7 +27,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:value="@integer/google_play_services_version"/>
 
         <activity
             android:name=".activities.InitActivity"
@@ -35,9 +35,9 @@
             android:noHistory="true"
             android:windowSoftInputMode="adjustResize|stateVisible">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
@@ -46,7 +46,7 @@
             android:parentActivityName=".activities.InitActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.InitActivity" />
+                android:value="info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.InitActivity"/>
         </activity>
         <activity
             android:name=".activities.CreateNewResourceActivity"
@@ -54,25 +54,29 @@
             android:parentActivityName=".activities.ShowResourcesActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.ShowResourcesActivity" />
+                android:value="info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.ShowResourcesActivity"/>
         </activity>
 
         <receiver
             android:name="broadcastreceiver.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <action android:name="info.ferrarimarco.uniroma2.msa.resourcesharing.ACK_REQUEST" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
+                <action android:name="info.ferrarimarco.uniroma2.msa.resourcesharing.ACK_REQUEST"/>
 
-                <category android:name="info.ferrarimarco.uniroma2.msa.resourcesharing" />
+                <category android:name="info.ferrarimarco.uniroma2.msa.resourcesharing"/>
             </intent-filter>
         </receiver>
 
-        <service android:name=".services.intent.GcmIntentServiceImpl" />
+        <service android:name=".services.intent.GcmIntentServiceImpl"/>
         <service
             android:name=".services.intent.ResourceIntentService"
-            android:exported="false" />
+            android:exported="false"/>
+        <service
+            android:name=".services.intent.UserIntentService"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

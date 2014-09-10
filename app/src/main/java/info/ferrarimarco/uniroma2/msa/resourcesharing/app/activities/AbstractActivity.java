@@ -3,9 +3,7 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -25,7 +23,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gms.GooglePla
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
-public abstract class AbstractActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public abstract class AbstractActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     protected ObjectGraph objectGraph;
 
@@ -46,7 +44,7 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
     private static final int CONNECTION_FAILURE_ERROR_RESOLUTION = 1002;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
         ButterKnife.inject(this);
@@ -57,42 +55,37 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
         googlePlayServiceUtils.checkGooglePlayServicesInstallationStatus(this);
 
         // Initializing google plus api client
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Plus.API)
-                .addApi(LocationServices.API)
-                .addScope(Plus.SCOPE_PLUS_LOGIN).build();
+        googleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(Plus.API).addApi(LocationServices.API).addScope(Plus.SCOPE_PLUS_LOGIN).build();
         googleApiClient.connect();
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart(){
         super.onStart();
         googlePlayServiceUtils.checkGooglePlayServicesInstallationStatus(this);
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume(){
         super.onResume();
         googlePlayServiceUtils.checkGooglePlayServicesInstallationStatus(this);
         bus.register(this);
 
-        if (!googleApiClient.isConnecting() && !googleApiClient.isConnected()) {
+        if(!googleApiClient.isConnecting() && !googleApiClient.isConnected()){
             googleApiClient.connect();
         }
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop(){
         super.onStop();
-        if (googleApiClient.isConnected()) {
+        if(googleApiClient.isConnected()){
             googleApiClient.disconnect();
         }
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause(){
         super.onPause();
 
         // Always unregister when an object no longer should be on the bus.
@@ -100,17 +93,17 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        switch(requestCode){
             case GooglePlayServiceUtils.REQUEST_CODE_RECOVER_PLAY_SERVICES:
-                if (resultCode == RESULT_CANCELED) {
+                if(resultCode == RESULT_CANCELED){
                     Toast.makeText(this, getResources().getString(R.string.google_play_services_missing_text), Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 return;
             case CONNECTION_FAILURE_ERROR_RESOLUTION:
-                if (resultCode == RESULT_OK) {
-                    // Try again
+                if(resultCode == RESULT_OK){
+                    // Try again to connect
                     googleApiClient.connect();
                 }
                 return;
@@ -119,66 +112,60 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
     }
 
     @Override
-    public void onConnectionSuspended(int arg0) {
-        Log.i(AbstractActivity.class.getName(), "GoogleApiClient connection has been suspended");
-
+    public void onConnectionSuspended(int arg0){
         // Reconnecting as we need the google api client for location updates
-        if (!googleApiClient.isConnecting()) {
+        if(!googleApiClient.isConnecting()){
             googleApiClient.connect();
         }
     }
 
     @Override
-    public void onConnected(Bundle arg0) {
+    public void onConnected(Bundle arg0){
         // Google API client is connected
 
         // Check user registration
-        if (!userService.isRegistrationCompleted() || !gcmMessagingService.isGcmRegistrationCompleted()) {
-            if (!userService.isRegistrationCompleted()) {
+        if(!userService.isRegistrationCompleted() || !gcmMessagingService.isGcmRegistrationCompleted()){
+            if(!userService.isRegistrationCompleted()){
                 // Get user's information
-                if (Plus.PeopleApi.getCurrentPerson(googleApiClient) != null) {
+                if(Plus.PeopleApi.getCurrentPerson(googleApiClient) != null){
                     String accountName = Plus.AccountApi.getAccountName(googleApiClient);
                     userService.registerNewUser(accountName);
-                } else {
+                }else{
                     throw new IllegalArgumentException("No account name defined");
                 }
             }
 
-            if (!gcmMessagingService.isGcmRegistrationCompleted()) {
+            if(!gcmMessagingService.isGcmRegistrationCompleted()){
                 gcmMessagingService.registerWithGcm();
             }
-        } else {
+        }else{
             // Registration is completed
 
-            if (getRedirectActivityClass() != null) {
+            if(getRedirectActivityClass() != null){
                 Intent startDestinationActivity = new Intent(this, getRedirectActivityClass());
                 startActivity(startDestinationActivity);
             }
 
-            if (terminateActivityAfterRedirect()) {
+            if(terminateActivityAfterRedirect()){
                 finish();
             }
         }
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult result) {
+    public void onConnectionFailed(ConnectionResult result){
         // Google API client encountered an error while connecting
 
-        if (!result.hasResolution()) {
+        if(!result.hasResolution()){
             GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this, 0).show();
-        } else {
-            try {
+        }else{
+            try{
                 result.startResolutionForResult(this, CONNECTION_FAILURE_ERROR_RESOLUTION);
-            } catch (IntentSender.SendIntentException e) {
+            }catch(IntentSender.SendIntentException e){
                 // Try again
                 googleApiClient.connect();
             }
         }
-    }
-
-    protected Location getLastKnownLocation() {
-        return LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
     }
 
     protected abstract Class getRedirectActivityClass();

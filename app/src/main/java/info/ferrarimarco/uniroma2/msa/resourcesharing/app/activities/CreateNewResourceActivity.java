@@ -1,9 +1,12 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+
+import com.google.android.gms.location.LocationServices;
 
 import org.joda.time.DateTime;
 
@@ -68,5 +71,9 @@ public class CreateNewResourceActivity extends AbstractActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private Location getLastKnownLocation(){
+        return LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
     }
 }

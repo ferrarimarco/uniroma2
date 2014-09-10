@@ -26,12 +26,13 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTas
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.AdapterModuleImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.UserIntentService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
 
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.CREATED_BY_ME;
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.NEW;
 
-public class ShowResourcesActivity extends AbstractActivity implements ActionBar.OnNavigationListener, SwipeRefreshLayout.OnRefreshListener, LocationListener {
+public class ShowResourcesActivity extends AbstractActivity implements ActionBar.OnNavigationListener, SwipeRefreshLayout.OnRefreshListener, LocationListener{
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -51,7 +52,7 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     private ResourceArrayAdapter resourceArrayAdapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         objectGraph = objectGraph.plus(new AdapterModuleImpl(this));
 
@@ -60,13 +61,13 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
         // Set up the action bar to show a dropdown list.
         final ActionBar actionBar = getActionBar();
 
-        if (actionBar != null) {
+        if(actionBar != null){
             // Set up the dropdown list navigation in the action bar.
             Resource.ResourceType[] resourceTypes = Resource.ResourceType.values();
             String[] resourceTypeLabels = new String[resourceTypes.length];
 
-            for (Resource.ResourceType resourceType : resourceTypes) {
-                switch (resourceType) {
+            for(Resource.ResourceType resourceType : resourceTypes){
+                switch(resourceType){
                     case NEW:
                         resourceTypeLabels[Resource.ResourceType.NEW.ordinal()] = getString(R.string.title_section_new_resource);
                         break;
@@ -80,23 +81,14 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
 
-            actionBar.setListNavigationCallbacks(
-                    new ArrayAdapter<>(
-                            actionBar.getThemedContext(),
-                            android.R.layout.simple_list_item_1,
-                            android.R.id.text1,
-                            resourceTypeLabels),
-                    this);
+            actionBar.setListNavigationCallbacks(new ArrayAdapter<>(actionBar.getThemedContext(), android.R.layout.simple_list_item_1, android.R.id.text1, resourceTypeLabels), this);
         }
 
         resourceArrayAdapter = objectGraph.get(ResourceArrayAdapter.class);
         resourcesListView.setAdapter(resourceArrayAdapter);
 
         swipeLayout.setOnRefreshListener(this);
-        swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
+        swipeLayout.setColorScheme(android.R.color.holo_blue_bright, android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light);
 
         // Request for location updates
         // TODO: configure this request
@@ -108,56 +100,55 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     }
 
     @Override
-    protected Class getRedirectActivityClass() {
+    protected Class getRedirectActivityClass(){
         return null;
     }
 
     @Override
-    protected boolean terminateActivityAfterRedirect() {
+    protected boolean terminateActivityAfterRedirect(){
         return false;
     }
 
 
     @Override
-    public void onRefresh() {
-        if (getActionBar() != null) {
+    public void onRefresh(){
+        if(getActionBar() != null){
             loadResources(getActionBar().getSelectedNavigationIndex());
         }
     }
 
     @Override
-    public boolean onNavigationItemSelected(int position, long id) {
+    public boolean onNavigationItemSelected(int position, long id){
         loadResources(position);
         return true;
     }
 
     @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
+    public void onRestoreInstanceState(Bundle savedInstanceState){
         // Restore the previously serialized current dropdown position.
-        if (getActionBar() != null && savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
-            getActionBar().setSelectedNavigationItem(
-                    savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
+        if(getActionBar() != null && savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)){
+            getActionBar().setSelectedNavigationItem(savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
         }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        if (getActionBar() != null) {
+    public void onSaveInstanceState(Bundle outState){
+        if(getActionBar() != null){
             // Serialize the current dropdown position.
             outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getActionBar().getSelectedNavigationIndex());
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu){
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.show_resources, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
             case R.id.action_new_resource:
                 Intent intent = new Intent(this, CreateNewResourceActivity.class);
                 startActivity(intent);
@@ -169,18 +160,18 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
         }
     }
 
-    private void loadResources(int resourceTypeId) {
+    private void loadResources(int resourceTypeId){
         swipeLayout.setRefreshing(true);
 
         Resource.ResourceType resourceType = NEW;
 
-        if (CREATED_BY_ME.ordinal() == resourceTypeId) {
+        if(CREATED_BY_ME.ordinal() == resourceTypeId){
             resourceType = CREATED_BY_ME;
-        } else if (NEW.ordinal() == resourceTypeId) {
+        }else if(NEW.ordinal() == resourceTypeId){
             resourceType = NEW;
         }
 
-        switch (resourceType) {
+        switch(resourceType){
             case NEW:
                 resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_NEW_RESOURCES_LOCAL);
                 break;
@@ -191,18 +182,17 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     }
 
     @Subscribe
-    public void resourceListAvailable(ResourceListAvailableEvent event) {
+    public void resourceListAvailable(ResourceListAvailableEvent event){
         ResourceTaskResult result = event.getResult();
 
-        if (getActionBar() != null) {
-            if (ResourceTaskType.READ_NEW_RESOURCES_LOCAL.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.NEW.ordinal()
-                    || ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.CREATED_BY_ME.ordinal()) {
-                if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
+        if(getActionBar() != null){
+            if(ResourceTaskType.READ_NEW_RESOURCES_LOCAL.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.NEW.ordinal() || ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.CREATED_BY_ME.ordinal()){
+                if(TaskResultType.SUCCESS.equals(result.getTaskResultType())){
                     resourceArrayAdapter.clear();
                     resourceArrayAdapter.addAll(result.getResources());
                     resourceArrayAdapter.notifyDataSetChanged();
-                } else if (TaskResultType.FAILURE.equals(result.getTaskResultType())) {
-                    // TODO: handle this error condition
+                }else if(TaskResultType.FAILURE.equals(result.getTaskResultType())){
+                    throw new IllegalStateException("Unable to read from internal data storage");
                 }
             }
         }
@@ -211,7 +201,7 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        //TODO: implement this
+    public void onLocationChanged(Location location){
+        UserIntentService.startActionUpdateUserInfo(this, location);
     }
 }
