@@ -11,34 +11,33 @@ import javax.inject.Inject;
 
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.broadcastreceiver.GcmBroadcastReceiver;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
-public class GcmIntentServiceImpl extends IntentService {
+public class GcmIntentServiceImpl extends IntentService{
 
     @Inject
     Bus bus;
 
-    public GcmIntentServiceImpl() {
+    public GcmIntentServiceImpl(){
         super("GcmIntentService");
     }
 
     @Override
-    public void onCreate() {
+    public void onCreate(){
         ObjectGraph objectGraph = ObjectGraphUtils.getObjectGraph(this);
         objectGraph.inject(this);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleIntent(Intent intent){
         Bundle extras = intent.getExtras();
 
         // The getMessageType() intent parameter must be the intent you received
         // in your BroadcastReceiver.
-        if (extras != null && !extras.isEmpty()) {
+        if(extras != null && !extras.isEmpty()){
             GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
             String messageType = gcm.getMessageType(intent);
-            switch (messageType) {
+            switch(messageType){
                 case GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR:
                     //sendNotification("Send error: " + extras.toString(), null);
                     break;
@@ -46,12 +45,6 @@ public class GcmIntentServiceImpl extends IntentService {
                     //sendNotification("Deleted messages on server: " + extras.toString(), null);
                     break;
                 case GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE:
-                    String receivedAction = intent.getExtras().getString("action");
-                    if (GcmMessagingServiceImpl.GcmMessage.NEW_RESOURCE_FROM_ME.getStringValue().equals(receivedAction)) {
-                        String androidId = extras.getString("androidId");
-
-                        ResourceIntentService.startActionAckSavedResource(this, Long.parseLong(androidId));
-                    }
                     break;
             }
 

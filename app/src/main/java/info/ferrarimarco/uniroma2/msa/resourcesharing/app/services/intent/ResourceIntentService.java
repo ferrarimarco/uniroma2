@@ -21,13 +21,11 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
  * <p/>
  * helper methods.
  */
-public class ResourceIntentService extends IntentService {
+public class ResourceIntentService extends IntentService{
 
     private static final String ACTION_SAVE_RESOURCE = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.SAVE_RESOURCE";
-    private static final String ACTION_ACK_SAVED_RESOURCE = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.ACTION_ACK_SAVED_RESOURCE";
 
     private static final String EXTRA_PARAM_RESOURCE_TO_SAVE = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.extra.RESOURCE_TO_SAVE";
-    private static final String EXTRA_PARAM_RESOURCE_ID_TO_ACK = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.extra.RESOURCE_ID_TO_ACK";
 
     @Inject
     ResourceService resourceService;
@@ -36,7 +34,7 @@ public class ResourceIntentService extends IntentService {
     GcmMessagingServiceImpl gcmMessagingService;
 
     @Override
-    public void onCreate() {
+    public void onCreate(){
         super.onCreate();
         ObjectGraph objectGraph = ObjectGraphUtils.getObjectGraph(this);
         objectGraph.inject(this);
@@ -48,40 +46,24 @@ public class ResourceIntentService extends IntentService {
      *
      * @see IntentService
      */
-    public static void startActionSaveResource(Context context, Resource resource) {
+    public static void startActionSaveResource(Context context, Resource resource){
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_SAVE_RESOURCE);
         intent.putExtra(EXTRA_PARAM_RESOURCE_TO_SAVE, resource);
         context.startService(intent);
     }
 
-    /**
-     * Starts this service to perform action ACK_SAVED_RESOURCE with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    public static void startActionAckSavedResource(Context context, Long resourceId) {
-        Intent intent = new Intent(context, ResourceIntentService.class);
-        intent.setAction(ACTION_ACK_SAVED_RESOURCE);
-        intent.putExtra(EXTRA_PARAM_RESOURCE_ID_TO_ACK, resourceId);
-        context.startService(intent);
-    }
-
-    public ResourceIntentService() {
+    public ResourceIntentService(){
         super("ResourceIntentService");
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
+    protected void onHandleIntent(Intent intent){
+        if(intent != null){
             final String action = intent.getAction();
-            if (ACTION_SAVE_RESOURCE.equals(action)) {
+            if(ACTION_SAVE_RESOURCE.equals(action)){
                 final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE_TO_SAVE);
                 handleActionSaveResource(resource);
-            } else if (ACTION_ACK_SAVED_RESOURCE.equals(action)) {
-                Long resourceId = intent.getLongExtra(EXTRA_PARAM_RESOURCE_ID_TO_ACK, -1L);
-                handleActionAckSavedResource(resourceId);
             }
         }
     }
@@ -90,33 +72,15 @@ public class ResourceIntentService extends IntentService {
      * Handle action Save resource in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionSaveResource(Resource resource) {
+    private void handleActionSaveResource(Resource resource){
         ResourceTaskResult resourceTaskResult = resourceService.saveResourceLocal(resource);
 
-        if (TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())) {
+        if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
             throw new RuntimeException("Unable to save the resource into local storage");
         }
 
         resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL);
 
         gcmMessagingService.sendNewResource(resource);
-    }
-
-    /**
-     * Handle action ACK Saved resource in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionAckSavedResource(Long resourceId) {
-        if (resourceId.equals(-1L)) {
-            throw new IllegalArgumentException("Unable to ack saved resource");
-        }
-
-        ResourceTaskResult resourceTaskResult = resourceService.updateResourceSentToBackend(resourceId);
-
-        if (TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())) {
-            throw new RuntimeException("Unable to ACK saved resource");
-        }
-
-        resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL);
     }
 }

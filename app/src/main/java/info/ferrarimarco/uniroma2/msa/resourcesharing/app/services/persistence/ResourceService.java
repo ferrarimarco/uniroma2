@@ -19,7 +19,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTas
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
-public class ResourceService {
+public class ResourceService{
 
     protected ObjectGraph objectGraph;
 
@@ -30,18 +30,18 @@ public class ResourceService {
     GenericDao<Resource> resourceDao;
 
     @Inject
-    public ResourceService(Context context) {
+    public ResourceService(Context context){
         objectGraph = ObjectGraphUtils.getObjectGraph(context);
     }
 
-    public void readResourcesFromLocalStorage(ResourceTaskType resourceTaskType) {
-        new AsyncTask<ResourceTaskType, Void, ResourceTaskResult>() {
+    public void readResourcesFromLocalStorage(ResourceTaskType resourceTaskType){
+        new AsyncTask<ResourceTaskType, Void, ResourceTaskResult>(){
             @Override
-            protected ResourceTaskResult doInBackground(ResourceTaskType... params) {
+            protected ResourceTaskResult doInBackground(ResourceTaskType... params){
                 ResourceTaskResult result = new ResourceTaskResult(params[0]);
-                try {
+                try{
                     resourceDao.open(Resource.class);
-                } catch (SQLException e) {
+                }catch(SQLException e){
                     e.printStackTrace();
                     result.setTaskResultType(TaskResultType.FAILURE);
                     return result;
@@ -50,13 +50,13 @@ public class ResourceService {
                 List<Resource> resources = result.getResources();
                 Resource res = new Resource();
 
-                try {
+                try{
                     resources = resourceDao.read(res);
-                } catch (SQLException e) {
+                }catch(SQLException e){
                     e.printStackTrace();
                     result.setTaskResultType(TaskResultType.FAILURE);
                     return result;
-                } finally {
+                }finally{
                     resourceDao.close();
                 }
 
@@ -66,62 +66,26 @@ public class ResourceService {
             }
 
             @Override
-            protected void onPostExecute(ResourceTaskResult result) {
+            protected void onPostExecute(ResourceTaskResult result){
                 bus.post(new ResourceListAvailableEvent(result));
             }
         }.execute(resourceTaskType);
     }
 
-    public ResourceTaskResult saveResourceLocal(Resource resource) {
+    public ResourceTaskResult saveResourceLocal(Resource resource){
         ResourceTaskResult result;
-        try {
+        try{
             resourceDao.open(Resource.class);
             resourceDao.save(resource);
             result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_FROM_ME_LOCAL, TaskResultType.SUCCESS);
-        } catch (SQLException e) {
+        }catch(SQLException e){
             e.printStackTrace();
             result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_FROM_ME_LOCAL, TaskResultType.FAILURE);
-        } finally {
+        }finally{
             resourceDao.close();
         }
 
         result.addResource(resource);
-        return result;
-    }
-
-    public ResourceTaskResult updateResourceSentToBackend(Long id) {
-        ResourceTaskResult result;
-
-        List<Resource> resources = null;
-
-        try {
-            resourceDao.open(Resource.class);
-
-            Resource res = new Resource();
-            res.setAndroidId(id);
-
-            resources = resourceDao.read(res);
-
-            if (resources == null || resources.size() > 1) {
-                throw new IllegalStateException("Error while reading resource from DB");
-            }
-
-            res = resources.get(0);
-            res.setSentToBackend(true);
-            resourceDao.update(res);
-
-            result = new ResourceTaskResult(ResourceTaskType.UPDATE_RESOURCE_SENT_TO_BACKEND, TaskResultType.SUCCESS);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            result = new ResourceTaskResult(ResourceTaskType.UPDATE_RESOURCE_SENT_TO_BACKEND, TaskResultType.FAILURE);
-        } finally {
-            resourceDao.close();
-        }
-
-        if (resources != null) {
-            result.addResource(resources.get(0));
-        }
-
         return result;
     }
 }
