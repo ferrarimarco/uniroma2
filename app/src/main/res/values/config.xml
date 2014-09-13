@@ -13,6 +13,7 @@
     <!-- 86400 = 1 Day -->
     <string name="gcm_project_id">uniroma2-msa-ferrarimarco</string>
     <string name="gcm_ttl">86400</string>
+    <string name="gcm_max_ttl">2419200</string>
     <string name="shared_preferences_id">info.ferrarimarco.uniroma2.msa.resourcesharing.app_preferences</string>
     <string name="gcm_registration_id_key">gcm_registration_id</string>
     <string name="google_account_name_key">google_account_name</string>
