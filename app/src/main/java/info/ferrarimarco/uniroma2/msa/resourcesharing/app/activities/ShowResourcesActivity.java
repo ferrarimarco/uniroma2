@@ -25,7 +25,6 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceLi
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.AdapterModuleImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.UserIntentService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
 
@@ -54,7 +53,6 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        objectGraph = objectGraph.plus(new AdapterModuleImpl(this));
 
         setContentView(R.layout.activity_show_resources);
 
@@ -84,7 +82,7 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
             actionBar.setListNavigationCallbacks(new ArrayAdapter<>(actionBar.getThemedContext(), android.R.layout.simple_list_item_1, android.R.id.text1, resourceTypeLabels), this);
         }
 
-        resourceArrayAdapter = objectGraph.get(ResourceArrayAdapter.class);
+        resourceArrayAdapter = new ResourceArrayAdapter(this);
         resourcesListView.setAdapter(resourceArrayAdapter);
 
         swipeLayout.setOnRefreshListener(this);
@@ -94,8 +92,8 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
         // TODO: configure this request
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        locationRequest.setInterval(1000); // Update location every second
-        locationRequest.setFastestInterval(500);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(10000);
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
 
