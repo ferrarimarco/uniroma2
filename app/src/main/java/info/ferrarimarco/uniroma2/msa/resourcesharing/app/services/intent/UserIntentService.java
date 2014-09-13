@@ -8,6 +8,7 @@ import android.location.Location;
 import javax.inject.Inject;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.location.LocationService;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -34,6 +35,9 @@ public class UserIntentService extends IntentService{
     }
 
     @Inject
+    LocationService locationService;
+
+    @Inject
     GcmMessagingServiceImpl gcmMessagingService;
 
     public UserIntentService(){
@@ -56,6 +60,6 @@ public class UserIntentService extends IntentService{
      * parameters.
      */
     private void handleActionUpdateUserInfo(Location location){
-        gcmMessagingService.updateUserDetails(location);
+        gcmMessagingService.updateUserDetails(locationService.resolveAddress(location));
     }
 }

@@ -15,7 +15,6 @@
     <string name="action_save_new_resource">Save New Resource</string>
     <string name="resource_title_hint">Title</string>
     <string name="resource_description_hint">Description</string>
-    <string name="resource_location_hint">Location</string>
     <string name="resource_acquisition_mode_hint">Acquisition Mode</string>
 
     <!-- Errors -->

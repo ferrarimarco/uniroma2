@@ -23,9 +23,6 @@ public class CreateNewResourceActivity extends AbstractActivity{
     @InjectView(R.id.resourceDescriptionEditText)
     EditText descriptionEditText;
 
-    @InjectView(R.id.resourceLocationEditText)
-    EditText locationEditText;
-
     @InjectView(R.id.resourceAcquisitionModeEditText)
     EditText acquisitionModeEditText;
 
@@ -63,9 +60,8 @@ public class CreateNewResourceActivity extends AbstractActivity{
             String title = titleEditText.getText().toString();
             String description = descriptionEditText.getText().toString();
             String acquisitionMode = acquisitionModeEditText.getText().toString();
-            String location = locationEditText.getText().toString();
 
-            Resource resource = new Resource(title, description, location, DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false);
+            Resource resource = new Resource(title, description, this.getLastKnownLocation(), DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, timeToLive);
             ResourceIntentService.startActionSaveResource(getApplicationContext(), resource);
             finish();
         }

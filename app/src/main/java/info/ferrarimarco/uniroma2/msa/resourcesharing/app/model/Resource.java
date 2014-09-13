@@ -1,5 +1,6 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.model;
 
+import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,6 +12,14 @@ import org.joda.time.DateTime;
 
 @DatabaseTable
 public class Resource implements GenericEntity, Parcelable{
+
+    public Long getTimeToLive(){
+        return timeToLive;
+    }
+
+    public void setTimeToLive(Long timeToLive){
+        this.timeToLive = timeToLive;
+    }
 
     public enum ResourceType{
         NEW,
@@ -33,16 +42,13 @@ public class Resource implements GenericEntity, Parcelable{
     private Long androidId;
 
     @DatabaseField
-    private String backendId;
-
-    @DatabaseField
     private String title;
 
     @DatabaseField
     private String description;
 
     @DatabaseField
-    private String location;
+    private Location location;
 
     @DatabaseField
     private DateTime creationTime;
@@ -59,12 +65,14 @@ public class Resource implements GenericEntity, Parcelable{
     @DatabaseField
     private Boolean expired;
 
+    private Long timeToLive;
+
     public Resource(){
         type = ResourceType.NEW;
         expired = false;
     }
 
-    public Resource(String title, String description, String location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired){
+    public Resource(String title, String description, Location location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired, Long timeToLive){
         this();
         this.title = title;
         this.description = description;
@@ -74,19 +82,20 @@ public class Resource implements GenericEntity, Parcelable{
         this.creatorId = creatorId;
         this.type = type;
         this.expired = expired;
+        this.timeToLive = timeToLive;
     }
 
     public Resource(Parcel in){
         this.androidId = in.readLong();
-        this.backendId = in.readString();
         this.title = in.readString();
         this.description = in.readString();
-        this.location = in.readString();
+        location = Location.CREATOR.createFromParcel(in);
         this.creationTime = (DateTime) in.readSerializable();
         this.acquisitionMode = in.readString();
         this.creatorId = in.readString();
         this.type = (ResourceType) in.readSerializable();
         this.expired = in.readByte() != 0;
+        this.timeToLive = in.readLong();
     }
 
     @Override
@@ -97,22 +106,21 @@ public class Resource implements GenericEntity, Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags){
         dest.writeLong(androidId);
-        dest.writeString(backendId);
         dest.writeString(title);
         dest.writeString(description);
-        dest.writeString(location);
+        location.writeToParcel(dest, flags);
         dest.writeSerializable(creationTime);
         dest.writeString(acquisitionMode);
         dest.writeString(creatorId);
         dest.writeSerializable(type);
         dest.writeByte((byte) (expired ? 1 : 0));
+        dest.writeLong(timeToLive);
     }
 
     @Override
     public String toString(){
         return "Resource{" +
                 "androidId='" + androidId + '\'' +
-                ", backendId='" + backendId + '\'' +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", location='" + location + '\'' +
@@ -121,6 +129,7 @@ public class Resource implements GenericEntity, Parcelable{
                 ", creatorId='" + creatorId + '\'' +
                 ", type='" + type.toString() + '\'' +
                 ", IsExpired='" + expired.toString() + '\'' +
+                ", TimeToLive='" + timeToLive.toString() + '\'' +
                 '}';
     }
 
@@ -149,16 +158,15 @@ public class Resource implements GenericEntity, Parcelable{
             return false;
         if(type != null ? !type.equals(resource.type) : resource.type != null)
             return false;
-        if(expired != null ? !expired.equals(resource.expired) : resource.expired != null)
+        if(timeToLive != null ? timeToLive.equals(resource.timeToLive) : resource.timeToLive != null)
             return false;
-        return !(backendId != null ? !backendId.equals(resource.backendId) : resource.backendId != null);
+        return !(expired != null ? !expired.equals(resource.expired) : resource.expired != null);
 
     }
 
     @Override
     public int hashCode(){
         int result = androidId != null ? androidId.hashCode() : 0;
-        result = 31 * result + (backendId != null ? backendId.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (location != null ? location.hashCode() : 0);
@@ -202,11 +210,11 @@ public class Resource implements GenericEntity, Parcelable{
         this.creationTime = creationTime;
     }
 
-    public String getLocation(){
+    public Location getLocation(){
         return location;
     }
 
-    public void setLocation(String location){
+    public void setLocation(Location location){
         this.location = location;
     }
 
@@ -240,13 +248,5 @@ public class Resource implements GenericEntity, Parcelable{
 
     public void setExpired(Boolean expired){
         this.expired = expired;
-    }
-
-    public String getBackendId(){
-        return backendId;
-    }
-
-    public void setBackendId(String backendId){
-        this.backendId = backendId;
     }
 }
