@@ -19,4 +19,14 @@
 
     <!-- Errors -->
     <string name="google_play_services_missing_text">Google Play Services must be installed</string>
+
+    <string name="minutes">minutes</string>
+    <string name="hours">hours</string>
+    <string name="days">days</string>
+
+    <string-array name="resource_ttl_array">
+        <item>@string/minutes</item>
+        <item>@string/hours</item>
+        <item>@string/days</item>
+    </string-array>
 </resources>

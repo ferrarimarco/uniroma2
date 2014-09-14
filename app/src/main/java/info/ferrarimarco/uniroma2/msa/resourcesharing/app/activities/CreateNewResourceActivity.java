@@ -4,7 +4,10 @@ import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.google.android.gms.location.LocationServices;
 
@@ -15,7 +18,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.ResourceIntentService;
 
-public class CreateNewResourceActivity extends AbstractActivity{
+public class CreateNewResourceActivity extends AbstractActivity implements AdapterView.OnItemSelectedListener{
 
     @InjectView(R.id.resourceTitleEditText)
     EditText titleEditText;
@@ -25,6 +28,12 @@ public class CreateNewResourceActivity extends AbstractActivity{
 
     @InjectView(R.id.resourceAcquisitionModeEditText)
     EditText acquisitionModeEditText;
+
+    @InjectView(R.id.resource_ttl_amount)
+    EditText ttlAmountEditText;
+
+    @InjectView(R.id.resource_ttl_spinner)
+    Spinner ttlSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -60,8 +69,23 @@ public class CreateNewResourceActivity extends AbstractActivity{
             String title = titleEditText.getText().toString();
             String description = descriptionEditText.getText().toString();
             String acquisitionMode = acquisitionModeEditText.getText().toString();
+            Long ttlAmount = Long.parseLong(ttlAmountEditText.getText().toString());
+            String selectedTtlUnit = ttlSpinner.getSelectedItem().toString();
 
-            Resource resource = new Resource(title, description, this.getLastKnownLocation(), DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, timeToLive);
+            // In secs
+            Long resourceTtl = ttlAmount;
+
+            if(selectedTtlUnit.equals(getResources().getString(R.string.minutes))){
+                resourceTtl *= 60;
+            }else if(selectedTtlUnit.equals(getResources().getString(R.string.hours))){
+                resourceTtl *= 60 * 60;
+            }else if(selectedTtlUnit.equals(getResources().getString(R.string.days))){
+                resourceTtl *= 60 * 60 * 24;
+            }else{
+                throw new IllegalArgumentException("Unable to choose a TTL unit measure");
+            }
+
+            Resource resource = new Resource(title, description, this.getLastKnownLocation(), DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, resourceTtl);
             ResourceIntentService.startActionSaveResource(getApplicationContext(), resource);
             finish();
         }
@@ -71,5 +95,15 @@ public class CreateNewResourceActivity extends AbstractActivity{
 
     private Location getLastKnownLocation(){
         return LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
+        // TODO: handle this if necessary
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent){
+        // TODO: handle this if necessary
     }
 }
