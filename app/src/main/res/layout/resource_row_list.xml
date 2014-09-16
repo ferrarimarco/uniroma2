@@ -9,14 +9,24 @@
         android:id="@+id/resource_title_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:textSize="15dp" />
 
     <TextView
         android:id="@+id/resource_description_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/resource_acquisition_mode_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/resource_ttl_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:textSize="15dp" />
 
 </LinearLayout>

@@ -8,6 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 
 import javax.inject.Inject;
@@ -19,6 +23,8 @@ public class ResourceArrayAdapter extends ArrayAdapter<Resource> {
 
     private Context context;
     private int layoutResourceId;
+
+    private static DateTimeFormatter dateTimeFormatter = DateTimeFormat.fullDateTime();
 
     @Inject
     public ResourceArrayAdapter(Context context) {
@@ -53,6 +59,15 @@ public class ResourceArrayAdapter extends ArrayAdapter<Resource> {
         TextView resourceDescriptionTextView = (TextView) convertView.findViewById(R.id.resource_description_text_view);
         resourceDescriptionTextView.setText(resource.getDescription());
         resourceDescriptionTextView.setTag(resource.getAndroidId());
+
+        TextView resourceAcquisitionModeTextView = (TextView) convertView.findViewById(R.id.resource_acquisition_mode_text_view);
+        resourceAcquisitionModeTextView.setText(resource.getAcquisitionMode());
+        resourceAcquisitionModeTextView.setTag(resource.getAndroidId());
+
+        TextView resourceTtlTextView = (TextView) convertView.findViewById(R.id.resource_ttl_text_view);
+        DateTime ttl = new DateTime(resource.getTimeToLive());
+        resourceTtlTextView.setText(ttl.toString(dateTimeFormatter));
+        resourceTtlTextView.setTag(resource.getAndroidId());
 
         return convertView;
 

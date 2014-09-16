@@ -18,6 +18,7 @@
     <string name="resource_title_hint">Title</string>
     <string name="resource_description_hint">Description</string>
     <string name="resource_acquisition_mode_hint">Acquisition Mode</string>
+    <string name="resource_ttl_hint">TTL</string>
     <string name="resource_save_completed">New Resource Created</string>
 
     <!-- Errors -->
@@ -32,4 +33,6 @@
         <item>@string/hours</item>
         <item>@string/days</item>
     </string-array>
+
+    <string name="new_resource_notification_title">New Resource</string>
 </resources>
