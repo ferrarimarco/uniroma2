@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
 
@@ -87,6 +88,7 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
 
             Resource resource = new Resource(title, description, this.getLastKnownLocation(), DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, resourceTtl);
             ResourceIntentService.startActionSaveResource(getApplicationContext(), resource);
+            Toast.makeText(this, getResources().getString(R.string.resource_save_completed), Toast.LENGTH_SHORT).show();
             finish();
         }
 

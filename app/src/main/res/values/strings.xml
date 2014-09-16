@@ -12,10 +12,11 @@
     <string name="action_new_resource">New Resource</string>
     <string name="title_activity_create_new_resource">Create New Resource</string>
 
-    <string name="action_save_new_resource">Save New Resource</string>
+    <string name="action_save_new_resource">Create New Resource</string>
     <string name="resource_title_hint">Title</string>
     <string name="resource_description_hint">Description</string>
     <string name="resource_acquisition_mode_hint">Acquisition Mode</string>
+    <string name="resource_save_completed">New Resource Created</string>
 
     <!-- Errors -->
     <string name="google_play_services_missing_text">Google Play Services must be installed</string>
