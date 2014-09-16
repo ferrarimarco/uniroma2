@@ -50,6 +50,18 @@ public class ResourceService{
                 List<Resource> resources = result.getResources();
                 Resource res = new Resource();
 
+                switch (params[0]) {
+                    case READ_NEW_RESOURCES_LOCAL:
+                        res.setType(Resource.ResourceType.NEW);
+                        break;
+                    case READ_CREATED_BY_ME_RESOURCES_LOCAL:
+                        res.setType(Resource.ResourceType.CREATED_BY_ME);
+                        break;
+                    case READ_BOOKED_BY_ME_RESOURCES:
+                        res.setType(Resource.ResourceType.BOOKED_BY_ME);
+                        break;
+                }
+
                 try{
                     resources = resourceDao.read(res);
                 }catch(SQLException e){
