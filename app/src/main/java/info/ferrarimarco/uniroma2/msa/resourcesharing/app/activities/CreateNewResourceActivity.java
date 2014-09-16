@@ -19,7 +19,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.ResourceIntentService;
 
-public class CreateNewResourceActivity extends AbstractActivity implements AdapterView.OnItemSelectedListener{
+public class CreateNewResourceActivity extends AbstractActivity implements AdapterView.OnItemSelectedListener {
 
     @InjectView(R.id.resourceTitleEditText)
     EditText titleEditText;
@@ -37,36 +37,36 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
     Spinner ttlSpinner;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_resource);
     }
 
     @Override
-    protected Class getRedirectActivityClass(){
+    protected Class getRedirectActivityClass() {
         return null;
     }
 
     @Override
-    protected boolean terminateActivityAfterRedirect(){
+    protected boolean terminateActivityAfterRedirect() {
         return false;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.create_new_resource, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if(id == R.id.action_save_new_resource){
+        if (id == R.id.action_save_new_resource) {
             String title = titleEditText.getText().toString();
             String description = descriptionEditText.getText().toString();
             String acquisitionMode = acquisitionModeEditText.getText().toString();
@@ -76,18 +76,18 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
             // In secs
             Long resourceTtl = ttlAmount;
 
-            if(selectedTtlUnit.equals(getResources().getString(R.string.minutes))){
+            if (selectedTtlUnit.equals(getResources().getString(R.string.minutes))) {
                 resourceTtl *= 60;
-            }else if(selectedTtlUnit.equals(getResources().getString(R.string.hours))){
+            } else if (selectedTtlUnit.equals(getResources().getString(R.string.hours))) {
                 resourceTtl *= 60 * 60;
-            }else if(selectedTtlUnit.equals(getResources().getString(R.string.days))){
+            } else if (selectedTtlUnit.equals(getResources().getString(R.string.days))) {
                 resourceTtl *= 60 * 60 * 24;
-            }else{
+            } else {
                 throw new IllegalArgumentException("Unable to choose a TTL unit measure");
             }
 
             Resource resource = new Resource(title, description, this.getLastKnownLocation(), DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, resourceTtl);
-            ResourceIntentService.startActionSaveResource(getApplicationContext(), resource);
+            ResourceIntentService.startActionSaveResourceFromMe(getApplicationContext(), resource);
             Toast.makeText(this, getResources().getString(R.string.resource_save_completed), Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -95,17 +95,17 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
         return super.onOptionsItemSelected(item);
     }
 
-    private Location getLastKnownLocation(){
+    private Location getLastKnownLocation() {
         return LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         // TODO: handle this if necessary
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent){
+    public void onNothingSelected(AdapterView<?> parent) {
         // TODO: handle this if necessary
     }
 }

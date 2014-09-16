@@ -23,15 +23,20 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
  */
 public class ResourceIntentService extends IntentService{
 
-    private static final String ACTION_SAVE_RESOURCE = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.SAVE_RESOURCE";
+    private static final String ACTION_SAVE_RESOURCE_FROM_ME = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.SAVE_RESOURCE_FROM_ME";
+    private static final String ACTION_RECEIVE_RESOURCE_FROM_OTHERS = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.SAVE_RESOURCE_FROM_ME";
 
-    private static final String EXTRA_PARAM_RESOURCE_TO_SAVE = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.extra.RESOURCE_TO_SAVE";
+    private static final String EXTRA_PARAM_RESOURCE = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.extra.RESOURCE";
 
     @Inject
     ResourceService resourceService;
 
     @Inject
     GcmMessagingServiceImpl gcmMessagingService;
+
+    public ResourceIntentService() {
+        super("ResourceIntentService");
+    }
 
     @Override
     public void onCreate(){
@@ -41,29 +46,42 @@ public class ResourceIntentService extends IntentService{
     }
 
     /**
-     * Starts this service to perform action SAVE_RESOURCE with the given parameters. If
+     * Starts this service to perform action RECEIVE_RESOURCE_FROM_OTHERS with the given parameters. If
      * the service is already performing a task this action will be queued.
      *
      * @see IntentService
      */
-    public static void startActionSaveResource(Context context, Resource resource){
+    public static void startActionReceiveResourceFromOthers(Context context, Resource resource) {
         Intent intent = new Intent(context, ResourceIntentService.class);
-        intent.setAction(ACTION_SAVE_RESOURCE);
-        intent.putExtra(EXTRA_PARAM_RESOURCE_TO_SAVE, resource);
+        intent.setAction(ACTION_RECEIVE_RESOURCE_FROM_OTHERS);
+        intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
         context.startService(intent);
     }
 
-    public ResourceIntentService(){
-        super("ResourceIntentService");
+    /**
+     * Starts this service to perform action SAVE_RESOURCE_FROM_ME with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
+    public static void startActionSaveResourceFromMe(Context context, Resource resource) {
+        Intent intent = new Intent(context, ResourceIntentService.class);
+        intent.setAction(ACTION_SAVE_RESOURCE_FROM_ME);
+        intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
+        context.startService(intent);
     }
+
 
     @Override
     protected void onHandleIntent(Intent intent){
         if(intent != null){
             final String action = intent.getAction();
-            if(ACTION_SAVE_RESOURCE.equals(action)){
-                final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE_TO_SAVE);
-                handleActionSaveResource(resource);
+            if (ACTION_SAVE_RESOURCE_FROM_ME.equals(action)) {
+                final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
+                handleActionSaveResourceFromMe(resource);
+            } else if (ACTION_RECEIVE_RESOURCE_FROM_OTHERS.equals(action)) {
+                final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
+                handleActionReceiveResourceFromOthers(resource);
             }
         }
     }
@@ -72,7 +90,7 @@ public class ResourceIntentService extends IntentService{
      * Handle action Save resource in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionSaveResource(Resource resource){
+    private void handleActionSaveResourceFromMe(Resource resource) {
         ResourceTaskResult resourceTaskResult = resourceService.saveResourceLocal(resource);
 
         if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
@@ -80,7 +98,20 @@ public class ResourceIntentService extends IntentService{
         }
 
         resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL);
-
         gcmMessagingService.sendNewResource(resource);
+    }
+
+    /**
+     * Handle action Receive resource in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionReceiveResourceFromOthers(Resource resource) {
+        ResourceTaskResult resourceTaskResult = resourceService.saveResourceLocal(resource);
+
+        if (TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())) {
+            throw new RuntimeException("Unable to save the resource into local storage");
+        }
+
+        resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_NEW_RESOURCES_LOCAL);
     }
 }
