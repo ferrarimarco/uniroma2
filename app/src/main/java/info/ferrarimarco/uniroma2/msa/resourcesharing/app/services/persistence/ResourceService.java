@@ -34,6 +34,26 @@ public class ResourceService{
         objectGraph = ObjectGraphUtils.getObjectGraph(context);
     }
 
+    public Resource readResourceFromLocalStorage(Resource criterion){
+        try{
+            resourceDao.open(Resource.class);
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+
+        Resource result = null;
+
+        try{
+            result = resourceDao.readUniqueResult(criterion);
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }finally{
+            resourceDao.close();
+        }
+
+        return result;
+    }
+
     public void readResourcesFromLocalStorage(ResourceTaskType resourceTaskType){
         new AsyncTask<ResourceTaskType, Void, ResourceTaskResult>(){
             @Override
@@ -50,7 +70,7 @@ public class ResourceService{
                 List<Resource> resources = result.getResources();
                 Resource res = new Resource();
 
-                switch (params[0]) {
+                switch(params[0]){
                     case READ_NEW_RESOURCES_LOCAL:
                         res.setType(Resource.ResourceType.NEW);
                         break;
