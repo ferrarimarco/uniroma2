@@ -11,22 +11,30 @@ import org.joda.time.DateTime;
 
 
 @DatabaseTable
-public class Resource implements GenericEntity, Parcelable {
+public class Resource implements GenericEntity, Parcelable{
 
-    public enum ResourceType {
+    public String getBookerId(){
+        return bookerId;
+    }
+
+    public void setBookerId(String bookerId){
+        this.bookerId = bookerId;
+    }
+
+    public enum ResourceType{
         NEW,
         CREATED_BY_ME,
         BOOKED_BY_ME
     }
 
-    public final static Parcelable.Creator<Resource> CREATOR = new Parcelable.Creator<Resource>() {
+    public final static Parcelable.Creator<Resource> CREATOR = new Parcelable.Creator<Resource>(){
         @Override
-        public Resource createFromParcel(Parcel source) {
+        public Resource createFromParcel(Parcel source){
             return new Resource(source);
         }
 
         @Override
-        public Resource[] newArray(int size) {
+        public Resource[] newArray(int size){
             return new Resource[size];
         }
     };
@@ -58,14 +66,17 @@ public class Resource implements GenericEntity, Parcelable {
     @DatabaseField
     private Boolean expired;
 
+    @DatabaseField
+    private String bookerId;
+
     private Long timeToLive;
 
-    public Resource() {
+    public Resource(){
         type = ResourceType.NEW;
         expired = false;
     }
 
-    public Resource(String title, String description, Location location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired, Long timeToLive) {
+    public Resource(String title, String description, Location location, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired, Long timeToLive, String bookerId){
         this();
         this.title = title;
         this.description = description;
@@ -76,9 +87,10 @@ public class Resource implements GenericEntity, Parcelable {
         this.type = type;
         this.expired = expired;
         this.timeToLive = timeToLive;
+        this.bookerId = bookerId;
     }
 
-    public Resource(Parcel in) {
+    public Resource(Parcel in){
         this.androidId = in.readLong();
         this.title = in.readString();
         this.description = in.readString();
@@ -89,15 +101,16 @@ public class Resource implements GenericEntity, Parcelable {
         this.type = (ResourceType) in.readSerializable();
         this.expired = in.readByte() != 0;
         this.timeToLive = in.readLong();
+        this.bookerId = in.readString();
     }
 
     @Override
-    public int describeContents() {
+    public int describeContents(){
         return 0;
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(Parcel dest, int flags){
         dest.writeLong(androidId);
         dest.writeString(title);
         dest.writeString(description);
@@ -108,10 +121,11 @@ public class Resource implements GenericEntity, Parcelable {
         dest.writeSerializable(type);
         dest.writeByte((byte) (expired ? 1 : 0));
         dest.writeLong(timeToLive);
+        dest.writeString(bookerId);
     }
 
     @Override
-    public String toString() {
+    public String toString(){
         return "Resource{" +
                 "androidId='" + androidId + '\'' +
                 ", title='" + title + '\'' +
@@ -123,42 +137,45 @@ public class Resource implements GenericEntity, Parcelable {
                 ", type='" + type.toString() + '\'' +
                 ", IsExpired='" + expired.toString() + '\'' +
                 ", TimeToLive='" + timeToLive.toString() + '\'' +
+                ", BookerId='" + bookerId + '\'' +
                 '}';
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public boolean equals(Object o){
+        if(this == o)
             return true;
-        if (!(o instanceof Resource))
+        if(!(o instanceof Resource))
             return false;
 
         Resource resource = (Resource) o;
 
-        if (acquisitionMode != null ? !acquisitionMode.equals(resource.acquisitionMode) : resource.acquisitionMode != null)
+        if(acquisitionMode != null ? !acquisitionMode.equals(resource.acquisitionMode) : resource.acquisitionMode != null)
             return false;
-        if (creationTime != null ? !creationTime.equals(resource.creationTime) : resource.creationTime != null)
+        if(creationTime != null ? !creationTime.equals(resource.creationTime) : resource.creationTime != null)
             return false;
-        if (creatorId != null ? !creatorId.equals(resource.creatorId) : resource.creatorId != null)
+        if(creatorId != null ? !creatorId.equals(resource.creatorId) : resource.creatorId != null)
             return false;
-        if (description != null ? !description.equals(resource.description) : resource.description != null)
+        if(description != null ? !description.equals(resource.description) : resource.description != null)
             return false;
-        if (androidId != null ? !androidId.equals(resource.androidId) : resource.androidId != null)
+        if(androidId != null ? !androidId.equals(resource.androidId) : resource.androidId != null)
             return false;
-        if (location != null ? !location.equals(resource.location) : resource.location != null)
+        if(location != null ? !location.equals(resource.location) : resource.location != null)
             return false;
-        if (title != null ? !title.equals(resource.title) : resource.title != null)
+        if(title != null ? !title.equals(resource.title) : resource.title != null)
             return false;
-        if (type != null ? !type.equals(resource.type) : resource.type != null)
+        if(type != null ? !type.equals(resource.type) : resource.type != null)
             return false;
-        if (timeToLive != null ? timeToLive.equals(resource.timeToLive) : resource.timeToLive != null)
+        if(timeToLive != null ? timeToLive.equals(resource.timeToLive) : resource.timeToLive != null)
+            return false;
+        if(bookerId != null ? bookerId.equals(resource.bookerId) : resource.bookerId != null)
             return false;
         return !(expired != null ? !expired.equals(resource.expired) : resource.expired != null);
 
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode(){
         int result = androidId != null ? androidId.hashCode() : 0;
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
@@ -168,82 +185,83 @@ public class Resource implements GenericEntity, Parcelable {
         result = 31 * result + (creatorId != null ? creatorId.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (expired != null ? expired.hashCode() : 0);
+        result = 31 * result + (bookerId != null ? bookerId.hashCode() : 0);
         return result;
     }
 
-    public Long getAndroidId() {
+    public Long getAndroidId(){
         return androidId;
     }
 
-    public void setAndroidId(Long androidId) {
+    public void setAndroidId(Long androidId){
         this.androidId = androidId;
     }
 
-    public String getTitle() {
+    public String getTitle(){
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(String title){
         this.title = title;
     }
 
-    public String getDescription() {
+    public String getDescription(){
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(String description){
         this.description = description;
     }
 
-    public DateTime getCreationTime() {
+    public DateTime getCreationTime(){
         return creationTime;
     }
 
-    public void setCreationTime(DateTime creationTime) {
+    public void setCreationTime(DateTime creationTime){
         this.creationTime = creationTime;
     }
 
-    public Location getLocation() {
+    public Location getLocation(){
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(Location location){
         this.location = location;
     }
 
-    public String getAcquisitionMode() {
+    public String getAcquisitionMode(){
         return acquisitionMode;
     }
 
-    public void setAcquisitionMode(String acquisitionMode) {
+    public void setAcquisitionMode(String acquisitionMode){
         this.acquisitionMode = acquisitionMode;
     }
 
-    public String getCreatorId() {
+    public String getCreatorId(){
         return creatorId;
     }
 
-    public void setCreatorId(String creatorId) {
+    public void setCreatorId(String creatorId){
         this.creatorId = creatorId;
     }
 
-    public ResourceType getType() {
+    public ResourceType getType(){
         return type;
     }
 
-    public void setType(ResourceType type) {
+    public void setType(ResourceType type){
         this.type = type;
     }
 
-    public Boolean isExpired() {
+    public Boolean isExpired(){
         return expired;
     }
 
-    public void setExpired(Boolean expired) {
+    public void setExpired(Boolean expired){
         this.expired = expired;
     }
 
-    public Long getTimeToLive() {
+    public Long getTimeToLive(){
         return timeToLive;
     }
 }
