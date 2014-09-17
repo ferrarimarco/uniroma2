@@ -34,5 +34,6 @@
         <item>@string/days</item>
     </string-array>
 
-    <string name="new_resource_notification_title">New Resource</string>
+    <string name="new_resource_notification_title">New Resource available</string>
+    <string name="booked_resource_notification_title">Resource Booked</string>
 </resources>
