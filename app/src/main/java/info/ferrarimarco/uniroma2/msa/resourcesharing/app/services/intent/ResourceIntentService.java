@@ -31,10 +31,12 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
  */
 public class ResourceIntentService extends IntentService{
 
-    private static final int NOTIFICATION_ID = 1;
+    private static final int NEW_RESOURCE_NOTIFICATION_ID = 1;
+    private static final int BOOKED_RESOURCE_NOTIFICATION_ID = 2;
 
     private static final String ACTION_SAVE_RESOURCE_FROM_ME = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.SAVE_RESOURCE_FROM_ME";
     private static final String ACTION_RECEIVE_RESOURCE_FROM_OTHERS = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.RECEIVE_RESOURCE_FROM_OTHERS";
+    private static final String ACTION_BOOK_RESOURCE_FROM_ME = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.BOOK_RESOURCE_FROM_ME";
 
     public static final String EXTRA_PARAM_RESOURCE = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.extra.RESOURCE";
 
@@ -44,7 +46,7 @@ public class ResourceIntentService extends IntentService{
     @Inject
     GcmMessagingServiceImpl gcmMessagingService;
 
-    public ResourceIntentService() {
+    public ResourceIntentService(){
         super("ResourceIntentService");
     }
 
@@ -61,7 +63,7 @@ public class ResourceIntentService extends IntentService{
      *
      * @see IntentService
      */
-    public static void startActionReceiveResourceFromOthers(Context context, Resource resource) {
+    public static void startActionReceiveResourceFromOthers(Context context, Resource resource){
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_RECEIVE_RESOURCE_FROM_OTHERS);
         intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
@@ -74,9 +76,22 @@ public class ResourceIntentService extends IntentService{
      *
      * @see IntentService
      */
-    public static void startActionSaveResourceFromMe(Context context, Resource resource) {
+    public static void startActionSaveResourceFromMe(Context context, Resource resource){
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_SAVE_RESOURCE_FROM_ME);
+        intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to perform action BOOK_RESOURCE_FROM_ME with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
+    public static void startActionBookResourceFromMe(Context context, Resource resource){
+        Intent intent = new Intent(context, ResourceIntentService.class);
+        intent.setAction(ACTION_BOOK_RESOURCE_FROM_ME);
         intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
         context.startService(intent);
     }
@@ -86,12 +101,22 @@ public class ResourceIntentService extends IntentService{
     protected void onHandleIntent(Intent intent){
         if(intent != null){
             final String action = intent.getAction();
-            if (ACTION_SAVE_RESOURCE_FROM_ME.equals(action)) {
-                final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
-                handleActionSaveResourceFromMe(resource);
-            } else if (ACTION_RECEIVE_RESOURCE_FROM_OTHERS.equals(action)) {
-                final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
-                handleActionReceiveResourceFromOthers(resource);
+            switch(action){
+                case ACTION_SAVE_RESOURCE_FROM_ME:{
+                    final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
+                    handleActionSaveResourceFromMe(resource);
+                    break;
+                }
+                case ACTION_RECEIVE_RESOURCE_FROM_OTHERS:{
+                    final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
+                    handleActionReceiveResourceFromOthers(resource);
+                    break;
+                }
+                case ACTION_BOOK_RESOURCE_FROM_ME:{
+                    final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
+                    handleActionBookResourceFromMe(resource);
+                    break;
+                }
             }
         }
     }
@@ -100,7 +125,7 @@ public class ResourceIntentService extends IntentService{
      * Handle action Save resource in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionSaveResourceFromMe(Resource resource) {
+    private void handleActionSaveResourceFromMe(Resource resource){
         ResourceTaskResult resourceTaskResult = resourceService.saveResourceLocal(resource);
 
         if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
@@ -115,17 +140,49 @@ public class ResourceIntentService extends IntentService{
      * Handle action Receive resource in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionReceiveResourceFromOthers(Resource resource) {
+    private void handleActionReceiveResourceFromOthers(Resource resource){
         ResourceTaskResult resourceTaskResult = resourceService.saveResourceLocal(resource);
 
-        if (TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())) {
+        if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
             throw new RuntimeException("Unable to save the resource into local storage");
         }
 
         showNewResourceNotification(resource);
     }
 
-    private void showNewResourceNotification(Resource resource) {
+    /**
+     * Handle action Book resource in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionBookResourceFromMe(Resource resource){
+
+        // For reference
+        String bookerId = resource.getBookerId();
+
+        // Remove booker id as it's not saved in local storage yet
+        // and we have to build a criteria
+        resource.setBookerId(null);
+
+        Resource result = resourceService.readResourceFromLocalStorage(resource);
+        result.setBookerId(bookerId);
+        ResourceTaskResult resourceTaskResult = resourceService.saveResourceLocal(resource);
+
+        if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
+            throw new RuntimeException("Unable to save the resource into local storage");
+        }
+
+        showBookedResourceNotification(resource);
+    }
+
+    private void showNewResourceNotification(Resource resource){
+        showNotification(NEW_RESOURCE_NOTIFICATION_ID, getResources().getString(R.string.new_resource_notification_title), resource);
+    }
+
+    private void showBookedResourceNotification(Resource resource){
+        showNotification(BOOKED_RESOURCE_NOTIFICATION_ID, getResources().getString(R.string.booked_resource_notification_title), resource);
+    }
+
+    private void showNotification(Integer notificationId, String notificationTitle, Resource resource){
         NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         Intent intent = new Intent(this, ShowResourcesActivity.class).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -141,16 +198,8 @@ public class ResourceIntentService extends IntentService{
         // Gets a PendingIntent containing the entire back stack
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification.Builder mBuilder = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_action_event)
-                .setContentTitle(resource.getTitle())
-                .setStyle(new Notification.BigTextStyle().bigText(resource.getDescription()))
-                .setContentText(resource.getTitle())
-                .setTicker(getResources().getString(R.string.new_resource_notification_title))
-                .setAutoCancel(true)
-                .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
-                .setContentIntent(contentIntent);
+        Notification.Builder mBuilder = new Notification.Builder(this).setSmallIcon(R.drawable.ic_action_event).setContentTitle(resource.getTitle()).setStyle(new Notification.BigTextStyle().bigText(resource.getDescription())).setContentText(resource.getTitle()).setTicker(notificationTitle).setAutoCancel(true).setSound(Settings.System.DEFAULT_NOTIFICATION_URI).setContentIntent(contentIntent);
 
-        notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        notificationManager.notify(notificationId, mBuilder.build());
     }
 }
