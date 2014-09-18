@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
     <string name="app_name">MSA Resource Sharing</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_init">MSA Resource Sharing</string>
@@ -36,4 +39,7 @@
 
     <string name="new_resource_notification_title">New Resource available</string>
     <string name="booked_resource_notification_title">Resource Booked</string>
+
+    <string name="book_resource_dialog_title">Book resource confirmation</string>
+    <string name="book_resource_dialog_message">Would you like to book this resource?</string>
 </resources>

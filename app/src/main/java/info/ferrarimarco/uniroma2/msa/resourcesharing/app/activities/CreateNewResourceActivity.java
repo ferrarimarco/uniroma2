@@ -86,7 +86,7 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
                 throw new IllegalArgumentException("Unable to choose a TTL unit measure");
             }
 
-            Resource resource = new Resource(title, description, this.getLastKnownLocation(), DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, resourceTtl);
+            Resource resource = new Resource(title, description, this.getLastKnownLocation(), DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, resourceTtl, null);
             ResourceIntentService.startActionSaveResourceFromMe(getApplicationContext(), resource);
             Toast.makeText(this, getResources().getString(R.string.resource_save_completed), Toast.LENGTH_SHORT).show();
             finish();

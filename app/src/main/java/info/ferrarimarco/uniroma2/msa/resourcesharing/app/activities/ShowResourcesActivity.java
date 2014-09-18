@@ -1,6 +1,8 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import com.squareup.otto.Subscribe;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
+import butterknife.OnItemClick;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArrayAdapter;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
@@ -25,6 +28,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceLi
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.ResourceIntentService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.UserIntentService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
 
@@ -110,7 +114,6 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     protected boolean terminateActivityAfterRedirect() {
         return false;
     }
-
 
     @Override
     public void onRefresh() {
@@ -210,5 +213,30 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     @Override
     public void onLocationChanged(Location location) {
         UserIntentService.startActionUpdateUserInfo(this, location);
+    }
+
+    @OnItemClick(R.id.resources_list_view)
+    public void onResourceClick(int position) {
+        // Get clicked resource
+        final Resource resource = resourceArrayAdapter.getItem(position);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.book_resource_dialog_message + " " + resource.getTitle())
+                .setTitle(R.string.book_resource_dialog_title);
+
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                ResourceIntentService.startActionBookResourceFromOthers(ShowResourcesActivity.this, resource);
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
