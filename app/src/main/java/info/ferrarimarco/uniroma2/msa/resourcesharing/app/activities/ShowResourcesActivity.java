@@ -31,6 +31,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.Locati
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.ResourceIntentService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
 
+import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.BOOKED_BY_ME;
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.CREATED_BY_ME;
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.NEW;
 
@@ -175,25 +176,31 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     private void loadResources(int resourceTypeId) {
         swipeLayout.setRefreshing(true);
 
-        Resource.ResourceType resourceType = NEW;
-
-        if (CREATED_BY_ME.ordinal() == resourceTypeId) {
-            resourceType = CREATED_BY_ME;
-        } else if (NEW.ordinal() == resourceTypeId) {
-            resourceType = NEW;
-        }
+        Resource.ResourceType resourceType = idToResourceType(resourceTypeId);
 
         switch (resourceType) {
             case NEW:
-                resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_NEW_RESOURCES_LOCAL);
+                resourceService.readResourcesLocal(ResourceTaskType.READ_NEW_RESOURCES_LOCAL);
                 break;
             case CREATED_BY_ME:
-                resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL);
+                resourceService.readResourcesLocal(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL);
                 break;
             case BOOKED_BY_ME:
-                resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_BOOKED_BY_ME_RESOURCES);
+                resourceService.readResourcesLocal(ResourceTaskType.READ_BOOKED_BY_ME_RESOURCES);
                 break;
         }
+    }
+
+    private Resource.ResourceType idToResourceType(int resourceTypeId) {
+        if (CREATED_BY_ME.ordinal() == resourceTypeId) {
+            return CREATED_BY_ME;
+        } else if (NEW.ordinal() == resourceTypeId) {
+            return NEW;
+        } else if (BOOKED_BY_ME.ordinal() == resourceTypeId) {
+            return BOOKED_BY_ME;
+        }
+
+        return null;
     }
 
     @Subscribe
@@ -201,16 +208,12 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
         ResourceTaskResult result = event.getResult();
 
         if (getActionBar() != null) {
-            if ((ResourceTaskType.READ_NEW_RESOURCES_LOCAL.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.NEW.ordinal())
-                    || (ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.CREATED_BY_ME.ordinal())
-                    || (ResourceTaskType.READ_BOOKED_BY_ME_RESOURCES.equals(result.getTaskType()) && getActionBar().getSelectedNavigationIndex() == Resource.ResourceType.BOOKED_BY_ME.ordinal())) {
-                if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
-                    resourceArrayAdapter.clear();
-                    resourceArrayAdapter.addAll(result.getResources());
-                    resourceArrayAdapter.notifyDataSetChanged();
-                } else if (TaskResultType.FAILURE.equals(result.getTaskResultType())) {
-                    throw new IllegalStateException("Unable to read from internal data storage");
-                }
+            if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
+                resourceArrayAdapter.clear();
+                resourceArrayAdapter.addAll(result.getResources());
+                resourceArrayAdapter.notifyDataSetChanged();
+            } else if (TaskResultType.FAILURE.equals(result.getTaskResultType())) {
+                throw new IllegalStateException("Unable to read from internal data storage");
             }
         }
 
@@ -223,21 +226,36 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
         final Resource resource = resourceArrayAdapter.getItem(position);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.book_resource_dialog_message + " " + resource.getTitle())
-                .setTitle(R.string.book_resource_dialog_title);
+        switch (resource.getType()) {
+            case NEW:
+                builder.setMessage(R.string.book_resource_dialog_message + " " + resource.getTitle())
+                        .setTitle(R.string.book_resource_dialog_title);
 
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                ResourceIntentService.startActionBookResourceFromOthers(ShowResourcesActivity.this, resource);
-                dialog.dismiss();
-            }
-        });
+                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        ResourceIntentService.startActionBookResourceFromOthers(ShowResourcesActivity.this, resource);
+                        dialog.dismiss();
+                    }
+                });
+                builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+                break;
+            case CREATED_BY_ME:
+                builder.setMessage(R.string.delete_resource_dialog_message + " " + resource.getTitle())
+                        .setTitle(R.string.delete_resource_dialog_title);
+
+                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        ResourceIntentService.startActionDeleteResourceFromMe(ShowResourcesActivity.this, resource);
+                    }
+                });
+                break;
+        }
+
         builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-
-            }
-        });
-        builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
             }

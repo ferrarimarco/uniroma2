@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import com.squareup.otto.Bus;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -19,7 +20,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTas
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
-public class ResourceService{
+public class ResourceService {
 
     protected ObjectGraph objectGraph;
 
@@ -29,67 +30,78 @@ public class ResourceService{
     @Inject
     GenericDao<Resource> resourceDao;
 
+    // For caching
+    private List<Resource> createdByMeResources;
+    private List<Resource> resourcesByOthers;
+    private List<Resource> bookedByMeResources;
+
     @Inject
-    public ResourceService(Context context){
+    public ResourceService(Context context) {
         objectGraph = ObjectGraphUtils.getObjectGraph(context);
+        createdByMeResources = new ArrayList<>();
+        resourcesByOthers = new ArrayList<>();
+        bookedByMeResources = new ArrayList<>();
     }
 
-    public Resource readResourceFromLocalStorage(Resource criterion){
-        try{
+    public Resource readResourceFromLocalStorage(Resource criterion) {
+        try {
             resourceDao.open(Resource.class);
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
         Resource result = null;
 
-        try{
+        try {
             result = resourceDao.readUniqueResult(criterion);
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally{
+        } finally {
             resourceDao.close();
         }
 
         return result;
     }
 
-    public void readResourcesFromLocalStorage(ResourceTaskType resourceTaskType){
-        new AsyncTask<ResourceTaskType, Void, ResourceTaskResult>(){
+    public void readResourcesLocal(ResourceTaskType resourceTaskType) {
+        new AsyncTask<ResourceTaskType, Void, ResourceTaskResult>() {
             @Override
-            protected ResourceTaskResult doInBackground(ResourceTaskType... params){
+            protected ResourceTaskResult doInBackground(ResourceTaskType... params) {
                 ResourceTaskResult result = new ResourceTaskResult(params[0]);
-                try{
-                    resourceDao.open(Resource.class);
-                }catch(SQLException e){
-                    e.printStackTrace();
-                    result.setTaskResultType(TaskResultType.FAILURE);
-                    return result;
-                }
 
-                List<Resource> resources = result.getResources();
+                List<Resource> resources = null;
+
                 Resource res = new Resource();
 
-                switch(params[0]){
+                switch (params[0]) {
                     case READ_NEW_RESOURCES_LOCAL:
                         res.setType(Resource.ResourceType.NEW);
+                        resources = resourcesByOthers;
                         break;
                     case READ_CREATED_BY_ME_RESOURCES_LOCAL:
                         res.setType(Resource.ResourceType.CREATED_BY_ME);
+                        resources = createdByMeResources;
                         break;
                     case READ_BOOKED_BY_ME_RESOURCES:
                         res.setType(Resource.ResourceType.BOOKED_BY_ME);
+                        resources = bookedByMeResources;
                         break;
                 }
 
-                try{
-                    resources = resourceDao.read(res);
-                }catch(SQLException e){
-                    e.printStackTrace();
-                    result.setTaskResultType(TaskResultType.FAILURE);
-                    return result;
-                }finally{
-                    resourceDao.close();
+                // No items in cache. Load from db
+                if (resources != null && resources.isEmpty()) {
+                    try {
+                        resourceDao.open(Resource.class);
+                        resources.addAll(resourceDao.read(res));
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        result.setTaskResultType(TaskResultType.FAILURE);
+                        return result;
+                    } finally {
+                        if (resourceDao != null) {
+                            resourceDao.close();
+                        }
+                    }
                 }
 
                 result.setTaskResultType(TaskResultType.SUCCESS);
@@ -98,26 +110,55 @@ public class ResourceService{
             }
 
             @Override
-            protected void onPostExecute(ResourceTaskResult result){
+            protected void onPostExecute(ResourceTaskResult result) {
                 bus.post(new ResourceListAvailableEvent(result));
             }
         }.execute(resourceTaskType);
     }
 
-    public ResourceTaskResult saveResourceLocal(Resource resource){
-        ResourceTaskResult result;
-        try{
+    public ResourceTaskResult saveResourceLocal(Resource resource) {
+        ResourceTaskResult result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_FROM_ME_LOCAL);
+        result.addResource(resource);
+
+        try {
             resourceDao.open(Resource.class);
             resourceDao.save(resource);
-            result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_FROM_ME_LOCAL, TaskResultType.SUCCESS);
-        }catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
-            result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_FROM_ME_LOCAL, TaskResultType.FAILURE);
-        }finally{
+            result.setTaskResultType(TaskResultType.FAILURE);
+            return result;
+        } finally {
             resourceDao.close();
         }
 
-        result.addResource(resource);
+        switch (resource.getType()) {
+            case NEW:
+                resourcesByOthers.add(resource);
+                break;
+            case CREATED_BY_ME:
+                createdByMeResources.add(resource);
+                break;
+            case BOOKED_BY_ME:
+                bookedByMeResources.add(resource);
+                break;
+        }
+
+        return result;
+    }
+
+    public ResourceTaskResult deleteResourceLocal(Resource resource) {
+        ResourceTaskResult result = new ResourceTaskResult(ResourceTaskType.DELETE_RESOURCE);
+
+        try {
+            resourceDao.delete(resource);
+            result.setTaskResultType(TaskResultType.SUCCESS);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            result.setTaskResultType(TaskResultType.FAILURE);
+            result.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+
         return result;
     }
 }

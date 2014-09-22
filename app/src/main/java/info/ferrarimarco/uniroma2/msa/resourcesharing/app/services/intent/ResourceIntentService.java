@@ -17,7 +17,6 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.ShowResourcesActivity;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
@@ -38,6 +37,7 @@ public class ResourceIntentService extends IntentService {
     private static final String ACTION_RECEIVE_RESOURCE_FROM_OTHERS = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.RECEIVE_RESOURCE_FROM_OTHERS";
     private static final String ACTION_BOOK_RESOURCE_FROM_ME = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.BOOK_RESOURCE_FROM_ME";
     private static final String ACTION_BOOK_RESOURCE_FROM_OTHERS = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.BOOK_RESOURCE_FROM_OTHERS";
+    private static final String ACTION_DELETE_RESOURCE_FROM_ME = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.DELETE_RESOURCE_FROM_ME";
 
     public static final String EXTRA_PARAM_RESOURCE = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.extra.RESOURCE";
 
@@ -110,6 +110,19 @@ public class ResourceIntentService extends IntentService {
         context.startService(intent);
     }
 
+    /**
+     * Starts this service to perform action DELETE_RESOURCE_FROM_ME with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
+    public static void startActionDeleteResourceFromMe(Context context, Resource resource) {
+        Intent intent = new Intent(context, ResourceIntentService.class);
+        intent.setAction(ACTION_DELETE_RESOURCE_FROM_ME);
+        intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
+        context.startService(intent);
+    }
+
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -136,6 +149,11 @@ public class ResourceIntentService extends IntentService {
                     handleActionBookResourceFromOthers(resource);
                     break;
                 }
+                case ACTION_DELETE_RESOURCE_FROM_ME: {
+                    final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
+                    handleActionDeleteResourceFromMe(resource);
+                    break;
+                }
             }
         }
     }
@@ -151,7 +169,6 @@ public class ResourceIntentService extends IntentService {
             throw new RuntimeException("Unable to save the resource into local storage");
         }
 
-        resourceService.readResourcesFromLocalStorage(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL);
         gcmMessagingService.sendNewResource(resource);
     }
 
@@ -179,6 +196,20 @@ public class ResourceIntentService extends IntentService {
 
     /**
      * Handle action Book resource in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionDeleteResourceFromMe(Resource resource) {
+        ResourceTaskResult resourceTaskResult = resourceService.deleteResourceLocal(resource);
+
+        if (TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())) {
+            throw new RuntimeException("Unable to delete the resource from local storage");
+        }
+
+        gcmMessagingService.deleteResourceFromMe(resource);
+    }
+
+    /**
+     * Handle action delete resource in the provided background thread with the provided
      * parameters.
      */
     private void handleActionBookResourceFromMe(Resource resource) {

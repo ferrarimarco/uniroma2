@@ -43,4 +43,7 @@
 
     <string name="book_resource_dialog_title">Book resource confirmation</string>
     <string name="book_resource_dialog_message">Would you like to book this resource?</string>
+    <string name="delete_resource_dialog_title">Delete resource confirmation</string>
+    <string name="delete_resource_dialog_message">Would you like to delete this resource?</string>
+
 </resources>

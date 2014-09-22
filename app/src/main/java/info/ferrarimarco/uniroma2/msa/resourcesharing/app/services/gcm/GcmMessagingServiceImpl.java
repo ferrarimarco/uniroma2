@@ -18,9 +18,9 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.config.SharedPreferencesServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 
-public class GcmMessagingServiceImpl{
+public class GcmMessagingServiceImpl {
 
-    public enum GcmMessage{
+    public enum GcmMessage {
 
         NEW_RESOURCE_FROM_ME("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.CREATE_NEW_RESOURCE"),
         DELETE_MY_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.DELETE_RESOURCE"),
@@ -30,16 +30,16 @@ public class GcmMessagingServiceImpl{
 
         private String stringValue;
 
-        private GcmMessage(String stringValue){
+        private GcmMessage(String stringValue) {
             this.stringValue = stringValue;
         }
 
-        public String getStringValue(){
+        public String getStringValue() {
             return stringValue;
         }
     }
 
-    public enum GcmMessageField{
+    public enum GcmMessageField {
         DATA_ACTION("action"),
         DATA_TITLE("title"),
         DATA_DESCRIPTION("description"),
@@ -58,11 +58,11 @@ public class GcmMessagingServiceImpl{
 
         private String stringValue;
 
-        private GcmMessageField(String stringValue){
+        private GcmMessageField(String stringValue) {
             this.stringValue = stringValue;
         }
 
-        public String getStringValue(){
+        public String getStringValue() {
             return stringValue;
         }
     }
@@ -86,7 +86,7 @@ public class GcmMessagingServiceImpl{
     private String gcmProjectRecipient;
 
     @Inject
-    public GcmMessagingServiceImpl(){
+    public GcmMessagingServiceImpl() {
         defaultGcmTtl = Long.parseLong(String.valueOf(context.getResources().getString(R.string.gcm_ttl)));
         maxGcmTtl = Long.parseLong(String.valueOf(context.getResources().getString(R.string.gcm_max_ttl)));
         String gcmProjectId = context.getResources().getString(R.string.gcm_project_id);
@@ -100,18 +100,18 @@ public class GcmMessagingServiceImpl{
      * Stores the registration ID in the application's
      * shared preferences.
      */
-    public void registerWithGcm(){
-        new AsyncTask<String, Void, Void>(){
+    public void registerWithGcm() {
+        new AsyncTask<String, Void, Void>() {
             @Override
-            protected Void doInBackground(String... params){
-                if(params.length != 1){
+            protected Void doInBackground(String... params) {
+                if (params.length != 1) {
                     throw new IllegalArgumentException("No user specified while registering with backend");
                 }
 
                 String userId = params[0];
                 Log.d(GcmMessagingServiceImpl.class.getName(), "Send GCM registration Id to backend for: " + userId);
 
-                try{
+                try {
                     gcm = GoogleCloudMessaging.getInstance(context);
                     gcmRegistrationId = gcm.register(context.getResources().getString(R.string.gcm_project_id));
 
@@ -119,7 +119,7 @@ public class GcmMessagingServiceImpl{
 
                     // Persist the regID - no need to register again.
                     sharedPreferencesService.storeGcmRegistrationId(gcmRegistrationId);
-                }catch(IOException ex){
+                } catch (IOException ex) {
                     Log.e(GcmMessagingServiceImpl.class.getName(), "Error :" + ex.getMessage());
                     // TODO: handle this error
                     // If there is an error, don't just keep trying to register.
@@ -132,11 +132,11 @@ public class GcmMessagingServiceImpl{
         }.execute(userService.readRegisteredUserId());
     }
 
-    public boolean isGcmRegistrationCompleted(){
+    public boolean isGcmRegistrationCompleted() {
         return sharedPreferencesService.isGcmRegistrationCompleted();
     }
 
-    public void sendNewResource(Resource resource){
+    public void sendNewResource(Resource resource) {
         Bundle data = new Bundle();
         data.putString(GcmMessageField.DATA_ACTION.getStringValue(), GcmMessage.NEW_RESOURCE_FROM_ME.getStringValue());
         data.putString(GcmMessageField.DATA_TITLE.getStringValue(), resource.getTitle());
@@ -151,7 +151,7 @@ public class GcmMessagingServiceImpl{
         sendGcmMessage(data, resource.getTimeToLive());
     }
 
-    public void bookResourceFromOthers(Resource resource){
+    public void bookResourceFromOthers(Resource resource) {
         Bundle data = new Bundle();
         data.putString(GcmMessageField.DATA_ACTION.getStringValue(), GcmMessage.BOOK_RESOURCE.getStringValue());
         data.putLong(GcmMessageField.DATA_CREATION_TIME.getStringValue(), resource.getCreationTime().getMillis());
@@ -162,12 +162,21 @@ public class GcmMessagingServiceImpl{
         sendGcmMessage(data, maxGcmTtl);
     }
 
-    public void updateUserDetails(Address address){
+    public void deleteResourceFromMe(Resource resource) {
+        Bundle data = new Bundle();
+        data.putString(GcmMessageField.DATA_ACTION.getStringValue(), GcmMessage.DELETE_MY_RESOURCE.getStringValue());
+        data.putLong(GcmMessageField.DATA_CREATION_TIME.getStringValue(), resource.getCreationTime().getMillis());
+        data.putString(GcmMessageField.DATA_CREATOR_ID.getStringValue(), resource.getCreatorId());
+
+        sendGcmMessage(data, maxGcmTtl);
+    }
+
+    public void updateUserDetails(Address address) {
         Bundle data = new Bundle();
 
         data.putString(GcmMessageField.DATA_ACTION.getStringValue(), GcmMessage.UPDATE_USER_DETAILS.getStringValue());
         data.putString(GcmMessageField.DATA_CREATOR_ID.getStringValue(), userService.readRegisteredUserId());
-        if(address.getMaxAddressLineIndex() > 0){
+        if (address.getMaxAddressLineIndex() > 0) {
             data.putString(GcmMessageField.DATA_ADDRESS.getStringValue(), address.getAddressLine(0));
         }
         data.putString(GcmMessageField.DATA_LOCALITY.getStringValue(), address.getLocality());
@@ -178,36 +187,36 @@ public class GcmMessagingServiceImpl{
         sendGcmMessage(data, defaultGcmTtl);
     }
 
-    private void sendGcmMessage(Bundle data, final Long timeToLive){
-        if(!this.isGcmRegistrationCompleted()){
+    private void sendGcmMessage(Bundle data, final Long timeToLive) {
+        if (!this.isGcmRegistrationCompleted()) {
             // TODO: handle this error condition
             return;
         }
 
-        new AsyncTask<Bundle, Void, Integer>(){
+        new AsyncTask<Bundle, Void, Integer>() {
             @Override
-            protected Integer doInBackground(Bundle... params){
-                if(params.length != 1){
+            protected Integer doInBackground(Bundle... params) {
+                if (params.length != 1) {
                     throw new IllegalArgumentException("No (or wrong) bundle specified while sending GCM message to backend");
                 }
 
                 Bundle data = params[0];
 
-                if(!data.containsKey(GcmMessageField.DATA_NEEDS_ACK.getStringValue())){
+                if (!data.containsKey(GcmMessageField.DATA_NEEDS_ACK.getStringValue())) {
                     data.putBoolean(GcmMessageField.DATA_NEEDS_ACK.getStringValue(), false);
                 }
 
                 String id = Integer.toString(messageId.incrementAndGet());
 
-                try{
+                try {
                     gcm = GoogleCloudMessaging.getInstance(context);
                     Long ttl = timeToLive;
-                    if(ttl == null){
+                    if (ttl == null) {
                         ttl = defaultGcmTtl;
                     }
 
                     gcm.send(gcmProjectRecipient, id, ttl, data);
-                }catch(IOException ex){
+                } catch (IOException ex) {
                     Log.e(GcmMessagingServiceImpl.class.getName(), "Error :" + ex.getMessage());
                     return -1;
                 }
