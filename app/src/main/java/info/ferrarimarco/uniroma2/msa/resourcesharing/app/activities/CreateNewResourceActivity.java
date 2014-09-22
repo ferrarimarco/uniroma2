@@ -101,11 +101,9 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // TODO: handle this if necessary
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-        // TODO: handle this if necessary
     }
 }

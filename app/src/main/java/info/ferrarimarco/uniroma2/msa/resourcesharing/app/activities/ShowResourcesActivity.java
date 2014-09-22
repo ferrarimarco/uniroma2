@@ -2,9 +2,9 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.squareup.otto.Subscribe;
@@ -28,14 +27,14 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceLi
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.LocationTrackingIntentService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.ResourceIntentService;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.UserIntentService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
 
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.CREATED_BY_ME;
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.NEW;
 
-public class ShowResourcesActivity extends AbstractActivity implements ActionBar.OnNavigationListener, SwipeRefreshLayout.OnRefreshListener, LocationListener {
+public class ShowResourcesActivity extends AbstractActivity implements ActionBar.OnNavigationListener, SwipeRefreshLayout.OnRefreshListener {
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -53,6 +52,8 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     ResourceService resourceService;
 
     private ResourceArrayAdapter resourceArrayAdapter;
+
+    private LocationRequest balancedPowerlocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,23 +97,29 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
         swipeLayout.setOnRefreshListener(this);
         swipeLayout.setColorScheme(android.R.color.holo_blue_bright, android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light);
 
+        balancedPowerlocationRequest = LocationRequest.create();
+        balancedPowerlocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        balancedPowerlocationRequest.setInterval(1000 * 60 * 60);
+        balancedPowerlocationRequest.setFastestInterval(1000 * 5);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
         // Request for location updates
-        // TODO: configure this request
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(10000);
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+        Intent locationTrackingIntent = new Intent(this, LocationTrackingIntentService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 1, locationTrackingIntent, 0);
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, balancedPowerlocationRequest, pendingIntent);
     }
 
     @Override
-    protected Class getRedirectActivityClass() {
-        return null;
-    }
-
-    @Override
-    protected boolean terminateActivityAfterRedirect() {
-        return false;
+    protected void onPause() {
+        super.onPause();
+        // Request for location updates
+        Intent locationTrackingIntent = new Intent(this, LocationTrackingIntentService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 1, locationTrackingIntent, 0);
+        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, pendingIntent);
     }
 
     @Override
@@ -210,11 +217,6 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
         swipeLayout.setRefreshing(false);
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        UserIntentService.startActionUpdateUserInfo(this, location);
-    }
-
     @OnItemClick(R.id.resources_list_view)
     public void onResourceClick(int position) {
         // Get clicked resource
@@ -230,7 +232,12 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
                 dialog.dismiss();
             }
         });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+        builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
             }
@@ -238,5 +245,15 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    @Override
+    protected Class getRedirectActivityClass() {
+        return null;
+    }
+
+    @Override
+    protected boolean terminateActivityAfterRedirect() {
+        return false;
     }
 }

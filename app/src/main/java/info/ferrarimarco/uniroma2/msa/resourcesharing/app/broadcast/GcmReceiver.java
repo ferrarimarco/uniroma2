@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.msa.resourcesharing.app.broadcastreceiver;
+package info.ferrarimarco.uniroma2.msa.resourcesharing.app.broadcast;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -8,7 +8,7 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.GcmIntentServiceImpl;
 
-public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
+public class GcmReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // Explicitly specify that GcmIntentService will handle the intent.

@@ -12,39 +12,31 @@ import org.joda.time.DateTime;
 
 import java.io.IOException;
 
-import dagger.ObjectGraph;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.broadcastreceiver.GcmBroadcastReceiver;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.broadcast.GcmReceiver;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl.GcmMessage;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl.GcmMessageField;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
-public class GcmIntentServiceImpl extends IntentService{
+public class GcmIntentServiceImpl extends IntentService {
 
-    public GcmIntentServiceImpl(){
+    public GcmIntentServiceImpl() {
         super("GcmIntentService");
     }
 
     @Override
-    public void onCreate(){
-        ObjectGraph objectGraph = ObjectGraphUtils.getObjectGraph(this);
-        objectGraph.inject(this);
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent){
+    protected void onHandleIntent(Intent intent) {
         Bundle extras = intent.getExtras();
 
         // The getMessageType() intent parameter must be the intent you received
         // in your BroadcastReceiver.
-        if(extras != null && !extras.isEmpty()){
+        if (extras != null && !extras.isEmpty()) {
             GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
             String messageType = gcm.getMessageType(intent);
-            switch(messageType){
+            switch (messageType) {
                 case GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR:
-                    try{
+                    try {
                         throw new IOException("Unable to send GCM message");
-                    }catch(IOException e){
+                    } catch (IOException e) {
                         e.printStackTrace();
                         Log.e(GcmIntentServiceImpl.class.getName(), e.getMessage());
                     }
@@ -72,7 +64,7 @@ public class GcmIntentServiceImpl extends IntentService{
                         case BOOK_RESOURCE:
                             Long creationTimeMs = intent.getLongExtra(GcmMessageField.DATA_CREATION_TIME.getStringValue(), 0L);
 
-                            if(creationTimeMs.equals(0L)){
+                            if (creationTimeMs.equals(0L)) {
                                 throw new IllegalArgumentException("Unable to read resource information");
                             }
 
@@ -89,7 +81,7 @@ public class GcmIntentServiceImpl extends IntentService{
             }
 
             // Release the wake lock provided by the WakefulBroadcastReceiver.
-            GcmBroadcastReceiver.completeWakefulIntent(intent);
+            GcmReceiver.completeWakefulIntent(intent);
         }
     }
 }
