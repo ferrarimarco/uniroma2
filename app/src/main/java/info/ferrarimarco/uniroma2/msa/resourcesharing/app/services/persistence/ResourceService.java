@@ -1,7 +1,6 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence;
 
 import android.content.Context;
-import android.os.AsyncTask;
 
 import com.squareup.otto.Bus;
 
@@ -64,56 +63,46 @@ public class ResourceService {
     }
 
     public void readResourcesLocal(ResourceTaskType resourceTaskType) {
-        new AsyncTask<ResourceTaskType, Void, ResourceTaskResult>() {
-            @Override
-            protected ResourceTaskResult doInBackground(ResourceTaskType... params) {
-                ResourceTaskResult result = new ResourceTaskResult(params[0]);
+        ResourceTaskResult result = new ResourceTaskResult(resourceTaskType);
 
-                List<Resource> resources = null;
+        List<Resource> resources = null;
 
-                Resource res = new Resource();
+        Resource res = new Resource();
 
-                switch (params[0]) {
-                    case READ_NEW_RESOURCES_LOCAL:
-                        res.setType(Resource.ResourceType.NEW);
-                        resources = resourcesByOthers;
-                        break;
-                    case READ_CREATED_BY_ME_RESOURCES_LOCAL:
-                        res.setType(Resource.ResourceType.CREATED_BY_ME);
-                        resources = createdByMeResources;
-                        break;
-                    case READ_BOOKED_BY_ME_RESOURCES:
-                        res.setType(Resource.ResourceType.BOOKED_BY_ME);
-                        resources = bookedByMeResources;
-                        break;
+        switch (resourceTaskType) {
+            case READ_NEW_RESOURCES_LOCAL:
+                res.setType(Resource.ResourceType.NEW);
+                resources = resourcesByOthers;
+                break;
+            case READ_CREATED_BY_ME_RESOURCES_LOCAL:
+                res.setType(Resource.ResourceType.CREATED_BY_ME);
+                resources = createdByMeResources;
+                break;
+            case READ_BOOKED_BY_ME_RESOURCES:
+                res.setType(Resource.ResourceType.BOOKED_BY_ME);
+                resources = bookedByMeResources;
+                break;
+        }
+
+        // No items in cache. Load from db
+        if (resources != null && resources.isEmpty()) {
+            try {
+                resourceDao.open(Resource.class);
+                resources.addAll(resourceDao.read(res));
+            } catch (SQLException e) {
+                e.printStackTrace();
+                result.setTaskResultType(TaskResultType.FAILURE);
+            } finally {
+                if (resourceDao != null) {
+                    resourceDao.close();
                 }
-
-                // No items in cache. Load from db
-                if (resources != null && resources.isEmpty()) {
-                    try {
-                        resourceDao.open(Resource.class);
-                        resources.addAll(resourceDao.read(res));
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                        result.setTaskResultType(TaskResultType.FAILURE);
-                        return result;
-                    } finally {
-                        if (resourceDao != null) {
-                            resourceDao.close();
-                        }
-                    }
-                }
-
-                result.setTaskResultType(TaskResultType.SUCCESS);
-                result.setResources(resources);
-                return result;
             }
+        }
 
-            @Override
-            protected void onPostExecute(ResourceTaskResult result) {
-                bus.post(new ResourceListAvailableEvent(result));
-            }
-        }.execute(resourceTaskType);
+        result.setTaskResultType(TaskResultType.SUCCESS);
+        result.setResources(resources);
+
+        bus.post(new ResourceListAvailableEvent(result));
     }
 
     public ResourceTaskResult saveResourceLocal(Resource resource) {
