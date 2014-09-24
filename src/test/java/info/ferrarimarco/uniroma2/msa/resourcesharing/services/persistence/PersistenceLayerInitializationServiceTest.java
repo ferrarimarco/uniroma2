@@ -4,7 +4,6 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingMobileNodeData;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
 
@@ -32,23 +31,18 @@ public class PersistenceLayerInitializationServiceTest extends BaseSpringTest{
 	@Autowired
 	private ResourcePersistenceService resourcePersistenceService;
 	
-	@Autowired
-	private MobileNodeDataPersistenceService mobileNodeDataPersistenceService;
-	
     @BeforeClass
     protected void setup() throws Exception {
     	super.setup();
     	assertThat(persistenceLayerInitializationService, notNullValue());
     	assertThat(userPersistenceService, notNullValue());
     	assertThat(resourcePersistenceService, notNullValue());
-    	assertThat(mobileNodeDataPersistenceService, notNullValue());
     }
 
 	@AfterMethod(alwaysRun = true)
 	protected void cleanupMethod() {
 		persistenceLayerInitializationService.cleanupUserRepository();
 		persistenceLayerInitializationService.cleanupResourceRepository();
-		persistenceLayerInitializationService.cleanupMobileNodeDataRepository();
 	}
     
     @Test(groups = "springServicesTestGroup", dependsOnGroups = "userPersistenceServiceTestGroup")
@@ -91,26 +85,5 @@ public class PersistenceLayerInitializationServiceTest extends BaseSpringTest{
 		}
 		
 		resourcePersistenceService.close();
-    }
-    
-    @Test(groups = "springServicesTestGroup", dependsOnGroups = {"userPersistenceServiceTestGroup", "resourcePersistenceServiceTestGroup", "mobileNodeDataPersistenceServiceTestGroup"})
-    public void mobileNodeDataRepositoryInitializationTest() {
-    	
-    	int resourceCount = 10;
-    	
-    	persistenceLayerInitializationService.initializeMobileNodeDataRepository(resourceCount);
-    	
-    	List<ResourceSharingMobileNodeData> resources = mobileNodeDataPersistenceService.findAll();
-    	
-    	mobileNodeDataPersistenceService.close();
-    	
-    	assertThat(resources, notNullValue());
-    	assertThat(resourceCount, equalTo(resources.size()));
-    	
-		logger.info("Stored Mobile nodes data list:");
-		
-		for(ResourceSharingMobileNodeData r : resources) {
-			logger.info(r.toString());
-		}
     }
 }

@@ -2,7 +2,6 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 
 import javax.annotation.PostConstruct;
 
-import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingMobileNodeData;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
@@ -22,9 +21,6 @@ public class PersistenceLayerInitializationService {
 	private ResourcePersistenceService resourcePersistenceService;
 	
 	@Autowired
-	private MobileNodeDataPersistenceService mobileNodeDataPersistenceService;
-	
-	@Autowired
 	private HashingService hashingService;
 	
 	@Autowired
@@ -38,7 +34,6 @@ public class PersistenceLayerInitializationService {
 	private void init() {
 		userPersistenceService.open();
 		resourcePersistenceService.open();
-		mobileNodeDataPersistenceService.open();
 	}
 
 	public void initializeUserRepository(Integer userCount) {
@@ -69,17 +64,5 @@ public class PersistenceLayerInitializationService {
 	
 	public void cleanupResourceRepository() {
 		resourcePersistenceService.dropCollection();
-	}
-	
-	public void initializeMobileNodeDataRepository(Integer mobileNodeDataCount) {
-		cleanupMobileNodeDataRepository();
-		
-		for(int i = 0; i < mobileNodeDataCount; i++) {
-			mobileNodeDataPersistenceService.storeMobileNodeData(new ResourceSharingMobileNodeData("ID" + i, "LOCATION" + i, new DateTime()));
-		}
-	}
-	
-	public void cleanupMobileNodeDataRepository() {
-		mobileNodeDataPersistenceService.dropCollection();
 	}
 }
