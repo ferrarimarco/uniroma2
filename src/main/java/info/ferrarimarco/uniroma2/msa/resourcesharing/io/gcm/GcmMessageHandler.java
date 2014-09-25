@@ -45,9 +45,6 @@ public class GcmMessageHandler {
 		} else if (action.equalsIgnoreCase("com.antoinecampbell.gcmdemo.ECHO")) {
 			// Send an ECHO response back
 			gcmMessageSender.sendJsonMessage(from, payload, null, null, false);
-		} else if (action.equalsIgnoreCase("com.antoinecampbell.gcmdemo.BROADCAST")) {
-			// Send an Broadcast response back
-			gcmMessageSender.broadcastMessage(payload);
 		}else {
 			log.info("Unkown action sent: " + action);
 		}

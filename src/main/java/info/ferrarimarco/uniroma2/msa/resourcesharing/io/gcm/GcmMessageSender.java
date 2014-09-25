@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class GcmMessageSender {
 	
-	static Random random = new Random();
+	private static Random random;
 	
 	@Autowired
 	private Connection connection;
@@ -25,6 +25,10 @@ public class GcmMessageSender {
 	 * 
 	 */
 	public String getRandomMessageId() {
+		if(random == null) {
+			random = new Random();
+		}
+		
 		return "m-" + Long.toString(random.nextLong());
 	}
 
@@ -94,15 +98,5 @@ public class GcmMessageSender {
 	public void sendJsonAck(String to, String messageId) {
 		String ack = createJsonAck(to, messageId);
 		send(ack);
-	}
-	
-	/**
-	 * Send GCM message to all registered devices
-	 * 
-	 * @param payload
-	 *            message data
-	 */
-	public void broadcastMessage(Map<String, String> payload) {
-
 	}
 }
