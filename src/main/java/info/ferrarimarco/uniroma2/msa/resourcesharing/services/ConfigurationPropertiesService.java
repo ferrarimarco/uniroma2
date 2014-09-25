@@ -29,4 +29,16 @@ public class ConfigurationPropertiesService {
 	public String getPropetiesFilePath() {
 		return propetiesFilePath;
 	}
+	
+	public String getGcmSender() {
+		return properties.getProperty("info.ferrarimarco.msa.resourcesharing.gcm.sender");
+	}
+	
+	public String getGcmServerKey() {
+		return properties.getProperty("info.ferrarimarco.msa.resourcesharing.gcm.serverkey");
+	}
+	
+	public String getGcmMaxTtl() {
+		return properties.getProperty("info.ferrarimarco.msa.resourcesharing.gcm.maxttl");
+	}
 }
