@@ -1,13 +1,10 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm;
 
-import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Packet;
 import org.json.simple.JSONValue;
 import org.springframework.beans.factory.annotation.Autowired;
