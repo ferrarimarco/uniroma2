@@ -1,22 +1,11 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#0099cc"
-    android:theme="@style/FullscreenTheme"
-    tools:context="info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.InitActivity">
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="#0099cc"
+             android:theme="@style/FullscreenTheme"
+             tools:context="info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.InitActivity">
 
-    <ProgressBar
-        android:id="@+id/init_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
-
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
     <TextView
         android:id="@+id/init_content"
         android:layout_width="match_parent"
@@ -26,5 +15,5 @@
         android:textStyle="bold"
         android:textSize="50sp"
         android:gravity="center"
-        android:text="@string/init_splash_text" />
+        android:text="@string/init_splash_text"/>
 </FrameLayout>
