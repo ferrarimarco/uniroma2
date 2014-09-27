@@ -2,7 +2,6 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -32,54 +31,58 @@ public class GcmIntentServiceImpl extends IntentService{
         if(extras != null && !extras.isEmpty()){
             GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
             String messageType = gcm.getMessageType(intent);
-            switch(messageType){
-                case GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR:
-                    try{
-                        throw new IOException("Unable to send GCM message");
-                    }catch(IOException e){
-                        e.printStackTrace();
-                        Log.e(GcmIntentServiceImpl.class.getName(), e.getMessage());
-                    }
-                    break;
-                case GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE:
-                    String action = intent.getStringExtra(GcmMessageField.DATA_ACTION.getStringValue());
-                    GcmMessage gcmMessage = GcmMessage.valueOf(action);
-                    Long time;
+            if(messageType != null){
+                switch(messageType){
+                    case GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR:
+                        try{
+                            throw new IOException("Unable to send GCM message");
+                        }catch(IOException e){
+                            e.printStackTrace();
+                            Log.e(GcmIntentServiceImpl.class.getName(), e.getMessage());
+                        }
+                        break;
+                    case GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE:
+                        String action = intent.getStringExtra(GcmMessageField.DATA_ACTION.getStringValue());
+                        GcmMessage gcmMessage = GcmMessage.valueOf(action);
+                        Long time;
 
-                    switch(gcmMessage){
-                        case NEW_RESOURCE_FROM_OTHERS:
-                            time = intent.getLongExtra(GcmMessageField.DATA_TTL.getStringValue(), 0L);
+                        switch(gcmMessage){
+                            case NEW_RESOURCE_FROM_OTHERS:
+                                time = intent.getLongExtra(GcmMessageField.DATA_TTL.getStringValue(), 0L);
 
-                            if(time != 0L){
-                                String title = intent.getStringExtra(GcmMessageField.DATA_TITLE.getStringValue());
-                                String description = intent.getStringExtra(GcmMessageField.DATA_DESCRIPTION.getStringValue());
-                                Location location = intent.getParcelableExtra(GcmMessageField.DATA_LOCATION.getStringValue());
-                                Long creationTimeMs = intent.getLongExtra(GcmMessageField.DATA_CREATION_TIME.getStringValue(), DateTime.now().getMillis());
-                                String acquisitionMode = intent.getStringExtra(GcmMessageField.DATA_ACQUISITION_MODE.getStringValue());
+                                if(time != 0L){
+                                    String title = intent.getStringExtra(GcmMessageField.DATA_TITLE.getStringValue());
+                                    String description = intent.getStringExtra(GcmMessageField.DATA_DESCRIPTION.getStringValue());
+                                    Double latitude = Double.parseDouble(intent.getStringExtra(GcmMessageField.DATA_LATITUDE.getStringValue()));
+                                    Double longitude = Double.parseDouble(intent.getStringExtra(GcmMessageField.DATA_LONGITUDE.getStringValue()));
+                                    Long creationTimeMs = intent.getLongExtra(GcmMessageField.DATA_CREATION_TIME.getStringValue(), DateTime.now().getMillis());
+                                    String acquisitionMode = intent.getStringExtra(GcmMessageField.DATA_ACQUISITION_MODE.getStringValue());
+                                    String creatorId = intent.getStringExtra(GcmMessageField.DATA_CREATOR_ID.getStringValue());
+
+                                    Resource resource = new Resource(title, description, latitude, longitude, new DateTime(creationTimeMs), acquisitionMode, creatorId, Resource.ResourceType.NEW, Boolean.FALSE, time, null);
+                                    ResourceIntentService.startActionReceiveResourceFromOthers(this, resource);
+                                }
+
+                                break;
+                            case BOOK_RESOURCE:
+                                time = intent.getLongExtra(GcmMessageField.DATA_CREATION_TIME.getStringValue(), 0L);
+
+                                if(time == 0L){
+                                    throw new IllegalArgumentException("Unable to read resource information");
+                                }
+
+                                String bookerId = intent.getStringExtra(GcmMessageField.DATA_BOOKER_ID.getStringValue());
                                 String creatorId = intent.getStringExtra(GcmMessageField.DATA_CREATOR_ID.getStringValue());
 
-                                Resource resource = new Resource(title, description, location, new DateTime(creationTimeMs), acquisitionMode, creatorId, Resource.ResourceType.NEW, Boolean.FALSE, time, null);
-                                ResourceIntentService.startActionReceiveResourceFromOthers(this, resource);
-                            }
+                                Resource resource = new Resource(null, null, null, null, new DateTime(time), null, creatorId, Resource.ResourceType.CREATED_BY_ME, Boolean.FALSE, time, bookerId);
+                                ResourceIntentService.startActionBookResourceFromMe(this, resource);
 
-                            break;
-                        case BOOK_RESOURCE:
-                            time = intent.getLongExtra(GcmMessageField.DATA_CREATION_TIME.getStringValue(), 0L);
+                                break;
 
-                            if(time == 0L){
-                                throw new IllegalArgumentException("Unable to read resource information");
-                            }
+                        }
+                        break;
+                }
 
-                            String bookerId = intent.getStringExtra(GcmMessageField.DATA_BOOKER_ID.getStringValue());
-                            String creatorId = intent.getStringExtra(GcmMessageField.DATA_CREATOR_ID.getStringValue());
-
-                            Resource resource = new Resource(null, null, null, new DateTime(time), null, creatorId, Resource.ResourceType.CREATED_BY_ME, Boolean.FALSE, time, bookerId);
-                            ResourceIntentService.startActionBookResourceFromMe(this, resource);
-
-                            break;
-
-                    }
-                    break;
             }
 
             // Release the wake lock provided by the WakefulBroadcastReceiver.
