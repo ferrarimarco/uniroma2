@@ -4,7 +4,6 @@ import android.content.Context;
 
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
 
 public class ObjectGraphUtils{
 
@@ -13,15 +12,15 @@ public class ObjectGraphUtils{
     private ObjectGraphUtils(){
     }
 
-    private static void initObjectGraph(Context applicationContext){
+    private static void initObjectGraph(Context context){
         if(objectGraph != null){
-            objectGraph = ObjectGraph.create(new ContextModuleImpl(applicationContext), new DaoModuleImpl());
+            objectGraph = ObjectGraph.create(new ContextModuleImpl(context));
         }
     }
 
-    public static ObjectGraph getObjectGraph(Context applicationContext){
+    public static ObjectGraph getObjectGraph(Context context){
         if(objectGraph == null){
-            initObjectGraph(applicationContext);
+            initObjectGraph(context.getApplicationContext());
         }
 
         return objectGraph;

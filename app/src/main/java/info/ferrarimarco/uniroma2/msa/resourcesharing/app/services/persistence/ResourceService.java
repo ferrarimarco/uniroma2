@@ -19,7 +19,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTas
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
-public class ResourceService {
+public class ResourceService{
 
     protected ObjectGraph objectGraph;
 
@@ -35,41 +35,42 @@ public class ResourceService {
     private List<Resource> bookedByMeResources;
 
     @Inject
-    public ResourceService(Context context) {
-        objectGraph = ObjectGraphUtils.getObjectGraph(context);
+    public ResourceService(Context context){
+        objectGraph = ObjectGraphUtils.getObjectGraph(context.getApplicationContext());
+        objectGraph.inject(this);
         createdByMeResources = new ArrayList<>();
         resourcesByOthers = new ArrayList<>();
         bookedByMeResources = new ArrayList<>();
     }
 
-    public Resource readResourceFromLocalStorage(Resource criterion) {
-        try {
+    public Resource readResourceFromLocalStorage(Resource criterion){
+        try{
             resourceDao.open(Resource.class);
-        } catch (SQLException e) {
+        }catch(SQLException e){
             throw new RuntimeException(e);
         }
 
         Resource result = null;
 
-        try {
+        try{
             result = resourceDao.readUniqueResult(criterion);
-        } catch (SQLException e) {
+        }catch(SQLException e){
             throw new RuntimeException(e);
-        } finally {
+        }finally{
             resourceDao.close();
         }
 
         return result;
     }
 
-    public void readResourcesLocal(ResourceTaskType resourceTaskType) {
+    public void readResourcesLocal(ResourceTaskType resourceTaskType){
         ResourceTaskResult result = new ResourceTaskResult(resourceTaskType);
 
         List<Resource> resources = null;
 
         Resource res = new Resource();
 
-        switch (resourceTaskType) {
+        switch(resourceTaskType){
             case READ_NEW_RESOURCES_LOCAL:
                 res.setType(Resource.ResourceType.NEW);
                 resources = resourcesByOthers;
@@ -85,15 +86,15 @@ public class ResourceService {
         }
 
         // No items in cache. Load from db
-        if (resources != null && resources.isEmpty()) {
-            try {
+        if(resources != null && resources.isEmpty()){
+            try{
                 resourceDao.open(Resource.class);
                 resources.addAll(resourceDao.read(res));
-            } catch (SQLException e) {
+            }catch(SQLException e){
                 e.printStackTrace();
                 result.setTaskResultType(TaskResultType.FAILURE);
-            } finally {
-                if (resourceDao != null) {
+            }finally{
+                if(resourceDao != null){
                     resourceDao.close();
                 }
             }
@@ -105,22 +106,22 @@ public class ResourceService {
         bus.post(new ResourceListAvailableEvent(result));
     }
 
-    public ResourceTaskResult saveResourceLocal(Resource resource) {
+    public ResourceTaskResult saveResourceLocal(Resource resource){
         ResourceTaskResult result = new ResourceTaskResult(ResourceTaskType.SAVE_RESOURCE_FROM_ME_LOCAL);
         result.addResource(resource);
 
-        try {
+        try{
             resourceDao.open(Resource.class);
             resourceDao.save(resource);
-        } catch (SQLException e) {
+        }catch(SQLException e){
             e.printStackTrace();
             result.setTaskResultType(TaskResultType.FAILURE);
             return result;
-        } finally {
+        }finally{
             resourceDao.close();
         }
 
-        switch (resource.getType()) {
+        switch(resource.getType()){
             case NEW:
                 resourcesByOthers.add(resource);
                 break;
@@ -135,13 +136,13 @@ public class ResourceService {
         return result;
     }
 
-    public ResourceTaskResult deleteResourceLocal(Resource resource) {
+    public ResourceTaskResult deleteResourceLocal(Resource resource){
         ResourceTaskResult result = new ResourceTaskResult(ResourceTaskType.DELETE_RESOURCE);
 
-        try {
+        try{
             resourceDao.delete(resource);
             result.setTaskResultType(TaskResultType.SUCCESS);
-        } catch (SQLException e) {
+        }catch(SQLException e){
             e.printStackTrace();
             result.setTaskResultType(TaskResultType.FAILURE);
             result.setMessage(e.getMessage());

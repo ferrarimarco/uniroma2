@@ -28,7 +28,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
  * <p/>
  * helper methods.
  */
-public class ResourceIntentService extends IntentService {
+public class ResourceIntentService extends IntentService{
 
     private static final int NEW_RESOURCE_NOTIFICATION_ID = 1;
     private static final int BOOKED_RESOURCE_NOTIFICATION_ID = 2;
@@ -47,14 +47,14 @@ public class ResourceIntentService extends IntentService {
     @Inject
     GcmMessagingServiceImpl gcmMessagingService;
 
-    public ResourceIntentService() {
+    public ResourceIntentService(){
         super("ResourceIntentService");
     }
 
     @Override
-    public void onCreate() {
+    public void onCreate(){
         super.onCreate();
-        ObjectGraph objectGraph = ObjectGraphUtils.getObjectGraph(this);
+        ObjectGraph objectGraph = ObjectGraphUtils.getObjectGraph(getApplicationContext());
         objectGraph.inject(this);
     }
 
@@ -64,7 +64,7 @@ public class ResourceIntentService extends IntentService {
      *
      * @see IntentService
      */
-    public static void startActionReceiveResourceFromOthers(Context context, Resource resource) {
+    public static void startActionReceiveResourceFromOthers(Context context, Resource resource){
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_RECEIVE_RESOURCE_FROM_OTHERS);
         intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
@@ -77,7 +77,7 @@ public class ResourceIntentService extends IntentService {
      *
      * @see IntentService
      */
-    public static void startActionSaveResourceFromMe(Context context, Resource resource) {
+    public static void startActionSaveResourceFromMe(Context context, Resource resource){
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_SAVE_RESOURCE_FROM_ME);
         intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
@@ -90,7 +90,7 @@ public class ResourceIntentService extends IntentService {
      *
      * @see IntentService
      */
-    public static void startActionBookResourceFromMe(Context context, Resource resource) {
+    public static void startActionBookResourceFromMe(Context context, Resource resource){
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_BOOK_RESOURCE_FROM_ME);
         intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
@@ -103,7 +103,7 @@ public class ResourceIntentService extends IntentService {
      *
      * @see IntentService
      */
-    public static void startActionBookResourceFromOthers(Context context, Resource resource) {
+    public static void startActionBookResourceFromOthers(Context context, Resource resource){
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_BOOK_RESOURCE_FROM_OTHERS);
         intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
@@ -116,7 +116,7 @@ public class ResourceIntentService extends IntentService {
      *
      * @see IntentService
      */
-    public static void startActionDeleteResourceFromMe(Context context, Resource resource) {
+    public static void startActionDeleteResourceFromMe(Context context, Resource resource){
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_DELETE_RESOURCE_FROM_ME);
         intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
@@ -125,31 +125,31 @@ public class ResourceIntentService extends IntentService {
 
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
+    protected void onHandleIntent(Intent intent){
+        if(intent != null){
             final String action = intent.getAction();
-            switch (action) {
-                case ACTION_SAVE_RESOURCE_FROM_ME: {
+            switch(action){
+                case ACTION_SAVE_RESOURCE_FROM_ME:{
                     final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
                     handleActionSaveResourceFromMe(resource);
                     break;
                 }
-                case ACTION_RECEIVE_RESOURCE_FROM_OTHERS: {
+                case ACTION_RECEIVE_RESOURCE_FROM_OTHERS:{
                     final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
                     handleActionReceiveResourceFromOthers(resource);
                     break;
                 }
-                case ACTION_BOOK_RESOURCE_FROM_ME: {
+                case ACTION_BOOK_RESOURCE_FROM_ME:{
                     final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
                     handleActionBookResourceFromMe(resource);
                     break;
                 }
-                case ACTION_BOOK_RESOURCE_FROM_OTHERS: {
+                case ACTION_BOOK_RESOURCE_FROM_OTHERS:{
                     final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
                     handleActionBookResourceFromOthers(resource);
                     break;
                 }
-                case ACTION_DELETE_RESOURCE_FROM_ME: {
+                case ACTION_DELETE_RESOURCE_FROM_ME:{
                     final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
                     handleActionDeleteResourceFromMe(resource);
                     break;
@@ -162,10 +162,10 @@ public class ResourceIntentService extends IntentService {
      * Handle action Save resource in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionSaveResourceFromMe(Resource resource) {
+    private void handleActionSaveResourceFromMe(Resource resource){
         ResourceTaskResult resourceTaskResult = resourceService.saveResourceLocal(resource);
 
-        if (TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())) {
+        if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
             throw new RuntimeException("Unable to save the resource into local storage");
         }
 
@@ -176,7 +176,7 @@ public class ResourceIntentService extends IntentService {
      * Handle action Save resource in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionBookResourceFromOthers(Resource resource) {
+    private void handleActionBookResourceFromOthers(Resource resource){
         gcmMessagingService.bookResourceFromOthers(resource);
     }
 
@@ -184,10 +184,10 @@ public class ResourceIntentService extends IntentService {
      * Handle action Receive resource in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionReceiveResourceFromOthers(Resource resource) {
+    private void handleActionReceiveResourceFromOthers(Resource resource){
         ResourceTaskResult resourceTaskResult = resourceService.saveResourceLocal(resource);
 
-        if (TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())) {
+        if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
             throw new RuntimeException("Unable to save the resource into local storage");
         }
 
@@ -198,10 +198,10 @@ public class ResourceIntentService extends IntentService {
      * Handle action Book resource in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionDeleteResourceFromMe(Resource resource) {
+    private void handleActionDeleteResourceFromMe(Resource resource){
         ResourceTaskResult resourceTaskResult = resourceService.deleteResourceLocal(resource);
 
-        if (TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())) {
+        if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
             throw new RuntimeException("Unable to delete the resource from local storage");
         }
 
@@ -212,7 +212,7 @@ public class ResourceIntentService extends IntentService {
      * Handle action delete resource in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionBookResourceFromMe(Resource resource) {
+    private void handleActionBookResourceFromMe(Resource resource){
 
         // For reference
         String bookerId = resource.getBookerId();
@@ -225,22 +225,22 @@ public class ResourceIntentService extends IntentService {
         result.setBookerId(bookerId);
         ResourceTaskResult resourceTaskResult = resourceService.saveResourceLocal(resource);
 
-        if (TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())) {
+        if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
             throw new RuntimeException("Unable to save the resource into local storage");
         }
 
         showBookedResourceNotification(resource);
     }
 
-    private void showNewResourceNotification(Resource resource) {
+    private void showNewResourceNotification(Resource resource){
         showNotification(NEW_RESOURCE_NOTIFICATION_ID, getResources().getString(R.string.new_resource_notification_title), resource);
     }
 
-    private void showBookedResourceNotification(Resource resource) {
+    private void showBookedResourceNotification(Resource resource){
         showNotification(BOOKED_RESOURCE_NOTIFICATION_ID, getResources().getString(R.string.booked_resource_notification_title), resource);
     }
 
-    private void showNotification(Integer notificationId, String notificationTitle, Resource resource) {
+    private void showNotification(Integer notificationId, String notificationTitle, Resource resource){
         NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         Intent intent = new Intent(this, ShowResourcesActivity.class).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
