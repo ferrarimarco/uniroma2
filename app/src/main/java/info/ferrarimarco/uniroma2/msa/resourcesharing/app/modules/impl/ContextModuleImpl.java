@@ -3,12 +3,16 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl;
 import android.content.Context;
 
 import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.AbstractActivity;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.CreateNewResourceActivity;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.InitActivity;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.ShowResourcesActivity;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHelperManager;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
@@ -16,7 +20,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.DaoModule;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
 
-@Module(injects = {GenericDao.class, GcmMessagingServiceImpl.class, AbstractActivity.class, ResourceService.class})
+@Module(injects = {GenericDao.class, GcmMessagingServiceImpl.class, AbstractActivity.class, InitActivity.class, ShowResourcesActivity.class, CreateNewResourceActivity.class, ResourceService.class})
 public class ContextModuleImpl implements DaoModule{
 
     private final Context applicationContext;
@@ -27,14 +31,14 @@ public class ContextModuleImpl implements DaoModule{
 
     @Provides
     @Singleton
-    public Context provideApplicationContext() {
+    public Context provideApplicationContext(){
         return applicationContext;
     }
 
     @Provides
     @Singleton
-    public Bus provideBus() {
-        return new Bus();
+    public Bus provideBus(){
+        return new Bus(ThreadEnforcer.ANY);
     }
 
     @Override
