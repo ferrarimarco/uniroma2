@@ -9,20 +9,10 @@ public class ObjectGraphUtils{
 
     private static ObjectGraph objectGraph;
 
-    private ObjectGraphUtils(){
-    }
-
-    private static void initObjectGraph(Context context){
-        if(objectGraph != null){
-            objectGraph = ObjectGraph.create(new ContextModuleImpl(context));
-        }
-    }
-
     public static ObjectGraph getObjectGraph(Context context){
-        if(objectGraph == null){
-            initObjectGraph(context.getApplicationContext());
+        if(objectGraph == null && context != null){
+            objectGraph = ObjectGraph.create(new ContextModuleImpl(context.getApplicationContext()));
         }
-
         return objectGraph;
     }
 }
