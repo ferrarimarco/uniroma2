@@ -49,7 +49,7 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
 
         ButterKnife.inject(this);
 
-        objectGraph = ObjectGraphUtils.getObjectGraph(this.getApplicationContext());
+        objectGraph = ObjectGraphUtils.getObjectGraph(getApplicationContext());
         objectGraph.inject(this);
 
         googlePlayServiceUtils.checkGooglePlayServicesInstallationStatus(this);
