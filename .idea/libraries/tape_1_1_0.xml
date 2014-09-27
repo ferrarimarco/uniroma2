@@ -4,6 +4,8 @@
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/tape/1.1.0/e8401f899d5a9cd571b8b974246e09b6b7f1349f/tape-1.1.0.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/tape/1.1.0/6b6bc61ce3c612ffd63a40004a093093dc24040a/tape-1.1.0-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>
