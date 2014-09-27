@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="registered_user_id">1</string>
-
-    <string name="backend_service_endpoint">http://localhost:8080</string>
-
-    <string name="security_provider">BC</string>
-    <string name="security_cryptography_algorithm">AES</string>
-    <string name="security_cryptography_transformation">AES/CBC/PKCS7Padding</string>
-    <string name="security_hashing_algorithm">SHA-512</string>
-
     <!-- 86400 = 1 Day -->
     <string name="gcm_project_id">uniroma2-msa-ferrarimarco</string>
     <string name="gcm_ttl">86400</string>
