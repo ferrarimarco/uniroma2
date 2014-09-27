@@ -7,16 +7,21 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.squareup.otto.Bus;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
+import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.GcmRegistrationCompletedEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.config.SharedPreferencesServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
 public class GcmMessagingServiceImpl {
 
@@ -43,7 +48,6 @@ public class GcmMessagingServiceImpl {
         DATA_ACTION("action"),
         DATA_TITLE("title"),
         DATA_DESCRIPTION("description"),
-        DATA_LOCATION("location"),
         DATA_CREATION_TIME("creation_time"),
         DATA_ACQUISITION_MODE("acquisition_mode"),
         DATA_CREATOR_ID("creator_id"),
@@ -78,6 +82,9 @@ public class GcmMessagingServiceImpl {
     @Inject
     Context context;
 
+    @Inject
+    Bus bus;
+
     private Long defaultGcmTtl;
     private Long maxGcmTtl;
     private static final String GCM_SUFFIX = "@gcm.googleapis.com";
@@ -87,6 +94,8 @@ public class GcmMessagingServiceImpl {
 
     @Inject
     public GcmMessagingServiceImpl() {
+        ObjectGraph objectGraph = ObjectGraphUtils.getObjectGraph(context);
+        objectGraph.inject(this);
         defaultGcmTtl = Long.parseLong(String.valueOf(context.getResources().getString(R.string.gcm_ttl)));
         maxGcmTtl = Long.parseLong(String.valueOf(context.getResources().getString(R.string.gcm_max_ttl)));
         String gcmProjectId = context.getResources().getString(R.string.gcm_project_id);
@@ -108,23 +117,20 @@ public class GcmMessagingServiceImpl {
                     throw new IllegalArgumentException("No user specified while registering with backend");
                 }
 
-                String userId = params[0];
-                Log.d(GcmMessagingServiceImpl.class.getName(), "Send GCM registration Id to backend for: " + userId);
-
                 try {
                     gcm = GoogleCloudMessaging.getInstance(context);
-                    gcmRegistrationId = gcm.register(context.getResources().getString(R.string.gcm_project_id));
+                    gcmRegistrationId = gcm.register(context.getResources().getString(R.string.gcm_project_number));
 
                     Log.d(GcmMessagingServiceImpl.class.getName(), "GCM Registration ID: " + gcmRegistrationId);
 
                     // Persist the regID - no need to register again.
                     sharedPreferencesService.storeGcmRegistrationId(gcmRegistrationId);
+                    bus.post(new GcmRegistrationCompletedEvent(TaskResultType.SUCCESS));
                 } catch (IOException ex) {
                     Log.e(GcmMessagingServiceImpl.class.getName(), "Error :" + ex.getMessage());
-                    // TODO: handle this error
-                    // If there is an error, don't just keep trying to register.
-                    // Require the user to click a button again, or perform
-                    // exponential back-off.
+                    GcmRegistrationCompletedEvent event = new GcmRegistrationCompletedEvent(TaskResultType.FAILURE);
+                    event.setFailureCause(ex);
+                    bus.post(event);
                 }
 
                 return null;
@@ -141,12 +147,13 @@ public class GcmMessagingServiceImpl {
         data.putString(GcmMessageField.DATA_ACTION.getStringValue(), GcmMessage.NEW_RESOURCE_FROM_ME.getStringValue());
         data.putString(GcmMessageField.DATA_TITLE.getStringValue(), resource.getTitle());
         data.putString(GcmMessageField.DATA_DESCRIPTION.getStringValue(), resource.getDescription());
-        data.putParcelable(GcmMessageField.DATA_LOCATION.getStringValue(), resource.getLocation());
-        data.putLong(GcmMessageField.DATA_CREATION_TIME.getStringValue(), resource.getCreationTime().getMillis());
+        data.putString(GcmMessageField.DATA_LATITUDE.getStringValue(), resource.getLatitude().toString());
+        data.putString(GcmMessageField.DATA_LONGITUDE.getStringValue(), resource.getLocation().toString());
+        data.putString(GcmMessageField.DATA_CREATION_TIME.getStringValue(), ((Long) resource.getCreationTime().getMillis()).toString());
         data.putString(GcmMessageField.DATA_ACQUISITION_MODE.getStringValue(), resource.getAcquisitionMode());
         data.putString(GcmMessageField.DATA_CREATOR_ID.getStringValue(), userService.readRegisteredUserId());
-        data.putLong(GcmMessageField.DATA_TTL.getStringValue(), resource.getTimeToLive());
-        data.putBoolean(GcmMessageField.DATA_NEEDS_ACK.getStringValue(), true);
+        data.putString(GcmMessageField.DATA_TTL.getStringValue(), resource.getTimeToLive().toString());
+        data.putString(GcmMessageField.DATA_NEEDS_ACK.getStringValue(), Boolean.TRUE.toString());
 
         sendGcmMessage(data, resource.getTimeToLive());
     }

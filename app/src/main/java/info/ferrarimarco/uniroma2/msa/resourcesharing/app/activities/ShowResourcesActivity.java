@@ -23,6 +23,7 @@ import butterknife.OnItemClick;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArrayAdapter;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.GcmRegistrationCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceListAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
@@ -273,5 +274,11 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     @Override
     protected boolean terminateActivityAfterRedirect() {
         return false;
+    }
+
+    @Override
+    @Subscribe
+    public void gcmRegistrationCompletedEventListener(GcmRegistrationCompletedEvent gcmRegistrationCompletedEvent){
+        super.gcmRegistrationCompletedEvent(gcmRegistrationCompletedEvent);
     }
 }

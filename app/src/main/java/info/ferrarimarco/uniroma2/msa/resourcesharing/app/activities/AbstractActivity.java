@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.GcmRegistrationCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gms.GooglePlayServiceUtils;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
@@ -140,15 +141,30 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
             }
         }else{
             // Registration is completed
+            afterInit();
+        }
+    }
 
-            if(getRedirectActivityClass() != null){
-                Intent startDestinationActivity = new Intent(this, getRedirectActivityClass());
-                startActivity(startDestinationActivity);
-            }
+    public void gcmRegistrationCompletedEvent(GcmRegistrationCompletedEvent gcmRegistrationCompletedEvent){
+        switch(gcmRegistrationCompletedEvent.getTaskResultType()){
+            case SUCCESS:
+                afterInit();
+                break;
+            case FAILURE:
+                throw new RuntimeException(gcmRegistrationCompletedEvent.getFailureCause());
+        }
+    }
 
-            if(terminateActivityAfterRedirect()){
-                finish();
-            }
+    public abstract void gcmRegistrationCompletedEventListener(GcmRegistrationCompletedEvent gcmRegistrationCompletedEvent);
+
+    private void afterInit(){
+        if(getRedirectActivityClass() != null){
+            Intent startDestinationActivity = new Intent(this, getRedirectActivityClass());
+            startActivity(startDestinationActivity);
+        }
+
+        if(terminateActivityAfterRedirect()){
+            finish();
         }
     }
 

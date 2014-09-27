@@ -11,12 +11,14 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
+import com.squareup.otto.Subscribe;
 
 import org.joda.time.DateTime;
 
 import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.GcmRegistrationCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.ResourceIntentService;
 
 public class CreateNewResourceActivity extends AbstractActivity implements AdapterView.OnItemSelectedListener{
@@ -40,6 +42,12 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_resource);
+    }
+
+    @Override
+    @Subscribe
+    public void gcmRegistrationCompletedEventListener(GcmRegistrationCompletedEvent gcmRegistrationCompletedEvent){
+        super.gcmRegistrationCompletedEvent(gcmRegistrationCompletedEvent);
     }
 
     @Override
