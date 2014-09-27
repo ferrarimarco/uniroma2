@@ -11,8 +11,7 @@ import org.robolectric.annotation.Config;
 
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.ContextModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.DaoModuleImpl;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.TestDaoModuleImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.impl.TestContextModuleImpl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -26,16 +25,8 @@ public abstract class BaseTezt {
     protected ObjectGraph objectGraph;
 
     public BaseTezt() {
-        initContext();
-        initObjectGraph();
-    }
-
-    public void initContext() {
         context = Robolectric.application.getApplicationContext();
-    }
-
-    public void initObjectGraph() {
-        objectGraph = ObjectGraph.create(new ContextModuleImpl(context), new DaoModuleImpl(), new TestDaoModuleImpl());
+        objectGraph = ObjectGraph.create(new ContextModuleImpl(context), new TestContextModuleImpl());
         objectGraph.inject(this);
     }
 
