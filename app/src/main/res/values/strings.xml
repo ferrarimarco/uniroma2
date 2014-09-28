@@ -4,6 +4,8 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <string name="app_name">MSA Resource Sharing</string>
     <string name="action_settings">Settings</string>
@@ -24,6 +26,10 @@
     <string name="resource_acquisition_mode_hint">Acquisition Mode</string>
     <string name="resource_ttl_hint">TTL</string>
     <string name="resource_save_completed">New Resource Created</string>
+    <string name="resource_save_error_empty_title">Please enter a title</string>
+    <string name="resource_save_error_empty_description">Please enter a description</string>
+    <string name="resource_save_error_empty_acquisition_mode">Please enter an acquisition mode</string>
+    <string name="resource_save_error_empty_ttl">Please enter a ttl</string>
 
     <!-- Errors -->
     <string name="google_play_services_missing_text">Google Play Services must be installed</string>
