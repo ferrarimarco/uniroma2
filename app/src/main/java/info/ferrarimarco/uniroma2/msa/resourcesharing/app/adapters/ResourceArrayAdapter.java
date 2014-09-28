@@ -19,15 +19,15 @@ import javax.inject.Inject;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 
-public class ResourceArrayAdapter extends ArrayAdapter<Resource> {
+public class ResourceArrayAdapter extends ArrayAdapter<Resource>{
 
     private Context context;
     private int layoutResourceId;
 
-    private static DateTimeFormatter dateTimeFormatter = DateTimeFormat.fullDateTime();
+    private static DateTimeFormatter dateTimeFormatter = DateTimeFormat.mediumTime();
 
     @Inject
-    public ResourceArrayAdapter(Context context) {
+    public ResourceArrayAdapter(Context context){
         super(context, R.layout.resource_row_list, new ArrayList<Resource>());
         this.context = context;
         this.layoutResourceId = R.layout.resource_row_list;
@@ -35,7 +35,7 @@ public class ResourceArrayAdapter extends ArrayAdapter<Resource> {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent){
 
         /*
          * The convertView argument is essentially a "ScrapView" as described is Lucas post
@@ -43,7 +43,7 @@ public class ResourceArrayAdapter extends ArrayAdapter<Resource> {
          * It will have a non-null value when ListView is asking you recycle the row layout.
          * So, when convertView is not null, you should simply update its contents instead of inflating a new row layout.
          */
-        if (convertView == null) {
+        if(convertView == null){
             // inflate the layout
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             convertView = inflater.inflate(layoutResourceId, parent, false);
