@@ -7,8 +7,10 @@ import android.location.Location;
 
 import javax.inject.Inject;
 
+import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.location.LocationService;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -42,6 +44,8 @@ public class UserIntentService extends IntentService{
 
     public UserIntentService(){
         super("UserIntentService");
+        ObjectGraph objectGraph = ObjectGraphUtils.getObjectGraph(this);
+        objectGraph.inject(this);
     }
 
     @Override

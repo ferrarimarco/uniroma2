@@ -6,19 +6,10 @@ import android.location.Location;
 
 import com.google.android.gms.location.LocationClient;
 
-import dagger.ObjectGraph;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
-
 public class LocationTrackingIntentService extends IntentService{
 
     public LocationTrackingIntentService(){
         super("LocationTrackingIntentService");
-    }
-
-    @Override
-    public void onCreate(){
-        ObjectGraph objectGraph = ObjectGraphUtils.getObjectGraph(getApplicationContext());
-        objectGraph.inject(this);
     }
 
     @Override
