@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
-    <string name="delete">Delete</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
@@ -14,7 +11,6 @@
     <string name="title_section_new_resource">New Resources</string>
     <string name="title_section_created_by_me_resource">Created by me</string>
     <string name="title_section_booked_resource">Booked by me</string>
-    <string name="title_activity_fullscreen">FullscreenActivity</string>
     <string name="init_splash_text">MSA</string>
     <string name="action_new_resource">New Resource</string>
     <string name="title_activity_create_new_resource">Create New Resource</string>
@@ -47,9 +43,7 @@
     <string name="new_resource_notification_title">New Resource available</string>
     <string name="booked_resource_notification_title">Resource Booked</string>
 
-    <string name="book_resource_dialog_title">Book resource confirmation</string>
     <string name="book_resource_dialog_message">Would you like to book this resource?</string>
-    <string name="delete_resource_dialog_title">Delete resource confirmation</string>
     <string name="delete_resource_dialog_message">Would you like to delete this resource?</string>
 
 </resources>
