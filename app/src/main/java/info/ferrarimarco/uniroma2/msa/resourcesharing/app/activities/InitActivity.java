@@ -2,6 +2,7 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.WindowManager;
 
 import com.google.android.gms.plus.Plus;
 import com.squareup.otto.Subscribe;
@@ -15,6 +16,7 @@ public class InitActivity extends AbstractActivity{
     protected void onCreate(Bundle savedInstanceState){
         setContentView(R.layout.activity_init);
         super.onCreate(savedInstanceState);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     @Subscribe
