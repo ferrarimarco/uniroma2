@@ -7,14 +7,14 @@ import javax.inject.Inject;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 
-public class SharedPreferencesServiceImpl {
+public class SharedPreferencesServiceImpl{
 
     private SharedPreferences applicationSharedPreferences;
     private String gcmRegistrationIdKey;
     private String googleAccountNameKey;
 
     @Inject
-    public SharedPreferencesServiceImpl(Context applicationContext) {
+    public SharedPreferencesServiceImpl(Context applicationContext){
         gcmRegistrationIdKey = applicationContext.getResources().getString(R.string.gcm_registration_id_key);
         googleAccountNameKey = applicationContext.getResources().getString(R.string.google_account_name_key);
         String sharedPreferencesId = applicationContext.getResources().getString(R.string.shared_preferences_id);
@@ -30,7 +30,7 @@ public class SharedPreferencesServiceImpl {
      * @return registration ID, or empty string if there is no existing
      * registration ID.
      */
-    public String getGcmRegistrationId() {
+    public String getGcmRegistrationId(){
         return applicationSharedPreferences.getString(gcmRegistrationIdKey, "");
     }
 
@@ -40,27 +40,39 @@ public class SharedPreferencesServiceImpl {
      *
      * @param regId registration ID
      */
-    public void storeGcmRegistrationId(String regId) {
+    public void storeGcmRegistrationId(String regId){
         SharedPreferences.Editor editor = applicationSharedPreferences.edit();
         editor.putString(gcmRegistrationIdKey, regId);
         editor.apply();
     }
 
-    public Boolean isGoogleSignInCompleted() {
+    public Boolean isGoogleSignInCompleted(){
         return applicationSharedPreferences.contains(googleAccountNameKey);
     }
 
-    public String getGoogleAccountName() {
+    public String getGoogleAccountName(){
         return applicationSharedPreferences.getString(googleAccountNameKey, "");
     }
 
-    public void storeGoogleAccountName(String googleAccountName) {
+    public void storeGoogleAccountName(String googleAccountName){
         SharedPreferences.Editor editor = applicationSharedPreferences.edit();
         editor.putString(googleAccountNameKey, googleAccountName);
         editor.apply();
     }
 
-    public boolean isGcmRegistrationCompleted() {
+    public boolean isGcmRegistrationCompleted(){
         return applicationSharedPreferences.contains(gcmRegistrationIdKey);
+    }
+
+    public String readRegisteredUserId(){
+        return getGoogleAccountName();
+    }
+
+    public Boolean isRegistrationCompleted(){
+        return this.isGoogleSignInCompleted();
+    }
+
+    public void registerNewUser(String userId){
+        this.storeGoogleAccountName(userId);
     }
 }

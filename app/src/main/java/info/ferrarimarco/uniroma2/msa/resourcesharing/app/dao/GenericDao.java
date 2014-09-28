@@ -51,28 +51,6 @@ public class GenericDao<T extends GenericEntity>{
         return dao.queryForMatching(resource);
     }
 
-    public T readUniqueResult(T resource) throws SQLException{
-        checkInitialization();
-
-        List<T> resources = dao.queryForMatching(resource);
-        T result = null;
-
-        if(resources != null){
-            if(resources.size() > 1){
-                throw new SQLException("More than one entry found for given criterion");
-            }else{
-                result = resources.get(0);
-            }
-        }
-
-        return result;
-    }
-
-    public List<T> readAll() throws SQLException{
-        checkInitialization();
-        return dao.queryForAll();
-    }
-
     public int update(T resource) throws SQLException{
         checkInitialization();
         return dao.update(resource);

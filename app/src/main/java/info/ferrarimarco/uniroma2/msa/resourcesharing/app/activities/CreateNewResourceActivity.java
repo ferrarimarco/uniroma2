@@ -11,14 +11,12 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
-import com.squareup.otto.Subscribe;
 
 import org.joda.time.DateTime;
 
 import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.GcmRegistrationCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.ResourceIntentService;
 
 public class CreateNewResourceActivity extends AbstractActivity implements AdapterView.OnItemSelectedListener{
@@ -40,24 +38,8 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_resource);
-    }
-
-    @Override
-    @Subscribe
-    public void gcmRegistrationCompletedEventListener(GcmRegistrationCompletedEvent gcmRegistrationCompletedEvent){
-        super.gcmRegistrationCompletedEvent(gcmRegistrationCompletedEvent);
-    }
-
-    @Override
-    protected Class getRedirectActivityClass(){
-        return null;
-    }
-
-    @Override
-    protected boolean terminateActivityAfterRedirect(){
-        return false;
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -75,32 +57,58 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
         int id = item.getItemId();
 
         if(id == R.id.action_save_new_resource){
-            String title = titleEditText.getText().toString();
-            String description = descriptionEditText.getText().toString();
-            String acquisitionMode = acquisitionModeEditText.getText().toString();
-            Long ttlAmount = Long.parseLong(ttlAmountEditText.getText().toString());
-            String selectedTtlUnit = ttlSpinner.getSelectedItem().toString();
+            if(areFieldsValid()){
+                String title = titleEditText.getText().toString();
+                String description = descriptionEditText.getText().toString();
+                String acquisitionMode = acquisitionModeEditText.getText().toString();
+                Long ttlAmount = Long.parseLong(ttlAmountEditText.getText().toString());
+                String selectedTtlUnit = ttlSpinner.getSelectedItem().toString();
 
-            // In secs
-            Long resourceTtl = ttlAmount;
+                // In secs
+                Long resourceTtl = ttlAmount;
 
-            if(selectedTtlUnit.equals(getResources().getString(R.string.minutes))){
-                resourceTtl *= 60;
-            }else if(selectedTtlUnit.equals(getResources().getString(R.string.hours))){
-                resourceTtl *= 60 * 60;
-            }else if(selectedTtlUnit.equals(getResources().getString(R.string.days))){
-                resourceTtl *= 60 * 60 * 24;
-            }else{
-                throw new IllegalArgumentException("Unable to choose a TTL unit measure");
+                if(selectedTtlUnit.equals(getResources().getString(R.string.minutes))){
+                    resourceTtl *= 60;
+                }else if(selectedTtlUnit.equals(getResources().getString(R.string.hours))){
+                    resourceTtl *= 60 * 60;
+                }else if(selectedTtlUnit.equals(getResources().getString(R.string.days))){
+                    resourceTtl *= 60 * 60 * 24;
+                }
+
+                Location location = getLastKnownLocation();
+
+                Resource resource = new Resource(title, description, location.getLatitude(), location.getLongitude(), DateTime.now(), acquisitionMode, sharedPreferencesService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, resourceTtl, null);
+                ResourceIntentService.startActionSaveResourceFromMe(getApplicationContext(), resource);
+                Toast.makeText(this, getResources().getString(R.string.resource_save_completed), Toast.LENGTH_SHORT).show();
+                finish();
             }
-
-            Resource resource = new Resource(title, description, this.getLastKnownLocation().getLatitude(), this.getLastKnownLocation().getLongitude(), DateTime.now(), acquisitionMode, userService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, resourceTtl, null);
-            ResourceIntentService.startActionSaveResourceFromMe(getApplicationContext(), resource);
-            Toast.makeText(this, getResources().getString(R.string.resource_save_completed), Toast.LENGTH_SHORT).show();
-            finish();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private Boolean areFieldsValid(){
+        if(titleEditText.getText().toString().trim().isEmpty()){
+            Toast.makeText(this, getResources().getString(R.string.resource_save_error_empty_title), Toast.LENGTH_SHORT).show();
+            return Boolean.FALSE;
+        }
+
+        if(descriptionEditText.getText().toString().trim().isEmpty()){
+            Toast.makeText(this, getResources().getString(R.string.resource_save_error_empty_description), Toast.LENGTH_SHORT).show();
+            return Boolean.FALSE;
+        }
+
+        if(acquisitionModeEditText.getText().toString().trim().isEmpty()){
+            Toast.makeText(this, getResources().getString(R.string.resource_save_error_empty_acquisition_mode), Toast.LENGTH_SHORT).show();
+            return Boolean.FALSE;
+        }
+
+        if(ttlAmountEditText.getText().toString().trim().isEmpty()){
+            Toast.makeText(this, getResources().getString(R.string.resource_save_error_empty_ttl), Toast.LENGTH_SHORT).show();
+            return Boolean.FALSE;
+        }
+
+        return Boolean.TRUE;
     }
 
     private Location getLastKnownLocation(){
@@ -113,5 +121,9 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
 
     @Override
     public void onNothingSelected(AdapterView<?> parent){
+    }
+
+    @Override
+    public void onConnected(Bundle arg0){
     }
 }

@@ -23,20 +23,17 @@ import butterknife.OnItemClick;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.adapters.ResourceArrayAdapter;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.GcmRegistrationCompletedEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.ResourceListAvailableEvent;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskType;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.LocationTrackingIntentService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.ResourceIntentService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
 
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.BOOKED_BY_ME;
 import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.CREATED_BY_ME;
-import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.NEW;
+import static info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource.ResourceType.CREATED_BY_OTHERS;
 
-public class ShowResourcesActivity extends AbstractActivity implements ActionBar.OnNavigationListener, SwipeRefreshLayout.OnRefreshListener {
+public class ShowResourcesActivity extends AbstractActivity implements ActionBar.OnNavigationListener, SwipeRefreshLayout.OnRefreshListener{
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -58,29 +55,28 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     private LocationRequest balancedPowerlocationRequest;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    protected void onCreate(Bundle savedInstanceState){
         setContentView(R.layout.activity_show_resources);
+        super.onCreate(savedInstanceState);
 
         // Set up the action bar to show a dropdown list.
         final ActionBar actionBar = getActionBar();
 
-        if (actionBar != null) {
+        if(actionBar != null){
             // Set up the dropdown list navigation in the action bar.
             Resource.ResourceType[] resourceTypes = Resource.ResourceType.values();
             String[] resourceTypeLabels = new String[resourceTypes.length];
 
-            for (Resource.ResourceType resourceType : resourceTypes) {
-                switch (resourceType) {
-                    case NEW:
-                        resourceTypeLabels[Resource.ResourceType.NEW.ordinal()] = getString(R.string.title_section_new_resource);
+            for(Resource.ResourceType resourceType : resourceTypes){
+                switch(resourceType){
+                    case CREATED_BY_OTHERS:
+                        resourceTypeLabels[Resource.ResourceType.CREATED_BY_OTHERS.ordinal()] = getString(R.string.title_section_new_resource);
                         break;
                     case CREATED_BY_ME:
                         resourceTypeLabels[Resource.ResourceType.CREATED_BY_ME.ordinal()] = getString(R.string.title_section_created_by_me_resource);
                         break;
                     case BOOKED_BY_ME:
-                        resourceTypeLabels[Resource.ResourceType.CREATED_BY_ME.ordinal()] = getString(R.string.title_section_booked_resource);
+                        resourceTypeLabels[Resource.ResourceType.BOOKED_BY_ME.ordinal()] = getString(R.string.title_section_booked_resource);
                         break;
                 }
             }
@@ -106,9 +102,7 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
+    public void onConnected(Bundle arg0){
         // Request for location updates
         Intent locationTrackingIntent = new Intent(this, LocationTrackingIntentService.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 1, locationTrackingIntent, 0);
@@ -116,53 +110,55 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause(){
+        if(googleApiClient.isConnected()){
+            Intent locationTrackingIntent = new Intent(this, LocationTrackingIntentService.class);
+            PendingIntent pendingIntent = PendingIntent.getService(this, 1, locationTrackingIntent, 0);
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, pendingIntent);
+        }
+
         super.onPause();
-        // Request for location updates
-        Intent locationTrackingIntent = new Intent(this, LocationTrackingIntentService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(this, 1, locationTrackingIntent, 0);
-        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, pendingIntent);
     }
 
     @Override
-    public void onRefresh() {
-        if (getActionBar() != null) {
+    public void onRefresh(){
+        if(getActionBar() != null){
             loadResources(getActionBar().getSelectedNavigationIndex());
         }
     }
 
     @Override
-    public boolean onNavigationItemSelected(int position, long id) {
+    public boolean onNavigationItemSelected(int position, long id){
         loadResources(position);
         return true;
     }
 
     @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
+    public void onRestoreInstanceState(Bundle savedInstanceState){
         // Restore the previously serialized current dropdown position.
-        if (getActionBar() != null && savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
+        if(getActionBar() != null && savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)){
             getActionBar().setSelectedNavigationItem(savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
         }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        if (getActionBar() != null) {
+    public void onSaveInstanceState(Bundle outState){
+        if(getActionBar() != null){
             // Serialize the current dropdown position.
             outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getActionBar().getSelectedNavigationIndex());
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu){
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.show_resources, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
             case R.id.action_new_resource:
                 Intent intent = new Intent(this, CreateNewResourceActivity.class);
                 startActivity(intent);
@@ -174,30 +170,30 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
         }
     }
 
-    private void loadResources(int resourceTypeId) {
+    private void loadResources(int resourceTypeId){
         swipeLayout.setRefreshing(true);
 
         Resource.ResourceType resourceType = idToResourceType(resourceTypeId);
 
-        switch (resourceType) {
-            case NEW:
-                resourceService.readResourcesLocal(ResourceTaskType.READ_NEW_RESOURCES_LOCAL);
+        switch(resourceType){
+            case CREATED_BY_OTHERS:
+                resourceService.readResourceLocal(new Resource(Resource.ResourceType.CREATED_BY_OTHERS), ResourceService.ResourceServiceOperationMode.ASYNC);
                 break;
             case CREATED_BY_ME:
-                resourceService.readResourcesLocal(ResourceTaskType.READ_CREATED_BY_ME_RESOURCES_LOCAL);
+                resourceService.readResourceLocal(new Resource(Resource.ResourceType.CREATED_BY_ME), ResourceService.ResourceServiceOperationMode.ASYNC);
                 break;
             case BOOKED_BY_ME:
-                resourceService.readResourcesLocal(ResourceTaskType.READ_BOOKED_BY_ME_RESOURCES);
+                resourceService.readResourceLocal(new Resource(Resource.ResourceType.BOOKED_BY_ME), ResourceService.ResourceServiceOperationMode.ASYNC);
                 break;
         }
     }
 
-    private Resource.ResourceType idToResourceType(int resourceTypeId) {
-        if (CREATED_BY_ME.ordinal() == resourceTypeId) {
+    private Resource.ResourceType idToResourceType(int resourceTypeId){
+        if(CREATED_BY_ME.ordinal() == resourceTypeId){
             return CREATED_BY_ME;
-        } else if (NEW.ordinal() == resourceTypeId) {
-            return NEW;
-        } else if (BOOKED_BY_ME.ordinal() == resourceTypeId) {
+        }else if(CREATED_BY_OTHERS.ordinal() == resourceTypeId){
+            return CREATED_BY_OTHERS;
+        }else if(BOOKED_BY_ME.ordinal() == resourceTypeId){
             return BOOKED_BY_ME;
         }
 
@@ -205,80 +201,54 @@ public class ShowResourcesActivity extends AbstractActivity implements ActionBar
     }
 
     @Subscribe
-    public void resourceListAvailable(ResourceListAvailableEvent event) {
+    public void resourceListAvailable(ResourceListAvailableEvent event){
         ResourceTaskResult result = event.getResult();
 
-        if (getActionBar() != null) {
-            if (TaskResultType.SUCCESS.equals(result.getTaskResultType())) {
-                resourceArrayAdapter.clear();
-                resourceArrayAdapter.addAll(result.getResources());
-                resourceArrayAdapter.notifyDataSetChanged();
-            } else if (TaskResultType.FAILURE.equals(result.getTaskResultType())) {
-                throw new IllegalStateException("Unable to read from internal data storage");
-            }
+        if(getActionBar() != null){
+            resourceArrayAdapter.clear();
+            resourceArrayAdapter.addAll(result.getResources());
+            resourceArrayAdapter.notifyDataSetChanged();
         }
 
         swipeLayout.setRefreshing(false);
     }
 
     @OnItemClick(R.id.resources_list_view)
-    public void onResourceClick(int position) {
+    public void onResourceClick(int position){
         // Get clicked resource
         final Resource resource = resourceArrayAdapter.getItem(position);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        switch (resource.getType()) {
-            case NEW:
-                builder.setMessage(R.string.book_resource_dialog_message + " " + resource.getTitle())
-                        .setTitle(R.string.book_resource_dialog_title);
+        switch(resource.getType()){
+            case CREATED_BY_OTHERS:
+                builder.setMessage(R.string.book_resource_dialog_message + " " + resource.getTitle()).setTitle(R.string.book_resource_dialog_message);
 
-                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+                builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialog, int id){
                         ResourceIntentService.startActionBookResourceFromOthers(ShowResourcesActivity.this, resource);
                         dialog.dismiss();
                     }
                 });
-                builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
                 break;
             case CREATED_BY_ME:
-                builder.setMessage(R.string.delete_resource_dialog_message + " " + resource.getTitle())
-                        .setTitle(R.string.delete_resource_dialog_title);
+                builder.setMessage(resource.getTitle()).setTitle(R.string.delete_resource_dialog_message);
 
-                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+                builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialog, int id){
                         ResourceIntentService.startActionDeleteResourceFromMe(ShowResourcesActivity.this, resource);
+                        ShowResourcesActivity.this.resourceArrayAdapter.remove(resource);
                     }
                 });
                 break;
         }
 
-        builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int id){
                 dialog.cancel();
             }
         });
 
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
-
-    @Override
-    protected Class getRedirectActivityClass() {
-        return null;
-    }
-
-    @Override
-    protected boolean terminateActivityAfterRedirect() {
-        return false;
-    }
-
-    @Override
-    @Subscribe
-    public void gcmRegistrationCompletedEventListener(GcmRegistrationCompletedEvent gcmRegistrationCompletedEvent){
-        super.gcmRegistrationCompletedEvent(gcmRegistrationCompletedEvent);
     }
 }

@@ -10,14 +10,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.ShowResourcesActivity;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.ResourceTaskResult;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.task.TaskResultType;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
@@ -54,7 +54,7 @@ public class ResourceIntentService extends IntentService{
     @Override
     public void onCreate(){
         super.onCreate();
-        ObjectGraph objectGraph = ObjectGraphUtils.getObjectGraph(getApplicationContext());
+        ObjectGraph objectGraph = ObjectGraphUtils.getObjectGraph(this);
         objectGraph.inject(this);
     }
 
@@ -163,12 +163,7 @@ public class ResourceIntentService extends IntentService{
      * parameters.
      */
     private void handleActionSaveResourceFromMe(Resource resource){
-        ResourceTaskResult resourceTaskResult = resourceService.saveResourceLocal(resource);
-
-        if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
-            throw new RuntimeException("Unable to save the resource into local storage");
-        }
-
+        resourceService.saveResourceLocal(resource);
         gcmMessagingService.sendNewResource(resource);
     }
 
@@ -185,32 +180,22 @@ public class ResourceIntentService extends IntentService{
      * parameters.
      */
     private void handleActionReceiveResourceFromOthers(Resource resource){
-        ResourceTaskResult resourceTaskResult = resourceService.saveResourceLocal(resource);
-
-        if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
-            throw new RuntimeException("Unable to save the resource into local storage");
-        }
-
+        resourceService.saveResourceLocal(resource);
         showNewResourceNotification(resource);
     }
 
     /**
-     * Handle action Book resource in the provided background thread with the provided
+     * Handle action Delete resource in the provided background thread with the provided
      * parameters.
      */
     private void handleActionDeleteResourceFromMe(Resource resource){
-        ResourceTaskResult resourceTaskResult = resourceService.deleteResourceLocal(resource);
-
-        if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
-            throw new RuntimeException("Unable to delete the resource from local storage");
-        }
-
+        resourceService.deleteResourceLocal(resource);
         gcmMessagingService.deleteResourceFromMe(resource);
     }
 
     /**
-     * Handle action delete resource in the provided background thread with the provided
-     * parameters.
+     * Handle action book resource from me. This action sets the booker ID for a resource created
+     * by the user.
      */
     private void handleActionBookResourceFromMe(Resource resource){
 
@@ -221,13 +206,19 @@ public class ResourceIntentService extends IntentService{
         // and we have to build a criteria
         resource.setBookerId(null);
 
-        Resource result = resourceService.readResourceFromLocalStorage(resource);
-        result.setBookerId(bookerId);
-        ResourceTaskResult resourceTaskResult = resourceService.saveResourceLocal(resource);
+        // Update resource type
+        resource.setType(Resource.ResourceType.CREATED_BY_ME);
 
-        if(TaskResultType.FAILURE.equals(resourceTaskResult.getTaskResultType())){
-            throw new RuntimeException("Unable to save the resource into local storage");
+        List<Resource> result = resourceService.readResourceLocal(resource, ResourceService.ResourceServiceOperationMode.SYNC).getResources();
+
+        if(result == null || result.size() != 1){
+            throw new IllegalArgumentException("Cannot find a resource to book");
         }
+
+        Resource resultResource = result.get(0);
+
+        resultResource.setBookerId(bookerId);
+        resourceService.updateResourceLocal(resultResource);
 
         showBookedResourceNotification(resource);
     }

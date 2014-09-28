@@ -13,7 +13,7 @@ import org.joda.time.DateTime;
 public class Resource implements GenericEntity, Parcelable{
 
     public enum ResourceType{
-        NEW,
+        CREATED_BY_OTHERS,
         CREATED_BY_ME,
         BOOKED_BY_ME
     }
@@ -66,7 +66,11 @@ public class Resource implements GenericEntity, Parcelable{
     private Long timeToLive;
 
     public Resource(){
-        type = ResourceType.NEW;
+        this(ResourceType.CREATED_BY_OTHERS);
+    }
+
+    public Resource(ResourceType resourceType){
+        type = resourceType;
         expired = false;
     }
 
@@ -107,7 +111,11 @@ public class Resource implements GenericEntity, Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags){
-        dest.writeLong(androidId);
+        if(androidId != null){
+            dest.writeLong(androidId);
+        }else{
+            dest.writeLong(-1L);
+        }
         dest.writeString(title);
         dest.writeString(description);
         dest.writeDouble(latitude);
@@ -117,7 +125,12 @@ public class Resource implements GenericEntity, Parcelable{
         dest.writeString(creatorId);
         dest.writeSerializable(type);
         dest.writeByte((byte) (expired ? 1 : 0));
-        dest.writeLong(timeToLive);
+        if(timeToLive != null){
+            dest.writeLong(timeToLive);
+        }else{
+            dest.writeLong(-1L);
+        }
+
         dest.writeString(bookerId);
     }
 

@@ -18,10 +18,9 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.event.GcmRegistrationCompletedEvent;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.config.SharedPreferencesServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gms.GooglePlayServiceUtils;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.UserService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
 public abstract class AbstractActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
@@ -32,7 +31,7 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
     GcmMessagingServiceImpl gcmMessagingService;
 
     @Inject
-    UserService userService;
+    SharedPreferencesServiceImpl sharedPreferencesService;
 
     @Inject
     Bus bus;
@@ -57,7 +56,6 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
 
         // Initializing google plus api client
         googleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(Plus.API).addApi(LocationServices.API).addScope(Plus.SCOPE_PLUS_LOGIN).build();
-        googleApiClient.connect();
     }
 
     @Override
@@ -78,19 +76,15 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
     }
 
     @Override
-    protected void onStop(){
-        super.onStop();
-        if(googleApiClient.isConnected()){
-            googleApiClient.disconnect();
-        }
-    }
-
-    @Override
     protected void onPause(){
         super.onPause();
 
         // Always unregister when an object no longer should be on the bus.
         bus.unregister(this);
+
+        if(googleApiClient.isConnected()){
+            googleApiClient.disconnect();
+        }
     }
 
     @Override
@@ -121,54 +115,6 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
     }
 
     @Override
-    public void onConnected(Bundle arg0){
-        // Google API client is connected
-
-        // Check user registration
-        if(!userService.isRegistrationCompleted() || !gcmMessagingService.isGcmRegistrationCompleted()){
-            if(!userService.isRegistrationCompleted()){
-                // Get user's information
-                if(Plus.PeopleApi.getCurrentPerson(googleApiClient) != null){
-                    String accountName = Plus.AccountApi.getAccountName(googleApiClient);
-                    userService.registerNewUser(accountName);
-                }else{
-                    throw new IllegalArgumentException("No account name defined");
-                }
-            }
-
-            if(!gcmMessagingService.isGcmRegistrationCompleted()){
-                gcmMessagingService.registerWithGcm();
-            }
-        }else{
-            // Registration is completed
-            afterInit();
-        }
-    }
-
-    public void gcmRegistrationCompletedEvent(GcmRegistrationCompletedEvent gcmRegistrationCompletedEvent){
-        switch(gcmRegistrationCompletedEvent.getTaskResultType()){
-            case SUCCESS:
-                afterInit();
-                break;
-            case FAILURE:
-                throw new RuntimeException(gcmRegistrationCompletedEvent.getFailureCause());
-        }
-    }
-
-    public abstract void gcmRegistrationCompletedEventListener(GcmRegistrationCompletedEvent gcmRegistrationCompletedEvent);
-
-    private void afterInit(){
-        if(getRedirectActivityClass() != null){
-            Intent startDestinationActivity = new Intent(this, getRedirectActivityClass());
-            startActivity(startDestinationActivity);
-        }
-
-        if(terminateActivityAfterRedirect()){
-            finish();
-        }
-    }
-
-    @Override
     public void onConnectionFailed(ConnectionResult result){
         // Google API client encountered an error while connecting
 
@@ -183,8 +129,4 @@ public abstract class AbstractActivity extends Activity implements GoogleApiClie
             }
         }
     }
-
-    protected abstract Class getRedirectActivityClass();
-
-    protected abstract boolean terminateActivityAfterRedirect();
 }
