@@ -16,12 +16,13 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.ShowResourc
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.GenericDao;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.dao.helper.DatabaseHelperManager;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.app.modules.DaoModule;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.ResourceIntentService;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.UserIntentService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
 
-@Module(injects = {GenericDao.class, GcmMessagingServiceImpl.class, AbstractActivity.class, InitActivity.class, ShowResourcesActivity.class, CreateNewResourceActivity.class, ResourceService.class})
-public class ContextModuleImpl implements DaoModule{
+@Module(injects = {GenericDao.class, GcmMessagingServiceImpl.class, AbstractActivity.class, InitActivity.class, ShowResourcesActivity.class, CreateNewResourceActivity.class, ResourceService.class, UserIntentService.class, ResourceIntentService.class})
+public class ContextModuleImpl{
 
     private final Context applicationContext;
 
@@ -41,7 +42,6 @@ public class ContextModuleImpl implements DaoModule{
         return new Bus(ThreadEnforcer.ANY);
     }
 
-    @Override
     @Provides
     @Singleton
     public GenericDao<Resource> provideResourceDao(DatabaseHelperManager databaseHelperManager, Context context){
