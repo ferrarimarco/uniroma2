@@ -2,9 +2,9 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 public class GcmMessageHandler {
@@ -22,7 +22,6 @@ public class GcmMessageHandler {
 		@SuppressWarnings("unchecked")
 		Map<String, String> payload = (Map<String, String>) jsonObject.get("data");
 
-		
 		String from = jsonObject.get("from").toString();
 		
 		// Send ACK to CCS

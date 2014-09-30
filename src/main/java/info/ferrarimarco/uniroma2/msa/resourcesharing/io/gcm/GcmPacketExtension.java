@@ -4,6 +4,7 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smack.util.XmlStringBuilder;
 
 /**
  * XMPP Packet Extension for GCM Cloud Connection Server.
@@ -34,9 +35,9 @@ public class GcmPacketExtension extends DefaultPacketExtension {
 
 			// Must override toXML() because it includes a <body>
 			@Override
-			public String toXML() {
+			public XmlStringBuilder toXML() {
 
-				StringBuilder buf = new StringBuilder();
+				XmlStringBuilder buf = new XmlStringBuilder();
 				buf.append("<message");
 				if (getXmlns() != null) {
 					buf.append(" xmlns=\"").append(getXmlns()).append("\"");
@@ -56,7 +57,7 @@ public class GcmPacketExtension extends DefaultPacketExtension {
 				buf.append(">");
 				buf.append(GcmPacketExtension.this.toXML());
 				buf.append("</message>");
-				return buf.toString();
+				return buf;
 			}
 		};
 	}

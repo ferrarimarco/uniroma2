@@ -3,6 +3,7 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm;
 import lombok.extern.slf4j.Slf4j;
 
 import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.XMPPConnection;
 
 @Slf4j
 public class GcmConnectionListener implements ConnectionListener{
@@ -18,7 +19,7 @@ public class GcmConnectionListener implements ConnectionListener{
 
 	@Override
 	public void reconnectingIn(int seconds) {
-		log.info("Reconnecting in %d secs", seconds);
+		log.info("Reconnecting in {} secs", seconds);
 	}
 
 	@Override
@@ -29,5 +30,15 @@ public class GcmConnectionListener implements ConnectionListener{
 	@Override
 	public void connectionClosed() {
 		log.info("Connection closed.");
+	}
+
+	@Override
+	public void authenticated(XMPPConnection connection) {
+		log.info("Authenticated.");
+	}
+
+	@Override
+	public void connected(XMPPConnection connection) {
+		log.info("Connected.");
 	}
 }

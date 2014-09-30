@@ -1,21 +1,79 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.jivesoftware.smack.Connection;
+import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLSocketFactory;
+import javax.security.sasl.SaslException;
+
+import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.json.simple.JSONValue;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class GcmMessageSender {
 	
 	private static Random random;
 	
-	@Autowired
-	private Connection connection;
+	private XMPPConnection connection;
+	
+	@Value("${info.ferrarimarco.msa.resourcesharing.gcm.server}")
+	private String gcmServer;
+	
+	@Value("${info.ferrarimarco.msa.resourcesharing.gcm.port}")
+	private String gcmServerPort;
+	
+	@Value("${info.ferrarimarco.msa.resourcesharing.gcm.username}")
+	private String username;
+	
+	@Value("${info.ferrarimarco.msa.resourcesharing.gcm.serverkey}")
+	private String password;
+	
+	public void connect() throws SmackException, IOException, XMPPException {
+		connection.connect();
+	}
+	
+	public void login() throws SaslException, XMPPException, SmackException, IOException {
+		connection.login(username, password);
+	}
+	
+	@PostConstruct
+	public void initConnection() throws XMPPException, SmackException, IOException {
+		// Add GcmPacketExtension
+		ProviderManager.addExtensionProvider(GcmPacketExtension.GCM_ELEMENT_NAME, GcmPacketExtension.GCM_NAMESPACE, new GcmPacketExtensionProvider());
+		
+		ConnectionConfiguration config = new ConnectionConfiguration(gcmServer, Integer.parseInt(gcmServerPort));
+		config.setSecurityMode(SecurityMode.enabled);
+		config.setReconnectionAllowed(true);
+		config.setRosterLoadedAtLogin(false);
+		config.setSendPresence(false);
+		config.setSocketFactory(SSLSocketFactory.getDefault());
+
+		// NOTE: Set to true to launch a window with information about packets
+		// sent and received
+		config.setDebuggerEnabled(true);
+
+		XMPPConnection connection = new XMPPTCPConnection(config);
+		connection.addConnectionListener(new GcmConnectionListener());
+		connection.addPacketListener(new GcmPacketListener(), new PacketTypeFilter(Message.class));
+		connection.addPacketInterceptor(new GcmPacketInterceptor(), new PacketTypeFilter(Message.class));
+		
+		this.connection = connection;
+	}
 	
 	/**
 	 * Returns a random message id to uniquely identify a message.
@@ -34,8 +92,12 @@ public class GcmMessageSender {
 
 	/**
 	 * Sends a downstream GCM message.
+	 * @throws XMPPException 
+	 * @throws IOException 
+	 * @throws SmackException 
 	 */
-	public void send(String jsonRequest) {
+	private void send(String jsonRequest) throws SmackException, IOException, XMPPException {
+		
 		Packet request = new GcmPacketExtension(jsonRequest).toPacket();
 		connection.sendPacket(request);
 	}
@@ -75,7 +137,12 @@ public class GcmMessageSender {
 	 */
 	public void sendJsonMessage(String to, Map<String, String> payload, String collapseKey, Long timeToLive, Boolean delayWhileIdle) {
 		String message = createJsonMessage(to, getRandomMessageId(), payload, collapseKey, timeToLive, delayWhileIdle);
-		send(message);
+		try {
+			send(message);
+		} catch (SmackException | IOException | XMPPException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 
@@ -97,6 +164,11 @@ public class GcmMessageSender {
 	 */
 	public void sendJsonAck(String to, String messageId) {
 		String ack = createJsonAck(to, messageId);
-		send(ack);
+		try {
+			send(ack);
+		} catch (SmackException | IOException | XMPPException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
