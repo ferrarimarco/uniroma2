@@ -1,5 +1,8 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 
 import java.io.IOException;
@@ -9,9 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 @ContextConfiguration("classpath:spring-context.xml")
 public class ConfigurationPropertiesServiceTest extends BaseSpringTest{

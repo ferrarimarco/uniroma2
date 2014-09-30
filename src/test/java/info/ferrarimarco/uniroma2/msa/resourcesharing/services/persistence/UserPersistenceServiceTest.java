@@ -1,15 +1,14 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-
-import java.util.List;
-
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.HashingService;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.UserPersistenceService;
+
+import java.util.List;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;

@@ -2,7 +2,8 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;

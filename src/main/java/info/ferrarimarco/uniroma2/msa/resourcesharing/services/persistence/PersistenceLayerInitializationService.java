@@ -1,11 +1,11 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 
-import javax.annotation.PostConstruct;
-
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.HashingService;
+
+import javax.annotation.PostConstruct;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;

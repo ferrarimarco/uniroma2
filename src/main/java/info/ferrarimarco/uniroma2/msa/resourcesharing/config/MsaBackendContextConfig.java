@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @PropertySource("classpath:MsaResourceSharingCommon.properties")
-@ComponentScan(basePackages = {"info.ferrarimarco.uniroma2.msa.resourcesharing"})
+@ComponentScan(basePackages = {"info.ferrarimarco.uniroma2.msa.resourcesharing", "info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.config"})
 @EnableTransactionManagement
 public class MsaBackendContextConfig {
 	@Bean

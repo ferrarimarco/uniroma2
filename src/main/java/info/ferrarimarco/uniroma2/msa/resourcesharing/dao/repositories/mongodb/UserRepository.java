@@ -1,8 +1,8 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.dao.repositories.mongodb;
 
-import java.util.List;
-
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
+
+import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
