@@ -46,5 +46,4 @@ public class ResourcePersistenceService extends AbstractMongoPersistenceService{
 	public void deleteAll() {
 		repository.deleteAll();		
 	}
-
 }

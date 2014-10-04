@@ -1,6 +1,5 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.impl;
 
-import info.ferrarimarco.uniroma2.msa.resourcesharing.services.ConfigurationPropertiesService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.HashingService;
 
 import java.security.MessageDigest;
@@ -14,7 +13,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,8 +21,11 @@ public class ShaHashingService implements HashingService {
 	
 	private Logger logger = LoggerFactory.getLogger(ShaHashingService.class);
 	
-	@Autowired
-	private ConfigurationPropertiesService configurationPropertiesService;
+	@Value("${info.ferrarimarco.msa.resourcesharing.security.hashing.algorithm}")
+	private String hashingAlgorithm;
+	
+	@Value("${info.ferrarimarco.msa.resourcesharing.security.provider}")
+	private String cryptographicProvider;
 	
 	private MessageDigest mda;
 	
@@ -34,7 +36,7 @@ public class ShaHashingService implements HashingService {
 	@PostConstruct
 	private void init() {
 		try {
-			mda = MessageDigest.getInstance(configurationPropertiesService.getHashingAlgorithm(), configurationPropertiesService.getCryptographyProvider());
+			mda = MessageDigest.getInstance(hashingAlgorithm, cryptographicProvider);
 		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
 			logger.error("ShaHashingService failed initialisation - {}: {}", e.toString(), ExceptionUtils.getStackTrace(e));
 		}

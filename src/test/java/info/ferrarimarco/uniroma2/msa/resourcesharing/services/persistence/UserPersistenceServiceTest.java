@@ -47,23 +47,15 @@ public class UserPersistenceServiceTest extends BaseSpringTest {
     
     @Test(groups = {"userPersistenceServiceTestGroup","springServicesTestGroup"})
 	public void registerNewUserTest() {
+    	userPersistenceService.open();
     	
-    	String username = "Marco Ferrari";
-    	String password = "password";
     	String email = "ferrari.marco@gmail.com";
-    	
-    	byte[] hashedPasswordBytes = hashingService.hash(password);
-    	String hashedPassword = datatypeConversionService.bytesToHexString(hashedPasswordBytes);
-    	
-		ResourceSharingUser user = new ResourceSharingUser(username, email, hashedPassword, new DateTime());
-		
+		ResourceSharingUser user = new ResourceSharingUser(email, new DateTime());
 		logger.info("User to store: {}", user.toString());
-		
 		user = userPersistenceService.storeUser(user);
-		
 		logger.info("Stored User: {}", user.toString());
 		
-		List<ResourceSharingUser> users = userPersistenceService.readUsersByName(username);
+		List<ResourceSharingUser> users = userPersistenceService.readUsersByEmail(email);
 		
 		userPersistenceService.close();
 		

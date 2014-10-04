@@ -30,10 +30,6 @@ public class UserPersistenceService extends AbstractMongoPersistenceService{
 		return repository.save(user);
 	}
 
-	public List<ResourceSharingUser> readUsersByName(String name){
-		return repository.findByName(name);
-	}
-	
 	public List<ResourceSharingUser> readUsersByEmail(String email){
 		return repository.findByEmail(email);
 	}

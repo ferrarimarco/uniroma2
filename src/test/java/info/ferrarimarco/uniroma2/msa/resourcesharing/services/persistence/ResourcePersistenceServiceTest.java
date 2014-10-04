@@ -32,9 +32,6 @@ public class ResourcePersistenceServiceTest extends BaseSpringTest {
 	private HashingService hashingService;
 	
 	@Autowired
-	private UserPersistenceService userPersistenceService;
-	
-	@Autowired
 	private DatatypeConversionService datatypeConversionService;
 	
     @BeforeClass
@@ -42,11 +39,9 @@ public class ResourcePersistenceServiceTest extends BaseSpringTest {
     	super.setup();
     	assertThat(resourcePersistenceService, notNullValue());
     	assertThat(hashingService, notNullValue());
-    	assertThat(userPersistenceService, notNullValue());
     	assertThat(datatypeConversionService, notNullValue());
     	
     	logger.info("Cleaning Repositories...");
-    	userPersistenceService.dropCollection();
     	resourcePersistenceService.dropCollection();
     	logger.info("Repositories cleaned");
     }
@@ -54,32 +49,18 @@ public class ResourcePersistenceServiceTest extends BaseSpringTest {
     @AfterClass
     protected void teardown() throws Exception {
     	logger.info("Cleaning repositories...");
-    	userPersistenceService.dropCollection();
     	resourcePersistenceService.dropCollection();
     	logger.info("Repositories cleaned");
     }
     
     @Test(groups = {"springServicesTestGroup", "resourcePersistenceServiceTestGroup"}, dependsOnGroups = {"userPersistenceServiceTestGroup"})
 	public void registerNewResourceTest() {
-    	
-    	// Register a new user first
-    	String username = "Marco Ferrari";
-    	String password = "password";
-    	String email = "ferrari.marco@gmail.com";
-    	byte[] hashedPasswordBytes = hashingService.hash(password);
-    	String hashedPassword = datatypeConversionService.bytesToHexString(hashedPasswordBytes);
-		ResourceSharingUser user = userPersistenceService.storeUser(new ResourceSharingUser(username, email, hashedPassword, new DateTime()));
-		
-		userPersistenceService.close();
-		
-		ResourceSharingResource resource = new ResourceSharingResource("Test Resource Title", "Test Resource Description", "Test Resource Location", "Test Resource Acquisition Mode", user.getId());
-		
+    	resourcePersistenceService.open();
+    	ResourceSharingResource resource = new ResourceSharingResource("Test Resource Title", "Test Resource Description", "Test Resource Location", "Test Resource Acquisition Mode", "Test Creator ID");
 		resource = resourcePersistenceService.storeResource(resource);
-		
 		logger.info("Stored Resource: {}", resource.toString());
-		
+
 		List<ResourceSharingResource> resources = resourcePersistenceService.readResourcesByCreatorId(resource.getCreatorId());
-		
 		resourcePersistenceService.close();
 		
 		assertThat(resources, notNullValue());
