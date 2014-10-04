@@ -140,7 +140,9 @@ public class GcmMessagingServiceImpl{
         data.putString(GcmMessageField.DATA_TITLE.getStringValue(), resource.getTitle());
         data.putString(GcmMessageField.DATA_DESCRIPTION.getStringValue(), resource.getDescription());
         data.putString(GcmMessageField.DATA_LATITUDE.getStringValue(), resource.getLatitude().toString());
-        data.putString(GcmMessageField.DATA_LONGITUDE.getStringValue(), resource.getLocation().toString());
+        data.putString(GcmMessageField.DATA_LONGITUDE.getStringValue(), resource.getLongitude().toString());
+        data.putString(GcmMessageField.DATA_LOCALITY.getStringValue(), resource.getLocality());
+        data.putString(GcmMessageField.DATA_COUNTRY.getStringValue(), resource.getCountry());
         data.putString(GcmMessageField.DATA_CREATION_TIME.getStringValue(), ((Long) resource.getCreationTime().getMillis()).toString());
         data.putString(GcmMessageField.DATA_ACQUISITION_MODE.getStringValue(), resource.getAcquisitionMode());
         data.putString(GcmMessageField.DATA_CREATOR_ID.getStringValue(), sharedPreferencesService.readRegisteredUserId());
