@@ -1,4 +1,5 @@
-package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm;
+package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.connection;
+
 
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;

@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm;
+package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.connection;
 
 import lombok.extern.slf4j.Slf4j;
 

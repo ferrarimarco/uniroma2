@@ -1,4 +1,6 @@
-package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm;
+package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.connection;
+
+import info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.message.GcmMessageHandler;
 
 import java.util.Map;
 
@@ -40,12 +42,12 @@ public class GcmPacketListener implements PacketListener{
 				// Process Nack
 				gcmMessageHandler.handleNackReceipt(jsonObject);
 			} else {
-				log.info("Unrecognized message type (%s)", messageType.toString());
+				log.warn("Unrecognized message type (%s)", messageType.toString());
 			}
 		} catch (ParseException e) {
-			log.info("Error parsing JSON " + json, e);
+			log.error("Error parsing JSON " + json, e);
 		} catch (Exception e) {
-			log.info("Couldn't send echo.", e);
+			log.error("Couldn't send echo.", e);
 		}
 	}
 }
