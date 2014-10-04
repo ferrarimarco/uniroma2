@@ -1,5 +1,6 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities;
 
+import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,10 +15,14 @@ import com.google.android.gms.location.LocationServices;
 
 import org.joda.time.DateTime;
 
+import javax.inject.Inject;
+
 import butterknife.InjectView;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.ResourceIntentService;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.location.LocationService;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
 
 public class CreateNewResourceActivity extends AbstractActivity implements AdapterView.OnItemSelectedListener{
 
@@ -36,10 +41,15 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
     @InjectView(R.id.resource_ttl_spinner)
     Spinner ttlSpinner;
 
+    @Inject
+    LocationService locationService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         setContentView(R.layout.activity_create_new_resource);
         super.onCreate(savedInstanceState);
+
+        ObjectGraphUtils.getObjectGraph(this).inject(this);
     }
 
     @Override
@@ -77,7 +87,9 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
 
                 Location location = getLastKnownLocation();
 
-                Resource resource = new Resource(title, description, location.getLatitude(), location.getLongitude(), DateTime.now(), acquisitionMode, sharedPreferencesService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, resourceTtl, null);
+                Address address = locationService.resolveAddress(location);
+
+                Resource resource = new Resource(title, description, address.getLatitude(), address.getLongitude(), address.getLocality(), address.getCountryName(), DateTime.now(), acquisitionMode, sharedPreferencesService.readRegisteredUserId(), Resource.ResourceType.CREATED_BY_ME, false, resourceTtl, null);
                 ResourceIntentService.startActionSaveResourceFromMe(getApplicationContext(), resource);
                 Toast.makeText(this, getResources().getString(R.string.resource_save_completed), Toast.LENGTH_SHORT).show();
                 finish();

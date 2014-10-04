@@ -128,29 +128,26 @@ public class ResourceIntentService extends IntentService{
     protected void onHandleIntent(Intent intent){
         if(intent != null){
             final String action = intent.getAction();
+            final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
             switch(action){
+
                 case ACTION_SAVE_RESOURCE_FROM_ME:{
-                    final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
                     handleActionSaveResourceFromMe(resource);
                     break;
                 }
                 case ACTION_RECEIVE_RESOURCE_FROM_OTHERS:{
-                    final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
                     handleActionReceiveResourceFromOthers(resource);
                     break;
                 }
                 case ACTION_BOOK_RESOURCE_FROM_ME:{
-                    final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
                     handleActionBookResourceFromMe(resource);
                     break;
                 }
                 case ACTION_BOOK_RESOURCE_FROM_OTHERS:{
-                    final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
                     handleActionBookResourceFromOthers(resource);
                     break;
                 }
                 case ACTION_DELETE_RESOURCE_FROM_ME:{
-                    final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
                     handleActionDeleteResourceFromMe(resource);
                     break;
                 }

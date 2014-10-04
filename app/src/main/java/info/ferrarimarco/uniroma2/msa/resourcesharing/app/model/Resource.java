@@ -46,6 +46,12 @@ public class Resource implements GenericEntity, Parcelable{
     private Double longitude;
 
     @DatabaseField
+    private String locality;
+
+    @DatabaseField
+    private String country;
+
+    @DatabaseField
     private DateTime creationTime;
 
     @DatabaseField
@@ -74,12 +80,14 @@ public class Resource implements GenericEntity, Parcelable{
         expired = false;
     }
 
-    public Resource(String title, String description, Double latitude, Double longitude, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired, Long timeToLive, String bookerId){
+    public Resource(String title, String description, Double latitude, Double longitude, String locality, String country, DateTime creationTime, String acquisitionMode, String creatorId, ResourceType type, Boolean expired, Long timeToLive, String bookerId) {
         this();
         this.title = title;
         this.description = description;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.locality = locality;
+        this.country = country;
         this.creationTime = creationTime;
         this.acquisitionMode = acquisitionMode;
         this.creatorId = creatorId;
@@ -95,6 +103,8 @@ public class Resource implements GenericEntity, Parcelable{
         this.description = in.readString();
         this.latitude = in.readDouble();
         this.longitude = in.readDouble();
+        this.locality = in.readString();
+        this.country = in.readString();
         this.creationTime = (DateTime) in.readSerializable();
         this.acquisitionMode = in.readString();
         this.creatorId = in.readString();
@@ -120,6 +130,8 @@ public class Resource implements GenericEntity, Parcelable{
         dest.writeString(description);
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
+        dest.writeString(locality);
+        dest.writeString(country);
         dest.writeSerializable(creationTime);
         dest.writeString(acquisitionMode);
         dest.writeString(creatorId);
@@ -142,6 +154,8 @@ public class Resource implements GenericEntity, Parcelable{
                 ", description='" + description + '\'' +
                 ", latitude='" + latitude + '\'' +
                 ", longitude='" + longitude + '\'' +
+                ", locality='" + locality + '\'' +
+                ", country='" + country + '\'' +
                 ", creationTime=" + creationTime +
                 ", acquisitionMode='" + acquisitionMode + '\'' +
                 ", creatorId='" + creatorId + '\'' +
@@ -175,6 +189,10 @@ public class Resource implements GenericEntity, Parcelable{
             return false;
         if(longitude != null ? !longitude.equals(resource.longitude) : resource.longitude != null)
             return false;
+        if (locality != null ? !locality.equals(resource.locality) : resource.locality != null)
+            return false;
+        if (country != null ? !country.equals(resource.country) : resource.country != null)
+            return false;
         if(title != null ? !title.equals(resource.title) : resource.title != null)
             return false;
         if(type != null ? !type.equals(resource.type) : resource.type != null)
@@ -194,6 +212,8 @@ public class Resource implements GenericEntity, Parcelable{
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (latitude != null ? latitude.hashCode() : 0);
         result = 31 * result + (longitude != null ? longitude.hashCode() : 0);
+        result = 31 * result + (locality != null ? locality.hashCode() : 0);
+        result = 31 * result + (country != null ? country.hashCode() : 0);
         result = 31 * result + (creationTime != null ? creationTime.hashCode() : 0);
         result = 31 * result + (acquisitionMode != null ? acquisitionMode.hashCode() : 0);
         result = 31 * result + (creatorId != null ? creatorId.hashCode() : 0);
@@ -249,6 +269,22 @@ public class Resource implements GenericEntity, Parcelable{
 
     public void setLongitude(Double longitude){
         this.longitude = longitude;
+    }
+
+    public String getLocality() {
+        return locality;
+    }
+
+    public void setLocality(String locality) {
+        this.locality = locality;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     public String getAcquisitionMode(){
