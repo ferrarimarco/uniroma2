@@ -50,7 +50,6 @@ public class GcmMessagingServiceImpl{
         DATA_ACQUISITION_MODE("acquisition_mode"),
         DATA_CREATOR_ID("creator_id"),
         DATA_TTL("ttl"),
-        DATA_NEEDS_ACK("needs_ack"),
         DATA_ADDRESS("address"),
         DATA_LOCALITY("locality"),
         DATA_COUNTRY("country"),
@@ -93,8 +92,7 @@ public class GcmMessagingServiceImpl{
         objectGraph.inject(this);
         defaultGcmTtl = Long.parseLong(String.valueOf(context.getResources().getString(R.string.gcm_ttl)));
         maxGcmTtl = Long.parseLong(String.valueOf(context.getResources().getString(R.string.gcm_max_ttl)));
-        String gcmProjectId = context.getResources().getString(R.string.gcm_project_id);
-        gcmProjectRecipient = gcmProjectId + GCM_SUFFIX;
+        gcmProjectRecipient = context.getResources().getString(R.string.gcm_project_number) + GCM_SUFFIX;
         messageId = new AtomicInteger();
     }
 
@@ -147,7 +145,6 @@ public class GcmMessagingServiceImpl{
         data.putString(GcmMessageField.DATA_ACQUISITION_MODE.getStringValue(), resource.getAcquisitionMode());
         data.putString(GcmMessageField.DATA_CREATOR_ID.getStringValue(), sharedPreferencesService.readRegisteredUserId());
         data.putString(GcmMessageField.DATA_TTL.getStringValue(), resource.getTimeToLive().toString());
-        data.putString(GcmMessageField.DATA_NEEDS_ACK.getStringValue(), Boolean.TRUE.toString());
 
         sendGcmMessage(data, resource.getTimeToLive());
     }
@@ -158,7 +155,6 @@ public class GcmMessagingServiceImpl{
         data.putLong(GcmMessageField.DATA_CREATION_TIME.getStringValue(), resource.getCreationTime().getMillis());
         data.putString(GcmMessageField.DATA_CREATOR_ID.getStringValue(), resource.getCreatorId());
         data.putString(GcmMessageField.DATA_BOOKER_ID.getStringValue(), sharedPreferencesService.readRegisteredUserId());
-        data.putBoolean(GcmMessageField.DATA_NEEDS_ACK.getStringValue(), true);
 
         sendGcmMessage(data, maxGcmTtl);
     }
@@ -202,10 +198,6 @@ public class GcmMessagingServiceImpl{
                 }
 
                 Bundle data = params[0];
-
-                if(!data.containsKey(GcmMessageField.DATA_NEEDS_ACK.getStringValue())){
-                    data.putBoolean(GcmMessageField.DATA_NEEDS_ACK.getStringValue(), false);
-                }
 
                 String id = Integer.toString(messageId.incrementAndGet());
 
