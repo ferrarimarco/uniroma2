@@ -7,12 +7,9 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.HashingService;
-
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.AfterClass;
@@ -20,9 +17,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @ContextConfiguration("classpath:spring-context.xml")
+@Slf4j
 public class UserPersistenceServiceTest extends BaseSpringTest {
-	
-	private static Logger logger = LoggerFactory.getLogger(UserPersistenceServiceTest.class);
 	
 	@Autowired
 	private HashingService hashingService;
@@ -49,31 +45,25 @@ public class UserPersistenceServiceTest extends BaseSpringTest {
 	public void registerNewUserTest() {
     	userPersistenceService.open();
     	
-    	String email = "ferrari.marco@gmail.com";
-		ResourceSharingUser user = new ResourceSharingUser(email, new DateTime());
-		logger.info("User to store: {}", user.toString());
-		user = userPersistenceService.storeUser(user);
-		logger.info("Stored User: {}", user.toString());
+    	String userId = "test-user-id";
+		ResourceSharingUser user = new ResourceSharingUser(userId, "test-user-gcm-id", new DateTime(), "test-user-address", "test-user-locality", "test-user-country", 0.0, 0.0);
 		
-		List<ResourceSharingUser> users = userPersistenceService.readUsersByEmail(email);
+		user = userPersistenceService.storeUser(user);
+		ResourceSharingUser readUser = userPersistenceService.readUsersByUserId(userId);
 		
 		userPersistenceService.close();
 		
-		assertThat(users, notNullValue());
-		assertThat(users.size(), equalTo(1));
-		assertThat(user, equalTo(users.get(0)));
+		assertThat(readUser, notNullValue());
+		assertThat(user, equalTo(readUser));
 		
-		logger.info("Stored users list:");
-		
-		for(ResourceSharingUser u : users) {
-			logger.info(u.toString());
-		}
+		log.info("User to store: {}", user.toString());
+		log.info("Stored user: {}", readUser.toString());
 	}
     
     @AfterClass
     protected void teardown() throws Exception {
-    	logger.info("Cleaning User repository...");
+    	log.info("Cleaning User repository...");
     	userPersistenceService.dropCollection();
-    	logger.info("User repository cleaned");
+    	log.info("User repository cleaned");
     }
 }

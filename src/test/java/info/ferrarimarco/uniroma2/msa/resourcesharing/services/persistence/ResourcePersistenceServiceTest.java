@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.HashingService;
 
@@ -56,7 +55,10 @@ public class ResourcePersistenceServiceTest extends BaseSpringTest {
     @Test(groups = {"springServicesTestGroup", "resourcePersistenceServiceTestGroup"}, dependsOnGroups = {"userPersistenceServiceTestGroup"})
 	public void registerNewResourceTest() {
     	resourcePersistenceService.open();
-    	ResourceSharingResource resource = new ResourceSharingResource("Test Resource Title", "Test Resource Description", "Test Resource Location", "Test Resource Acquisition Mode", "Test Creator ID");
+    	
+    	ResourceSharingResource resource = new ResourceSharingResource("Test Resource ID", "Test Resource Title", "Test Resource Description", 0.0, 0.0,
+    			"Test Resource locality", "Test Resource Country", new DateTime(),
+    			"Test Resource Acquisition Mode", "Test Creator ID");
 		resource = resourcePersistenceService.storeResource(resource);
 		logger.info("Stored Resource: {}", resource.toString());
 

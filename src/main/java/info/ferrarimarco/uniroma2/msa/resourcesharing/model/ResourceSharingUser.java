@@ -20,6 +20,6 @@ public class ResourceSharingUser {
 	private String address;
 	private String locality;
 	private String country;
-	private String latitude;
-	private String longitude;
+	private Double latitude;
+	private Double longitude;
 }
