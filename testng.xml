@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="ResourceSharingCommonTestSuite" verbose="1">
+<suite name="MSA Resource Sharing Test Suite" verbose="1">
 	<test name="services">
 		<packages>
 			<package name="info.ferrarimarco.uniroma2.msa.resourcesharing.services.*" />
@@ -12,10 +12,5 @@
 		<classes>
 			<class name="info.ferrarimarco.uniroma2.msa.resourcesharing.controllers.io.ClientIOControllerTest" />
 		</classes>
-	</test>
-	<test name="ModelTests">
-		<packages>
-			<package name="info.ferrarimarco.uniroma2.msa.resourcesharing.model.*" />
-		</packages>
 	</test>
 </suite>
