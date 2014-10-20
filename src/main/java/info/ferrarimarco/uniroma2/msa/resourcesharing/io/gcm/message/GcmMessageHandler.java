@@ -20,8 +20,6 @@ public class GcmMessageHandler {
         NEW_RESOURCE_FROM_ME("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.CREATE_NEW_RESOURCE"),
         DELETE_MY_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.DELETE_RESOURCE"),
         UPDATE_USER_DETAILS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.UPDATE_USER_DETAILS"),
-
-        // This can never be received from devices. It should be only sent downstream by server
         NEW_RESOURCE_FROM_OTHERS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.NEW_RESOURCE_BY_OTHERS"),
         BOOK_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.BOOK_RESOURCE");
 
@@ -99,12 +97,12 @@ public class GcmMessageHandler {
      */
     public void handleIncomingDataMessage(Map<String, Object> jsonObject) {
         @SuppressWarnings("unchecked")
-        Map<String, String> payload = (Map<String, String>) jsonObject.get(GcmMessageField.MESSAGE_DATA);
+        Map<String, String> payload = (Map<String, String>) jsonObject.get(GcmMessageField.MESSAGE_DATA.getStringValue());
 
-        String from = jsonObject.get(GcmMessageField.MESSAGE_FROM).toString();
-        String messageId = jsonObject.get(GcmMessageField.MESSAGE_ID).toString();
-        String category = jsonObject.get(GcmMessageField.MESSAGE_CATEGORY).toString();
-        GcmMessageAction action = GcmMessageAction.getGcmMessageAction(payload.get(GcmMessageField.MESSAGE_ACTION));
+        String from = jsonObject.get(GcmMessageField.MESSAGE_FROM.getStringValue()).toString();
+        String messageId = jsonObject.get(GcmMessageField.MESSAGE_ID.getStringValue()).toString();
+        String category = jsonObject.get(GcmMessageField.MESSAGE_CATEGORY.getStringValue()).toString();
+        GcmMessageAction action = GcmMessageAction.getGcmMessageAction(payload.get(GcmMessageField.MESSAGE_ACTION.getStringValue()));
 
         // PackageName of the application that sent this message.
         log.info("Application: {}", category);
@@ -144,8 +142,8 @@ public class GcmMessageHandler {
      * By default, it only logs a INFO message, but subclasses could override it to properly handle ACKS.
      */
     public void handleAckReceipt(Map<String, Object> jsonObject) {
-        String messageId = jsonObject.get("message_id").toString();
-        String from = jsonObject.get("from").toString();
+        String messageId = jsonObject.get(GcmMessageField.MESSAGE_ID.getStringValue()).toString();
+        String from = jsonObject.get(GcmMessageField.MESSAGE_FROM.getStringValue()).toString();
         log.info("handleAckReceipt() from: " + from + ", messageId: " + messageId);
     }
 
@@ -156,8 +154,8 @@ public class GcmMessageHandler {
      * By default, it only logs a INFO message, but subclasses could override it to properly handle NACKS.
      */
     public void handleNackReceipt(Map<String, Object> jsonObject) {
-        String messageId = jsonObject.get("message_id").toString();
-        String from = jsonObject.get("from").toString();
+        String messageId = jsonObject.get(GcmMessageField.MESSAGE_ID.getStringValue()).toString();
+        String from = jsonObject.get(GcmMessageField.MESSAGE_FROM.getStringValue()).toString();
         log.info("handleNackReceipt() from: " + from + ", messageId: " + messageId);
     }
 }
