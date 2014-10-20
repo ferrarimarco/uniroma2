@@ -1,6 +1,9 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.message;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.connection.GcmConnectionManager;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.ResourcePersistenceService;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.UserPersistenceService;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.HashingService;
 
 import java.util.Map;
 
@@ -10,71 +13,149 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 public class GcmMessageHandler {
-	
-	@Autowired
-	private GcmMessageSender gcmMessageSender;
-	
-	@Autowired
-	private GcmConnectionManager gcmConnectionManager;
-	
-	/**
-	 * Handles an upstream data message from a device application.
-	 * 
-	 * <p>
-	 * This sample echo server sends an echo message back to the device. Subclasses should override this method to process an upstream message.
-	 */
-	public void handleIncomingDataMessage(Map<String, Object> jsonObject) {
-		@SuppressWarnings("unchecked")
-		Map<String, String> payload = (Map<String, String>) jsonObject.get("data");
 
-		String from = jsonObject.get("from").toString();
-		
-		// Send ACK to CCS
-		String messageId = jsonObject.get("message_id").toString();
-		gcmMessageSender.sendJsonAck(from, messageId);
-		
-		// PackageName of the application that sent this message.
-		String category = jsonObject.get("category").toString();
-		log.info("Application: " + category);
+    private enum GcmMessageAction{
+        NEW_RESOURCE_FROM_ME("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.CREATE_NEW_RESOURCE"),
+        DELETE_MY_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.DELETE_RESOURCE"),
+        UPDATE_USER_DETAILS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.UPDATE_USER_DETAILS"),
 
-		String action = payload.get("action");
-		if (action.equalsIgnoreCase("com.antoinecampbell.gcmdemo.REGISTER")) {
-			String name = payload.get("name").toString();
-			// TODO: Store username and registrationID in DB
+        // This can never be received from devices. It should be only sent downstream by server
+        NEW_RESOURCE_FROM_OTHERS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.NEW_RESOURCE_BY_OTHERS"),
+        BOOK_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.BOOK_RESOURCE");
 
-			// Send an REGISTER response back
-			payload.put("message", "Registration successful");
-			gcmMessageSender.sendJsonMessage(from, payload, null, null, false);
-			log.info("Adding new user: " + name + ":" + from);
-		} else if (action.equalsIgnoreCase("com.antoinecampbell.gcmdemo.ECHO")) {
-			// Send an ECHO response back
-			gcmMessageSender.sendJsonMessage(from, payload, null, null, false);
-		}else {
-			log.info("Unkown action sent: " + action);
-		}
-	}
-	
-	/**
-	 * Handles an ACK.
-	 * 
-	 * <p>
-	 * By default, it only logs a INFO message, but subclasses could override it to properly handle ACKS.
-	 */
-	public void handleAckReceipt(Map<String, Object> jsonObject) {
-		String messageId = jsonObject.get("message_id").toString();
-		String from = jsonObject.get("from").toString();
-		log.info("handleAckReceipt() from: " + from + ", messageId: " + messageId);
-	}
+        private String stringValue;
 
-	/**
-	 * Handles a NACK.
-	 * 
-	 * <p>
-	 * By default, it only logs a INFO message, but subclasses could override it to properly handle NACKS.
-	 */
-	public void handleNackReceipt(Map<String, Object> jsonObject) {
-		String messageId = jsonObject.get("message_id").toString();
-		String from = jsonObject.get("from").toString();
-		log.info("handleNackReceipt() from: " + from + ", messageId: " + messageId);
-	}
+        private GcmMessageAction(String stringValue){
+            this.stringValue = stringValue;
+        }
+
+        public String getStringValue(){
+            return stringValue;
+        }
+
+        public static GcmMessageAction getGcmMessageAction(String stringValue) {
+            GcmMessageAction[] elements = GcmMessageAction.values();
+
+            for(GcmMessageAction action : elements) {
+                if(action.getStringValue().equals(stringValue)) {
+                    return action;
+                }
+            }
+
+            return null;
+        }
+    }
+
+    private enum GcmMessageField{
+        MESSAGE_ID("message_id"),
+        MESSAGE_FROM("from"),
+        MESSAGE_DATA("data"),
+        MESSAGE_CATEGORY("category"),
+        MESSAGE_ACTION("action"),
+        DATA_ACTION("action"),
+        DATA_TITLE("title"),
+        DATA_DESCRIPTION("description"),
+        DATA_CREATION_TIME("creation_time"),
+        DATA_ACQUISITION_MODE("acquisition_mode"),
+        DATA_CREATOR_ID("creator_id"),
+        DATA_TTL("ttl"),
+        DATA_ADDRESS("address"),
+        DATA_LOCALITY("locality"),
+        DATA_COUNTRY("country"),
+        DATA_LATITUDE("latitude"),
+        DATA_LONGITUDE("longitude"),
+        DATA_BOOKER_ID("booker_id");
+
+        private String stringValue;
+
+        private GcmMessageField(String stringValue){
+            this.stringValue = stringValue;
+        }
+
+        public String getStringValue(){
+            return stringValue;
+        }
+    }
+
+    @Autowired
+    private GcmMessageSender gcmMessageSender;
+
+    @Autowired
+    private GcmConnectionManager gcmConnectionManager;
+
+    @Autowired
+    private UserPersistenceService userPersistenceService;
+
+    @Autowired
+    private ResourcePersistenceService resourcePersistenceService;
+
+    @Autowired
+    private HashingService hashingService;
+
+    /**
+     * Handles an upstream data message from a device application.
+     */
+    public void handleIncomingDataMessage(Map<String, Object> jsonObject) {
+        @SuppressWarnings("unchecked")
+        Map<String, String> payload = (Map<String, String>) jsonObject.get(GcmMessageField.MESSAGE_DATA);
+
+        String from = jsonObject.get(GcmMessageField.MESSAGE_FROM).toString();
+        String messageId = jsonObject.get(GcmMessageField.MESSAGE_ID).toString();
+        String category = jsonObject.get(GcmMessageField.MESSAGE_CATEGORY).toString();
+        GcmMessageAction action = GcmMessageAction.getGcmMessageAction(payload.get(GcmMessageField.MESSAGE_ACTION));
+
+        // PackageName of the application that sent this message.
+        log.info("Application: {}", category);
+
+        // Send ACK to CCS
+        gcmMessageSender.sendJsonAck(from, messageId);
+
+        switch(action) {
+        case BOOK_RESOURCE:
+            break;
+        case DELETE_MY_RESOURCE:
+            break;
+        case NEW_RESOURCE_FROM_ME:
+            // NEW RESOURCE CREATED from user
+            break;
+        case NEW_RESOURCE_FROM_OTHERS:
+            
+            break;
+        case UPDATE_USER_DETAILS:
+            //            String name = payload.get("name").toString();
+            //            // TODO: Store username and registrationID in DB
+            //
+            //            // Send an REGISTER response back
+            //            payload.put("message", "Registration successful");
+            //            gcmMessageSender.sendJsonMessage(from, payload, null, null, false);
+            break;
+        default:
+            log.info("Action {} not supported. Ignored.", action);
+            break;
+        }
+    }
+
+    /**
+     * Handles an ACK.
+     * 
+     * <p>
+     * By default, it only logs a INFO message, but subclasses could override it to properly handle ACKS.
+     */
+    public void handleAckReceipt(Map<String, Object> jsonObject) {
+        String messageId = jsonObject.get("message_id").toString();
+        String from = jsonObject.get("from").toString();
+        log.info("handleAckReceipt() from: " + from + ", messageId: " + messageId);
+    }
+
+    /**
+     * Handles a NACK.
+     * 
+     * <p>
+     * By default, it only logs a INFO message, but subclasses could override it to properly handle NACKS.
+     */
+    public void handleNackReceipt(Map<String, Object> jsonObject) {
+        String messageId = jsonObject.get("message_id").toString();
+        String from = jsonObject.get("from").toString();
+        log.info("handleNackReceipt() from: " + from + ", messageId: " + messageId);
+    }
 }
