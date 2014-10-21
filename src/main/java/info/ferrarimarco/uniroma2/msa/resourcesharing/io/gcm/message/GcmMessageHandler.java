@@ -8,6 +8,7 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.Resou
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.UserPersistenceService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.HashingService;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -122,7 +123,7 @@ public class GcmMessageHandler {
         gcmMessageSender.sendJsonAck(senderGcmId, messageId);
         
         log.trace("PackageName of the Application that sent this message: {}", category);
-
+        
         switch(action) {
         case BOOK_RESOURCE:
             String bookerId = payload.get(GcmMessageField.DATA_BOOKER_ID.getStringValue());
@@ -142,7 +143,7 @@ public class GcmMessageHandler {
                 ResourceSharingUser resourceCreator = userPersistenceService.readUsersByUserId(creatorId);
                 
                 // Resource booked message to resource creator
-                gcmMessageSender.sendJsonMessage(resourceCreator.getGcmId(), payloadResp, collapseKey, timeToLive, true);
+                gcmMessageSender.sendJsonMessage(resourceCreator.getGcmId(), payload, null, timeToLive, true);
             }
             break;
         case DELETE_MY_RESOURCE:
