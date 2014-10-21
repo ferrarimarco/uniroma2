@@ -1,6 +1,9 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.message;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.connection.GcmConnectionManager;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.ResourcePersistenceService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.UserPersistenceService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.HashingService;
@@ -9,6 +12,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -91,7 +95,17 @@ public class GcmMessageHandler {
 
     @Autowired
     private HashingService hashingService;
-
+    
+    @Autowired
+    private DatatypeConversionService datatypeConversionService;
+    
+    private ResourceSharingResource createResource(String creationTimeMs, String creatorId) {
+        byte[] hashedPasswordBytes = hashingService.hash(creationTimeMs + creatorId);
+        String hashedId = datatypeConversionService.bytesToHexString(hashedPasswordBytes);
+        
+        return new ResourceSharingResource(hashedId);
+    }
+    
     /**
      * Handles an upstream data message from a device application.
      */
@@ -99,35 +113,83 @@ public class GcmMessageHandler {
         @SuppressWarnings("unchecked")
         Map<String, String> payload = (Map<String, String>) jsonObject.get(GcmMessageField.MESSAGE_DATA.getStringValue());
 
-        String from = jsonObject.get(GcmMessageField.MESSAGE_FROM.getStringValue()).toString();
+        String senderGcmId = jsonObject.get(GcmMessageField.MESSAGE_FROM.getStringValue()).toString();
         String messageId = jsonObject.get(GcmMessageField.MESSAGE_ID.getStringValue()).toString();
         String category = jsonObject.get(GcmMessageField.MESSAGE_CATEGORY.getStringValue()).toString();
         GcmMessageAction action = GcmMessageAction.getGcmMessageAction(payload.get(GcmMessageField.MESSAGE_ACTION.getStringValue()));
 
-        // PackageName of the application that sent this message.
-        log.info("Application: {}", category);
-
         // Send ACK to CCS
-        gcmMessageSender.sendJsonAck(from, messageId);
+        gcmMessageSender.sendJsonAck(senderGcmId, messageId);
+        
+        log.trace("PackageName of the Application that sent this message: {}", category);
 
         switch(action) {
         case BOOK_RESOURCE:
+            String bookerId = payload.get(GcmMessageField.DATA_BOOKER_ID.getStringValue());
+            String creatorId = payload.get(GcmMessageField.DATA_CREATOR_ID.getStringValue());
+            Long creationTime = -1L;
+            try {
+                creationTime = Long.parseLong(payload.get(GcmMessageField.DATA_CREATION_TIME.getStringValue()));
+            } catch (Exception e) {
+                log.error("Unable to parse creation time {}, from {} ({})", payload.get(GcmMessageField.DATA_CREATION_TIME.getStringValue()), creatorId, senderGcmId);
+                creationTime = -1L;
+            }
+            
+            if(creationTime != -1L) {
+                ResourceSharingResource resourceToBook = resourcePersistenceService.readResourceById(createResource(creationTime.toString(), creatorId).getId());
+                resourcePersistenceService.bookResource(resourceToBook);
+                
+                ResourceSharingUser resourceCreator = userPersistenceService.readUsersByUserId(creatorId);
+                
+                // Resource booked message to resource creator
+                gcmMessageSender.sendJsonMessage(resourceCreator.getGcmId(), payloadResp, collapseKey, timeToLive, true);
+            }
             break;
         case DELETE_MY_RESOURCE:
+            String creatorIdDeleteResource = payload.get(GcmMessageField.DATA_CREATOR_ID.getStringValue());
+            Long creationTimeDeleteResource = -1L;
+            try {
+                creationTimeDeleteResource = Long.parseLong(payload.get(GcmMessageField.DATA_CREATION_TIME.getStringValue()));
+            } catch (Exception e) {
+                log.error("Unable to parse creation time {}, from {} ({})", payload.get(GcmMessageField.DATA_CREATION_TIME.getStringValue()), creatorIdDeleteResource, senderGcmId);
+                creationTimeDeleteResource = -1L;
+            }
+            
+            if(creationTime != -1L) {
+                resourcePersistenceService.deleteResource(new ResourceSharingResource(creationTimeDeleteResource, creatorIdDeleteResource));
+            }
             break;
         case NEW_RESOURCE_FROM_ME:
             // NEW RESOURCE CREATED from user
+            // also update user info
             break;
         case NEW_RESOURCE_FROM_OTHERS:
-            
+            // This should not be sent by devices, but only from server to devices
+            log.warn("Received {} action from {}. A client is misbehaving. Message ignored.", action.getStringValue(), senderGcmId);
             break;
         case UPDATE_USER_DETAILS:
-            //            String name = payload.get("name").toString();
-            //            // TODO: Store username and registrationID in DB
-            //
-            //            // Send an REGISTER response back
-            //            payload.put("message", "Registration successful");
-            //            gcmMessageSender.sendJsonMessage(from, payload, null, null, false);
+            String senderUserId = payload.get(GcmMessageField.DATA_CREATOR_ID.getStringValue());
+            String address = payload.get(GcmMessageField.DATA_ADDRESS.getStringValue());
+            String locality = payload.get(GcmMessageField.DATA_LOCALITY.getStringValue());
+            String country = payload.get(GcmMessageField.DATA_COUNTRY.getStringValue());
+            Double latitude = 0.0;
+            try {
+                latitude = Double.parseDouble(payload.get(GcmMessageField.DATA_LATITUDE.getStringValue()));
+            } catch (Exception e) {
+                latitude = 0.0;
+                log.error("Unable to parse latitude. Using {}.", latitude);
+            }
+
+            Double longitude = 0.0;
+            try {
+                longitude = Double.parseDouble(payload.get(GcmMessageField.DATA_LONGITUDE.getStringValue()));
+            } catch (Exception e) {
+                longitude = 0.0;
+                log.error("Unable to parse longitude. Using {}.", longitude);
+            }
+
+            ResourceSharingUser user = new ResourceSharingUser(senderUserId, senderGcmId, new DateTime(), address, locality, country, latitude, longitude);
+            userPersistenceService.storeUser(user);
             break;
         default:
             log.info("Action {} not supported. Ignored.", action);
