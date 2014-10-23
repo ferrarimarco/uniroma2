@@ -26,6 +26,8 @@ public class ResourceSharingResource {
 	private DateTime creationTime;
 	private String acquisitionMode;
 	private String creatorId;
+	private Boolean expired;
+	private String bookerId;
 	
 	public ResourceSharingResource(String resourceId) {
 	    this.id = resourceId;

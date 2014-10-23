@@ -93,19 +93,6 @@ public class GcmMessageHandler {
 
     @Autowired
     private ResourcePersistenceService resourcePersistenceService;
-
-    @Autowired
-    private HashingService hashingService;
-    
-    @Autowired
-    private DatatypeConversionService datatypeConversionService;
-    
-    private ResourceSharingResource createResource(String creationTimeMs, String creatorId) {
-        byte[] hashedPasswordBytes = hashingService.hash(creationTimeMs + creatorId);
-        String hashedId = datatypeConversionService.bytesToHexString(hashedPasswordBytes);
-        
-        return new ResourceSharingResource(hashedId);
-    }
     
     /**
      * Handles an upstream data message from a device application.
@@ -137,8 +124,9 @@ public class GcmMessageHandler {
             }
             
             if(creationTime != -1L) {
-                ResourceSharingResource resourceToBook = resourcePersistenceService.readResourceById(createResource(creationTime.toString(), creatorId).getId());
-                resourcePersistenceService.bookResource(resourceToBook);
+                ResourceSharingResource resourceToBook = resourcePersistenceService.readResourceById(Long.toString(creationTime), creatorId);
+                resourceToBook.setBookerId(bookerId);
+                resourcePersistenceService.storeResource(resourceToBook);
                 
                 ResourceSharingUser resourceCreator = userPersistenceService.readUsersByUserId(creatorId);
                 
@@ -157,7 +145,7 @@ public class GcmMessageHandler {
             }
             
             if(creationTime != -1L) {
-                resourcePersistenceService.deleteResource(new ResourceSharingResource(creationTimeDeleteResource, creatorIdDeleteResource));
+                resourcePersistenceService.deleteResource(Long.toString(creationTimeDeleteResource), creatorIdDeleteResource);
             }
             break;
         case NEW_RESOURCE_FROM_ME:
