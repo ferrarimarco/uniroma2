@@ -17,7 +17,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@ContextConfiguration("classpath:spring-context.xml")
 public class ResourcePersistenceServiceTest extends BaseSpringTest {
 	
 	private static Logger logger = LoggerFactory.getLogger(ResourcePersistenceServiceTest.class);

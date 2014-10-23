@@ -14,7 +14,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@ContextConfiguration("classpath:spring-context.xml")
 @Slf4j
 public class UserPersistenceServiceTest extends BaseSpringTest {
 	

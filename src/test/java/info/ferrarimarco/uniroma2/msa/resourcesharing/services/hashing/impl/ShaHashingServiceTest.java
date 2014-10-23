@@ -1,5 +1,6 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.impl;
 
+import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.HashingService;
 
@@ -13,8 +14,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@ContextConfiguration("classpath:spring-context.xml")
-public class ShaHashingServiceTest extends AbstractTestNGSpringContextTests{
+public class ShaHashingServiceTest extends BaseSpringTest{
 	
 	private static Logger logger = LoggerFactory.getLogger(ShaHashingServiceTest.class);
 	
