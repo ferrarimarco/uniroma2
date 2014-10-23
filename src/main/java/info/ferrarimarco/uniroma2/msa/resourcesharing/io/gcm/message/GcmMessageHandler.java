@@ -26,7 +26,9 @@ public class GcmMessageHandler {
         DELETE_MY_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.DELETE_RESOURCE"),
         UPDATE_USER_DETAILS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.UPDATE_USER_DETAILS"),
         NEW_RESOURCE_FROM_OTHERS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.NEW_RESOURCE_BY_OTHERS"),
-        BOOK_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.BOOK_RESOURCE");
+        BOOK_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.BOOK_RESOURCE"),
+        RESOURCE_ALREADY_BOOKED("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.RESOURCE_ALREADY_BOOKED"),
+        BOOKED_RESOURCE_DELETED("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.BOOKED_RESOURCE_DELETED");
 
         private String stringValue;
 
@@ -93,7 +95,7 @@ public class GcmMessageHandler {
 
     @Autowired
     private ResourcePersistenceService resourcePersistenceService;
-    
+
     /**
      * Handles an upstream data message from a device application.
      */
@@ -108,9 +110,9 @@ public class GcmMessageHandler {
 
         // Send ACK to CCS
         gcmMessageSender.sendJsonAck(senderGcmId, messageId);
-        
+
         log.trace("PackageName of the Application that sent this message: {}", category);
-        
+
         switch(action) {
         case BOOK_RESOURCE:
             String bookerId = payload.get(GcmMessageField.DATA_BOOKER_ID.getStringValue());
@@ -129,16 +131,23 @@ public class GcmMessageHandler {
                 log.error("Unable to parse TTL {}, from {} ({})", payload.get(GcmMessageField.DATA_TTL.getStringValue()), creatorId, senderGcmId);
                 timeToLive = -1L;
             }
-            
+
             if(creationTime != -1L && timeToLive != -1L) {
                 ResourceSharingResource resourceToBook = resourcePersistenceService.readResourceById(Long.toString(creationTime), creatorId);
-                resourceToBook.setBookerId(bookerId);
-                resourcePersistenceService.storeResource(resourceToBook);
-                
-                ResourceSharingUser resourceCreator = userPersistenceService.readUsersByUserId(creatorId);
-                
-                // Resource booked message to resource creator
-                gcmMessageSender.sendJsonMessage(resourceCreator.getGcmId(), payload, null, timeToLive, true);
+
+                if(resourceToBook.getBookerId() == null || resourceToBook.getBookerId().length() == 0) {
+                    resourceToBook.setBookerId(bookerId);
+                    resourcePersistenceService.storeResource(resourceToBook);
+
+                    ResourceSharingUser resourceCreator = userPersistenceService.readUsersByUserId(creatorId);
+
+                    // Resource booked message to resource creator
+                    gcmMessageSender.sendJsonMessage(resourceCreator.getGcmId(), payload, null, timeToLive, true);
+                }else {
+                    // Resource already booked message to resource booker
+                    payload.put(GcmMessageField.MESSAGE_ACTION.getStringValue(), GcmMessageAction.RESOURCE_ALREADY_BOOKED.getStringValue());
+                    gcmMessageSender.sendJsonMessage(senderGcmId, payload, null, timeToLive, true);
+                }
             }
             break;
         case DELETE_MY_RESOURCE:
@@ -150,9 +159,16 @@ public class GcmMessageHandler {
                 log.error("Unable to parse creation time {}, from {} ({})", payload.get(GcmMessageField.DATA_CREATION_TIME.getStringValue()), creatorIdDeleteResource, senderGcmId);
                 creationTimeDeleteResource = -1L;
             }
-            
+
             if(creationTimeDeleteResource != -1L) {
-                resourcePersistenceService.deleteResource(Long.toString(creationTimeDeleteResource), creatorIdDeleteResource);
+                ResourceSharingResource resourceToDelete = resourcePersistenceService.readResourceById(Long.toString(creationTimeDeleteResource), creatorIdDeleteResource);
+                if(resourceToDelete.getBookerId() != null && resourceToDelete.getBookerId().length() > 0) {
+                 // Booked resource deleted message to resource booker
+                    payload.put(GcmMessageField.MESSAGE_ACTION.getStringValue(), GcmMessageAction.BOOKED_RESOURCE_DELETED.getStringValue());
+                    gcmMessageSender.sendJsonMessage(senderGcmId, payload, null, null, true);
+                }
+                
+                resourcePersistenceService.deleteResource(resourceToDelete.getId());
             }
             break;
         case NEW_RESOURCE_FROM_ME:
