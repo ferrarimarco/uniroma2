@@ -1,8 +1,7 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
@@ -12,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -35,10 +33,6 @@ public class UserPersistenceServiceTest extends BaseSpringTest {
     	assertThat(hashingService, notNullValue());
     	assertThat(userPersistenceService, notNullValue());
     	assertThat(datatypeConversionService, notNullValue());
-    	
-    	logger.info("Cleaning User repository...");
-    	userPersistenceService.dropCollection();
-    	logger.info("User repository cleaned");
     }
     
     @Test(groups = {"userPersistenceServiceTestGroup","springServicesTestGroup"})
@@ -59,11 +53,4 @@ public class UserPersistenceServiceTest extends BaseSpringTest {
 		log.info("User to store: {}", user.toString());
 		log.info("Stored user: {}", readUser.toString());
 	}
-    
-    @AfterClass
-    protected void teardown() throws Exception {
-    	log.info("Cleaning User repository...");
-    	userPersistenceService.dropCollection();
-    	log.info("User repository cleaned");
-    }
 }

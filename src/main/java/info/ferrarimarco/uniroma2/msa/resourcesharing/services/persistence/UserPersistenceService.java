@@ -37,9 +37,4 @@ public class UserPersistenceService extends AbstractMongoPersistenceService{
 	public List<ResourceSharingUser> findAll(){
 		return repository.findAll();
 	}
-
-	@Override
-	public void dropCollection() {
-		super.dropCollection(ResourceSharingUser.class);
-	}
 }

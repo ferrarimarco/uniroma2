@@ -122,8 +122,15 @@ public class GcmMessageHandler {
                 log.error("Unable to parse creation time {}, from {} ({})", payload.get(GcmMessageField.DATA_CREATION_TIME.getStringValue()), creatorId, senderGcmId);
                 creationTime = -1L;
             }
+            Long timeToLive;
+            try {
+                timeToLive = Long.parseLong(payload.get(GcmMessageField.DATA_TTL.getStringValue()));
+            } catch (Exception e1) {
+                log.error("Unable to parse TTL {}, from {} ({})", payload.get(GcmMessageField.DATA_TTL.getStringValue()), creatorId, senderGcmId);
+                timeToLive = -1L;
+            }
             
-            if(creationTime != -1L) {
+            if(creationTime != -1L && timeToLive != -1L) {
                 ResourceSharingResource resourceToBook = resourcePersistenceService.readResourceById(Long.toString(creationTime), creatorId);
                 resourceToBook.setBookerId(bookerId);
                 resourcePersistenceService.storeResource(resourceToBook);
@@ -144,7 +151,7 @@ public class GcmMessageHandler {
                 creationTimeDeleteResource = -1L;
             }
             
-            if(creationTime != -1L) {
+            if(creationTimeDeleteResource != -1L) {
                 resourcePersistenceService.deleteResource(Long.toString(creationTimeDeleteResource), creatorIdDeleteResource);
             }
             break;

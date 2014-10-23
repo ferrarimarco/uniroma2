@@ -26,11 +26,4 @@ public abstract class AbstractMongoPersistenceService {
 	}
 	
 	public abstract void deleteAll();
-	
-	public abstract void dropCollection();
-	
-	protected void dropCollection(Class<?> clazz) {
-		mongoTemplate.dropCollection(clazz);
-	}
-	
 }

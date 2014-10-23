@@ -51,11 +51,6 @@ public class ResourcePersistenceService extends AbstractMongoPersistenceService{
     }
 
     @Override
-    public void dropCollection() {
-        super.dropCollection(ResourceSharingResource.class);
-    }
-
-    @Override
     public void deleteAll() {
         repository.deleteAll();		
     }

@@ -1,8 +1,7 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -39,17 +37,6 @@ public class ResourcePersistenceServiceTest extends BaseSpringTest {
     	assertThat(resourcePersistenceService, notNullValue());
     	assertThat(hashingService, notNullValue());
     	assertThat(datatypeConversionService, notNullValue());
-    	
-    	logger.info("Cleaning Repositories...");
-    	resourcePersistenceService.dropCollection();
-    	logger.info("Repositories cleaned");
-    }
-    
-    @AfterClass
-    protected void teardown() throws Exception {
-    	logger.info("Cleaning repositories...");
-    	resourcePersistenceService.dropCollection();
-    	logger.info("Repositories cleaned");
     }
     
     @Test(groups = {"springServicesTestGroup", "resourcePersistenceServiceTestGroup"}, dependsOnGroups = {"userPersistenceServiceTestGroup"})
@@ -58,7 +45,7 @@ public class ResourcePersistenceServiceTest extends BaseSpringTest {
     	
     	ResourceSharingResource resource = new ResourceSharingResource("Test Resource ID", "Test Resource Title", "Test Resource Description", 0.0, 0.0,
     			"Test Resource locality", "Test Resource Country", new DateTime(),
-    			"Test Resource Acquisition Mode", "Test Creator ID");
+    			"Test Resource Acquisition Mode", "Test Creator ID", false, "Test Booker ID");
 		resource = resourcePersistenceService.storeResource(resource);
 		logger.info("Stored Resource: {}", resource.toString());
 
