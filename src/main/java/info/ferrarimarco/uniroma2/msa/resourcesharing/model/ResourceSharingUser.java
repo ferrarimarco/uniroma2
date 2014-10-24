@@ -22,4 +22,5 @@ public class ResourceSharingUser {
 	private String country;
 	private Double latitude;
 	private Double longitude;
+	private Integer maxDistance;
 }

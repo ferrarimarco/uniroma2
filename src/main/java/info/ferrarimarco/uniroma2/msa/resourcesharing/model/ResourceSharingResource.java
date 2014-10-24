@@ -28,6 +28,7 @@ public class ResourceSharingResource {
 	private String creatorId;
 	private Boolean expired;
 	private String bookerId;
+	private Long ttl;
 	
 	public ResourceSharingResource(String resourceId) {
 	    this.id = resourceId;
