@@ -1,14 +1,10 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.message;
 
-import info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.connection.GcmConnectionManager;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.ResourcePersistenceService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence.UserPersistenceService;
-import info.ferrarimarco.uniroma2.msa.resourcesharing.services.hashing.HashingService;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -86,9 +82,6 @@ public class GcmMessageHandler {
 
     @Autowired
     private GcmMessageSender gcmMessageSender;
-
-    @Autowired
-    private GcmConnectionManager gcmConnectionManager;
 
     @Autowired
     private UserPersistenceService userPersistenceService;
