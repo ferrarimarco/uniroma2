@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GcmMessageHandler {
 
-    private enum GcmMessageAction{
+    protected enum GcmMessageAction{
         NEW_RESOURCE_FROM_ME("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.CREATE_NEW_RESOURCE"),
         DELETE_MY_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.DELETE_RESOURCE"),
         UPDATE_USER_DETAILS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.UPDATE_USER_DETAILS"),
@@ -49,7 +49,7 @@ public class GcmMessageHandler {
         }
     }
 
-    private enum GcmMessageField{
+    protected enum GcmMessageField{
         MESSAGE_ID("message_id"),
         MESSAGE_FROM("from"),
         MESSAGE_DATA("data"),
@@ -167,10 +167,6 @@ public class GcmMessageHandler {
         case NEW_RESOURCE_FROM_ME:
             // NEW RESOURCE CREATED from user
             // also update user info
-            break;
-        case NEW_RESOURCE_FROM_OTHERS:
-            // This should not be sent by devices, but only from server to devices
-            log.warn("Received {} action from {}. A client is misbehaving. Message ignored.", action.getStringValue(), senderGcmId);
             break;
         case UPDATE_USER_DETAILS:
             String senderUserId = payload.get(GcmMessageField.DATA_CREATOR_ID.getStringValue());
