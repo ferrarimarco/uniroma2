@@ -1,7 +1,8 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
@@ -10,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -39,7 +39,7 @@ public class UserPersistenceServiceTest extends BaseSpringTest {
     	userPersistenceService.open();
     	
     	String userId = "test-user-id";
-		ResourceSharingUser user = new ResourceSharingUser(userId, "test-user-gcm-id", new DateTime(), "test-user-address", "test-user-locality", "test-user-country", 0.0, 0.0);
+		ResourceSharingUser user = new ResourceSharingUser(userId, "test-user-gcm-id", new DateTime(), "test-user-address", "test-user-locality", "test-user-country", 0.0, 0.0, null);
 		
 		user = userPersistenceService.storeUser(user);
 		ResourceSharingUser readUser = userPersistenceService.readUsersByUserId(userId);

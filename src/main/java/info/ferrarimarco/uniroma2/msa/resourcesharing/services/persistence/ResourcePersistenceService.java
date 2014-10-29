@@ -31,6 +31,9 @@ public class ResourcePersistenceService extends AbstractMongoPersistenceService{
     }
 
     public ResourceSharingResource storeResource(ResourceSharingResource resource){
+    	if(resource.getId() == null || resource.getId().length() == 0) {
+    		resource.setId(this.createResourceId(Long.toString(resource.getCreationTime().getMillis()), resource.getCreatorId()));
+    	}
         return repository.save(resource);
     }
 
