@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ResourcePersistenceService extends AbstractMongoPersistenceService{
+public class ResourcePersistenceService extends AbstractMongoPersistenceService {
 
     private ResourceRepository repository;
 
@@ -30,14 +30,14 @@ public class ResourcePersistenceService extends AbstractMongoPersistenceService{
         repository = context.getBean(ResourceRepository.class);
     }
 
-    public ResourceSharingResource storeResource(ResourceSharingResource resource){
-    	if(resource.getId() == null || resource.getId().length() == 0) {
-    		resource.setId(this.createResourceId(Long.toString(resource.getCreationTime().getMillis()), resource.getCreatorId()));
-    	}
+    public ResourceSharingResource storeResource(ResourceSharingResource resource) {
+        if (resource.getId() == null || resource.getId().length() == 0) {
+            resource.setId(this.createResourceId(Long.toString(resource.getCreationTime().getMillis()), resource.getCreatorId()));
+        }
         return repository.save(resource);
     }
 
-    public List<ResourceSharingResource> readResourcesByCreatorId(String creatorId){
+    public List<ResourceSharingResource> readResourcesByCreatorId(String creatorId) {
         return repository.findByCreatorId(creatorId);
     }
 
@@ -49,13 +49,13 @@ public class ResourcePersistenceService extends AbstractMongoPersistenceService{
         return repository.findById(createResourceId(creationTimeMs, creatorId));
     }
 
-    public List<ResourceSharingResource> findAll(){
+    public List<ResourceSharingResource> findAll() {
         return repository.findAll();
     }
 
     @Override
     public void deleteAll() {
-        repository.deleteAll();		
+        repository.deleteAll();
     }
 
     public void deleteResource(String resourceId) {
@@ -66,7 +66,7 @@ public class ResourcePersistenceService extends AbstractMongoPersistenceService{
         repository.delete(createResourceId(creationTimeMs, creatorId));
     }
 
-    private String createResourceId(String creationTimeMs, String creatorId) {
+    public String createResourceId(String creationTimeMs, String creatorId) {
         byte[] hashedPasswordBytes = hashingService.hash(creationTimeMs + creatorId);
         return datatypeConversionService.bytesToHexString(hashedPasswordBytes);
     }
