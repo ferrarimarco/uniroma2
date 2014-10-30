@@ -11,50 +11,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserPersistenceService extends AbstractMongoPersistenceService{
+public class UserPersistenceService extends AbstractMongoPersistenceService {
 
-	private UserRepository repository;
-	
-	@Autowired
-	private DistanceService distanceService;
-	
-	public UserPersistenceService() {
-		super();
-	}
-	
-	@Override
-	protected void open(){
-		repository = context.getBean(UserRepository.class);
-	}
-	
-	@Override
-	public void deleteAll() {
-		repository.deleteAll();
-	}
+    private UserRepository repository;
 
-	public ResourceSharingUser storeUser(ResourceSharingUser user){
-		return repository.save(user);
-	}
+    @Autowired
+    private DistanceService distanceService;
 
-	public ResourceSharingUser readUsersByUserId(String userId){
-		return repository.findByUserId(userId);
-	}
+    public UserPersistenceService() {
+        super();
+    }
 
-	public List<ResourceSharingUser> findAll(){
-		return repository.findAll();
-	}
-	
-	public List<ResourceSharingUser> findUsersInRange(Double latitude, Double longitude){
-		List<ResourceSharingUser> users = findAll();
-		List<ResourceSharingUser> usersInRange = new ArrayList<>();
-		
-		for(ResourceSharingUser user : users) {
-			Double distanceFromCurrentPosition = distanceService.calculateDistance(latitude, longitude, user.getLatitude(), user.getLongitude());
-			if(user.getMaxDistance() != null && distanceFromCurrentPosition <= user.getMaxDistance()) {
-				users.add(user);
-			}
-		}
-		
-		return usersInRange;
-	}
+    @Override
+    protected void open() {
+        repository = context.getBean(UserRepository.class);
+    }
+
+    @Override
+    public void deleteAll() {
+        repository.deleteAll();
+    }
+
+    public ResourceSharingUser storeUser(ResourceSharingUser user) {
+        return repository.save(user);
+    }
+
+    public ResourceSharingUser readUsersByUserId(String userId) {
+        return repository.findByUserId(userId);
+    }
+
+    public List<ResourceSharingUser> findAll() {
+        return repository.findAll();
+    }
+
+    public List<ResourceSharingUser> findUsersInRange(Double latitude, Double longitude) {
+        List<ResourceSharingUser> users = findAll();
+        List<ResourceSharingUser> usersInRange = new ArrayList<>();
+
+        for (ResourceSharingUser user : users) {
+            Double distanceFromCurrentPosition = distanceService.calculateDistance(latitude, longitude, user.getLatitude(), user.getLongitude());
+            if (user.getMaxDistance() != null && distanceFromCurrentPosition <= user.getMaxDistance()) {
+                users.add(user);
+            }
+        }
+
+        return usersInRange;
+    }
 }

@@ -8,22 +8,22 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 public abstract class AbstractMongoPersistenceService {
-	
-	protected AbstractApplicationContext context;
-	
-	@Autowired
-	protected MongoTemplate mongoTemplate;
-	
-	public AbstractMongoPersistenceService() {
-		context = new AnnotationConfigApplicationContext(SpringMongoConfig.class);
-		open();
-	}
-	
-	protected abstract void open();
-	
-	public void close(){
-		context.close();
-	}
-	
-	public abstract void deleteAll();
+
+    protected AbstractApplicationContext context;
+
+    @Autowired
+    protected MongoTemplate mongoTemplate;
+
+    public AbstractMongoPersistenceService() {
+        context = new AnnotationConfigApplicationContext(SpringMongoConfig.class);
+        open();
+    }
+
+    protected abstract void open();
+
+    public void close() {
+        context.close();
+    }
+
+    public abstract void deleteAll();
 }

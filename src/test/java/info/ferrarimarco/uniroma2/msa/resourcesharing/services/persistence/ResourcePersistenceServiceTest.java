@@ -1,8 +1,7 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.BaseSpringTest;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DatatypeConversionService;
@@ -18,47 +17,46 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class ResourcePersistenceServiceTest extends BaseSpringTest {
-	
-	private static Logger logger = LoggerFactory.getLogger(ResourcePersistenceServiceTest.class);
-	
-	@Autowired
-	private ResourcePersistenceService resourcePersistenceService;
-	
-	@Autowired
-	private HashingService hashingService;
-	
-	@Autowired
-	private DatatypeConversionService datatypeConversionService;
-	
+
+    private static Logger logger = LoggerFactory.getLogger(ResourcePersistenceServiceTest.class);
+
+    @Autowired
+    private ResourcePersistenceService resourcePersistenceService;
+
+    @Autowired
+    private HashingService hashingService;
+
+    @Autowired
+    private DatatypeConversionService datatypeConversionService;
+
     @BeforeClass
     protected void setup() throws Exception {
-    	super.setup();
-    	assertThat(resourcePersistenceService, notNullValue());
-    	assertThat(hashingService, notNullValue());
-    	assertThat(datatypeConversionService, notNullValue());
+        super.setup();
+        assertThat(resourcePersistenceService, notNullValue());
+        assertThat(hashingService, notNullValue());
+        assertThat(datatypeConversionService, notNullValue());
     }
-    
-    @Test(groups = {"springServicesTestGroup", "resourcePersistenceServiceTestGroup"}, dependsOnGroups = {"userPersistenceServiceTestGroup"})
-	public void registerNewResourceTest() {
-    	resourcePersistenceService.open();
-    	
-    	ResourceSharingResource resource = new ResourceSharingResource("Test Resource ID", "Test Resource Title", "Test Resource Description", 0.0, 0.0,
-    			"Test Resource locality", "Test Resource Country", new DateTime(),
-    			"Test Resource Acquisition Mode", "Test Creator ID", false, "Test Booker ID", null);
-		resource = resourcePersistenceService.storeResource(resource);
-		logger.info("Stored Resource: {}", resource.toString());
 
-		List<ResourceSharingResource> resources = resourcePersistenceService.readResourcesByCreatorId(resource.getCreatorId());
-		resourcePersistenceService.close();
-		
-		assertThat(resources, notNullValue());
-		assertThat(resources.size(), equalTo(1));
-		assertThat(resource, equalTo(resources.get(0)));
-		
-		logger.info("Stored resources list:");
-		
-		for(ResourceSharingResource r : resources) {
-			logger.info(r.toString());
-		}
-	}
+    @Test(groups = { "springServicesTestGroup", "resourcePersistenceServiceTestGroup" }, dependsOnGroups = { "userPersistenceServiceTestGroup" })
+    public void registerNewResourceTest() {
+        resourcePersistenceService.open();
+
+        ResourceSharingResource resource = new ResourceSharingResource("Test Resource ID", "Test Resource Title", "Test Resource Description", 0.0, 0.0, "Test Resource locality",
+                "Test Resource Country", new DateTime(), "Test Resource Acquisition Mode", "Test Creator ID", false, "Test Booker ID", null);
+        resource = resourcePersistenceService.storeResource(resource);
+        logger.info("Stored Resource: {}", resource.toString());
+
+        List<ResourceSharingResource> resources = resourcePersistenceService.readResourcesByCreatorId(resource.getCreatorId());
+        resourcePersistenceService.close();
+
+        assertThat(resources, notNullValue());
+        assertThat(resources.size(), equalTo(1));
+        assertThat(resource, equalTo(resources.get(0)));
+
+        logger.info("Stored resources list:");
+
+        for (ResourceSharingResource r : resources) {
+            logger.info(r.toString());
+        }
+    }
 }

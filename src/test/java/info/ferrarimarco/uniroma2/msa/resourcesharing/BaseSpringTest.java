@@ -9,11 +9,11 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
 
-@ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = {MsaBackendContextConfig.class})
+@ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = { MsaBackendContextConfig.class })
 public abstract class BaseSpringTest extends AbstractTestNGSpringContextTests {
 
-	@BeforeClass
-	protected void setup() throws Exception {
-		assertThat(applicationContext, notNullValue());
-	}
+    @BeforeClass
+    protected void setup() throws Exception {
+        assertThat(applicationContext, notNullValue());
+    }
 }

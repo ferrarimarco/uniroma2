@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface ResourceRepository extends MongoRepository<ResourceSharingResource,String> {
-	
-	List<ResourceSharingResource> findByCreatorId(String creatorId);
-	
-	ResourceSharingResource findById(String id);
+public interface ResourceRepository extends MongoRepository<ResourceSharingResource, String> {
+
+    List<ResourceSharingResource> findByCreatorId(String creatorId);
+
+    ResourceSharingResource findById(String id);
 }

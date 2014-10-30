@@ -12,14 +12,14 @@ import com.mongodb.MongoClient;
 @Configuration
 @EnableMongoRepositories(basePackages = "info.ferrarimarco.uniroma2.msa.resourcesharing.dao.repositories.mongodb")
 public class SpringMongoConfig {
-	
-	@Bean
-	public MongoDbFactory mongoDbFactory() throws Exception {
-		return new SimpleMongoDbFactory(new MongoClient(), "localhost");
-	}
-	
-	@Bean
-	public MongoTemplate mongoTemplate() throws Exception {
-		return new MongoTemplate(mongoDbFactory());
-	}
+
+    @Bean
+    public MongoDbFactory mongoDbFactory() throws Exception {
+        return new SimpleMongoDbFactory(new MongoClient(), "localhost");
+    }
+
+    @Bean
+    public MongoTemplate mongoTemplate() throws Exception {
+        return new MongoTemplate(mongoDbFactory());
+    }
 }

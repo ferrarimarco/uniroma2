@@ -13,14 +13,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResourceSharingUser {
-	@Id
-	private String userId;
-	private String gcmId;
-	private DateTime lastUpdate;
-	private String address;
-	private String locality;
-	private String country;
-	private Double latitude;
-	private Double longitude;
-	private Integer maxDistance;
+    @Id
+    private String userId;
+    private String gcmId;
+    private DateTime lastUpdate;
+    private String address;
+    private String locality;
+    private String country;
+    private Double latitude;
+    private Double longitude;
+    private Integer maxDistance;
 }

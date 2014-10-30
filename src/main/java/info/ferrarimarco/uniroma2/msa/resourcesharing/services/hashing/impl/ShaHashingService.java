@@ -18,32 +18,32 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ShaHashingService implements HashingService {
-	
-	private Logger logger = LoggerFactory.getLogger(ShaHashingService.class);
-	
-	@Value("${info.ferrarimarco.msa.resourcesharing.security.hashing.algorithm}")
-	private String hashingAlgorithm;
-	
-	@Value("${info.ferrarimarco.msa.resourcesharing.security.provider}")
-	private String cryptographicProvider;
-	
-	private MessageDigest mda;
-	
-	public ShaHashingService() {
-		Security.addProvider(new BouncyCastleProvider());
-	}
-	
-	@PostConstruct
-	private void init() {
-		try {
-			mda = MessageDigest.getInstance(hashingAlgorithm, cryptographicProvider);
-		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-			logger.error("ShaHashingService failed initialisation - {}: {}", e.toString(), ExceptionUtils.getStackTrace(e));
-		}
-	}
-	
-	@Override
-	public byte[] hash(String input) {
-		return mda.digest(input.getBytes());
-	}
+
+    private Logger logger = LoggerFactory.getLogger(ShaHashingService.class);
+
+    @Value("${info.ferrarimarco.msa.resourcesharing.security.hashing.algorithm}")
+    private String hashingAlgorithm;
+
+    @Value("${info.ferrarimarco.msa.resourcesharing.security.provider}")
+    private String cryptographicProvider;
+
+    private MessageDigest mda;
+
+    public ShaHashingService() {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
+    @PostConstruct
+    private void init() {
+        try {
+            mda = MessageDigest.getInstance(hashingAlgorithm, cryptographicProvider);
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            logger.error("ShaHashingService failed initialisation - {}: {}", e.toString(), ExceptionUtils.getStackTrace(e));
+        }
+    }
+
+    @Override
+    public byte[] hash(String input) {
+        return mda.digest(input.getBytes());
+    }
 }
