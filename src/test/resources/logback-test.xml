@@ -2,17 +2,17 @@
 <configuration>
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<layout class="ch.qos.logback.classic.PatternLayout">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 			<Pattern>
 				%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n
 			</Pattern>
-		</layout>
+		</encoder>
 	</appender>
-	
+
 	<root>
 		<level value="INFO" />
 		<appender-ref ref="STDOUT" />
 	</root>
-	
+
 </configuration>
 
