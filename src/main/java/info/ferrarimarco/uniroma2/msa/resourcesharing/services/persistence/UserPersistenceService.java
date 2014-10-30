@@ -50,7 +50,7 @@ public class UserPersistenceService extends AbstractMongoPersistenceService {
 
         for (ResourceSharingUser user : users) {
             Double distanceFromCurrentPosition = distanceService.calculateDistance(latitude, longitude, user.getLatitude(), user.getLongitude());
-            if (user.getMaxDistance() != null && distanceFromCurrentPosition <= user.getMaxDistance()) {
+            if ((user.getMaxDistance() != null && distanceFromCurrentPosition <= user.getMaxDistance()) || user.getMaxDistance() == ResourceSharingUser.DUMMY_MAX_DISTANCE) {
                 users.add(user);
             }
         }

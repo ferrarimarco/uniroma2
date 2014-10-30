@@ -64,7 +64,7 @@ public class GcmMessageHandler {
             return stringValue;
         }
     }
-
+    
     @Autowired
     private GcmMessageSender gcmMessageSender;
 
@@ -231,11 +231,12 @@ public class GcmMessageHandler {
                 return;
             }
 
-            Integer maxDistance = null;
+            Integer maxDistance;
             try {
                 maxDistance = Integer.parseInt(payload.get(GcmMessageField.DATA_MAX_DISTANCE.getStringValue()));
             } catch (Exception e) {
-                log.error("Unable to parse maxDistance.");
+                log.warn("Unable to parse maxDistance. Using {}", ResourceSharingUser.DUMMY_MAX_DISTANCE);
+                maxDistance = ResourceSharingUser.DUMMY_MAX_DISTANCE;
             }
 
             ResourceSharingUser user = userPersistenceService.readUsersByUserId(senderUserId);
@@ -246,9 +247,7 @@ public class GcmMessageHandler {
                 user.setCountry(country);
                 user.setLatitude(latitude);
                 user.setLongitude(longitude);
-                if (maxDistance != null) {
-                    user.setMaxDistance(maxDistance);
-                }
+                user.setMaxDistance(maxDistance);
             } else {
                 user = new ResourceSharingUser(senderUserId, senderGcmId, new DateTime(), address, locality, country, latitude, longitude, maxDistance);
             }
