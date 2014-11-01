@@ -141,7 +141,8 @@ public class GcmMessageHandler {
                 if (resourceToDelete.getBookerId() != null && resourceToDelete.getBookerId().length() > 0) {
                     // Booked resource deleted message to resource booker
                     payload.put(GcmMessageField.MESSAGE_ACTION.getStringValue(), GcmMessageAction.BOOKED_RESOURCE_DELETED.getStringValue());
-                    gcmMessageSender.sendJsonMessage(senderGcmId, payload, null, null, true);
+                    ResourceSharingUser booker = userPersistenceService.readUsersByUserId(resourceToDelete.getBookerId());
+                    gcmMessageSender.sendJsonMessage(booker.getGcmId(), payload, null, null, true);
                 }
 
                 resourcePersistenceService.deleteResource(resourceToDelete.getId());
