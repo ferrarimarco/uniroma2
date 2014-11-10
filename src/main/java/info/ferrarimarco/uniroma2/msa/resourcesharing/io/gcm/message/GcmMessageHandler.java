@@ -45,7 +45,7 @@ public class GcmMessageHandler {
                 }
             }
 
-            return null;
+            throw new IllegalArgumentException("No GcmMessageAction found for " + stringValue);
         }
     }
 
@@ -256,7 +256,7 @@ public class GcmMessageHandler {
             userPersistenceService.storeUser(user);
             break;
         default:
-            log.info("Action {} not supported. Ignored.", action);
+            log.warn("Action {} not supported. Ignored.", action);
             break;
         }
     }
