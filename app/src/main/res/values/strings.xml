@@ -42,6 +42,9 @@
 
     <string name="new_resource_notification_title">New Resource available</string>
     <string name="booked_resource_notification_title">Resource Booked</string>
+    <string name="resource_already_booked_notification_title">Resource not available, was already booked</string>
+    <string name="booked_resource_deleted_notification_title">Resource you booked has been deleted</string>
+
 
     <string name="book_resource_dialog_message">Would you like to book this resource?</string>
     <string name="delete_resource_dialog_message">Would you like to delete this resource?</string>

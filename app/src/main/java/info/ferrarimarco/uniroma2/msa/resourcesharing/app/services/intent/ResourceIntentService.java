@@ -18,6 +18,7 @@ import dagger.ObjectGraph;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.R;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.ShowResourcesActivity;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.model.Resource;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.config.SharedPreferencesServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.gcm.GcmMessagingServiceImpl;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.persistence.ResourceService;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
@@ -28,16 +29,20 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.app.util.ObjectGraphUtils;
  * <p/>
  * helper methods.
  */
-public class ResourceIntentService extends IntentService{
+public class ResourceIntentService extends IntentService {
 
     private static final int NEW_RESOURCE_NOTIFICATION_ID = 1;
     private static final int BOOKED_RESOURCE_NOTIFICATION_ID = 2;
+    private static final int RESOURCE_ALREADY_BOOKED_NOTIFICATION_ID = 3;
+    private static final int BOOKED_RESOURCE_DELETED_NOTIFICATION_ID = 4;
 
     private static final String ACTION_SAVE_RESOURCE_FROM_ME = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.SAVE_RESOURCE_FROM_ME";
     private static final String ACTION_RECEIVE_RESOURCE_FROM_OTHERS = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.RECEIVE_RESOURCE_FROM_OTHERS";
     private static final String ACTION_BOOK_RESOURCE_FROM_ME = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.BOOK_RESOURCE_FROM_ME";
     private static final String ACTION_BOOK_RESOURCE_FROM_OTHERS = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.BOOK_RESOURCE_FROM_OTHERS";
     private static final String ACTION_DELETE_RESOURCE_FROM_ME = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.DELETE_RESOURCE_FROM_ME";
+    private static final String ACTION_RESOURCE_ALREADY_BOOKED = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.RESOURCE_ALREADY_BOOKED";
+    private static final String ACTION_BOOKED_RESOURCE_DELETED = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.action.BOOKED_RESOURCE_DELETED";
 
     public static final String EXTRA_PARAM_RESOURCE = "info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent.extra.RESOURCE";
 
@@ -47,12 +52,15 @@ public class ResourceIntentService extends IntentService{
     @Inject
     GcmMessagingServiceImpl gcmMessagingService;
 
-    public ResourceIntentService(){
+    @Inject
+    SharedPreferencesServiceImpl sharedPreferencesService;
+
+    public ResourceIntentService() {
         super("ResourceIntentService");
     }
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
         ObjectGraph objectGraph = ObjectGraphUtils.getObjectGraph(this);
         objectGraph.inject(this);
@@ -64,7 +72,7 @@ public class ResourceIntentService extends IntentService{
      *
      * @see IntentService
      */
-    public static void startActionReceiveResourceFromOthers(Context context, Resource resource){
+    public static void startActionReceiveResourceFromOthers(Context context, Resource resource) {
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_RECEIVE_RESOURCE_FROM_OTHERS);
         intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
@@ -77,7 +85,7 @@ public class ResourceIntentService extends IntentService{
      *
      * @see IntentService
      */
-    public static void startActionSaveResourceFromMe(Context context, Resource resource){
+    public static void startActionSaveResourceFromMe(Context context, Resource resource) {
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_SAVE_RESOURCE_FROM_ME);
         intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
@@ -90,7 +98,7 @@ public class ResourceIntentService extends IntentService{
      *
      * @see IntentService
      */
-    public static void startActionBookResourceFromMe(Context context, Resource resource){
+    public static void startActionBookResourceFromMe(Context context, Resource resource) {
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_BOOK_RESOURCE_FROM_ME);
         intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
@@ -103,7 +111,7 @@ public class ResourceIntentService extends IntentService{
      *
      * @see IntentService
      */
-    public static void startActionBookResourceFromOthers(Context context, Resource resource){
+    public static void startActionBookResourceFromOthers(Context context, Resource resource) {
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_BOOK_RESOURCE_FROM_OTHERS);
         intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
@@ -116,85 +124,117 @@ public class ResourceIntentService extends IntentService{
      *
      * @see IntentService
      */
-    public static void startActionDeleteResourceFromMe(Context context, Resource resource){
+    public static void startActionDeleteResourceFromMe(Context context, Resource resource) {
         Intent intent = new Intent(context, ResourceIntentService.class);
         intent.setAction(ACTION_DELETE_RESOURCE_FROM_ME);
         intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
         context.startService(intent);
     }
 
+    public static void startActionResourceFromOthersAlreadyBooked(Context context, Resource resource) {
+        Intent intent = new Intent(context, ResourceIntentService.class);
+        intent.setAction(ACTION_RESOURCE_ALREADY_BOOKED);
+        intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
+        context.startService(intent);
+    }
+
+    public static void startActionBookedResourceDeleted(Context context, Resource resource) {
+        Intent intent = new Intent(context, ResourceIntentService.class);
+        intent.setAction(ACTION_BOOKED_RESOURCE_DELETED);
+        intent.putExtra(EXTRA_PARAM_RESOURCE, resource);
+        context.startService(intent);
+    }
 
     @Override
-    protected void onHandleIntent(Intent intent){
-        if(intent != null){
+    protected void onHandleIntent(Intent intent) {
+        if (intent != null) {
             final String action = intent.getAction();
             final Resource resource = intent.getParcelableExtra(EXTRA_PARAM_RESOURCE);
-            switch(action){
+            switch (action) {
 
-                case ACTION_SAVE_RESOURCE_FROM_ME:{
+                case ACTION_SAVE_RESOURCE_FROM_ME: {
                     handleActionSaveResourceFromMe(resource);
                     break;
                 }
-                case ACTION_RECEIVE_RESOURCE_FROM_OTHERS:{
+                case ACTION_RECEIVE_RESOURCE_FROM_OTHERS: {
                     handleActionReceiveResourceFromOthers(resource);
                     break;
                 }
-                case ACTION_BOOK_RESOURCE_FROM_ME:{
+                case ACTION_BOOK_RESOURCE_FROM_ME: {
                     handleActionBookResourceFromMe(resource);
                     break;
                 }
-                case ACTION_BOOK_RESOURCE_FROM_OTHERS:{
+                case ACTION_BOOK_RESOURCE_FROM_OTHERS: {
                     handleActionBookResourceFromOthers(resource);
                     break;
                 }
-                case ACTION_DELETE_RESOURCE_FROM_ME:{
+                case ACTION_DELETE_RESOURCE_FROM_ME: {
                     handleActionDeleteResourceFromMe(resource);
+                    break;
+                }
+                case ACTION_RESOURCE_ALREADY_BOOKED: {
+                    handleActionResourceFromOthersAlreadyBooked(resource);
+                    break;
+                }
+                case ACTION_BOOKED_RESOURCE_DELETED: {
+                    handleActionBookedResourceFromOthersDeleted(resource);
                     break;
                 }
             }
         }
     }
 
-    /**
-     * Handle action Save resource in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionSaveResourceFromMe(Resource resource){
+    private void handleActionSaveResourceFromMe(Resource resource) {
         resourceService.saveResourceLocal(resource);
         gcmMessagingService.sendNewResource(resource);
     }
 
-    /**
-     * Handle action Save resource in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionBookResourceFromOthers(Resource resource){
+    private void handleActionBookResourceFromOthers(Resource resource) {
+        // delete resource from available resources list
+        Resource tempResource = new Resource();
+        tempResource.setAndroidId(resource.getAndroidId());
+        resourceService.deleteResourceLocal(tempResource);
+
+        // save the resource as booked by me
+        resource.setBookerId(sharedPreferencesService.readRegisteredUserId());
+        resource.setType(Resource.ResourceType.BOOKED_BY_ME);
+        resourceService.saveResourceLocal(resource);
+
+        // send booking request
         gcmMessagingService.bookResourceFromOthers(resource);
     }
 
-    /**
-     * Handle action Receive resource in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionReceiveResourceFromOthers(Resource resource){
+    private void handleActionReceiveResourceFromOthers(Resource resource) {
         resourceService.saveResourceLocal(resource);
         showNewResourceNotification(resource);
     }
 
-    /**
-     * Handle action Delete resource in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionDeleteResourceFromMe(Resource resource){
+    private void handleActionDeleteResourceFromMe(Resource resource) {
         resourceService.deleteResourceLocal(resource);
         gcmMessagingService.deleteResourceFromMe(resource);
+    }
+
+    private void handleActionResourceFromOthersAlreadyBooked(Resource resource) {
+        // delete resource from booked resources list
+        Resource localResource = getLocalResourceByCriteria(resource);
+        resourceService.deleteResourceLocal(localResource);
+
+        showResourceAlreadyBookedNotification(localResource);
+    }
+
+    private void handleActionBookedResourceFromOthersDeleted(Resource resource) {
+        // delete resource from booked resources list
+        Resource localResource = getLocalResourceByCriteria(resource);
+        resourceService.deleteResourceLocal(localResource);
+
+        showBookedResourceDeletedNotification(localResource);
     }
 
     /**
      * Handle action book resource from me. This action sets the booker ID for a resource created
      * by the user.
      */
-    private void handleActionBookResourceFromMe(Resource resource){
+    private void handleActionBookResourceFromMe(Resource resource) {
 
         // For reference
         String bookerId = resource.getBookerId();
@@ -206,13 +246,7 @@ public class ResourceIntentService extends IntentService{
         // Update resource type
         resource.setType(Resource.ResourceType.CREATED_BY_ME);
 
-        List<Resource> result = resourceService.readResourceLocal(resource, ResourceService.ResourceServiceOperationMode.SYNC).getResources();
-
-        if(result == null || result.size() != 1){
-            throw new IllegalArgumentException("Cannot find a resource to book");
-        }
-
-        Resource resultResource = result.get(0);
+        Resource resultResource = getLocalResourceByCriteria(resource);
 
         resultResource.setBookerId(bookerId);
         resourceService.updateResourceLocal(resultResource);
@@ -220,15 +254,33 @@ public class ResourceIntentService extends IntentService{
         showBookedResourceNotification(resource);
     }
 
-    private void showNewResourceNotification(Resource resource){
+    private Resource getLocalResourceByCriteria(Resource criteria) {
+        List<Resource> result = resourceService.readResourceLocal(criteria, ResourceService.ResourceServiceOperationMode.SYNC).getResources();
+
+        if (result == null || result.size() != 1) {
+            throw new IllegalArgumentException("Cannot find a resource to book");
+        }
+
+        return result.get(0);
+    }
+
+    private void showNewResourceNotification(Resource resource) {
         showNotification(NEW_RESOURCE_NOTIFICATION_ID, getResources().getString(R.string.new_resource_notification_title), resource);
     }
 
-    private void showBookedResourceNotification(Resource resource){
+    private void showBookedResourceNotification(Resource resource) {
         showNotification(BOOKED_RESOURCE_NOTIFICATION_ID, getResources().getString(R.string.booked_resource_notification_title), resource);
     }
 
-    private void showNotification(Integer notificationId, String notificationTitle, Resource resource){
+    private void showResourceAlreadyBookedNotification(Resource resource) {
+        showNotification(RESOURCE_ALREADY_BOOKED_NOTIFICATION_ID, getResources().getString(R.string.resource_already_booked_notification_title), resource);
+    }
+
+    private void showBookedResourceDeletedNotification(Resource resource) {
+        showNotification(BOOKED_RESOURCE_DELETED_NOTIFICATION_ID, getResources().getString(R.string.booked_resource_deleted_notification_title), resource);
+    }
+
+    private void showNotification(Integer notificationId, String notificationTitle, Resource resource) {
         NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         Intent intent = new Intent(this, ShowResourcesActivity.class).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);

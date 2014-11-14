@@ -29,7 +29,9 @@ public class GcmMessagingServiceImpl{
         DELETE_MY_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.DELETE_RESOURCE"),
         UPDATE_USER_DETAILS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.UPDATE_USER_DETAILS"),
         NEW_RESOURCE_FROM_OTHERS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.NEW_RESOURCE_BY_OTHERS"),
-        BOOK_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.BOOK_RESOURCE");
+        BOOK_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.BOOK_RESOURCE"),
+        RESOURCE_ALREADY_BOOKED("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.RESOURCE_ALREADY_BOOKED"),
+        BOOKED_RESOURCE_DELETED("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.BOOKED_RESOURCE_DELETED");
 
         private String stringValue;
 
@@ -55,7 +57,8 @@ public class GcmMessagingServiceImpl{
         DATA_COUNTRY("country"),
         DATA_LATITUDE("latitude"),
         DATA_LONGITUDE("longitude"),
-        DATA_BOOKER_ID("booker_id");
+        DATA_BOOKER_ID("booker_id"),
+        DATA_MAX_DISTANCE("max_distance");
 
         private String stringValue;
 
@@ -154,7 +157,7 @@ public class GcmMessagingServiceImpl{
         data.putString(GcmMessageField.DATA_ACTION.getStringValue(), GcmMessage.BOOK_RESOURCE.getStringValue());
         data.putLong(GcmMessageField.DATA_CREATION_TIME.getStringValue(), resource.getCreationTime().getMillis());
         data.putString(GcmMessageField.DATA_CREATOR_ID.getStringValue(), resource.getCreatorId());
-        data.putString(GcmMessageField.DATA_BOOKER_ID.getStringValue(), sharedPreferencesService.readRegisteredUserId());
+        data.putString(GcmMessageField.DATA_BOOKER_ID.getStringValue(), resource.getBookerId());
 
         sendGcmMessage(data, maxGcmTtl);
     }
@@ -180,6 +183,7 @@ public class GcmMessagingServiceImpl{
         data.putString(GcmMessageField.DATA_COUNTRY.getStringValue(), address.getCountryName());
         data.putString(GcmMessageField.DATA_LATITUDE.getStringValue(), Double.toString(address.getLatitude()));
         data.putString(GcmMessageField.DATA_LONGITUDE.getStringValue(), Double.toString(address.getLongitude()));
+        data.putString(GcmMessageField.DATA_MAX_DISTANCE.getStringValue(), Integer.toString(1000));
 
         sendGcmMessage(data, defaultGcmTtl);
     }

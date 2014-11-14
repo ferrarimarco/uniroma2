@@ -33,12 +33,11 @@ public class GcmIntentServiceImpl extends IntentService {
                     case GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE:
                         String action = intent.getStringExtra(GcmMessageField.DATA_ACTION.getStringValue());
                         GcmMessage gcmMessage = GcmMessage.valueOf(action);
-                        Long time;
+                        Long time = intent.getLongExtra(GcmMessageField.DATA_TTL.getStringValue(), 0L);
+                        ;
 
                         switch (gcmMessage) {
                             case NEW_RESOURCE_FROM_OTHERS:
-                                time = intent.getLongExtra(GcmMessageField.DATA_TTL.getStringValue(), 0L);
-
                                 if (time != 0L) {
                                     String title = intent.getStringExtra(GcmMessageField.DATA_TITLE.getStringValue());
                                     String description = intent.getStringExtra(GcmMessageField.DATA_DESCRIPTION.getStringValue());
@@ -56,14 +55,26 @@ public class GcmIntentServiceImpl extends IntentService {
 
                                 break;
                             case BOOK_RESOURCE:
-                                time = intent.getLongExtra(GcmMessageField.DATA_CREATION_TIME.getStringValue(), 0L);
-
                                 if (time != 0L) {
                                     String bookerId = intent.getStringExtra(GcmMessageField.DATA_BOOKER_ID.getStringValue());
                                     String creatorId = intent.getStringExtra(GcmMessageField.DATA_CREATOR_ID.getStringValue());
 
                                     Resource resource = new Resource(null, null, null, null, null, null, new DateTime(time), null, creatorId, Resource.ResourceType.CREATED_BY_ME, Boolean.FALSE, time, bookerId);
                                     ResourceIntentService.startActionBookResourceFromMe(this, resource);
+                                }
+                                break;
+                            case RESOURCE_ALREADY_BOOKED:
+                                if (time != 0L) {
+                                    String creatorId = intent.getStringExtra(GcmMessageField.DATA_CREATOR_ID.getStringValue());
+                                    Resource resource = new Resource(null, null, null, null, null, null, new DateTime(time), null, creatorId, Resource.ResourceType.CREATED_BY_OTHERS, Boolean.FALSE, time, null);
+                                    ResourceIntentService.startActionResourceFromOthersAlreadyBooked(this, resource);
+                                }
+                                break;
+                            case BOOKED_RESOURCE_DELETED:
+                                if (time != 0L) {
+                                    String creatorId = intent.getStringExtra(GcmMessageField.DATA_CREATOR_ID.getStringValue());
+                                    Resource resource = new Resource(null, null, null, null, null, null, new DateTime(time), null, creatorId, Resource.ResourceType.CREATED_BY_OTHERS, Boolean.FALSE, time, null);
+                                    ResourceIntentService.startActionBookedResourceDeleted(this, resource);
                                 }
                                 break;
                         }
