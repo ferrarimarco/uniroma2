@@ -34,7 +34,7 @@ android {
 
     buildTypes {
         debug {
-            runProguard false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
