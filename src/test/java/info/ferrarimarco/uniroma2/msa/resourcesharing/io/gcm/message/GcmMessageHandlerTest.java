@@ -227,7 +227,17 @@ public class GcmMessageHandlerTest {
 				0));
 		when(userPersistenceService.findUsersInRange(
 				Double.parseDouble(payload.get(GcmMessageField.DATA_LATITUDE.getStringValue())),
-				Double.parseDouble(payload.get(GcmMessageField.DATA_LONGITUDE.getStringValue()))))
+				Double.parseDouble(payload.get(GcmMessageField.DATA_LONGITUDE.getStringValue())),
+				new ResourceSharingUser(
+						payload.get(GcmMessageField.DATA_CREATOR_ID.getStringValue()),
+						"test-creator-gcm-id",
+						new DateTime(),
+						"test-creator-address",
+						"test-creator-locality",
+						"test-creator-country",
+						0.0,
+						0.0,
+						0)))
 				.thenReturn(usersInRange);
 
 		gcmMessageHandler.handleIncomingDataMessage(jsonObject);
@@ -250,6 +260,16 @@ public class GcmMessageHandlerTest {
 						Long.parseLong(payload.get(GcmMessageField.DATA_TTL.getStringValue()))));
 		verify(userPersistenceService).findUsersInRange(
 				Double.parseDouble(payload.get(GcmMessageField.DATA_LATITUDE.getStringValue())),
-				Double.parseDouble(payload.get(GcmMessageField.DATA_LONGITUDE.getStringValue())));
+				Double.parseDouble(payload.get(GcmMessageField.DATA_LONGITUDE.getStringValue())),
+				new ResourceSharingUser(
+						payload.get(GcmMessageField.DATA_CREATOR_ID.getStringValue()),
+						"test-creator-gcm-id",
+						new DateTime(),
+						"test-creator-address",
+						"test-creator-locality",
+						"test-creator-country",
+						0.0,
+						0.0,
+						0));
 	}
 }

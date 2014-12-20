@@ -203,7 +203,7 @@ public class GcmMessageHandler {
                     creator = new ResourceSharingUser(creatorIdNewResource, senderGcmId, new DateTime(), null, resourceLocality, resourceCountry, resourceLatitude, resourceLongitude, null);
                 }
                 // Search for users in resource range
-                List<ResourceSharingUser> usersInRange = userPersistenceService.findUsersInRange(resourceLatitude, resourceLongitude);
+                List<ResourceSharingUser> usersInRange = userPersistenceService.findUsersInRange(resourceLatitude, resourceLongitude, creator);
                 payload.put(GcmMessageField.MESSAGE_ACTION.getStringValue(), GcmMessageAction.NEW_RESOURCE_FROM_OTHERS.getStringValue());
                 for (ResourceSharingUser user : usersInRange) {
                     gcmMessageSender.sendJsonMessage(user.getGcmId(), payload, null, null, true);

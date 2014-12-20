@@ -1,5 +1,7 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.connection;
 
+import info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.message.GcmMessageHandler;
+
 import java.io.IOException;
 
 import javax.annotation.PostConstruct;
@@ -18,6 +20,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +39,15 @@ public class GcmConnectionManager {
 
     @Value("${info.ferrarimarco.msa.resourcesharing.gcm.serverkey}")
     private String password;
+    
+    @Autowired
+    private GcmConnectionListener gcmConnectionListener;
+    
+    @Autowired
+    private GcmPacketInterceptor gcmPacketInterceptor;
+    
+    @Autowired
+    private GcmMessageHandler gcmMessageHandler;
 
     private static XMPPConnection connection;
 
@@ -60,9 +72,9 @@ public class GcmConnectionManager {
         config.setDebuggerEnabled(true);
 
         XMPPConnection connection = new XMPPTCPConnection(config);
-        connection.addConnectionListener(new GcmConnectionListener());
-        connection.addPacketListener(new GcmPacketListener(), new PacketTypeFilter(Message.class));
-        connection.addPacketInterceptor(new GcmPacketInterceptor(), new PacketTypeFilter(Message.class));
+        connection.addConnectionListener(gcmConnectionListener);
+        connection.addPacketListener(new GcmPacketListener(gcmMessageHandler), new PacketTypeFilter(Message.class));
+        connection.addPacketInterceptor(gcmPacketInterceptor, new PacketTypeFilter(Message.class));
 
         GcmConnectionManager.connection = connection;
         connect();

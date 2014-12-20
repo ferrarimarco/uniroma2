@@ -13,48 +13,51 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserPersistenceService extends AbstractMongoPersistenceService {
 
-    private UserRepository repository;
+	private UserRepository repository;
 
-    @Autowired
-    private DistanceService distanceService;
+	@Autowired
+	private DistanceService distanceService;
 
-    public UserPersistenceService() {
-        super();
-    }
+	public UserPersistenceService() {
+		super();
+	}
 
-    @Override
-    protected void open() {
-        repository = context.getBean(UserRepository.class);
-    }
+	@Override
+	protected void open() {
+		repository = context.getBean(UserRepository.class);
+	}
 
-    @Override
-    public void deleteAll() {
-        repository.deleteAll();
-    }
+	@Override
+	public void deleteAll() {
+		repository.deleteAll();
+	}
 
-    public ResourceSharingUser storeUser(ResourceSharingUser user) {
-        return repository.save(user);
-    }
+	public ResourceSharingUser storeUser(ResourceSharingUser user) {
+		return repository.save(user);
+	}
 
-    public ResourceSharingUser readUsersByUserId(String userId) {
-        return repository.findByUserId(userId);
-    }
+	public ResourceSharingUser readUsersByUserId(String userId) {
+		return repository.findByUserId(userId);
+	}
 
-    public List<ResourceSharingUser> findAll() {
-        return repository.findAll();
-    }
+	public List<ResourceSharingUser> findAll() {
+		return repository.findAll();
+	}
 
-    public List<ResourceSharingUser> findUsersInRange(Double latitude, Double longitude) {
-        List<ResourceSharingUser> users = findAll();
-        List<ResourceSharingUser> usersInRange = new ArrayList<>();
+	public List<ResourceSharingUser> findUsersInRange(Double latitude, Double longitude, ResourceSharingUser creator) {
+		List<ResourceSharingUser> users = findAll();
+		List<ResourceSharingUser> usersInRange = new ArrayList<>();
 
-        for (ResourceSharingUser user : users) {
-            Double distanceFromCurrentPosition = distanceService.calculateDistance(latitude, longitude, user.getLatitude(), user.getLongitude());
-            if ((user.getMaxDistance() != null && distanceFromCurrentPosition <= user.getMaxDistance()) || user.getMaxDistance() == ResourceSharingUser.DUMMY_MAX_DISTANCE) {
-                users.add(user);
-            }
-        }
+		for (ResourceSharingUser user : users) {
+			Double distanceFromCurrentPosition = distanceService.calculateDistance(latitude, longitude, user.getLatitude(), user.getLongitude());
+			if ((user.getMaxDistance() != null
+					&& (distanceFromCurrentPosition <= user.getMaxDistance()) || user.getMaxDistance() == ResourceSharingUser.DUMMY_MAX_DISTANCE)
+					//&& (creator != null && !creator.equals(user))
+				) {
+				usersInRange.add(user);
+			}
+		}
 
-        return usersInRange;
-    }
+		return usersInRange;
+	}
 }

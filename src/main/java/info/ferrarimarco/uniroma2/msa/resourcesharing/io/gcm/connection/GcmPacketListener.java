@@ -4,6 +4,8 @@ import info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.message.GcmMessageH
 
 import java.util.Map;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.jivesoftware.smack.PacketListener;
@@ -14,11 +16,13 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
+@RequiredArgsConstructor
 public class GcmPacketListener implements PacketListener {
 
     @Autowired
+    @NonNull
     private GcmMessageHandler gcmMessageHandler;
-
+    
     @Override
     public void processPacket(Packet packet) {
         log.info("Received: " + packet.toXML());

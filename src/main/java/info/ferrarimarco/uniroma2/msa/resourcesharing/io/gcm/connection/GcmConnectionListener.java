@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 public class GcmConnectionListener implements ConnectionListener {
     @Override
     public void reconnectionSuccessful() {
