@@ -77,12 +77,13 @@ public class CreateNewResourceActivity extends AbstractActivity implements Adapt
                 // In secs
                 Long resourceTtl = ttlAmount;
 
+                // Convert to msec
                 if(selectedTtlUnit.equals(getResources().getString(R.string.minutes))){
-                    resourceTtl *= 60;
+                    resourceTtl *= 60 * 1000;
                 }else if(selectedTtlUnit.equals(getResources().getString(R.string.hours))){
-                    resourceTtl *= 60 * 60;
+                    resourceTtl *= 60 * 60 * 1000;
                 }else if(selectedTtlUnit.equals(getResources().getString(R.string.days))){
-                    resourceTtl *= 60 * 60 * 24;
+                    resourceTtl *= 24 * 60 * 60 * 1000;
                 }
 
                 Location location = getLastKnownLocation();

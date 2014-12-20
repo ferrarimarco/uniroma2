@@ -28,7 +28,7 @@ public class GcmMessagingServiceImpl{
         NEW_RESOURCE_FROM_ME("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.CREATE_NEW_RESOURCE"),
         DELETE_MY_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.DELETE_RESOURCE"),
         UPDATE_USER_DETAILS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.UPDATE_USER_DETAILS"),
-        NEW_RESOURCE_FROM_OTHERS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.NEW_RESOURCE_BY_OTHERS"),
+        NEW_RESOURCE_BY_OTHERS("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.NEW_RESOURCE_BY_OTHERS"),
         BOOK_RESOURCE("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.BOOK_RESOURCE"),
         RESOURCE_ALREADY_BOOKED("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.RESOURCE_ALREADY_BOOKED"),
         BOOKED_RESOURCE_DELETED("info.ferrarimarco.uniroma2.msa.resourcesharing.app.gcm.message.BOOKED_RESOURCE_DELETED");
@@ -41,6 +41,26 @@ public class GcmMessagingServiceImpl{
 
         public String getStringValue(){
             return stringValue;
+        }
+
+        public static GcmMessage getGcmMessage(String stringValue){
+            if(NEW_RESOURCE_FROM_ME.getStringValue().equals(stringValue)){
+                return NEW_RESOURCE_FROM_ME;
+            }else if(DELETE_MY_RESOURCE.getStringValue().equals(stringValue)){
+                return DELETE_MY_RESOURCE;
+            }else if(UPDATE_USER_DETAILS.getStringValue().equals(stringValue)){
+                return UPDATE_USER_DETAILS;
+            }else if(NEW_RESOURCE_BY_OTHERS.getStringValue().equals(stringValue)){
+                return NEW_RESOURCE_BY_OTHERS;
+            }else if(BOOK_RESOURCE.getStringValue().equals(stringValue)){
+                return BOOK_RESOURCE;
+            }else if(RESOURCE_ALREADY_BOOKED.getStringValue().equals(stringValue)){
+                return RESOURCE_ALREADY_BOOKED;
+            }else if(BOOKED_RESOURCE_DELETED.getStringValue().equals(stringValue)){
+                return BOOKED_RESOURCE_DELETED;
+            }else{
+                return null;
+            }
         }
     }
 
@@ -155,7 +175,7 @@ public class GcmMessagingServiceImpl{
     public void bookResourceFromOthers(Resource resource){
         Bundle data = new Bundle();
         data.putString(GcmMessageField.DATA_ACTION.getStringValue(), GcmMessage.BOOK_RESOURCE.getStringValue());
-        data.putLong(GcmMessageField.DATA_CREATION_TIME.getStringValue(), resource.getCreationTime().getMillis());
+        data.putString(GcmMessageField.DATA_CREATION_TIME.getStringValue(), Long.toString(resource.getCreationTime().getMillis()));
         data.putString(GcmMessageField.DATA_CREATOR_ID.getStringValue(), resource.getCreatorId());
         data.putString(GcmMessageField.DATA_BOOKER_ID.getStringValue(), resource.getBookerId());
 
@@ -165,7 +185,7 @@ public class GcmMessagingServiceImpl{
     public void deleteResourceFromMe(Resource resource){
         Bundle data = new Bundle();
         data.putString(GcmMessageField.DATA_ACTION.getStringValue(), GcmMessage.DELETE_MY_RESOURCE.getStringValue());
-        data.putLong(GcmMessageField.DATA_CREATION_TIME.getStringValue(), resource.getCreationTime().getMillis());
+        data.putString(GcmMessageField.DATA_CREATION_TIME.getStringValue(), Long.toString(resource.getCreationTime().getMillis()));
         data.putString(GcmMessageField.DATA_CREATOR_ID.getStringValue(), resource.getCreatorId());
 
         sendGcmMessage(data, maxGcmTtl);

@@ -3,6 +3,7 @@ package info.ferrarimarco.uniroma2.msa.resourcesharing.app.services.intent;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -32,12 +33,17 @@ public class GcmIntentServiceImpl extends IntentService {
                 switch (messageType) {
                     case GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE:
                         String action = intent.getStringExtra(GcmMessageField.DATA_ACTION.getStringValue());
-                        GcmMessage gcmMessage = GcmMessage.valueOf(action);
-                        Long time = intent.getLongExtra(GcmMessageField.DATA_TTL.getStringValue(), 0L);
-                        ;
+                        GcmMessage gcmMessage = GcmMessage.getGcmMessage(action);
+                        Long time;
+                        try{
+                            time = Long.parseLong(intent.getStringExtra(GcmMessageField.DATA_TTL.getStringValue()));
+                        }catch(Exception e){
+                            time = 0L;
+                            Log.w(GcmIntentServiceImpl.class.getName(), "Error while parsing TTL from resource.");
+                        }
 
                         switch (gcmMessage) {
-                            case NEW_RESOURCE_FROM_OTHERS:
+                            case NEW_RESOURCE_BY_OTHERS:
                                 if (time != 0L) {
                                     String title = intent.getStringExtra(GcmMessageField.DATA_TITLE.getStringValue());
                                     String description = intent.getStringExtra(GcmMessageField.DATA_DESCRIPTION.getStringValue());
