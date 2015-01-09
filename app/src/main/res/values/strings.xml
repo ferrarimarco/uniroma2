@@ -32,12 +32,10 @@
 
     <string name="minutes">minutes</string>
     <string name="hours">hours</string>
-    <string name="days">days</string>
 
     <string-array name="resource_ttl_array">
         <item>@string/minutes</item>
         <item>@string/hours</item>
-        <item>@string/days</item>
     </string-array>
 
     <string name="new_resource_notification_title">New Resource available</string>
