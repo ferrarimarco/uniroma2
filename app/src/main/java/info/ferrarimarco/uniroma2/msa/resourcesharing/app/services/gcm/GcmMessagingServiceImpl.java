@@ -77,8 +77,7 @@ public class GcmMessagingServiceImpl{
         DATA_COUNTRY("country"),
         DATA_LATITUDE("latitude"),
         DATA_LONGITUDE("longitude"),
-        DATA_BOOKER_ID("booker_id"),
-        DATA_MAX_DISTANCE("max_distance");
+        DATA_BOOKER_ID("booker_id");
 
         private String stringValue;
 
@@ -203,7 +202,6 @@ public class GcmMessagingServiceImpl{
         data.putString(GcmMessageField.DATA_COUNTRY.getStringValue(), address.getCountryName());
         data.putString(GcmMessageField.DATA_LATITUDE.getStringValue(), Double.toString(address.getLatitude()));
         data.putString(GcmMessageField.DATA_LONGITUDE.getStringValue(), Double.toString(address.getLongitude()));
-        data.putString(GcmMessageField.DATA_MAX_DISTANCE.getStringValue(), Integer.toString(1000));
 
         sendGcmMessage(data, defaultGcmTtl);
     }
