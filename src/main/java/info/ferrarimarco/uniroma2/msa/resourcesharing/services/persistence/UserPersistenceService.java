@@ -1,6 +1,7 @@
 package info.ferrarimarco.uniroma2.msa.resourcesharing.services.persistence;
 
 import info.ferrarimarco.uniroma2.msa.resourcesharing.dao.repositories.mongodb.UserRepository;
+import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingResource;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.model.ResourceSharingUser;
 import info.ferrarimarco.uniroma2.msa.resourcesharing.services.DistanceService;
 
@@ -44,16 +45,20 @@ public class UserPersistenceService extends AbstractMongoPersistenceService {
 		return repository.findAll();
 	}
 
-	public List<ResourceSharingUser> findUsersInRange(Double latitude, Double longitude, ResourceSharingUser creator) {
+	public List<ResourceSharingUser> findUsersInRange(Double latitude, Double longitude, ResourceSharingUser creator, ResourceSharingResource newResource) {
 		List<ResourceSharingUser> users = findAll();
 		List<ResourceSharingUser> usersInRange = new ArrayList<>();
+		
+		// Calculate max distance from resource in Km (1Km/10min)
+		// minimum is 1 Km
+		double maxDistanceFromResource;
+		double multiplier = newResource.getTtl() / 1000 / 60;
+		
+		maxDistanceFromResource = multiplier > 0 ? 1.0 * multiplier : 1.0;
 
 		for (ResourceSharingUser user : users) {
 			Double distanceFromCurrentPosition = distanceService.calculateDistance(latitude, longitude, user.getLatitude(), user.getLongitude());
-			if ((user.getMaxDistance() != null
-					&& (distanceFromCurrentPosition <= user.getMaxDistance()) || user.getMaxDistance() == ResourceSharingUser.DUMMY_MAX_DISTANCE)
-					//&& (creator != null && !creator.equals(user))
-				) {
+			if(distanceFromCurrentPosition <= maxDistanceFromResource){
 				usersInRange.add(user);
 			}
 		}

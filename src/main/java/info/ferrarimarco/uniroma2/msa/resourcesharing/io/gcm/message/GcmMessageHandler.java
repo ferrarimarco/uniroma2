@@ -53,7 +53,7 @@ public class GcmMessageHandler {
     protected enum GcmMessageField {
         MESSAGE_ID("message_id"), MESSAGE_FROM("from"), MESSAGE_DATA("data"), MESSAGE_CATEGORY("category"), MESSAGE_ACTION("action"), DATA_ACTION("action"), DATA_TITLE("title"), DATA_DESCRIPTION(
                 "description"), DATA_CREATION_TIME("creation_time"), DATA_ACQUISITION_MODE("acquisition_mode"), DATA_CREATOR_ID("creator_id"), DATA_TTL("ttl"), DATA_ADDRESS("address"), DATA_LOCALITY(
-                "locality"), DATA_COUNTRY("country"), DATA_LATITUDE("latitude"), DATA_LONGITUDE("longitude"), DATA_BOOKER_ID("booker_id"), DATA_MAX_DISTANCE("max_distance");
+                "locality"), DATA_COUNTRY("country"), DATA_LATITUDE("latitude"), DATA_LONGITUDE("longitude"), DATA_BOOKER_ID("booker_id");
 
         private String stringValue;
 
@@ -200,13 +200,16 @@ public class GcmMessageHandler {
                 ResourceSharingUser creator = userPersistenceService.readUsersByUserId(creatorIdNewResource);
                 if (creator == null) {
                     // Update user info
-                    creator = new ResourceSharingUser(creatorIdNewResource, senderGcmId, new DateTime(), null, resourceLocality, resourceCountry, resourceLatitude, resourceLongitude, null);
+                    creator = new ResourceSharingUser(creatorIdNewResource, senderGcmId, new DateTime(), null, resourceLocality, resourceCountry, resourceLatitude, resourceLongitude);
+                    userPersistenceService.storeUser(creator);
                 }
                 // Search for users in resource range
-                List<ResourceSharingUser> usersInRange = userPersistenceService.findUsersInRange(resourceLatitude, resourceLongitude, creator);
+                List<ResourceSharingUser> usersInRange = userPersistenceService.findUsersInRange(resourceLatitude, resourceLongitude, creator, newResource);
                 payload.put(GcmMessageField.MESSAGE_ACTION.getStringValue(), GcmMessageAction.NEW_RESOURCE_FROM_OTHERS.getStringValue());
                 for (ResourceSharingUser user : usersInRange) {
-                    gcmMessageSender.sendJsonMessage(user.getGcmId(), payload, null, null, true);
+                	//if(!user.equals(creator)){
+                		gcmMessageSender.sendJsonMessage(user.getGcmId(), payload, null, null, true);
+                	//}
                 }
             } else {
                 log.warn("Resource {} is expired. Skipped.", resourceTitle);
@@ -233,14 +236,6 @@ public class GcmMessageHandler {
                 return;
             }
 
-            Integer maxDistance;
-            try {
-                maxDistance = Integer.parseInt(payload.get(GcmMessageField.DATA_MAX_DISTANCE.getStringValue()));
-            } catch (Exception e) {
-                log.warn("Unable to parse maxDistance. Using {}", ResourceSharingUser.DUMMY_MAX_DISTANCE);
-                maxDistance = ResourceSharingUser.DUMMY_MAX_DISTANCE;
-            }
-
             ResourceSharingUser user = userPersistenceService.readUsersByUserId(senderUserId);
             if (user != null) {
                 user.setLastUpdate(new DateTime());
@@ -249,9 +244,8 @@ public class GcmMessageHandler {
                 user.setCountry(country);
                 user.setLatitude(latitude);
                 user.setLongitude(longitude);
-                user.setMaxDistance(maxDistance);
             } else {
-                user = new ResourceSharingUser(senderUserId, senderGcmId, new DateTime(), address, locality, country, latitude, longitude, maxDistance);
+                user = new ResourceSharingUser(senderUserId, senderGcmId, new DateTime(), address, locality, country, latitude, longitude);
             }
 
             userPersistenceService.storeUser(user);

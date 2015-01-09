@@ -38,7 +38,7 @@ public class UserPersistenceServiceTest extends BaseSpringTest {
         userPersistenceService.open();
 
         String userId = "test-user-id";
-        ResourceSharingUser user = new ResourceSharingUser(userId, "test-user-gcm-id", new DateTime(), "test-user-address", "test-user-locality", "test-user-country", 0.0, 0.0, null);
+        ResourceSharingUser user = new ResourceSharingUser(userId, "test-user-gcm-id", new DateTime(), "test-user-address", "test-user-locality", "test-user-country", 0.0, 0.0);
 
         user = userPersistenceService.storeUser(user);
         ResourceSharingUser readUser = userPersistenceService.readUsersByUserId(userId);

@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
@@ -23,8 +22,4 @@ public class ResourceSharingUser {
     private String country;
     private Double latitude;
     private Double longitude;
-    private Integer maxDistance;
-    
-    @Transient
-    public static final Integer DUMMY_MAX_DISTANCE = -1;
 }
