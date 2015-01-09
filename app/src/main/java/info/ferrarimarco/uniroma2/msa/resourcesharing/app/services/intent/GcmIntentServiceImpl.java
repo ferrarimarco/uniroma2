@@ -55,8 +55,12 @@ public class GcmIntentServiceImpl extends IntentService {
                                     String acquisitionMode = intent.getStringExtra(GcmMessageField.DATA_ACQUISITION_MODE.getStringValue());
                                     String creatorId = intent.getStringExtra(GcmMessageField.DATA_CREATOR_ID.getStringValue());
 
-                                    Resource resource = new Resource(title, description, latitude, longitude, locality, country, new DateTime(creationTimeMs), acquisitionMode, creatorId, Resource.ResourceType.CREATED_BY_OTHERS, Boolean.FALSE, time, null);
-                                    ResourceIntentService.startActionReceiveResourceFromOthers(this, resource);
+                                    if (creationTimeMs + time < System.currentTimeMillis()) {
+                                        Resource resource = new Resource(title, description, latitude, longitude, locality, country, new DateTime(creationTimeMs), acquisitionMode, creatorId, Resource.ResourceType.CREATED_BY_OTHERS, Boolean.FALSE, time, null);
+                                        ResourceIntentService.startActionReceiveResourceFromOthers(this, resource);
+                                    } else {
+                                        Log.d(GcmIntentServiceImpl.class.getName(), "Resource is expired, do not save it.");
+                                    }
                                 }
 
                                 break;
