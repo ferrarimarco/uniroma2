@@ -202,9 +202,10 @@ public class GcmMessagingServiceImpl{
             }
             data.putString(GcmMessageField.DATA_LOCALITY.getStringValue(), address.getLocality());
             data.putString(GcmMessageField.DATA_COUNTRY.getStringValue(), address.getCountryName());
-            data.putString(GcmMessageField.DATA_LATITUDE.getStringValue(), Double.toString(address.getLatitude()));
-            data.putString(GcmMessageField.DATA_LONGITUDE.getStringValue(), Double.toString(address.getLongitude()));
         }
+
+        data.putString(GcmMessageField.DATA_LATITUDE.getStringValue(), Double.toString(address.getLatitude()));
+        data.putString(GcmMessageField.DATA_LONGITUDE.getStringValue(), Double.toString(address.getLongitude()));
 
         sendGcmMessage(data, defaultGcmTtl);
     }
