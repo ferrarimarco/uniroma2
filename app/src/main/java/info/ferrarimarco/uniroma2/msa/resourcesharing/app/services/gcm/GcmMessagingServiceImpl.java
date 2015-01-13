@@ -195,13 +195,16 @@ public class GcmMessagingServiceImpl{
 
         data.putString(GcmMessageField.DATA_ACTION.getStringValue(), GcmMessage.UPDATE_USER_DETAILS.getStringValue());
         data.putString(GcmMessageField.DATA_CREATOR_ID.getStringValue(), sharedPreferencesService.readRegisteredUserId());
-        if(address.getMaxAddressLineIndex() > 0){
-            data.putString(GcmMessageField.DATA_ADDRESS.getStringValue(), address.getAddressLine(0));
+
+        if (address != null) {
+            if (address.getMaxAddressLineIndex() > 0) {
+                data.putString(GcmMessageField.DATA_ADDRESS.getStringValue(), address.getAddressLine(0));
+            }
+            data.putString(GcmMessageField.DATA_LOCALITY.getStringValue(), address.getLocality());
+            data.putString(GcmMessageField.DATA_COUNTRY.getStringValue(), address.getCountryName());
+            data.putString(GcmMessageField.DATA_LATITUDE.getStringValue(), Double.toString(address.getLatitude()));
+            data.putString(GcmMessageField.DATA_LONGITUDE.getStringValue(), Double.toString(address.getLongitude()));
         }
-        data.putString(GcmMessageField.DATA_LOCALITY.getStringValue(), address.getLocality());
-        data.putString(GcmMessageField.DATA_COUNTRY.getStringValue(), address.getCountryName());
-        data.putString(GcmMessageField.DATA_LATITUDE.getStringValue(), Double.toString(address.getLatitude()));
-        data.putString(GcmMessageField.DATA_LONGITUDE.getStringValue(), Double.toString(address.getLongitude()));
 
         sendGcmMessage(data, defaultGcmTtl);
     }
