@@ -8,7 +8,7 @@ dependencies {
     androidTestCompile 'junit:junit:4.11'
     androidTestCompile 'org.robolectric:robolectric:2.3'
     androidTestCompile 'com.squareup:fest-android:1.0.8'
-    compile 'com.google.android.gms:play-services:5.2.08'
+    compile 'com.google.android.gms:play-services:6.5.87'
     compile 'com.squareup.dagger:dagger:1.2.2'
     compile 'com.squareup.dagger:dagger-compiler:1.2.2'
     compile 'com.j256.ormlite:ormlite-android:4.48'
