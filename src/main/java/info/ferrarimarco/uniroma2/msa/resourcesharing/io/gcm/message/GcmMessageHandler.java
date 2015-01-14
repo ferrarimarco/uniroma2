@@ -200,9 +200,15 @@ public class GcmMessageHandler {
                 ResourceSharingUser creator = userPersistenceService.readUsersByUserId(creatorIdNewResource);
                 if (creator == null) {
                     // Update user info
-                    creator = new ResourceSharingUser(creatorIdNewResource, senderGcmId, new DateTime(), null, resourceLocality, resourceCountry, resourceLatitude, resourceLongitude);
-                    userPersistenceService.storeUser(creator);
+                    creator = new ResourceSharingUser(creatorIdNewResource, senderGcmId, creationTime, null, resourceLocality, resourceCountry, resourceLatitude, resourceLongitude);
+                }else{
+                	creator.setLastUpdate(creationTime);
+                	creator.setLatitude(resourceLatitude);
+                	creator.setLongitude(resourceLongitude);
                 }
+                
+                userPersistenceService.storeUser(creator);
+                
                 // Search for users in resource range
                 List<ResourceSharingUser> usersInRange = userPersistenceService.findUsersInRange(resourceLatitude, resourceLongitude, creator, newResource);
                 payload.put(GcmMessageField.MESSAGE_ACTION.getStringValue(), GcmMessageAction.NEW_RESOURCE_FROM_OTHERS.getStringValue());
