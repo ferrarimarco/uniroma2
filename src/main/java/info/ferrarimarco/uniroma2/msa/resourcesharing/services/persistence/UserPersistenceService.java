@@ -52,9 +52,9 @@ public class UserPersistenceService extends AbstractMongoPersistenceService {
 		// Calculate max distance from resource in Km (1Km/10min)
 		// minimum is 1 Km
 		double maxDistanceFromResource;
-		double multiplier = newResource.getTtl() / 1000 / 60;
+		double multiplier = newResource.getTtl() / 1000 / 60 / 10;
 		
-		maxDistanceFromResource = multiplier > 0 ? 1.0 * multiplier : 1.0;
+		maxDistanceFromResource = multiplier > 1.0 ? 1.0 * multiplier : 1.0;
 
 		for (ResourceSharingUser user : users) {
 			Double distanceFromCurrentPosition = distanceService.calculateDistance(latitude, longitude, user.getLatitude(), user.getLongitude());
