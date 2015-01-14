@@ -55,7 +55,7 @@ public class GcmIntentServiceImpl extends IntentService {
                                     String acquisitionMode = intent.getStringExtra(GcmMessageField.DATA_ACQUISITION_MODE.getStringValue());
                                     String creatorId = intent.getStringExtra(GcmMessageField.DATA_CREATOR_ID.getStringValue());
 
-                                    if (creationTimeMs + time < System.currentTimeMillis()) {
+                                    if (creationTimeMs + time > System.currentTimeMillis()) {
                                         Resource resource = new Resource(title, description, latitude, longitude, locality, country, new DateTime(creationTimeMs), acquisitionMode, creatorId, Resource.ResourceType.CREATED_BY_OTHERS, Boolean.FALSE, time, null);
                                         ResourceIntentService.startActionReceiveResourceFromOthers(this, resource);
                                     } else {
