@@ -7,31 +7,36 @@ import android.location.Location;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
 
-public class LocationService{
+public class LocationService {
 
     private Geocoder geocoder;
 
     @Inject
-    public LocationService(Context context){
+    public LocationService(Context context) {
         geocoder = new Geocoder(context, Locale.getDefault());
     }
 
-    public Address resolveAddress(Location location){
+    public Address resolveAddress(Location location) {
         // Create a list to contain the result address
         List<Address> addresses = null;
         Address result = null;
 
-        try{
+        try {
             addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-        }catch(IOException e1){
-            Log.e(LocationService.class.getName(), "IO Exception in resolveAddress()");
-            e1.printStackTrace();
-        }catch(IllegalArgumentException e2){
+        } catch (IOException e1) {
+            Log.e(LocationService.class.getName(), "IO Exception in resolveAddress(): " + e1.getLocalizedMessage());
+            // At least send lat e long
+            addresses = new ArrayList<>();
+            addresses.add(new Address(Locale.getDefault()));
+            addresses.get(0).setLatitude(location.getLatitude());
+            addresses.get(0).setLongitude(location.getLongitude());
+        } catch (IllegalArgumentException e2) {
             // Error message to post in the log
             String errorString = "Illegal arguments " +
                     Double.toString(location.getLatitude()) +
@@ -42,9 +47,9 @@ public class LocationService{
             e2.printStackTrace();
         }
         // If the reverse geocode returned an address
-        if(addresses != null && addresses.size() > 0){
+        if (addresses != null && addresses.size() > 0) {
             result = addresses.get(0);
-        }else{
+        } else {
             // TODO: handle this error condition
         }
 

@@ -177,6 +177,7 @@ public class GcmMessagingServiceImpl{
         data.putString(GcmMessageField.DATA_CREATION_TIME.getStringValue(), Long.toString(resource.getCreationTime().getMillis()));
         data.putString(GcmMessageField.DATA_CREATOR_ID.getStringValue(), resource.getCreatorId());
         data.putString(GcmMessageField.DATA_BOOKER_ID.getStringValue(), resource.getBookerId());
+        data.putString(GcmMessageField.DATA_TTL.getStringValue(), resource.getTimeToLive().toString());
 
         sendGcmMessage(data, maxGcmTtl);
     }
@@ -186,6 +187,7 @@ public class GcmMessagingServiceImpl{
         data.putString(GcmMessageField.DATA_ACTION.getStringValue(), GcmMessage.DELETE_MY_RESOURCE.getStringValue());
         data.putString(GcmMessageField.DATA_CREATION_TIME.getStringValue(), Long.toString(resource.getCreationTime().getMillis()));
         data.putString(GcmMessageField.DATA_CREATOR_ID.getStringValue(), resource.getCreatorId());
+        data.putString(GcmMessageField.DATA_TTL.getStringValue(), resource.getTimeToLive().toString());
 
         sendGcmMessage(data, maxGcmTtl);
     }
@@ -202,10 +204,9 @@ public class GcmMessagingServiceImpl{
             }
             data.putString(GcmMessageField.DATA_LOCALITY.getStringValue(), address.getLocality());
             data.putString(GcmMessageField.DATA_COUNTRY.getStringValue(), address.getCountryName());
+            data.putString(GcmMessageField.DATA_LATITUDE.getStringValue(), Double.toString(address.getLatitude()));
+            data.putString(GcmMessageField.DATA_LONGITUDE.getStringValue(), Double.toString(address.getLongitude()));
         }
-
-        data.putString(GcmMessageField.DATA_LATITUDE.getStringValue(), Double.toString(address.getLatitude()));
-        data.putString(GcmMessageField.DATA_LONGITUDE.getStringValue(), Double.toString(address.getLongitude()));
 
         sendGcmMessage(data, defaultGcmTtl);
     }
