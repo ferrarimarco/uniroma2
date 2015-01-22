@@ -213,9 +213,9 @@ public class GcmMessageHandler {
                 List<ResourceSharingUser> usersInRange = userPersistenceService.findUsersInRange(resourceLatitude, resourceLongitude, creator, newResource);
                 payload.put(GcmMessageField.MESSAGE_ACTION.getStringValue(), GcmMessageAction.NEW_RESOURCE_FROM_OTHERS.getStringValue());
                 for (ResourceSharingUser user : usersInRange) {
-                	//if(!user.equals(creator)){
+                	if(!user.equals(creator)){
                 		gcmMessageSender.sendJsonMessage(user.getGcmId(), payload, null, null, true);
-                	//}
+                	}
                 }
             } else {
                 log.warn("Resource {} is expired. Skipped.", resourceTitle);
