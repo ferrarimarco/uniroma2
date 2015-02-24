@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="restaurant-management Test Suite" verbose="1">
+	<test name="Tests">
+		<packages>
+			<package name="info.ferrarimarco.uniroma2.is.*" />
+		</packages>
+	</test>
+</suite>
