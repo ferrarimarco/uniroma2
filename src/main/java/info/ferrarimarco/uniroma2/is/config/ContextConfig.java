@@ -7,8 +7,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@PropertySource("classpath:app.properties")
-@Import({SpringMongoConfig.class})
+@PropertySource("classpath:application.properties")
+@Import({SpringMongoConfig.class, TemplateConfig.class})
 @Configuration
 @EnableTransactionManagement
 public class ContextConfig {
