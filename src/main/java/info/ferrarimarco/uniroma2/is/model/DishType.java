@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class DishType extends Entity{
-    private DishType superType;
-    private List<DishType> subTypes;
+    private String superTypeId;
+    private List<String> subTypeIds;
     private String name;
     private boolean isLeaf;
 }
