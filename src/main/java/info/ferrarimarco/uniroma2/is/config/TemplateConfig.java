@@ -68,14 +68,6 @@ public class TemplateConfig {
         return viewResolver;
     }
     
-//    <!-- **************************************************************** -->
-//    <!--  MESSAGE EXTERNALIZATION/INTERNATIONALIZATION                    -->
-//    <!--  Standard Spring MessageSource implementation                    -->
-//    <!-- **************************************************************** -->
-//    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-//      <property name="basename" value="Messages" />
-//    </bean>
-    
     public MessageSource messageSource(){
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasename(baseName);
