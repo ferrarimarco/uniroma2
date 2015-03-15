@@ -22,27 +22,24 @@ public class TemplateConfig {
     @Value("${config.template.prefix}")
     private String prefix;
     
-    @Value("${config.template.suffix}")
-    private String suffix;
-    
     @Value("${config.template.templateMode}")
     private String templateMode;
     
     @Value("${config.template.viewResolverOrder}")
     private int viewResolverOrder;
     
-    @Value("${config.template.viewNames}")
-    private String[] viewNames;
-    
     @Value("${config.template.internationalization.basename}")
     private String baseName;
+    
+    @Value("${config.template.encoding}")
+    private String characterEncoding;
     
     @Bean
     public TemplateResolver templateResolver(){
         TemplateResolver templateResolver = new ServletContextTemplateResolver();
         templateResolver.setPrefix(prefix);
-        templateResolver.setSuffix(suffix);
         templateResolver.setTemplateMode(templateMode);
+        templateResolver.setCharacterEncoding(characterEncoding);
         return templateResolver;
     }
     
@@ -64,10 +61,11 @@ public class TemplateConfig {
             log.warn("Template engine for view resolver was not set.");
         }
         viewResolver.setOrder(viewResolverOrder);
-        viewResolver.setViewNames(viewNames);
+        viewResolver.setCharacterEncoding(characterEncoding);
         return viewResolver;
     }
     
+    @Bean
     public MessageSource messageSource(){
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasename(baseName);
