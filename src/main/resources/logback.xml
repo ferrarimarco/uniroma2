@@ -17,6 +17,7 @@
 	<logger name="org.hibernate" level="WARN" />
 	<logger name="jdbc" additivity="false" value="WARN" />
 	<logger name="org.springframework" level="WARN" />
+	<logger name="org.thymeleaf" level="WARN" />
 	
 	<root>
 		<level value="WARN" />
