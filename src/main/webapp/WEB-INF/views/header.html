@@ -7,26 +7,20 @@
 	<div class="navbar navbar-inverse navbar-fixed-top"
 		th:fragment="header">
 		<div class="container">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse"
-					data-target=".nav-collapse">
-					<span class="icon-bar"></span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="#">My project</a>
-			</div>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
-					<li class="active"><a href="#" th:href="@{/}">Home</a></li>
-					<li><a href="#" th:href="@{/message}">Messages</a></li>
-					<li><a href="#" th:href="@{/task}">Tasks</a></li>
+					<li><a href="#" th:href="@{/}" th:text="#{header.menu.home}">[Home]</a></li>
+					<li><a href="#" th:href="@{/stats}" th:text="#{header.menu.stats}">[Statistics]</a></li>
+					<li><a href="#" th:href="@{/products}" th:text="#{header.menu.products}">[Product Management]</a></li>
+					<li><a href="#" th:href="@{/menu}" th:text="#{header.menu.menu}">[Menu Management]</a></li>
+					<li><a href="#" th:href="@{/users}" th:text="#{header.menu.users}">[User Management]</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li th:if="${#authorization.expression('!isAuthenticated()')}">
-						<a href="/signin" th:href="@{/signin}">Sign in</a>
+						<a href="#" th:href="@{/login.html}">Sign in</a>
 					</li>
 					<li th:if="${#authorization.expression('isAuthenticated()')}">
-						<a href="/logout" th:href="@{/logout}">Logout</a>
+						<a href="#" th:href="@{/logout}">Logout</a>
 					</li>
 				</ul>
 			</div>
