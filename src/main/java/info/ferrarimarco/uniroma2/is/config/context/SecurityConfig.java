@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.is.config;
+package info.ferrarimarco.uniroma2.is.config.context;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +28,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage("/login.html")
                 .failureUrl("/login-error.html")
                 .permitAll()
+                .defaultSuccessUrl("/home.html")
                 .and()
             .logout()
                 .permitAll();

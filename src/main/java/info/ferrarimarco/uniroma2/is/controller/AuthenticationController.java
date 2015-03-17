@@ -18,4 +18,11 @@ public class AuthenticationController {
         model.addAttribute("loginError", true);
         return "login.html";
     }
+    
+    // Logout
+    @RequestMapping("/logout.html")
+    public String logout(Model model) {
+        model.addAttribute("logout", true);
+        return "login.html";
+    }
 }

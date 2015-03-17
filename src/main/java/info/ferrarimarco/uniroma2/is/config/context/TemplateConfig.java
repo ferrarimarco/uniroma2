@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.is.config;
+package info.ferrarimarco.uniroma2.is.config.context;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.ViewResolver;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.dialect.IDialect;
+import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
@@ -48,6 +50,7 @@ public class TemplateConfig {
     public TemplateEngine templateEngine(TemplateResolver templateResolver){
         TemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
+        templateEngine.addDialect(new SpringSecurityDialect());
         return templateEngine;
     }
     

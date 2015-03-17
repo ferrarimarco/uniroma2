@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.is.config;
+package info.ferrarimarco.uniroma2.is.config.servlet;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
