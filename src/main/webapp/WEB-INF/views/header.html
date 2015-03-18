@@ -10,20 +10,31 @@
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
 					<li><a href="#" th:href="@{/}" th:text="#{header.menu.home}">[Home]</a></li>
-					<li><a href="#" th:href="@{/stats}" th:text="#{header.menu.stats}">[Statistics]</a></li>
-					<li><a href="#" th:href="@{/products}" th:text="#{header.menu.products}">[Product Management]</a></li>
-					<li><a href="#" th:href="@{/menu}" th:text="#{header.menu.menu}">[Menu Management]</a></li>
-					<li><a href="#" th:href="@{/users}" th:text="#{header.menu.users}">[User Management]</a></li>
+					<li><a href="#" th:href="@{/stats}"
+						th:text="#{header.menu.stats}">[Statistics]</a></li>
+					<li><a href="#" th:href="@{/products}"
+						th:text="#{header.menu.products}">[Product Management]</a></li>
+					<li><a href="#" th:href="@{/menu}"
+						th:text="#{header.menu.menu}">[Menu Management]</a></li>
+					<li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+						<a href="#" th:href="@{/users}" th:text="#{header.menu.users}">[User Management]</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li th:if="${#authorization.expression('!isAuthenticated()')}">
 						<a href="#" th:href="@{/login.html}">Sign in</a>
 					</li>
 					<li th:if="${#authorization.expression('isAuthenticated()')}">
-						<a href="#" th:href="@{/logout.html}">Logout</a>
+						<form name="login_form" th:action="@{/logout.html}" method="post">
+							<fieldset>
+								<div class="form-actions">
+									<button type="submit" class="btn">Sign out</button>
+								</div>
+							</fieldset>
+						</form>
 					</li>
 				</ul>
 			</div>
+
 		</div>
 	</div>
 </body>

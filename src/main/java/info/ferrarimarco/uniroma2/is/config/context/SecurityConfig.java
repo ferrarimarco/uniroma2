@@ -13,7 +13,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("user").password("password").roles("USER");
+        auth.inMemoryAuthentication()
+                .withUser("user").password("password").roles("USER")
+            .and()
+                .withUser("admin").password("password").roles("USER", "ADMIN");
     }
     
     @Override
@@ -32,6 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
             .logout()
                 .logoutUrl("/logout.html")
+                .logoutSuccessUrl("/logout.html")
                 .permitAll();
     }
 }
