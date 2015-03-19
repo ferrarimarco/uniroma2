@@ -22,7 +22,6 @@ public class AuthenticationController {
     // Logout
     @RequestMapping("/logout.html")
     public String logout(Model model) {
-        model.addAttribute("logout", true);
-        return "login.html";
+        return "index.html";
     }
 }
