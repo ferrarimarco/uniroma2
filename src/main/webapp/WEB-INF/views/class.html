@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title th:text="#{base.title}+#{class.title}">[Class Management]</title>
+</head>
+<body>
+	<div th:include="header.html :: header">[HEADER]</div>
+	<div>
+		<h2>Owners</h2>
+
+		<table>
+			<thead>
+				<tr>
+					<th style="width: 150px;">Class ID</th>
+					<th style="width: 150px;">Class Name</th>
+					<th>No. of items</th>
+					<th>Is Leaf</th>
+					<th>No. of descendants</th>
+					<th>Superclass</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="clazz : ${classes}">
+					<td><a href="#" th:href="@{|/class/${class.id}|}" th:text="${clazz.id}">[Class ID]</a></td>
+					<td><span th:text="${clazz.name}">[Class Name]</span></td>
+					<td><span th:text="${clazz.instanceCount}">[No. of items]</span></td>
+					<td th:text="${clazz.isLeaf}">[Is leaf: true of false]</td>
+					<td><span th:text="${clazz.subTypesCount}"></span></td>
+					<td><a href="#" th:href="@{|/class/${clazz.superTypeId}|}" th:text="${clazz.superTypeName}">[Superclass name]</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
+
+

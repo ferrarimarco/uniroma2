@@ -2,6 +2,8 @@ package info.ferrarimarco.uniroma2.is.model;
 
 import java.util.List;
 
+import org.springframework.data.annotation.Transient;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,4 +18,15 @@ public class DishType extends Entity{
     private List<String> subTypeIds;
     private String name;
     private boolean isLeaf;
+    
+    @Transient
+    private String superTypeName;
+    
+    @Transient
+    private int instanceCount;
+    
+    @Transient
+    public int getSubTypesCount(){
+        return subTypeIds != null ? subTypeIds.size() : 0;
+    }
 }
