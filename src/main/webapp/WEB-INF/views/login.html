@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:tiles="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title tiles:fragment="title" th:text="#{base.title}+#{login.title}">[Login]</title>
+<title th:text="#{base.title}+#{login.title}">[Login]</title>
 </head>
 <body>
 	<div th:include="header.html :: header">[HEADER]</div>
-	<div tiles:fragment="content">
+	<div>
 		<form name="login_form" th:action="@{/login.html}" method="post">
 			<fieldset>
 				<legend th:text="#{login.form.legend}">[Login Legend]</legend>
