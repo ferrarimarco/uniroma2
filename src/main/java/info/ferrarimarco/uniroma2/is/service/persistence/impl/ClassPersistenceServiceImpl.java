@@ -5,18 +5,18 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import info.ferrarimarco.uniroma2.is.model.Instance;
-import info.ferrarimarco.uniroma2.is.persistence.repositories.InstanceRepository;
+import info.ferrarimarco.uniroma2.is.model.Clazz;
+import info.ferrarimarco.uniroma2.is.persistence.repositories.ClassRepository;
 
 @Service
-public class InstancePersistenceService extends AbstractPersistenceService<Instance> {
-    
+public class ClassPersistenceServiceImpl extends AbstractPersistenceService<Clazz> {
+
     @Autowired
     @Getter
-    private InstanceRepository repository;
+    private ClassRepository repository;
     
     @Override
-    public Instance findById(String id) {
+    public Clazz findById(String id) {
         return repository.findOne(id);
     }
 }

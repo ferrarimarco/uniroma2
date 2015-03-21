@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Class extends Entity{
+public class Clazz extends Entity{
     private String superClassId;
     private List<String> subClassIds;
     private String name;
