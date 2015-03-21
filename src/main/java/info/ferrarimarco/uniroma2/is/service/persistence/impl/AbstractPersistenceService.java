@@ -1,5 +1,7 @@
 package info.ferrarimarco.uniroma2.is.service.persistence.impl;
 
+import java.util.List;
+
 import info.ferrarimarco.uniroma2.is.model.Entity;
 import info.ferrarimarco.uniroma2.is.service.persistence.PersistenceService;
 
@@ -17,5 +19,9 @@ public abstract class AbstractPersistenceService<T extends Entity> implements Pe
     @Override
     public void deleteAll() {
         getRepository().deleteAll();
+    }
+    
+    public List<T> findAll(){
+        return getRepository().findAll();
     }
 }
