@@ -1,6 +1,6 @@
 package info.ferrarimarco.uniroma2.is.config.initializer;
 
-import info.ferrarimarco.uniroma2.is.config.context.ContextConfig;
+import info.ferrarimarco.uniroma2.is.config.context.RootConfig;
 import info.ferrarimarco.uniroma2.is.config.servlet.SpringMvcConfig;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
@@ -9,7 +9,7 @@ public class ApplicationInitializer extends AbstractAnnotationConfigDispatcherSe
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class<?>[]{ContextConfig.class};
+        return new Class<?>[]{RootConfig.class};
     }
 
     @Override
