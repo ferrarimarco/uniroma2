@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DishType extends Entity{
-    private String superTypeId;
-    private List<String> subTypeIds;
+public class Class extends Entity{
+    private String superClassId;
+    private List<String> subClassIds;
     private String name;
     private boolean isLeaf;
     
@@ -27,6 +27,6 @@ public class DishType extends Entity{
     
     @Transient
     public int getSubTypesCount(){
-        return subTypeIds != null ? subTypeIds.size() : 0;
+        return subClassIds != null ? subClassIds.size() : 0;
     }
 }

@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Dish extends Entity{
-    private DishType dishType;
+public class Instance extends Entity{
+    private Class instanceClass;
     private String name;
     private String barCode;
     private String brand;

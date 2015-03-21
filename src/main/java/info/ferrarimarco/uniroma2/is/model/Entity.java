@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 @Data
-public class Entity {
+public abstract class Entity {
     @Id
     private String id;
 }
