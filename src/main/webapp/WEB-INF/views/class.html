@@ -6,13 +6,22 @@
 <body>
 	<div th:include="header.html :: header">[HEADER]</div>
 	<div>
-		<h2>Owners</h2>
-
+		<h2>Classes</h2>
+		<form name="classes_form" th:action="@{/#}" method="post">
+			<fieldset>
+				<div class="form-actions">
+					<button type="submit" class="btn">Create new class</button>
+					<button type="submit" class="btn">Delete selected classes</button>
+					<button type="submit" class="btn">Delete all instances for selected classes</button>
+				</div>
+			</fieldset>
+		</form>
 		<table>
 			<thead>
 				<tr>
-					<th style="width: 150px;">Class ID</th>
-					<th style="width: 150px;">Class Name</th>
+					<th>[Select all checkbox]</th>
+					<th>Class ID</th>
+					<th>Class Name</th>
 					<th>No. of items</th>
 					<th>Is Leaf</th>
 					<th>No. of descendants</th>
@@ -20,13 +29,18 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="clazz : ${classes}">
-					<td><a href="#" th:href="@{|/class/${class.id}|}" th:text="${clazz.id}">[Class ID]</a></td>
+				<tr th:each="clazz : ${allClasses}">
+					<td><input type="checkbox" name="selected" value="0" /></td>
+					<td><a href="#" th:href="@{|/class/${class.id}|}"
+						th:text="${clazz.id}">[Class ID]</a></td>
 					<td><span th:text="${clazz.name}">[Class Name]</span></td>
-					<td><span th:text="${clazz.instanceCount}">[No. of items]</span></td>
-					<td th:text="${clazz.isLeaf}">[Is leaf: true of false]</td>
-					<td><span th:text="${clazz.subTypesCount}"></span></td>
-					<td><a href="#" th:href="@{|/class/${clazz.superTypeId}|}" th:text="${clazz.superTypeName}">[Superclass name]</a></td>
+					<td><span th:text="${clazz.instanceCount}">[No. of
+							items]</span></td>
+					<td th:text="${clazz.isLeaf}">[true of false]</td>
+					<td><span th:text="${clazz.subTypesCount}">[No. of
+							descendants]</span></td>
+					<td><a href="#" th:href="@{|/class/${clazz.superTypeId}|}"
+						th:text="${clazz.superTypeName}">[Superclass name]</a></td>
 				</tr>
 			</tbody>
 		</table>
