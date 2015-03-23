@@ -7,9 +7,13 @@ import info.ferrarimarco.uniroma2.is.service.persistence.InstancePersistenceServ
 import info.ferrarimarco.uniroma2.is.service.persistence.PersistenceService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/class")
@@ -21,19 +25,27 @@ public class ClassController {
     @Autowired
     private InstancePersistenceService instanceService;
 
-    @ModelAttribute("allClasses")
-    public List<Clazz> populateClasses() {
-        List<Clazz> allClasses = classService.findAll();
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
+    public String index(Model model, Pageable pageable) {
         
-        for(Clazz clazz : allClasses){
+        Page<Clazz> allClassesPage = classService.findAll(pageable);
+        
+        for(Clazz clazz : allClassesPage){
             clazz.setInstanceCount(instanceService.findInstanceCountByInstanceClass(clazz));
         }
         
-        return allClasses;
+        model.addAttribute("allClassesPage", allClassesPage);
+        
+        return "class.html";
     }
-
-    @RequestMapping(value = {"/"})
-    public String index() {
+    
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
+    public String createClass() {
+        return "class.html";
+    }
+    
+    @RequestMapping(value = {"", "/{classId}"}, method = RequestMethod.PUT)
+    public String updateClass(@PathVariable("classId") String classId) {
         return "class.html";
     }
 

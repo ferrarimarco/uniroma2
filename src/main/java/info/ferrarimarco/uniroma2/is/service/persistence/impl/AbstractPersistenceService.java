@@ -6,6 +6,8 @@ import info.ferrarimarco.uniroma2.is.model.Entity;
 import info.ferrarimarco.uniroma2.is.service.persistence.PersistenceService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -23,5 +25,9 @@ public abstract class AbstractPersistenceService<T extends Entity> implements Pe
     
     public List<T> findAll(){
         return getRepository().findAll();
+    }
+    
+    public Page<T> findAll(Pageable pageable){
+        return getRepository().findAll(pageable);
     }
 }

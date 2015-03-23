@@ -12,7 +12,8 @@
 				<div class="form-actions">
 					<button type="submit" class="btn">Create new class</button>
 					<button type="submit" class="btn">Delete selected classes</button>
-					<button type="submit" class="btn">Delete all instances for selected classes</button>
+					<button type="submit" class="btn">Delete all instances for
+						selected classes</button>
 				</div>
 			</fieldset>
 		</form>
@@ -29,7 +30,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="clazz : ${allClasses}">
+				<tr th:each="clazz : ${allClassesPage.content}">
 					<td><input type="checkbox" name="selected" value="0" /></td>
 					<td><a href="#" th:href="@{|/class/${class.id}|}"
 						th:text="${clazz.id}">[Class ID]</a></td>
@@ -44,6 +45,9 @@
 				</tr>
 			</tbody>
 		</table>
+		<div>
+			<a href="#" th:href="@{/class(page=${allClassesPage.number} + 1, size=${allClassesPage.size})}" th:text="#{base.next}">[Next]</a>
+		</div>
 	</div>
 </body>
 </html>
