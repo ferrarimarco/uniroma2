@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 public class Clazz extends Entity{
     private String superClassId;
     private List<String> subClassIds;
-    private String name;
     private boolean isLeaf;
     
     @Transient

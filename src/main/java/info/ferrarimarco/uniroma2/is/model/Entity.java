@@ -10,4 +10,5 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public abstract class Entity {
     @Id
     private String id;
+    private String name;
 }

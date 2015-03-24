@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class Instance extends Entity{
     private Clazz instanceClass;
-    private String name;
     private String barCode;
     private String brand;
 }
