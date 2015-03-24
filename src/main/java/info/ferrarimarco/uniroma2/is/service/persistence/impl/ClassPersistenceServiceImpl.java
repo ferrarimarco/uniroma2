@@ -14,9 +14,4 @@ public class ClassPersistenceServiceImpl extends AbstractPersistenceService<Claz
     @Autowired
     @Getter
     private ClassRepository repository;
-    
-    @Override
-    public Clazz findById(String id) {
-        return getRepository().findOne(id);
-    }
 }

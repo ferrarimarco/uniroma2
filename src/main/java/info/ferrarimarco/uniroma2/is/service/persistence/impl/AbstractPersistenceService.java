@@ -1,9 +1,9 @@
 package info.ferrarimarco.uniroma2.is.service.persistence.impl;
 
-import java.util.List;
-
 import info.ferrarimarco.uniroma2.is.model.Entity;
 import info.ferrarimarco.uniroma2.is.service.persistence.PersistenceService;
+
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,5 +29,10 @@ public abstract class AbstractPersistenceService<T extends Entity> implements Pe
     
     public Page<T> findAll(Pageable pageable){
         return getRepository().findAll(pageable);
+    }
+    
+    @Override
+    public T findById(String id) {
+        return getRepository().findOne(id);
     }
 }
