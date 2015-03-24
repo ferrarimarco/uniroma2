@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="layouts/allEntitiesLayout.html">
+<head>
+<title th:text="#{instance.title}">[Instance Management]</title>
+</head>
+<body>
+	<div layout:fragment="entitiesTable">
+		<table>
+			<thead>
+				<tr>
+					<th>Select item checkbox</th>
+					<th>ID</th>
+					<th>Name</th>
+					<th>No. of Instances</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="entity : ${allEntitiesPage.content}">
+					<td><input type="checkbox" name="selected" value="0" /></td>
+					<td><a href="#" th:href="@{|/${entityName}/${entity.id}|}" th:text="${entity.id}">[Class ID]</a></td>
+					<td><span th:text="${entity.name}">[Name]</span></td>
+					<td><span th:text="${entity.instanceCount}">[No. of Instances]</span></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
+
+

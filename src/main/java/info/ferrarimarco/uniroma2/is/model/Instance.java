@@ -16,4 +16,5 @@ public class Instance extends Entity{
     private Clazz instanceClass;
     private String barCode;
     private String brand;
+    private String instanceCount;
 }
