@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="layouts/baseLayout.html">
+<head>
+<title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE" th:text="#{base.title}">[All entities page]</title>
+</head>
+<body>
+	<div class="container">
+		<div layout:fragment="content">
+			<div th:replace="fragments/tableHeader.html :: tableHeader(Classes)">[Table Header]</div>
+			<div layout:fragment="entitiesTable">[Entities Table]</div>
+			<div
+				th:replace="fragments/allEntitiesPagingFooter.html :: pagingFooter(|/entities/${entityName}|,
+			${allEntitiesPage.number}, ${allEntitiesPage.size})">[Paging
+				footer]</div>
+		</div>
+	</div>
+</body>
+</html>
+
+

@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>[Paging footer]</title>
+</head>
+<body>
+	<div th:fragment="pagingFooter (baseUrl,currentPageNumber,desiredSize)">
+		<a href="#" th:href="@{${baseUrl}(page=${currentPageNumber} - 1, size=${desiredSize})}" th:text="#{base.previous}">[Previous]</a>
+		<a href="#" th:href="@{${baseUrl}(page=${currentPageNumber} + 1, size=${desiredSize})}" th:text="#{base.next}">[Next]</a>
+	</div>
+</body>
+</html>

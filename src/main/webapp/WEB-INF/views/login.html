@@ -4,7 +4,7 @@
 <title th:text="#{base.title}+#{login.title}">[Login]</title>
 </head>
 <body>
-	<div th:include="header.html :: header">[HEADER]</div>
+	<div th:include="fragments/header.html :: header">[HEADER]</div>
 	<div>
 		<form name="login_form" th:action="@{/login.html}" method="post">
 			<fieldset>

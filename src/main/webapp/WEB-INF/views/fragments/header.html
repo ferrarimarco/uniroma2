@@ -10,9 +10,9 @@
 					<li><a href="#" th:href="@{/}" th:text="#{header.menu.home}">[Home]</a></li>
 					<li><a href="#" th:href="@{/stats}"
 						th:text="#{header.menu.stats}">[Statistics]</a></li>
-					<li><a href="#" th:href="@{/class}"
+					<li><a href="#" th:href="@{/entities/class}"
 						th:text="#{header.menu.class}">[Class Management]</a></li>
-					<li><a href="#" th:href="@{/instance}"
+					<li><a href="#" th:href="@{/entities/instance}"
 						th:text="#{header.menu.instance}">[Instance Management]</a></li>
 					<li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
 						<a href="#" th:href="@{/users}" th:text="#{header.menu.users}">[User Management]</a></li>

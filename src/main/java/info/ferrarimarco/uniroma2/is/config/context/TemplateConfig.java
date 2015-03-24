@@ -1,6 +1,7 @@
 package info.ferrarimarco.uniroma2.is.config.context;
 
 import lombok.extern.slf4j.Slf4j;
+import nz.net.ultraq.thymeleaf.LayoutDialect;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,6 +51,7 @@ public class TemplateConfig {
         TemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
         templateEngine.addDialect(new SpringSecurityDialect());
+        templateEngine.addDialect(new LayoutDialect());
         return templateEngine;
     }
     

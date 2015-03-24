@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>[Table header fragment]</title>
+</head>
+<body>
+	<div th:fragment="tableHeader (tableTitle)">
+		<h2 th:text="${tableTitle}">[Table Title]</h2>
+		<form name="instances_form" th:action="@{/#}" method="post">
+			<fieldset>
+				<div class="form-actions">
+					<button type="submit" class="btn">Create new</button>
+					<button type="submit" class="btn">Delete selected</button>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+</body>
+</html>
