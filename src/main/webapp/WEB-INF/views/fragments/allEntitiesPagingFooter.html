@@ -5,7 +5,7 @@
 </head>
 <body>
 	<div th:fragment="pagingFooter (baseUrl,currentPageNumber,desiredSize)">
-		<a href="#" th:href="@{${baseUrl}(page=${currentPageNumber} - 1, size=${desiredSize})}" th:text="#{base.previous}">[Previous]</a>
+		<a href="#" th:if="${currentPageNumber} > 0" th:href="@{${baseUrl}(page=${currentPageNumber} - 1, size=${desiredSize})}" th:text="#{base.previous}">[Previous]</a>
 		<a href="#" th:href="@{${baseUrl}(page=${currentPageNumber} + 1, size=${desiredSize})}" th:text="#{base.next}">[Next]</a>
 	</div>
 </body>
