@@ -6,25 +6,25 @@
 <body>
 	<div th:fragment="tableHeader (tableTitle)">
 		<h2 th:text="${tableTitle}">[Table Title]</h2>
-		<a href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#createNewEntityModal">Create New</a> <a
-			href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#deleteEntitiesModal">Delete Selected</a>
-	</div>
-	<div class="modal fade" id="createNewEntityModal" tabindex="-1" role="dialog">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&amp;times;</button>
-					<h4 class="modal-title" id="createNewEntityModalLabel">Modal title</h4>
-				</div>
-				<div class="modal-body">
-					<h3>Modal Body</h3>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary">Save changes</button>
+		<div class="modal fade" id="createNewEntityModal" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&amp;times;</button>
+						<h4 class="modal-title" id="createNewEntityModalLabel">Modal title</h4>
+					</div>
+					<div class="modal-body">
+						<h3>Modal Body</h3>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary">Save changes</button>
+					</div>
 				</div>
 			</div>
 		</div>
+		<a href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#createNewEntityModal">Create New</a> <a href="#"
+			class="btn btn-lg btn-success" data-toggle="modal" data-target="#deleteEntitiesModal">Delete Selected</a>
 	</div>
 </body>
 </html>
