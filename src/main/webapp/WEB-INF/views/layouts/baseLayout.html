@@ -3,6 +3,9 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE" th:text="#{base.title}">[Base layout]</title>
+<link rel='stylesheet' th:src="@{/webjars/bootstrap/3.3.4/dist/css/bootstrap.min.css}"></link>
+<link rel='stylesheet' th:src="@{/webjars/bootstrap/3.3.4/dist/css/bootstrap-theme.min.css}"></link>
+<script type='text/javascript' th:src='@{|/webjars/jquery/2.1.3/jquery.min.js|}'></script>
 </head>
 <body>
 	<div th:replace="fragments/header.html :: header">[Header]</div>
