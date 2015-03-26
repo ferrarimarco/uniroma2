@@ -15,4 +15,5 @@ public abstract class Entity {
     @Id
     private String id;
     private String name;
+    private String symbolicId;
 }

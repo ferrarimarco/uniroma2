@@ -11,48 +11,48 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title" id="createNewEntityModalLabel">Create new Product</h4>
+						<h4 class="modal-title" id="createNewEntityModalLabel" th:text="#{instance.createnewproducttitle}">[Create new Product]</h4>
 					</div>
 					<div class="modal-body">
 						<form class="form-horizontal" method="post" action='employee/add.htm' name="createProductForm"
 							id="createProductForm">
 							<fieldset>
-								<legend>New Product Information</legend>
+								<legend th:text="#{instance.newproductlegend}">[New Product Information]</legend>
 								<div class="form-group">
-									<label class="control-label" for="productName">Name</label>
+									<label class="control-label" for="productName" th:text="#{instance.name}">[Name]</label>
 									<input type="text" class="form-control" name="productName" id="productName" placeholder="Name" />
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="productClass">Class</label>
+									<label class="control-label" for="productClass" th:text="#{instance.class}">[Class]</label>
 									<select class="form-control" name="productClass" id="productClass">
 										<option value="class">[Class (Category)]</option>
 									</select>
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="productBarcode">Barcode</label>
+									<label class="control-label" for="productBarcode" th:text="#{instance.barcode}">[Barcode]</label>
 									<input type="text" class="form-control" name="productBarcode" id="productBarcode" placeholder="Barcode"
 										disabled="disabled" />
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="productBrand">Brand</label>
+									<label class="control-label" for="productBrand" th:text="#{instance.brande}">[Brand]</label>
 									<input type="text" class="form-control" name="productBrand" id="productBrand" placeholder="Brand" />
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="productAmount">Initial Amount</label>
+									<label class="control-label" for="productAmount" th:text="#{instance.initialamount}">[Initial Amount]</label>
 									<input type="number" class="form-control" name="productAmount" id="productAmount" placeholder="Amount" min="0" />
 								</div>
 							</fieldset>
 						</form>
 					</div>
 					<div class="modal-footer">
-						<button type="submit" class="btn btn-primary">Create</button>
-						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-primary" th:text="#{base.create}">[Create]</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{base.cancel}">[Cancel]</button>
 					</div>
 				</div>
 			</div>
 		</div>
-		<a href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#createNewEntityModal">Create New</a>
-		<a href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#deleteEntitiesModal">Delete Selected</a>
+		<a href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#createNewEntityModal" th:text="#{base.create}">[Create]</a>
+		<a href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#deleteEntitiesModal" th:text="#{base.deleteselected}">[Delete Selected]</a>
 	</div>
 </body>
 </html>
