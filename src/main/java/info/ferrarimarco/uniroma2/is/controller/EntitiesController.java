@@ -1,8 +1,6 @@
 package info.ferrarimarco.uniroma2.is.controller;
 
-import info.ferrarimarco.uniroma2.is.model.Clazz;
-import info.ferrarimarco.uniroma2.is.service.persistence.InstancePersistenceService;
-import info.ferrarimarco.uniroma2.is.service.persistence.PersistenceService;
+import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +13,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/entities")
-public class EntityController {
+public class EntitiesController {
     
     @Autowired
-    private PersistenceService<Clazz> classService;
-    
-    @Autowired
-    private InstancePersistenceService instanceService;
+    private ProductPersistenceService productService;
 
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.GET)
     public String index(@PathVariable("entityName") String entityName, Model model, Pageable pageable) {
@@ -31,12 +26,9 @@ public class EntityController {
         
         String viewName = null;
         
-        if("class".equals(entityName)){
-            model.addAttribute("allEntitiesPage", classService.findAll(pageable));
-            
-            viewName = "classes.html";
-        }else if("instance".equals(entityName)){
-            model.addAttribute("allEntitiesPage", classService.findAll(pageable));
+        if("product".equals(entityName)){
+            model.addAttribute("allEntitiesPage", productService.findAll(pageable));
+            viewName = "products.html";
         }else{
             throw new IllegalArgumentException("Entity name not valid"); 
         }
@@ -48,13 +40,13 @@ public class EntityController {
     
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.POST)
     public String createClass(@PathVariable("entityName") String entityName) {
-        return "class.html";
+        return "products.html";
     }
     
     @RequestMapping(value = {"{entityName}/{entityId}", "/{entityName}/{entityId}"}, method = RequestMethod.PUT)
     public String updateClass(
             @PathVariable("entityName") String entityName,
             @PathVariable("entityId") String entityId) {
-        return "class.html";
+        return "products.html";
     }
 }

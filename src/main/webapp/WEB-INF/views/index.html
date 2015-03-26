@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/baseLayout.html">
 <head>
-<title th:text="#{base.title}+#{home.title}">[Home]</title>
+<title th:text="#{home.title}">[Home]</title>
 </head>
 <body>
-	<div th:include="header.html :: header">[HEADER]</div>
-	<div>
-		HOME
+	<div class="container">
+		<div layout:fragment="content">HOME</div>
 	</div>
 </body>
 </html>

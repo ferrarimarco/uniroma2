@@ -6,9 +6,12 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Clazz extends Entity{
-    private Category category;
+@EqualsAndHashCode(callSuper = true)
+public class Product extends Entity{
+    private Clazz clazz;
+    private String barCode;
+    private String brand;
+    private String instanceCount;
 }
