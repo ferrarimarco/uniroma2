@@ -14,4 +14,5 @@ public class Product extends Entity{
     private String barCode;
     private String brand;
     private String instanceCount;
+    private String symbolicId;
 }
