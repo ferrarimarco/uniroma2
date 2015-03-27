@@ -9,14 +9,14 @@
 		<table>
 			<thead>
 				<tr>
-					<th th:text=""></th>
-					<th th:text="${instance.id}">[ID]</th>
-					<th th:text="${instance.name}">[Name]</th>
-					<th th:text="${instance.category}">[Category]</th>
-					<th th:text="${instance.class}">[Class]</th>
-					<th th:text="${instance.brand}">[Brand]</th>
-					<th th:text="${instance.barcode}">[Barcode]</th>
-					<th th:text="${instance.count}">[Count]</th>
+					<th></th>
+					<th th:text="#{instance.id}">[ID]</th>
+					<th th:text="#{instance.name}">[Name]</th>
+					<th th:text="#{instance.category}">[Category]</th>
+					<th th:text="#{instance.class}">[Class]</th>
+					<th th:text="#{instance.brand}">[Brand]</th>
+					<th th:text="#{instance.barcode}">[Barcode]</th>
+					<th th:text="#{instance.count}">[Count]</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -24,11 +24,11 @@
 					<td><input type="checkbox" name="selected" value="0" /></td>
 					<td><a href="#" th:href="@{|/${entityName}/${product.id}|}" th:text="${product.symbolicId}">[ID]</a></td>
 					<td th:text="${product.name}">[Name]</td>
-					<td th:text="${product.clazz.category}">[Category]</td>
-					<td th:text="${product.clazz}">[Class]</td>
+					<td th:text="${product.clazz.category.name}">[Category]</td>
+					<td th:text="${product.clazz.name}">[Class]</td>
 					<td th:text="${product.brand}">[Brand]</td>
-					<td th:text="${product.barcode}">[Barcode]</td>
-					<td th:text="${product.instanceCount}">[Count]</td>
+					<td th:text="${product.barCode}">[Barcode]</td>
+					<td th:text="${product.amount}">[Count]</td>
 				</tr>
 			</tbody>
 		</table>
