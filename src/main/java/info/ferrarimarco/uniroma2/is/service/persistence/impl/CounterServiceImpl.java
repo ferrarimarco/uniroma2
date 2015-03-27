@@ -1,6 +1,9 @@
 package info.ferrarimarco.uniroma2.is.service.persistence.impl;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -13,9 +16,24 @@ import info.ferrarimarco.uniroma2.is.service.persistence.CounterService;
 
 @Service
 public class CounterServiceImpl implements CounterService {
-    
+
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    // Dynamic init and increment are useful if more instances of this app are running in distributed environment
+    // so there is no need to coordinate
+    @Value("${config.persistence.counter.init}")
+    private long counterInitValue;
+
+    @Value("${config.persistence.counter.increment}")
+    private long counterIncrement;
+
+    @PostConstruct
+    private void initializeCounters(){
+        if(!mongoTemplate.collectionExists(Counter.class)){
+            mongoTemplate.createCollection(Counter.class);
+        }
+    }
 
     @Override
     public long getNextCategorySequence() {
@@ -31,12 +49,26 @@ public class CounterServiceImpl implements CounterService {
     public long getNextProductSequence() {
         return increaseCounter(Constants.PRODUCT_SYM_ID_COUNTER_NAME);
     }
-
+    
     private long increaseCounter(String counterName){
         Query query = new Query(Criteria.where("name").is(counterName));
-        Update update = new Update().inc("sequence", 1);
-        Counter counter = mongoTemplate.findAndModify(query, update, Counter.class); // return old Counter object
-        // TODO: check if collection exists
-        return counter.getSequence();
+        Update update = new Update().inc("sequence", counterIncrement);
+
+        // return the Counter object (before the update)
+        Counter counter = mongoTemplate.findAndModify(query, update, Counter.class);
+
+        long result;
+
+        // Create new counter if necessary
+        if(counter == null){
+            result = counterInitValue;
+
+            counter = new Counter(counterName, counterInitValue + counterIncrement);
+            mongoTemplate.save(counter);
+        }else{
+            result = counter.getSequence();
+        }
+
+        return result;
     }
 }
