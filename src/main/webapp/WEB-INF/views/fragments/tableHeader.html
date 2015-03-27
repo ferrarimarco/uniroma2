@@ -14,38 +14,38 @@
 						<h4 class="modal-title" id="createNewEntityModalLabel" th:text="#{instance.createnewproducttitle}">[Create new Product]</h4>
 					</div>
 					<div class="modal-body">
-						<form class="form-horizontal" method="post" action='employee/add.htm' name="createProductForm"
+						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/product}" th:object="${product}"
 							id="createProductForm">
 							<fieldset>
 								<legend th:text="#{instance.newproductlegend}">[New Product Information]</legend>
 								<div class="form-group">
 									<label class="control-label" for="productName" th:text="#{instance.name}">[Name]</label>
-									<input type="text" class="form-control" name="productName" id="productName" placeholder="Name" />
+									<input type="text" class="form-control" id="productName" placeholder="Name" th:field="*{name}" />
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productClass" th:text="#{instance.class}">[Class]</label>
-									<select class="form-control" name="productClass" id="productClass">
-										<option value="class">[Class (Category)]</option>
+									<select class="form-control" id="productClass" th:field="*{clazzId}">
+										<option th:each="clazz : ${allClasses}" th:value="${clazz.id}" th:text="${clazz.name}">[Class (Category)]</option>
 									</select>
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productBarcode" th:text="#{instance.barcode}">[Barcode]</label>
-									<input type="text" class="form-control" name="productBarcode" id="productBarcode" placeholder="Barcode"
+									<input type="text" class="form-control" id="productBarcode" placeholder="Barcode" th:field="*{barCode}"
 										disabled="disabled" />
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="productBrand" th:text="#{instance.brande}">[Brand]</label>
-									<input type="text" class="form-control" name="productBrand" id="productBrand" placeholder="Brand" />
+									<label class="control-label" for="productBrand" th:text="#{instance.brand}">[Brand]</label>
+									<input type="text" class="form-control" id="productBrand" placeholder="Brand" th:field="*{brand}"/>
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productAmount" th:text="#{instance.initialamount}">[Initial Amount]</label>
-									<input type="number" class="form-control" name="productAmount" id="productAmount" placeholder="Amount" min="0" />
+									<input type="number" class="form-control" id="productAmount" placeholder="Amount" min="0" th:field="*{amount}" />
 								</div>
 							</fieldset>
 						</form>
 					</div>
 					<div class="modal-footer">
-						<button type="submit" class="btn btn-primary" th:text="#{base.create}">[Create]</button>
+						<button type="submit" form="createProductForm" class="btn btn-primary" th:text="#{base.create}">[Create]</button>
 						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{base.cancel}">[Cancel]</button>
 					</div>
 				</div>
