@@ -10,12 +10,16 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import info.ferrarimarco.uniroma2.is.model.Entity;
 import info.ferrarimarco.uniroma2.is.persistence.repositories.EntityRepository;
+import info.ferrarimarco.uniroma2.is.service.persistence.CounterService;
 import info.ferrarimarco.uniroma2.is.service.persistence.EntityPersistenceService;
 
 public abstract class EntityPersistenceServiceImpl<T extends Entity> implements EntityPersistenceService<T>{
     
     @Autowired
     protected MongoTemplate mongoTemplate;
+    
+    @Autowired
+    protected CounterService counterService;
 
     protected abstract MongoRepository<T, String> getRepository();
     
@@ -52,5 +56,10 @@ public abstract class EntityPersistenceServiceImpl<T extends Entity> implements 
     @Override
     public Page<T> findByName(String name, Pageable pageable) {
         return getEntityRepository().findByName(name, pageable);
+    }
+    
+    @Override
+    public T save(T entity){
+        return getRepository().save(entity);
     }
 }

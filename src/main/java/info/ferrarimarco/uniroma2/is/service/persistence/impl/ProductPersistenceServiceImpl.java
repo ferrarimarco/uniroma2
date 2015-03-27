@@ -1,7 +1,9 @@
 package info.ferrarimarco.uniroma2.is.service.persistence.impl;
 
 import info.ferrarimarco.uniroma2.is.model.Clazz;
+import info.ferrarimarco.uniroma2.is.model.Constants;
 import info.ferrarimarco.uniroma2.is.model.Product;
+import info.ferrarimarco.uniroma2.is.persistence.repositories.ClazzRepository;
 import info.ferrarimarco.uniroma2.is.persistence.repositories.EntityRepository;
 import info.ferrarimarco.uniroma2.is.persistence.repositories.ProductRepository;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
@@ -9,6 +11,7 @@ import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceServi
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,7 +24,10 @@ public class ProductPersistenceServiceImpl extends EntityPersistenceServiceImpl<
     @Autowired
     @Getter
     private ProductRepository repository;
-
+    
+    @Autowired
+    private ClazzRepository classRepository;
+    
     @Override
     public List<Product> findByClazz(Clazz clazz) {
         return getRepository().findByClazz(clazz);
@@ -35,5 +41,11 @@ public class ProductPersistenceServiceImpl extends EntityPersistenceServiceImpl<
     @Override
     protected EntityRepository<Product> getEntityRepository() {
         return this.getRepository();
+    }
+    
+    public Product save(@NonNull Product product){
+        product.setSymbolicId(Constants.PRODUCT_SYM_ID_PREFIX + counterService.getNextProductSequence());
+        product.setClazz(classRepository.findOne(product.getClazzId()));
+        return super.save(product);
     }
 }

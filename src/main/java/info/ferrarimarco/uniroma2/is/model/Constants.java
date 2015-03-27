@@ -8,4 +8,6 @@ public class Constants {
     public static final String CATEGORY_SYM_ID_COUNTER_NAME = "cat";
     public static final String CLASS_SYM_ID_COUNTER_NAME = "class";
     public static final String PRODUCT_SYM_ID_COUNTER_NAME = "product";
+    
+    public static final String PRODUCT_MODEL_KEY = PRODUCT_SYM_ID_COUNTER_NAME;
 }

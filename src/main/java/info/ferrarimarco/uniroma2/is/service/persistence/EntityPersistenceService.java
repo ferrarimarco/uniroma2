@@ -13,5 +13,6 @@ public interface EntityPersistenceService<T extends Entity> {
     List<T> findAll();
     Page<T> findAll(Pageable pageable);
     List<T> findByName(String name);
-    Page<T> findByName(String name, Pageable pageable);    
+    Page<T> findByName(String name, Pageable pageable);
+    T save(T entity);
 }
