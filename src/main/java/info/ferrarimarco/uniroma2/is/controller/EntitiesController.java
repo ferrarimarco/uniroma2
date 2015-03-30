@@ -2,6 +2,8 @@ package info.ferrarimarco.uniroma2.is.controller;
 
 import info.ferrarimarco.uniroma2.is.model.Constants;
 import info.ferrarimarco.uniroma2.is.model.Product;
+import info.ferrarimarco.uniroma2.is.model.dto.EntityIdListDto;
+import info.ferrarimarco.uniroma2.is.model.dto.ProductDto;
 import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
 
@@ -42,15 +44,20 @@ public class EntitiesController {
         }
         
         model.addAttribute("entityName", entityName);
-        model.addAttribute(Constants.PRODUCT_MODEL_KEY, new Product());
+        model.addAttribute(Constants.PRODUCT_DTO_MODEL_KEY, new ProductDto());
+        model.addAttribute(Constants.ENTITY_ID_LIST_MODEL_KEY, new EntityIdListDto());
         
         return viewName;
     }
     
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.POST)
-    public String createEntity(@PathVariable("entityName") String entityName, Model model, Pageable pageable, @ModelAttribute Product product) {
-        Product savedProduct = productPersistenceService.save(product);
-        model.addAttribute(Constants.PRODUCT_MODEL_KEY, savedProduct);
+    public String createEntity(@PathVariable("entityName") String entityName, Model model, Pageable pageable, @ModelAttribute ProductDto productDto) {
+        if(productDto.getClazz() == null){
+            productDto.setClazz(clazzPersistenceService.findById(productDto.getClazzId())); 
+        }
+        
+        Product savedProduct = productPersistenceService.save(productDto.asProductClone());
+        model.addAttribute(Constants.PRODUCT_DTO_MODEL_KEY, savedProduct);
         return index(entityName, model, pageable);
     }
     

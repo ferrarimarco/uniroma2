@@ -1,13 +1,12 @@
 package info.ferrarimarco.uniroma2.is.model;
 
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 @Data
 @AllArgsConstructor
@@ -22,8 +21,4 @@ public class Product extends Entity{
     @NonNull
     private String brand;
     private int amount;
-    
-    // This field is used when an instance has a DTO role
-    @Transient
-    private String clazzId;
 }

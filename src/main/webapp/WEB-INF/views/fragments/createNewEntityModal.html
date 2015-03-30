@@ -13,7 +13,7 @@
 						<h4 class="modal-title" id="createNewEntityModalLabel" th:text="#{instance.createnewproducttitle}">[Create new Product]</h4>
 					</div>
 					<div class="modal-body">
-						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/product}" th:object="${product}"
+						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/product}" th:object="${productDto}"
 							id="createProductForm">
 							<fieldset>
 								<legend th:text="#{instance.newproductlegend}">[New Product Information]</legend>

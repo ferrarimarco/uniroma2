@@ -9,5 +9,6 @@ public class Constants {
     public static final String CLASS_SYM_ID_COUNTER_NAME = "class";
     public static final String PRODUCT_SYM_ID_COUNTER_NAME = "product";
     
-    public static final String PRODUCT_MODEL_KEY = PRODUCT_SYM_ID_COUNTER_NAME;
+    public static final String PRODUCT_DTO_MODEL_KEY = "productDto";
+    public static final String ENTITY_ID_LIST_MODEL_KEY = "entityIdListDTO";
 }
