@@ -23,7 +23,7 @@ public class Product extends Entity{
     private String brand;
     private int amount;
     
-    // This is field is used when an instance has a DTO role
+    // This field is used when an instance has a DTO role
     @Transient
     private String clazzId;
 }
