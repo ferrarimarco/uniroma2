@@ -45,7 +45,6 @@ public class ProductPersistenceServiceImpl extends EntityPersistenceServiceImpl<
     
     public Product save(@NonNull Product product){
         product.setSymbolicId(Constants.PRODUCT_SYM_ID_PREFIX + counterService.getNextProductSequence());
-        product.setClazz(classRepository.findOne(product.getClazzId()));
         return super.save(product);
     }
 }

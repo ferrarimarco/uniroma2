@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>[Table header fragment]</title>
+</head>
+<body>
+	<div th:fragment="deleteSelectedEntitiesModal">
+		<div class="modal fade" id="deleteSelectedEntitiesModal" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title" id="deleteSelectedEntitiesModal" th:text="#{instance.deletetitle}">[Delete products]</h4>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/delete}" th:object="${entityIdListDTO}"
+							id="deleteEntitiesForm">
+							<fieldset>
+								<legend th:text="#{instance.deleteinstanceslegend}">[Delete products confirmation]</legend>
+								<input type="hidden" th:field="*{ids}" />
+							</fieldset>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="submit" form="deleteSelectedEntitiesModal" class="btn btn-primary" th:text="#{base.delete}">[Delete]</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{base.cancel}">[Cancel]</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>
