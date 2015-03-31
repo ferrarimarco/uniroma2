@@ -9,7 +9,6 @@
 		<table>
 			<thead>
 				<tr>
-					<th></th>
 					<th th:text="#{instance.id}">[ID]</th>
 					<th th:text="#{instance.name}">[Name]</th>
 					<th th:text="#{instance.category}">[Category]</th>
@@ -21,7 +20,6 @@
 			</thead>
 			<tbody>
 				<tr th:each="product : ${allEntitiesPage.content}">
-					<td><input type="checkbox" name="selected" value="${product.id}" /></td>
 					<td><a href="#" th:href="@{|/${entityName}/${product.id}|}" th:text="${product.symbolicId}">[ID]</a></td>
 					<td th:text="${product.name}">[Name]</td>
 					<td th:text="${product.clazz.category.name}">[Category]</td>
