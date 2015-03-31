@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/entities")
@@ -50,14 +51,24 @@ public class EntitiesController {
         return viewName;
     }
     
+    @RequestMapping(value = {"{entityName}/{entityId}", "/{entityName}/{entityId}"}, method = RequestMethod.GET)
+    @ResponseBody
+    public Product getEntity(@PathVariable("entityName") String entityName,
+            @PathVariable("entityId") String entityId){
+        if("product".equals(entityName)){
+            return productPersistenceService.findById(entityId);
+        }
+        
+        return null;
+    }
+    
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.POST)
     public String createEntity(@PathVariable("entityName") String entityName, Model model, Pageable pageable, @ModelAttribute ProductDto productDto) {
         if(productDto.getClazz() == null){
             productDto.setClazz(clazzPersistenceService.findById(productDto.getClazzId())); 
         }
         
-        Product savedProduct = productPersistenceService.save(productDto.asProductClone());
-        model.addAttribute(Constants.PRODUCT_DTO_MODEL_KEY, savedProduct);
+        productPersistenceService.save(productDto.asProductClone());
         return index(entityName, model, pageable);
     }
     

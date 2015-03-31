@@ -4,19 +4,19 @@
 <title>[Table header fragment]</title>
 </head>
 <body>
-	<div th:fragment="createNewEntityModal">
-		<div class="modal fade" id="createNewEntityModal" tabindex="-1" role="dialog">
+	<div th:fragment="editEntityModal">
+		<div class="modal fade" id="editEntityModal" tabindex="-1" role="dialog">
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title" id="createNewEntityModalLabel" th:text="#{instance.createnewproducttitle}">[Create new Product]</h4>
+						<h4 class="modal-title" id="editEntityModalLabel" th:text="#{instance.editproducttitle}">[Edit Product]</h4>
 					</div>
 					<div class="modal-body">
 						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/product}" th:object="${productDto}"
-							id="createProductForm">
+							id="editProductForm">
 							<fieldset>
-								<legend th:text="#{instance.newproductlegend}">[New Product Information]</legend>
+								<legend th:text="#{instance.editproductlegend}">[Product Information]</legend>
 								<div class="form-group">
 									<label class="control-label" for="productName" th:text="#{instance.name}">[Name]</label>
 									<input type="text" class="form-control" id="productName" placeholder="Name" th:field="*{name}" />
@@ -37,7 +37,7 @@
 									<input type="text" class="form-control" id="productBrand" placeholder="Brand" th:field="*{brand}"/>
 								</div>
 								<div class="form-group">
-									<label class="control-label" for="productAmount" th:text="#{instance.initialamount}">[Amount]</label>
+									<label class="control-label" for="productAmount" th:text="#{instance.amount}">[Amount]</label>
 									<input type="number" class="form-control" id="productAmount" placeholder="Amount" min="0" th:field="*{amount}" />
 								</div>
 							</fieldset>

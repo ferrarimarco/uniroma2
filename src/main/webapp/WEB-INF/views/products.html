@@ -20,7 +20,7 @@
 			</thead>
 			<tbody>
 				<tr th:each="product : ${allEntitiesPage.content}">
-					<td><a href="#" th:href="@{|/${entityName}/${product.id}|}" th:text="${product.symbolicId}">[ID]</a></td>
+					<td><a href="#" data-toggle="modal" data-target="#editEntityModal" th:attr="data-entity-name=${entityName},data-entity-id=${product.id}"  data-entity-name="${entityName}" data-entity-id="${product.id}" th:text="${product.symbolicId}">[ID]</a></td>
 					<td th:text="${product.name}">[Name]</td>
 					<td th:text="${product.clazz.category.name}">[Category]</td>
 					<td th:text="${product.clazz.name}">[Class]</td>
