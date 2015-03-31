@@ -9,7 +9,7 @@
 			<h2 th:text="#{instance.tabletitle}">[Table Title]</h2>
 			<div th:replace="fragments/createNewEntityModal.html :: createNewEntityModal">[Table Header]</div>
 			<a href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#createNewEntityModal" th:text="#{base.create}">[Create]</a>
-			<a href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#deleteEntitiesModal" th:text="#{base.deleteselected}">[Delete Selected]</a>
+			<a href="#" class="btn btn-lg btn-danger" th:text="#{base.deleteselected}">[Delete Selected]</a>
 			<div layout:fragment="entitiesTable">[Entities Table]</div>
 			<div th:replace="fragments/allEntitiesPagingFooter.html :: pagingFooter(|/entities/${entityName}|,
 			${allEntitiesPage.number}, ${allEntitiesPage.size})">[Paging footer]</div>
