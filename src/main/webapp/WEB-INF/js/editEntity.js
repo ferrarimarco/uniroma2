@@ -6,14 +6,18 @@ $('#editEntityModal').on('show.bs.modal', function(event) {
 });
 
 function loadProduct(entityName, entityId) {
-	$.getJSON(entityName + "/" + entityId), {
-		name : $('#name').val()
-	}, function(entity) {
-		var modal = $(this)
-		modal.find('#productName').text(entity.name)
-		modal.find('#productClass').val(reci)
-		modal.find('#productBarcode').text(entity.barCode)
-		modal.find('#productBrand').text(entity.brand)
-		modal.find('#productAmount').text(entity.amount)
-	};
+	$.ajax({
+		url: entityName + "/" + entityId,
+		dataType: 'json',
+		success: function(result){
+			$('#productName').val(result.name)
+			$("#productClass").val(result.clazz.id)
+			$('#productBarcode').val(result.barCode)
+			$('#productBrand').val(result.brand)
+			$('#productAmount').val(result.amount)
+		},
+		error: function(request, textStatus, errorThrown) {
+			alert(textStatus);
+		}
+	});
 }

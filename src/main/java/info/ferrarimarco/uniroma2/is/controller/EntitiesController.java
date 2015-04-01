@@ -10,6 +10,7 @@ import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceServi
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -51,7 +52,7 @@ public class EntitiesController {
         return viewName;
     }
     
-    @RequestMapping(value = {"{entityName}/{entityId}", "/{entityName}/{entityId}"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"{entityName}/{entityId}", "/{entityName}/{entityId}"}, method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public Product getEntity(@PathVariable("entityName") String entityName,
             @PathVariable("entityId") String entityId){
