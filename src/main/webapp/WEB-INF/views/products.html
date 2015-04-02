@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="layouts/allEntitiesLayout.html">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/allEntitiesLayout.html">
 <head>
 <title th:text="#{instance.title}">[Instance Management]</title>
 </head>
@@ -20,7 +19,17 @@
 			</thead>
 			<tbody>
 				<tr th:each="product : ${allEntitiesPage.content}">
-					<td><a href="#" data-toggle="modal" data-target="#editEntityModal" th:attr="data-entity-name=${entityName},data-entity-id=${product.id}"  data-entity-name="${entityName}" data-entity-id="${product.id}" th:text="${product.symbolicId}">[ID]</a></td>
+					<td>
+						<a href="#" data-toggle="modal" data-target="#editEntityModal" th:attr="data-entity-name=${entityName},data-entity-id=${product.id}"
+						data-entity-name="${entityName}"
+						data-entity-id="${product.id}"
+						data-entity-instance-name="${product.name}"
+						data-entity-clazz="${product.clazz.name}"
+						data-entity-barcode="${product.barCode}"
+						data-entity-brand="${product.brand}"
+						data-entity-amount="${product.amount}"
+						th:text="${product.symbolicId}">[ID]</a>
+					</td>
 					<td th:text="${product.name}">[Name]</td>
 					<td th:text="${product.clazz.category.name}">[Category]</td>
 					<td th:text="${product.clazz.name}">[Class]</td>

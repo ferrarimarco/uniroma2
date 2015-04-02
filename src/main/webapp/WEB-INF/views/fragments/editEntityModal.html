@@ -19,26 +19,26 @@
 								<legend th:text="#{instance.editproductlegend}">[Product Information]</legend>
 								<div class="form-group">
 									<label class="control-label" for="productName" th:text="#{instance.name}">[Name]</label>
-									<input type="text" class="form-control" id="productName" placeholder="Name" th:field="*{name}" />
+									<input type="text" class="form-control" id="productName" placeholder="Name" th:field="*{name}" value=""></input>
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productClass" th:text="#{instance.class}">[Class]</label>
 									<select class="form-control" id="productClass" th:field="*{clazzId}">
-										<option th:each="clazz : ${allClasses}" th:value="${clazz.id}" th:text="${clazz.name}">[Class (Category)]</option>
+										<option th:each="clazz : ${allClasses}" th:value="${clazz.id}" th:text="${clazz.name}" value="">[Class (Category)]</option>
 									</select>
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productBarcode" th:text="#{instance.barcode}">[Barcode]</label>
 									<input type="text" class="form-control" id="productBarcode" placeholder="Barcode" th:field="*{barCode}"
-										disabled="disabled" />
+										disabled="disabled" value=""></input>
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productBrand" th:text="#{instance.brand}">[Brand]</label>
-									<input type="text" class="form-control" id="productBrand" placeholder="Brand" th:field="*{brand}"/>
+									<input type="text" class="form-control" id="productBrand" placeholder="Brand" th:field="*{brand}" value="" />
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productAmount" th:text="#{instance.amount}">[Amount]</label>
-									<input type="number" class="form-control" id="productAmount" placeholder="Amount" min="0" th:field="*{amount}" />
+									<input type="number" class="form-control" id="productAmount" placeholder="Amount" min="0" th:field="*{amount}" value=""></input>
 								</div>
 							</fieldset>
 						</form>
