@@ -70,7 +70,6 @@ public class TemplateConfig {
     }
     
     @Bean
-    // TODO: should this be moved to ContextConfig?
     public MessageSource messageSource(){
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasename(baseName);
