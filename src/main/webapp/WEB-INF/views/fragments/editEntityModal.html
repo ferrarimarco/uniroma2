@@ -34,7 +34,7 @@
 									<label class="control-label" for="productBrand" th:text="#{instance.brand}">[Brand]</label>
 									<input type="text" class="form-control" id="productBrand" placeholder="Brand" th:field="*{brand}" value="" />
 								</div>
-								<div class="form-group">
+								<div class="form-group" id="productAmountField">
 									<label class="control-label" for="productAmount" th:text="#{instance.amount}">[Amount]</label>
 									<input type="number" class="form-control" id="productAmount" placeholder="Amount" min="0" th:field="*{amount}" value="" />
 								</div>
