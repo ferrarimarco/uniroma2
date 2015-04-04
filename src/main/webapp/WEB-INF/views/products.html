@@ -36,7 +36,15 @@
 					<td th:text="${product.clazz.name}">[Class]</td>
 					<td th:text="${product.brand}">[Brand]</td>
 					<td th:text="${product.barCode}">[Barcode]</td>
-					<td th:text="${product.amount}">[Count]</td>
+					<td>
+						<a href="#" data-toggle="modal" data-target="#editInstancesModal"
+							th:attr="
+							data-entity-name=${entityName},
+							data-entity-id=${product.id},
+							data-entity-title=${product.name},
+							data-entity-amount=${product.amount}"
+							th:text="${product.amount}">[Amount]</a>
+					</td>
 				</tr>
 			</tbody>
 		</table>

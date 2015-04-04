@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>[Edit Instances Modal]</title>
+</head>
+<body>
+	<div th:fragment="editInstancesModal">
+		<div class="modal fade" id="editInstancesModal" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title" id="editInstancesModalLabel" th:text="#{instance.instanceModalTitle}">[Modal Title]</h4>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/product}" th:object="${productDto}" id="editInstanceForm">
+							<fieldset>
+								<legend th:text="#{instance.instanceModalLegend}">[Edit Amount]</legend>
+								<div class="form-group">
+									<label class="control-label" for="productName" th:text="#{instance.name}">[Name]</label>
+									<input type="text" class="form-control" id="productName" placeholder="Name" th:field="*{name}" value="" disabled="disabled"/>
+								</div>
+								<div class="form-group" id="productAmountField">
+									<label class="control-label" for="productAmount" th:text="#{instance.amount}">[Amount]</label>
+									<input type="number" class="form-control" id="productAmount" placeholder="Amount" min="0" th:field="*{amount}" value="" />
+								</div>
+								<div>
+									<input type="hidden" id="productPreviousAmount" th:field="*{previousAmount}" value="" />
+									<input type="hidden" id="productId" th:field="*{id}" value="" />
+								</div>
+							</fieldset>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="submit" form="editInstanceForm" class="btn btn-primary" th:text="#{base.save}">[Save]</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{base.cancel}">[Cancel]</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>
