@@ -10,16 +10,15 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title" id="editEntityModalLabel" th:text="#{instance.editproducttitle}">[Edit Product]</h4>
+						<h4 class="modal-title" id="editEntityModalLabel" th:text="#{instance.productModalTitle}">[Modal Title]</h4>
 					</div>
 					<div class="modal-body">
-						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/product}" th:object="${productDto}"
-							id="editProductForm">
+						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/product}" th:object="${productDto}" id="editProductForm">
 							<fieldset>
-								<legend th:text="#{instance.editproductlegend}">[Product Information]</legend>
+								<legend th:text="#{instance.productModalLegend}">[Product Information]</legend>
 								<div class="form-group">
 									<label class="control-label" for="productName" th:text="#{instance.name}">[Name]</label>
-									<input type="text" class="form-control" id="productName" placeholder="Name" th:field="*{name}" value=""></input>
+									<input type="text" class="form-control" id="productName" placeholder="Name" th:field="*{name}" value="" />
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productClass" th:text="#{instance.class}">[Class]</label>
@@ -29,8 +28,7 @@
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productBarcode" th:text="#{instance.barcode}">[Barcode]</label>
-									<input type="text" class="form-control" id="productBarcode" placeholder="Barcode" th:field="*{barCode}"
-										disabled="disabled" value=""></input>
+									<input type="text" class="form-control" id="productBarcode" placeholder="Barcode" th:field="*{barCode}" disabled="disabled" value="" />
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productBrand" th:text="#{instance.brand}">[Brand]</label>
@@ -38,13 +36,16 @@
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productAmount" th:text="#{instance.amount}">[Amount]</label>
-									<input type="number" class="form-control" id="productAmount" placeholder="Amount" min="0" th:field="*{amount}" value=""></input>
+									<input type="number" class="form-control" id="productAmount" placeholder="Amount" min="0" th:field="*{amount}" value="" />
+								</div>
+								<div>
+									<input type="hidden" id="productId" th:field="*{id}" value="" />
 								</div>
 							</fieldset>
 						</form>
 					</div>
 					<div class="modal-footer">
-						<button type="submit" form="createProductForm" class="btn btn-primary" th:text="#{base.create}">[Create]</button>
+						<button type="submit" form="editProductForm" class="btn btn-primary" th:text="#{base.save}">[Save]</button>
 						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{base.cancel}">[Cancel]</button>
 					</div>
 				</div>

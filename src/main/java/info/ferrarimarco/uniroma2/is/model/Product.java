@@ -1,6 +1,7 @@
 package info.ferrarimarco.uniroma2.is.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Builder
 public class Product extends Entity{
     @NonNull
     @DBRef

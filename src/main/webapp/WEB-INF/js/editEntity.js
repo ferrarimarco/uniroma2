@@ -1,17 +1,12 @@
 $('#editEntityModal').on('show.bs.modal', function(event) {
-	var button = $(event.relatedTarget) // Button that triggered the modal
-	$('#productName').val(button.data('entity-instance-name'))
-	$('#productBarcode').val(button.data('entity-barcode'))
-	$('#productBrand').val(button.data('entity-brand'))
-	$('#productAmount').val(button.data('entity-amount'))
+	var button = $(event.relatedTarget); // Button that triggered the modal
+	var modal = $('#editEntityModal');
+	$('#productName', modal).val(button.data('entity-title'));
+	$('#productBarcode', modal).val(button.data('entity-barcode'));
+	$('#productBrand', modal).val(button.data('entity-brand'));
+	$('#productAmount', modal).val(button.data('entity-amount'));
+	$('#productId', modal).val(button.data('entity-id'));
 	
 	// Set entity class
-	$("#productClass").filter(function() {
-	    return this.text == button.data('entity-class'); 
-	}).attr('selected', true);
-	
-	// Append entity ID to form action
-	var action = $("editProductForm").attr('action')
-	action = action + "/" + button.data('entity-id')
-	$("#search-form").attr("action", action);
+	$("#productClass option:contains(" + button.data('entity-clazz') + ")", modal).attr('selected', true);
 });

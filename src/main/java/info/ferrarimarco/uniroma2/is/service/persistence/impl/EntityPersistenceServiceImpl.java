@@ -62,4 +62,8 @@ public abstract class EntityPersistenceServiceImpl<T extends Entity> implements 
     public T save(T entity){
         return getRepository().save(entity);
     }
+    
+    public boolean exists(String id){
+        return getRepository().exists(id);
+    }
 }

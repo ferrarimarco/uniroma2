@@ -14,20 +14,21 @@
 					<th th:text="#{instance.class}">[Class]</th>
 					<th th:text="#{instance.brand}">[Brand]</th>
 					<th th:text="#{instance.barcode}">[Barcode]</th>
-					<th th:text="#{instance.count}">[Count]</th>
+					<th th:text="#{instance.amount}">[Amount]</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr th:each="product : ${allEntitiesPage.content}">
 					<td>
-						<a href="#" data-toggle="modal" data-target="#editEntityModal" th:attr="data-entity-name=${entityName},data-entity-id=${product.id}"
-						data-entity-name="${entityName}"
-						data-entity-id="${product.id}"
-						data-entity-instance-name="${product.name}"
-						data-entity-clazz="${product.clazz.name}"
-						data-entity-barcode="${product.barCode}"
-						data-entity-brand="${product.brand}"
-						data-entity-amount="${product.amount}"
+						<a href="#" data-toggle="modal" data-target="#editEntityModal"
+						th:attr="
+						data-entity-name=${entityName},
+						data-entity-id=${product.id},
+						data-entity-title=${product.name},
+						data-entity-clazz=${product.clazz.name},
+						data-entity-barcode=${product.barCode},
+						data-entity-brand=${product.brand},
+						data-entity-amount=${product.amount}"
 						th:text="${product.symbolicId}">[ID]</a>
 					</td>
 					<td th:text="${product.name}">[Name]</td>

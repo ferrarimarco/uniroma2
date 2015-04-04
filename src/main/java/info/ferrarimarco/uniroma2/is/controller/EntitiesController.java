@@ -22,21 +22,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/entities")
 public class EntitiesController {
-    
+
     @Autowired
     private ProductPersistenceService productPersistenceService;
-    
+
     @Autowired
     private ClazzPersistenceService clazzPersistenceService;
-    
+
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.GET)
     public String index(@PathVariable("entityName") String entityName, Model model, Pageable pageable) {
         if(StringUtils.isBlank(entityName)){
-           throw new IllegalArgumentException("Entity name cannot be null"); 
+            throw new IllegalArgumentException("Entity name cannot be null"); 
         }
-        
+
         String viewName = null;
-        
+
         if("product".equals(entityName)){
             model.addAttribute("allEntitiesPage", productPersistenceService.findAll(pageable));
             model.addAttribute("allClasses", clazzPersistenceService.findAll());
@@ -45,13 +45,14 @@ public class EntitiesController {
             throw new IllegalArgumentException("Entity name not valid"); 
         }
         
+        // TODO: move "entityName" to constants
         model.addAttribute("entityName", entityName);
         model.addAttribute(Constants.PRODUCT_DTO_MODEL_KEY, new ProductDto());
         model.addAttribute(Constants.ENTITY_ID_LIST_MODEL_KEY, new EntityIdListDto());
-        
+
         return viewName;
     }
-    
+
     @RequestMapping(value = {"{entityName}/{entityId}", "/{entityName}/{entityId}"}, method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public Product getEntity(@PathVariable("entityName") String entityName,
@@ -59,24 +60,25 @@ public class EntitiesController {
         if("product".equals(entityName)){
             return productPersistenceService.findById(entityId);
         }
-        
+
         return null;
     }
-    
+
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.POST)
     public String createEntity(@PathVariable("entityName") String entityName, Model model, Pageable pageable, @ModelAttribute ProductDto productDto) {
         if(productDto.getClazz() == null){
             productDto.setClazz(clazzPersistenceService.findById(productDto.getClazzId())); 
         }
         
+        // This may be an update request
+        if(productDto.getId() != null && productPersistenceService.exists(productDto.getId())){
+            productDto.setId(productDto.getId());
+            productDto.setSymbolicId(productPersistenceService.findById(productDto.getId()).getSymbolicId());
+        }else{
+            productDto.setId(null);
+        }
+
         productPersistenceService.save(productDto.asProductClone());
         return index(entityName, model, pageable);
-    }
-    
-    @RequestMapping(value = {"{entityName}/{entityId}", "/{entityName}/{entityId}"}, method = RequestMethod.PUT)
-    public String updateEntity(
-            @PathVariable("entityName") String entityName,
-            @PathVariable("entityId") String entityId) {
-        return "products.html";
     }
 }

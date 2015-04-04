@@ -17,6 +17,9 @@ public class ProductDto extends Product {
     private String clazzId;
     
     public Product asProductClone(){
-        return new Product(this.getClazz(), this.getBarCode(), this.getBrand(), this.getAmount());
+        Product p = Product.builder().clazz(this.getClazz()).barCode(this.getBarCode()).brand(this.getBrand()).amount(this.getAmount()).build();
+        p.setName(this.getName());
+        p.setId(this.getId());
+        return p;
     }
 }
