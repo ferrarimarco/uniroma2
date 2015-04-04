@@ -45,8 +45,7 @@ public class EntitiesController {
             throw new IllegalArgumentException("Entity name not valid"); 
         }
         
-        // TODO: move "entityName" to constants
-        model.addAttribute("entityName", entityName);
+        model.addAttribute(Constants.ENTITY_NAME_MODEL_KEY, entityName);
         model.addAttribute(Constants.PRODUCT_DTO_MODEL_KEY, new ProductDto());
         model.addAttribute(Constants.ENTITY_ID_LIST_MODEL_KEY, new EntityIdListDto());
 
@@ -71,7 +70,7 @@ public class EntitiesController {
         }
         
         // This may be an update request
-        if(productDto.getId() != null && productPersistenceService.exists(productDto.getId())){
+        if(productDto.getId() != null && productPersistenceService.exists(productDto.getId())){ // Update
             productDto.setId(productDto.getId());
             productDto.setSymbolicId(productPersistenceService.findById(productDto.getId()).getSymbolicId());
         }else{

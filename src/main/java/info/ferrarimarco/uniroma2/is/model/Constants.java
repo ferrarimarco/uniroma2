@@ -11,4 +11,5 @@ public class Constants {
     
     public static final String PRODUCT_DTO_MODEL_KEY = "productDto";
     public static final String ENTITY_ID_LIST_MODEL_KEY = "entityIdListDTO";
+    public static final String ENTITY_NAME_MODEL_KEY = "entityName";
 }
