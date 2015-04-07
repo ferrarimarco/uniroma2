@@ -19,5 +19,5 @@ public class ProductInstance extends Entity {
     @NonNull
     private String productId;
     private DateTime expirationDate;
-    private int amount;
+    private Long amount;
 }

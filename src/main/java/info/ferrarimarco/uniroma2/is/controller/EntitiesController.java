@@ -86,7 +86,6 @@ public class EntitiesController {
             // This may be an update request
             if (productDto.getId() != null && productPersistenceService.exists(productDto.getId())) { // Update
                 productDto.setId(productDto.getId());
-                productDto.setSymbolicId(productPersistenceService.findById(productDto.getId()).getSymbolicId());
             } else {
                 productDto.setId(null);
             }
@@ -104,9 +103,12 @@ public class EntitiesController {
             }else if(Operation.REMOVE_INSTANCES.equals(instanceDto.getOperation())){
                 Long count = productInstancePersistenceService.countInstancesByProductId(instanceDto.getProductId());
                 if(count < instanceDto.getNewAmount()){
-                    instanceDto.setNewAmount((int) (count - instanceDto.getNewAmount()));
+                    instanceDto.setNewAmount(count - instanceDto.getNewAmount());
+                    product.setRequested(product.getRequested() + count);
+                    product.setDispensed(product.getDispensed() + count);
                 }else{
-                    // TODO: set error (required too much instances)
+                    // TODO: set error (required too many instances)
+                    // TODO: update indexes
                 }
             }
             

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InstanceDto {
     private String productId;
-    private int newAmount;
+    private Long newAmount;
     private Operation operation;
     private String expirationDate;
     

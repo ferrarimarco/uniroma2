@@ -26,4 +26,8 @@ public class Product extends Entity{
     
     @Transient
     private Long amount;
+    
+    private Long requested;
+    private Long dispensed;
+    private Long expired;
 }

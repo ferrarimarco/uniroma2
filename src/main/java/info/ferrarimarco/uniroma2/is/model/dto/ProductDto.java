@@ -20,7 +20,8 @@ public class ProductDto extends Product {
     private String clazzId;
     
     public Product asProductClone(){
-        ProductBuilder productBuilder = Product.builder().clazz(this.getClazz()).barCode(this.getBarCode()).brand(this.getBrand());
+        ProductBuilder productBuilder = Product.builder().clazz(getClazz()).barCode(getBarCode()).brand(getBrand())
+                .requested(getRequested()).dispensed(getDispensed());
 
         Product p = productBuilder.build();
         p.setName(this.getName());
