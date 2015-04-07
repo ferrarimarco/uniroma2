@@ -7,23 +7,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.joda.time.DateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Builder
-public class Product extends Entity{
-    @NonNull
-    @DBRef
-    private Clazz clazz;
-    private String barCode;
+public class ProductInstance extends Entity {
     
     @NonNull
-    private String brand;
-    
-    @Transient
-    private Long amount;
+    private String productId;
+    private DateTime expirationDate;
+    private int amount;
 }

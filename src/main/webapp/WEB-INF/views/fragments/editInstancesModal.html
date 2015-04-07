@@ -10,23 +10,40 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title" id="editInstancesModalLabel" th:text="#{instance.instanceModalTitle}">[Modal Title]</h4>
+						<h4 class="modal-title" id="editInstancesModalLabel" th:text="#{instance.modalTitle}">[Modal Title]</h4>
 					</div>
 					<div class="modal-body">
-						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/product}" th:object="${productDto}" id="editInstanceForm">
+						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/productInstance}" th:object="${instanceDto}" id="editInstanceForm">
 							<fieldset>
-								<legend th:text="#{instance.instanceModalLegend}">[Edit Amount]</legend>
-								<div class="form-group">
-									<label class="control-label" for="productName" th:text="#{instance.name}">[Name]</label>
-									<input type="text" class="form-control" id="productName" placeholder="Name" th:field="*{name}" value="" disabled="disabled"/>
+								<legend id="editInstanceModalLegend" th:text="#{instance.modalLegend} + ': '">[Edit instance modal legend]</legend>
+								<div class="form-group" id="operationField">
+									<label class="control-label" for="operationField" th:text="#{instance.operation}">[Operation]</label>
+									<ul>
+										<li class="radio">
+											<input type="radio" id="operationRadioAdd" th:field="*{operation}" value="ADD_INSTANCES" />
+											<label for="operationRadioAdd" th:text="#{instance.addInstances}">[Add instances]</label>
+										</li>
+										<li class="radio">
+											<input type="radio" id="operationRadioRemove" th:field="*{operation}" value="REMOVE_INSTANCES" />
+											<label for="operationRadioRemove" th:text="#{instance.removeInstances}">[Remove instances]</label>
+										</li>
+									</ul>
 								</div>
 								<div class="form-group" id="productAmountField">
 									<label class="control-label" for="productAmount" th:text="#{instance.amount}">[Amount]</label>
-									<input type="number" class="form-control" id="productAmount" placeholder="Amount" min="0" th:field="*{amount}" value="" />
+									<input type="number" class="form-control" id="productAmount" placeholder="Amount" min="1" th:field="*{newAmount}" />
+								</div>
+								<div class="form-group" id="productExpirationDateField">
+									<label class="control-label" for="expirationDatePicker" th:text="#{instance.expirationDate}">[Expiration Date]</label>
+									<div class="input-group date" id="expirationDatePicker">
+										<input type="text" class="form-control" th:field="*{expirationDate}"/>
+										<span class="input-group-addon">
+											<span class="glyphicon glyphicon-calendar"></span>
+										</span>
+									</div>
 								</div>
 								<div>
-									<input type="hidden" id="productPreviousAmount" th:field="*{previousAmount}" value="" />
-									<input type="hidden" id="productId" th:field="*{id}" value="" />
+									<input type="hidden" id="productId" th:field="*{productId}" />
 								</div>
 							</fieldset>
 						</form>

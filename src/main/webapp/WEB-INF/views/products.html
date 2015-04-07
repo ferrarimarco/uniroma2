@@ -27,8 +27,7 @@
 						data-entity-title=${product.name},
 						data-entity-clazz=${product.clazz.name},
 						data-entity-barcode=${product.barCode},
-						data-entity-brand=${product.brand},
-						data-entity-amount=${product.amount}"
+						data-entity-brand=${product.brand}"
 						th:text="${product.symbolicId}">[ID]</a>
 					</td>
 					<td th:text="${product.name}">[Name]</td>
@@ -41,9 +40,7 @@
 							th:attr="
 							data-entity-name=${entityName},
 							data-entity-id=${product.id},
-							data-entity-title=${product.name},
-							data-entity-amount=${product.amount}"
-							th:text="${product.amount}">[Amount]</a>
+							data-entity-title=${product.name}" th:text="${product.amount}">[Amount]</a>
 					</td>
 				</tr>
 			</tbody>

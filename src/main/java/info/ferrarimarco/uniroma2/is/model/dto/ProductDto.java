@@ -11,13 +11,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ProductDto extends Product {
+    
+    public enum Operation{
+        ADD_INSTANCES,
+        REMOVE_INSTANCES
+    }
+    
     private String clazzId;
-    private int previousAmount;
     
     public Product asProductClone(){
-        Product p = Product.builder().clazz(this.getClazz()).barCode(this.getBarCode()).brand(this.getBrand()).amount(this.getAmount()).build();
+        ProductBuilder productBuilder = Product.builder().clazz(this.getClazz()).barCode(this.getBarCode()).brand(this.getBrand());
+
+        Product p = productBuilder.build();
         p.setName(this.getName());
         p.setId(this.getId());
+        p.setSymbolicId(this.getSymbolicId());
+        
         return p;
     }
 }

@@ -50,6 +50,11 @@ public class CounterServiceImpl implements CounterService {
         return increaseCounter(Constants.PRODUCT_SYM_ID_COUNTER_NAME);
     }
     
+    @Override
+    public long getNextProductEntitySequence() {
+        return increaseCounter(Constants.PRODUCT_INSTANCE_COUNTER_NAME);
+    }
+    
     private long increaseCounter(String counterName){
         Query query = new Query(Criteria.where("name").is(counterName));
         Update update = new Update().inc("sequence", counterIncrement);
