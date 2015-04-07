@@ -10,20 +10,20 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title" id="editEntityModalLabel" th:text="#{instance.productModalTitle}">[Modal Title]</h4>
+						<h4 class="modal-title" id="editEntityModalLabel" th:text="#{instance.modalTitle}">[Modal Title]</h4>
 					</div>
 					<div class="modal-body">
 						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/product}" th:object="${productDto}" id="editProductForm">
 							<fieldset>
-								<legend th:text="#{instance.productModalLegend}">[Product Information]</legend>
+								<legend id="editProductModalLegend" th:text="#{instance.modalLegend}">[Product Information]</legend>
 								<div class="form-group">
 									<label class="control-label" for="productName" th:text="#{instance.name}">[Name]</label>
-									<input type="text" class="form-control" id="productName" placeholder="Name" th:field="*{name}" value="" />
+									<input type="text" class="form-control" id="productName" placeholder="Name" th:field="*{name}" required="required" />
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productClass" th:text="#{instance.class}">[Class]</label>
-									<select class="form-control" id="productClass" th:field="*{clazzId}">
-										<option th:each="clazz : ${allClasses}" th:value="${clazz.id}" th:text="${clazz.name}" value="">[Class (Category)]</option>
+									<select class="form-control" id="productClass" th:field="*{clazzId}" required="required">
+										<option th:each="clazz : ${allClasses}" th:value="${clazz.id}" th:text="${clazz.name}" >[Class (Category)]</option>
 									</select>
 								</div>
 								<div class="form-group">
@@ -32,7 +32,7 @@
 								</div>
 								<div class="form-group">
 									<label class="control-label" for="productBrand" th:text="#{instance.brand}">[Brand]</label>
-									<input type="text" class="form-control" id="productBrand" placeholder="Brand" th:field="*{brand}" value="" />
+									<input type="text" class="form-control" id="productBrand" placeholder="Brand" th:field="*{brand}" required="required" />
 								</div>
 								<div>
 									<input type="hidden" id="productId" th:field="*{id}" value="" />
