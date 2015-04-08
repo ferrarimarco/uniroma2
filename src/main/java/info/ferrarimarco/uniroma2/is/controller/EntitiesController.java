@@ -74,7 +74,7 @@ public class EntitiesController {
     }
 
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.POST)
-    public String createEntity(@PathVariable("entityName") String entityName, Model model, Pageable pageable, @ModelAttribute ProductDto productDto, @ModelAttribute InstanceDto instanceDto) {
+    public String postEntity(@PathVariable("entityName") String entityName, Model model, Pageable pageable, @ModelAttribute ProductDto productDto, @ModelAttribute InstanceDto instanceDto) {
         if(StringUtils.isBlank(entityName)){
             throw new IllegalArgumentException("Entity name cannot be null");
         }
@@ -108,7 +108,7 @@ public class EntitiesController {
                     product.setDispensed(product.getDispensed() + count);
                 }else{
                     // TODO: set error (required too many instances)
-                    // TODO: update indexes
+                    product.setRequested(product.getRequested() + (instanceDto.getNewAmount() - count));
                 }
             }
             
