@@ -1,5 +1,6 @@
 package info.ferrarimarco.uniroma2.is.service.persistence.impl;
 
+import info.ferrarimarco.uniroma2.is.model.Category;
 import info.ferrarimarco.uniroma2.is.model.Clazz;
 import info.ferrarimarco.uniroma2.is.model.Constants;
 import info.ferrarimarco.uniroma2.is.model.Product;
@@ -29,6 +30,16 @@ public class ProductPersistenceServiceImpl extends EntityPersistenceServiceImpl<
     private ClazzRepository classRepository;
     
     @Override
+    public List<Product> findByCategory(Category category) {
+        return getRepository().findByCategory(category);
+    }
+
+    @Override
+    public Page<Product> findByCategory(Category category, Pageable pageable) {
+        return getRepository().findByCategory(category, pageable);
+    }
+    
+    @Override
     public List<Product> findByClazz(Clazz clazz) {
         return getRepository().findByClazz(clazz);
     }
@@ -43,8 +54,19 @@ public class ProductPersistenceServiceImpl extends EntityPersistenceServiceImpl<
         return this.getRepository();
     }
     
+    @Override
     public Product save(@NonNull Product product){
         product.setSymbolicId(Constants.PRODUCT_SYM_ID_PREFIX + counterService.getNextProductSequence());
         return super.save(product);
+    }
+    
+    @Override
+    public Long countByCategory(Category category){
+        return getRepository().countByCategory(category);
+    }
+    
+    @Override
+    public Long countByClazz(Clazz clazz){
+        return getRepository().countByClazz(clazz);
     }
 }

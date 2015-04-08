@@ -29,11 +29,13 @@ public class ProductInstancePersistenceServiceImpl extends EntityPersistenceServ
         return this.getRepository();
     }
     
+    @Override
     public ProductInstance save(@NonNull ProductInstance product){
         product.setSymbolicId(Constants.PRODUCT_INSTANCE_SYM_ID_PREFIX + counterService.getNextProductEntitySequence());
         return super.save(product);
     }
     
+    @Override
     public Long countByProductId(String productId){
         return getRepository().countByProductId(productId);
     }
