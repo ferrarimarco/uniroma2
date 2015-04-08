@@ -1,12 +1,5 @@
 package info.ferrarimarco.uniroma2.is.service.impl;
 
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-
 import info.ferrarimarco.uniroma2.is.model.Category;
 import info.ferrarimarco.uniroma2.is.model.Clazz;
 import info.ferrarimarco.uniroma2.is.model.Entity;
@@ -16,9 +9,20 @@ import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceServ
 import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+
 @Service
 public class StatServiceImpl implements StatService {
-
+    
+    private enum ProductStat{
+        REQUESTED,
+        DISPENSED,
+        EXPIRED
+    }
+    
     @Autowired
     private CategoryPersistenceService categoryPersistenceService;
 
@@ -33,121 +37,72 @@ public class StatServiceImpl implements StatService {
         // TODO Auto-generated method stub
         return null;
     }
-
-    @Override
-    public Double successo(String entityId, Class<? extends Entity> clazz) {
-        Long totalDispensed = 0L;
-        Long totalRequested = 0L;
-        int pageIndex = 0;
-        
-        if(Category.class.equals(clazz)){
-            Category category = categoryPersistenceService.findById(entityId);
-            Page<Product> products = productPersistenceService.findByCategory(category, new PageRequest(pageIndex, 10));
-            
-            
-            
-        }else if(Clazz.class.equals(clazz)){
-            e = clazzPersistenceService.findById(entityId);
-        }else if(Product.class.equals(clazz)){
-            e = productPersistenceService.findById(entityId);
+    
+    private Long computeTotalByCriteria(String criteriaId, Class<? extends Entity> criteriaClass, ProductStat productStat){
+        int pageIndex = -1;
+        Long total = 0L;
+        Entity criteria = null;
+        if(Category.class.equals(criteriaClass)){
+            criteria = categoryPersistenceService.findById(criteriaId);
+        }else if(Clazz.class.equals(criteriaClass)){
+            criteria = clazzPersistenceService.findById(criteriaId);
         }else{
             throw new IllegalArgumentException("Entity class not handled");
         }
         
-        //VERIFICO SE VOGLIO CALCOLARE L'INDICE DI UNA CLASSE ALIMENTARE o DI UN PRODOTTO
-        if(CostantiClassiAlimentari.containsClasseAlimentare(k.toString()))
-        {
-            if(CostantiClassiAlimentari.containsClasseBase(k.toString()))
-            {
-                Double erogazioneTotaleClasse = new Double(0);
-                Double richiesteTotaliClasse =  new Double(0);
-                Set <String> tutteLePortate= keySet();
-                for (String s : tutteLePortate)     //Individuo oggetti di Tipo ClasseBase
-                {
-                    Portata oggettoPortata = getMappaProdotti().get(s);
-                    if((oggettoPortata.getClass().getName()).equals(k.toString()))  //Se Ã¨ un oggetto di Classe k
-                    {
-                        erogazioneTotaleClasse = erogazioneTotaleClasse + oggettoPortata.getErogate();
-                        richiesteTotaliClasse = richiesteTotaliClasse + oggettoPortata.getRichieste();
-                    }
-                }
-                if(richiesteTotaliClasse>0)
-                {
-                    Double successo = new Double(erogazioneTotaleClasse/richiesteTotaliClasse);
-                    return successo;
-                }
-                else throw new ArithmeticException ("Al momento nessun prodotto di questo tipo risulta ancora erogato/a. Impossibile calcolarne l'indice di Successo!");   
-            }
-            if(CostantiClassiAlimentari.containsCategoria(k.toString()))
-            {
-                Double erogazioneTotaleCategorie = new Double(0);
-                Double richiesteTotaliCategorie=  new Double(0);
-                Set <String> tutteLePortate= keySet();
-                int n=0;
-                for (String s : tutteLePortate)     //Individuo oggetti di Tipo Categoria
-                {
-                    Portata oggettoPortata = getMappaProdotti().get(s);
-                    if(CalcolaSuperClasseDi(oggettoPortata).equals(k.toString()))
-                    {
-                        erogazioneTotaleCategorie = erogazioneTotaleCategorie + oggettoPortata.getErogate();
-                        richiesteTotaliCategorie = richiesteTotaliCategorie + oggettoPortata.getRichieste();
-                        n++;
-                    }                   
-                }
-                System.out.println("ErogazioneTotaleCategorie: "+erogazioneTotaleCategorie);
-                System.out.println("RichiesteTotaliCategorie: "+richiesteTotaliCategorie);
-                System.out.println("Trovati "+n+" prodotti di classe"+k.toString());
-                if(richiesteTotaliCategorie>0)
-                {
-                    Double successo = new Double(erogazioneTotaleCategorie/richiesteTotaliCategorie);
-                    //return mappaProdotti.get(k.toString()).gradimentoMedioGiornaliero(gradimentoMedioGiornaliero);
-                    return successo;
-                }
-                else throw new ArithmeticException ("Al momento nessun prodotto di questo tipo risulta ancora erogato/a. Impossibile calcolarne l'indice di Successo!");    
-            }
-            else    //Indice su classe Madre: Calcolo tutti gli oggetti!
-            {
-                System.out.println("Metodo A");
-                if(!k.toString().equals("Portata")) 
-                {
-                    System.out.println("Attenzione Indice Totale non di Portata!?!?!");
-                    return -1;
-                }
-
-                Double erogazioneComplessiva = new Double(0);
-                Double richiesteComplessive=  new Double(0);
-                Set <String> tutteLePortate= keySet();
-                int n=0;
-                for (String s : tutteLePortate)
-                {
-                    Portata oggettoPortata = getMappaProdotti().get(s);
-
-                    erogazioneComplessiva = erogazioneComplessiva + oggettoPortata.getErogate();
-                    richiesteComplessive = richiesteComplessive + oggettoPortata.getRichieste();
-                    n++;            
-                }
-                System.out.println("Trovati "+n+" prodotti di classe "+k.toString());       
-                if(richiesteComplessive>0)
-                {
-                    Double successo = new Double(erogazioneComplessiva/richiesteComplessive);
-                    //return mappaProdotti.get(k.toString()).gradimentoMedioGiornaliero(gradimentoMedioGiornaliero);
-                    return successo;
-                }
-                else throw new ArithmeticException ("Al momento nessun prodotto di questo tipo risulta ancora erogato/a. Impossibile calcolarne l'indice di Successo!"); 
-            }
+        if(criteria == null){
+            throw new NullPointerException("criteria cannot be null");
         }
-        else  //Ã¨ un Prodotto
-        {
-            if (mappaProdotti.get(k.toString())==null)
-            {
-                throw new ProdottoException("\nControllore Amministrazione successo(). Prodotti " + k.toString() + "  non sono presenti\n");
+        
+        Page<Product> products = null;
+        do{
+            if(Category.class.equals(criteriaClass)){
+                products = productPersistenceService.findByCategory((Category) criteria, new PageRequest(++pageIndex, 10));
+            }else if(Clazz.class.equals(criteriaClass)){
+                products = productPersistenceService.findByClazz((Clazz) criteria, new PageRequest(++pageIndex, 10));
+            }else{
+                throw new IllegalArgumentException("Entity class not handled");
             }
-
-            Portata p = mappaProdotti.get(k.toString()); 
-            double a = p.successo();
-            return a;   
+            
+            for(Product product : products){
+                switch(productStat){
+                case DISPENSED:
+                    total += product.getDispensed();
+                    break;
+                case EXPIRED:
+                    total += product.getExpired();
+                    break;
+                case REQUESTED:
+                    total += product.getRequested();
+                    break;
+                }
+            }
+        }while(products != null && products.hasNext());
+        
+        return total;        
+    }
+    
+    @Override
+    public Double success(String entityId, Class<? extends Entity> clazz) {
+        Long totalDispensed = 0L;
+        Long totalRequested = 0L;
+        
+        if(Category.class.equals(clazz) || Clazz.class.equals(clazz)){
+            totalDispensed = computeTotalByCriteria(entityId, clazz, ProductStat.DISPENSED);
+            totalRequested = computeTotalByCriteria(entityId, clazz, ProductStat.REQUESTED);
+        }else if(Product.class.equals(clazz)){
+            Product product = productPersistenceService.findById(entityId);
+            totalDispensed = product.getDispensed();
+            totalRequested = product.getRequested();
+        }else{
+            throw new IllegalArgumentException("Entity class not handled");
         }
-
+        
+        if(totalRequested <= 0){
+            throw new ArithmeticException ("Cannot compute success stat. This item has not been requested yet.");
+        }
+        
+        return totalDispensed.doubleValue()/totalRequested.doubleValue();
     }
 
     @Override
