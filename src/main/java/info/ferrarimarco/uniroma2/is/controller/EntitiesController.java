@@ -100,12 +100,14 @@ public class EntitiesController {
             
             if(Operation.ADD_INSTANCES.equals(instanceDto.getOperation())){
                 productInstancePersistenceService.save(instanceDto.asProductInstanceClone());
+                product.setStocked(product.getStocked() + instanceDto.getNewAmount());
             }else if(Operation.REMOVE_INSTANCES.equals(instanceDto.getOperation())){
                 Long count = productInstancePersistenceService.countInstancesByProductId(instanceDto.getProductId());
                 if(count < instanceDto.getNewAmount()){
                     instanceDto.setNewAmount(count - instanceDto.getNewAmount());
                     product.setRequested(product.getRequested() + count);
                     product.setDispensed(product.getDispensed() + count);
+                    // TODO: remove instances
                 }else{
                     // TODO: set error (required too many instances)
                     product.setRequested(product.getRequested() + (instanceDto.getNewAmount() - count));

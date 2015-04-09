@@ -30,4 +30,5 @@ public class Product extends Entity{
     private Long requested;
     private Long dispensed;
     private Long expired;
+    private Long stocked;
 }
