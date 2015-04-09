@@ -20,7 +20,8 @@ public class StatServiceImpl implements StatService {
     private enum ProductStat{
         REQUESTED,
         DISPENSED,
-        EXPIRED
+        EXPIRED,
+        STOCKED
     }
 
     @Autowired
@@ -31,12 +32,6 @@ public class StatServiceImpl implements StatService {
 
     @Autowired
     private ProductPersistenceService productPersistenceService;
-
-    @Override
-    public Double deperibilita() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     private Long computeTotal(Class<? extends Entity> criteriaClass, ProductStat productStat){
         int pageIndex = -1;
@@ -62,6 +57,9 @@ public class StatServiceImpl implements StatService {
                     break;
                 case REQUESTED:
                     total += product.getRequested();
+                    break;
+                case STOCKED:
+                    total += product.getStocked();
                     break;
                 }
             }
@@ -107,6 +105,9 @@ public class StatServiceImpl implements StatService {
                 case REQUESTED:
                     total += product.getRequested();
                     break;
+                case STOCKED:
+                    total += product.getStocked();
+                    break;
                 }
             }
         }while(products != null && products.hasNext());
@@ -136,6 +137,29 @@ public class StatServiceImpl implements StatService {
 
         return totalDispensed.doubleValue()/totalRequested.doubleValue();
     }
+    
+    @Override
+    public Double perishability(String entityId, Class<? extends Entity> clazz) {
+        Long totalExpired = 0L;
+        Long totalStocked = 0L;
+
+        if(Category.class.equals(clazz) || Clazz.class.equals(clazz)){
+            totalExpired = computeTotalByCriteria(entityId, clazz, ProductStat.EXPIRED);
+            totalStocked = computeTotalByCriteria(entityId, clazz, ProductStat.STOCKED);
+        }else if(Product.class.equals(clazz)){
+            Product product = productPersistenceService.findById(entityId);
+            totalExpired = product.getExpired();
+            totalStocked = product.getRequested();
+        }else{
+            throw new IllegalArgumentException("Entity class not handled");
+        }
+
+        if(totalStocked <= 0){
+            throw new ArithmeticException ("Cannot compute success stat. This item has not been requested yet.");
+        }
+
+        return totalExpired.doubleValue()/totalStocked.doubleValue();
+    }
 
     @Override
     public Double liking(String entityId, Class<? extends Entity> clazz) {
@@ -143,13 +167,9 @@ public class StatServiceImpl implements StatService {
         Long totalDispensed = 0L;
 
         if(Category.class.equals(clazz)){
-            //Calcolo Formula: erogazione(categoria) / erogazioneComplessiva
-            //Es: erogazione(Bevanda)/Erogazione(Portata)
             dispensed = computeTotalByCriteria(entityId, clazz, ProductStat.DISPENSED);
             totalDispensed = computeTotal(Category.class, ProductStat.DISPENSED);
         }if(Clazz.class.equals(clazz)){
-            //Calcolo Formula: erogazione(classeBase) / erogazioneTotaleClassiConStessaPiÃ¹VicinaSuperClasse
-            //Es: erogazione(Acqua)/Erogazione(Bevande)
             dispensed = computeTotalByCriteria(entityId, clazz, ProductStat.DISPENSED);
             Clazz productClazz = clazzPersistenceService.findById(entityId);
             totalDispensed = computeTotalByCriteria(productClazz.getCategory().getId(), Category.class, ProductStat.DISPENSED); 
@@ -167,11 +187,4 @@ public class StatServiceImpl implements StatService {
 
         return dispensed.doubleValue()/totalDispensed.doubleValue();
     }
-
-    @Override
-    public Double gradimentoMedioGiornaliero() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }
