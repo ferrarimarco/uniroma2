@@ -16,4 +16,5 @@ public interface EntityPersistenceService<T extends Entity> {
     Page<T> findByName(String name, Pageable pageable);
     T save(T entity);
     boolean exists(String id);
+    void delete(String id);
 }

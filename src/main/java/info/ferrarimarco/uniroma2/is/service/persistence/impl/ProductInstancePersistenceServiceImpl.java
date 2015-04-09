@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -49,6 +51,11 @@ public class ProductInstancePersistenceServiceImpl extends EntityPersistenceServ
             count += instance.getAmount();
         }
         return count;
+    }
+
+    @Override
+    public Page<ProductInstance> findByProductId(String productId, Pageable pageable) {
+        return getRepository().findByProductId(productId, pageable);
     }
 
 }

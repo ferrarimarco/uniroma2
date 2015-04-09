@@ -2,6 +2,7 @@ package info.ferrarimarco.uniroma2.is.controller;
 
 import info.ferrarimarco.uniroma2.is.model.Constants;
 import info.ferrarimarco.uniroma2.is.model.Product;
+import info.ferrarimarco.uniroma2.is.model.ProductInstance;
 import info.ferrarimarco.uniroma2.is.model.dto.InstanceDto;
 import info.ferrarimarco.uniroma2.is.model.dto.ProductDto;
 import info.ferrarimarco.uniroma2.is.model.dto.ProductDto.Operation;
@@ -12,6 +13,7 @@ import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceServi
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -103,11 +105,29 @@ public class EntitiesController {
                 product.setStocked(product.getStocked() + instanceDto.getNewAmount());
             }else if(Operation.REMOVE_INSTANCES.equals(instanceDto.getOperation())){
                 Long count = productInstancePersistenceService.countInstancesByProductId(instanceDto.getProductId());
-                if(count < instanceDto.getNewAmount()){
+                if(count > instanceDto.getNewAmount()){
                     instanceDto.setNewAmount(count - instanceDto.getNewAmount());
                     product.setRequested(product.getRequested() + count);
                     product.setDispensed(product.getDispensed() + count);
-                    // TODO: remove instances
+                    
+                    Page<ProductInstance> productInstances = null;
+                    int pageIndex = -1;
+                    do{
+                        productInstances = productInstancePersistenceService.findByProductId(product.getId(), new PageRequest(++pageIndex, 10));
+                        
+                        for(int i = 0; i < productInstances.getContent().size() && instanceDto.getNewAmount() > 0; i++){
+                            ProductInstance productInstance = productInstances.getContent().get(i);
+                            if(productInstance.getAmount() <= instanceDto.getNewAmount()){
+                                instanceDto.setNewAmount(instanceDto.getNewAmount() - productInstance.getAmount());
+                                productInstancePersistenceService.delete(productInstance.getId());
+                            }else{
+                                productInstance.setAmount(productInstance.getAmount() - instanceDto.getNewAmount());
+                                productInstancePersistenceService.save(productInstance);
+                                instanceDto.setNewAmount(0L);
+                            }
+                        }
+                    }
+                    while(instanceDto.getNewAmount() > 0);
                 }else{
                     // TODO: set error (required too many instances)
                     product.setRequested(product.getRequested() + (instanceDto.getNewAmount() - count));

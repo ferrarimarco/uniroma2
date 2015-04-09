@@ -63,7 +63,13 @@ public abstract class EntityPersistenceServiceImpl<T extends Entity> implements 
         return getRepository().save(entity);
     }
     
+    @Override
     public boolean exists(String id){
         return getRepository().exists(id);
+    }
+    
+    @Override
+    public void delete(String id){
+        getRepository().delete(id);
     }
 }
