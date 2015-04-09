@@ -16,13 +16,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class StatServiceImpl implements StatService {
-    
+
     private enum ProductStat{
         REQUESTED,
         DISPENSED,
         EXPIRED
     }
-    
+
     @Autowired
     private CategoryPersistenceService categoryPersistenceService;
 
@@ -37,33 +37,21 @@ public class StatServiceImpl implements StatService {
         // TODO Auto-generated method stub
         return null;
     }
-    
-    private Long computeTotalByCriteria(String criteriaId, Class<? extends Entity> criteriaClass, ProductStat productStat){
+
+    private Long computeTotal(Class<? extends Entity> criteriaClass, ProductStat productStat){
         int pageIndex = -1;
         Long total = 0L;
-        Entity criteria = null;
-        if(Category.class.equals(criteriaClass)){
-            criteria = categoryPersistenceService.findById(criteriaId);
-        }else if(Clazz.class.equals(criteriaClass)){
-            criteria = clazzPersistenceService.findById(criteriaId);
-        }else{
-            throw new IllegalArgumentException("Entity class not handled");
-        }
-        
-        if(criteria == null){
-            throw new NullPointerException("criteria cannot be null");
-        }
-        
+
         Page<Product> products = null;
         do{
             if(Category.class.equals(criteriaClass)){
-                products = productPersistenceService.findByCategory((Category) criteria, new PageRequest(++pageIndex, 10));
+                products = productPersistenceService.findAll(new PageRequest(++pageIndex, 10));
             }else if(Clazz.class.equals(criteriaClass)){
-                products = productPersistenceService.findByClazz((Clazz) criteria, new PageRequest(++pageIndex, 10));
+                products = productPersistenceService.findAll(new PageRequest(++pageIndex, 10));
             }else{
                 throw new IllegalArgumentException("Entity class not handled");
             }
-            
+
             for(Product product : products){
                 switch(productStat){
                 case DISPENSED:
@@ -78,15 +66,59 @@ public class StatServiceImpl implements StatService {
                 }
             }
         }while(products != null && products.hasNext());
-        
+
         return total;        
     }
-    
+
+    private Long computeTotalByCriteria(String criteriaId, Class<? extends Entity> criteriaClass, ProductStat productStat){
+        int pageIndex = -1;
+        Long total = 0L;
+        Entity criteria = null;
+        if(Category.class.equals(criteriaClass)){
+            criteria = categoryPersistenceService.findById(criteriaId);
+        }else if(Clazz.class.equals(criteriaClass)){
+            criteria = clazzPersistenceService.findById(criteriaId);
+        }else{
+            throw new IllegalArgumentException("Entity class not handled");
+        }
+
+        if(criteria == null){
+            throw new NullPointerException("criteria cannot be null");
+        }
+
+        Page<Product> products = null;
+        do{
+            if(Category.class.equals(criteriaClass)){
+                products = productPersistenceService.findByCategory((Category) criteria, new PageRequest(++pageIndex, 10));
+            }else if(Clazz.class.equals(criteriaClass)){
+                products = productPersistenceService.findByClazz((Clazz) criteria, new PageRequest(++pageIndex, 10));
+            }else{
+                throw new IllegalArgumentException("Entity class not handled");
+            }
+
+            for(Product product : products){
+                switch(productStat){
+                case DISPENSED:
+                    total += product.getDispensed();
+                    break;
+                case EXPIRED:
+                    total += product.getExpired();
+                    break;
+                case REQUESTED:
+                    total += product.getRequested();
+                    break;
+                }
+            }
+        }while(products != null && products.hasNext());
+
+        return total;        
+    }
+
     @Override
     public Double success(String entityId, Class<? extends Entity> clazz) {
         Long totalDispensed = 0L;
         Long totalRequested = 0L;
-        
+
         if(Category.class.equals(clazz) || Clazz.class.equals(clazz)){
             totalDispensed = computeTotalByCriteria(entityId, clazz, ProductStat.DISPENSED);
             totalRequested = computeTotalByCriteria(entityId, clazz, ProductStat.REQUESTED);
@@ -97,18 +129,43 @@ public class StatServiceImpl implements StatService {
         }else{
             throw new IllegalArgumentException("Entity class not handled");
         }
-        
+
         if(totalRequested <= 0){
             throw new ArithmeticException ("Cannot compute success stat. This item has not been requested yet.");
         }
-        
+
         return totalDispensed.doubleValue()/totalRequested.doubleValue();
     }
 
     @Override
-    public Double gradimento() {
-        // TODO Auto-generated method stub
-        return null;
+    public Double liking(String entityId, Class<? extends Entity> clazz) {
+        Long dispensed = 0L;
+        Long totalDispensed = 0L;
+
+        if(Category.class.equals(clazz)){
+            //Calcolo Formula: erogazione(categoria) / erogazioneComplessiva
+            //Es: erogazione(Bevanda)/Erogazione(Portata)
+            dispensed = computeTotalByCriteria(entityId, clazz, ProductStat.DISPENSED);
+            totalDispensed = computeTotal(Category.class, ProductStat.DISPENSED);
+        }if(Clazz.class.equals(clazz)){
+            //Calcolo Formula: erogazione(classeBase) / erogazioneTotaleClassiConStessaPiÃ¹VicinaSuperClasse
+            //Es: erogazione(Acqua)/Erogazione(Bevande)
+            dispensed = computeTotalByCriteria(entityId, clazz, ProductStat.DISPENSED);
+            Clazz productClazz = clazzPersistenceService.findById(entityId);
+            totalDispensed = computeTotalByCriteria(productClazz.getCategory().getId(), Category.class, ProductStat.DISPENSED); 
+        }else if(Product.class.equals(clazz)){
+            Product product = productPersistenceService.findById(entityId);
+            dispensed = product.getDispensed();
+            totalDispensed = computeTotalByCriteria(product.getClazz().getId(), Clazz.class, ProductStat.DISPENSED);
+        }else{
+            throw new IllegalArgumentException("Entity class not handled");
+        }
+
+        if(totalDispensed <= 0){
+            throw new ArithmeticException ("Cannot compute success stat. This item has not been requested yet.");
+        }
+
+        return dispensed.doubleValue()/totalDispensed.doubleValue();
     }
 
     @Override
