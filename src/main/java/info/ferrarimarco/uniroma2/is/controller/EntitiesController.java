@@ -6,12 +6,8 @@ import info.ferrarimarco.uniroma2.is.model.ProductInstance;
 import info.ferrarimarco.uniroma2.is.model.dto.InstanceDto;
 import info.ferrarimarco.uniroma2.is.model.dto.ProductDto;
 import info.ferrarimarco.uniroma2.is.model.dto.ProductDto.Operation;
-import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
-import info.ferrarimarco.uniroma2.is.service.persistence.ProductInstancePersistenceService;
-import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,17 +22,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/entities")
-public class EntitiesController {
+public class EntitiesController extends AbstractController{
 
-    @Autowired
-    private ProductPersistenceService productPersistenceService;
-    
-    @Autowired
-    private ProductInstancePersistenceService productInstancePersistenceService;
-
-    @Autowired
-    private ClazzPersistenceService clazzPersistenceService;
-    
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.GET)
     public String index(@PathVariable("entityName") String entityName, Model model, Pageable pageable) {
         if(StringUtils.isBlank(entityName)){
@@ -51,9 +38,8 @@ public class EntitiesController {
                 product.setAmount(productInstancePersistenceService.countInstancesByProductId(product.getId()));
             }
             model.addAttribute("allEntitiesPage", allEntitesPage);
-            model.addAttribute("allClasses", clazzPersistenceService.findAll());
-            model.addAttribute(Constants.PRODUCT_DTO_MODEL_KEY, new ProductDto());
-            model.addAttribute(Constants.INSTANCE_DTO_MODEL_KEY, new InstanceDto());
+            model.addAttribute(new ProductDto());
+            model.addAttribute(new InstanceDto());
             viewName = "products.html";
         }else{
             throw new IllegalArgumentException("Entity name not valid");
@@ -85,6 +71,11 @@ public class EntitiesController {
             if (productDto.getClazz() == null) {
                 productDto.setClazz(clazzPersistenceService.findById(productDto.getClazzId()));
             }
+            
+            if(productDto.getCategory() == null){
+                productDto.setCategory(productDto.getClazz().getCategory());
+            }
+            
             // This may be an update request
             if (productDto.getId() != null && productPersistenceService.exists(productDto.getId())) { // Update
                 productDto.setId(productDto.getId());

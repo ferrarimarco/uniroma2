@@ -16,6 +16,11 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 @EqualsAndHashCode(callSuper = true)
 @Builder
 public class Product extends Entity{
+    
+    @NonNull
+    @DBRef
+    private Category category;
+    
     @NonNull
     @DBRef
     private Clazz clazz;

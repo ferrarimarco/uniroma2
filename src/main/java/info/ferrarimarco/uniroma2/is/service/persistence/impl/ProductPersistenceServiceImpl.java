@@ -7,6 +7,7 @@ import info.ferrarimarco.uniroma2.is.model.Product;
 import info.ferrarimarco.uniroma2.is.persistence.repositories.ClazzRepository;
 import info.ferrarimarco.uniroma2.is.persistence.repositories.EntityRepository;
 import info.ferrarimarco.uniroma2.is.persistence.repositories.ProductRepository;
+import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
 
 import java.util.List;
@@ -28,6 +29,9 @@ public class ProductPersistenceServiceImpl extends EntityPersistenceServiceImpl<
     
     @Autowired
     private ClazzRepository classRepository;
+    
+    @Autowired
+    private CategoryPersistenceService categoryPersistenceService ;
     
     @Override
     public List<Product> findByCategory(Category category) {
@@ -57,6 +61,7 @@ public class ProductPersistenceServiceImpl extends EntityPersistenceServiceImpl<
     @Override
     public Product save(@NonNull Product product){
         product.setSymbolicId(Constants.PRODUCT_SYM_ID_PREFIX + counterService.getNextProductSequence());
+        product.setCategory(product.getClazz().getCategory());
         return super.save(product);
     }
     

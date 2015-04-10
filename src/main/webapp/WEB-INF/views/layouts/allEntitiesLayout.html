@@ -11,7 +11,7 @@
 			<div th:replace="fragments/editInstancesModal.html :: editInstancesModal">[Edit instances modal]</div>
 			<a href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#editEntityModal" th:text="#{base.create}">[Create]</a>
 			<div layout:fragment="entitiesTable">[Entities Table]</div>
-			<div th:replace="fragments/allEntitiesPagingFooter.html :: pagingFooter(|/entities/${entityName}|,
+			<div th:replace="fragments/tablePagingFooter.html :: pagingFooter(|/entities/${entityName}|,
 			${allEntitiesPage.number}, ${allEntitiesPage.size})">[Paging footer]</div>
 		</div>
 	</div>

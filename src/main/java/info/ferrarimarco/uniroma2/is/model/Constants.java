@@ -11,7 +11,5 @@ public class Constants {
     public static final String PRODUCT_SYM_ID_COUNTER_NAME = "product";
     public static final String PRODUCT_INSTANCE_COUNTER_NAME = "productInstance";
 
-    public static final String PRODUCT_DTO_MODEL_KEY = "productDto";
     public static final String ENTITY_NAME_MODEL_KEY = "entityName";
-    public static final String INSTANCE_DTO_MODEL_KEY = "instanceDto";
 }

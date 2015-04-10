@@ -21,12 +21,12 @@ public class ProductDto extends Product {
     
     public Product asProductClone(){
         ProductBuilder productBuilder = Product.builder().clazz(getClazz()).barCode(getBarCode()).brand(getBrand())
-                .requested(getRequested()).dispensed(getDispensed());
+                .requested(getRequested()).dispensed(getDispensed()).category(getCategory());
 
         Product p = productBuilder.build();
-        p.setName(this.getName());
-        p.setId(this.getId());
-        p.setSymbolicId(this.getSymbolicId());
+        p.setName(getName());
+        p.setId(getId());
+        p.setSymbolicId(getSymbolicId());
         
         return p;
     }
