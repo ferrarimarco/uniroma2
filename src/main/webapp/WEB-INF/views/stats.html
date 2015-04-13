@@ -17,7 +17,7 @@
 					</div>
 					<div class="form-group">
 						<label class="control-label" for="productClass" th:text="#{instance.class}">[Class]</label>
-						<select class="form-control" id="productClass" th:field="*{clazzId}" required="required">
+						<select class="form-control" id="productClass" th:field="*{clazzId}">
 							<option th:each="clazz : ${allClasses}" th:value="${clazz.id}" th:text="${clazz.name}">[Class]</option>
 						</select>
 					</div>
@@ -27,9 +27,44 @@
 							<option th:each="product : ${allProducts}" th:value="${product.id}" th:text="${product.name}">[Product]</option>
 						</select>
 					</div>
+					<div class="form-group" id="indexTypeField">
+						<label class="control-label" for="indexTypeField" th:text="#{stat.indexType}">[Index type]</label>
+						<ul>
+							<li class="radio">
+								<input type="radio" id="indexTypeRadioSuccess" th:field="*{indexType}" th:value="${SUCCESS}" />
+								<label for="indexTypeRadioSuccess" th:text="#{instance.successIndex}">[Success]</label>
+							</li>
+							<li class="radio">
+								<input type="radio" id="indexTypeRadioLiking" th:field="*{indexType}" th:value="${LIKING}" />
+								<label for="indexTypeRadioLiking" th:text="#{instance.likingIndex}">[Liking]</label>
+							</li>
+							<li class="radio">
+								<input type="radio" id="indexTypeRadioPerishability" th:field="*{indexType}" th:value="${PERISHABILITY}" />
+								<label for="indexTypeRadioPerishability" th:text="#{instance.perishabilityIndex}">[Perishability]</label>
+							</li>
+						</ul>
+					</div>
 				</fieldset>
-				<button type="submit" form="productStatsForm" class="btn btn-primary" th:text="#{stats.load}">[Load]</button>
+				<button type="submit" id="statsFormSubmit" form="productStatsForm" class="btn btn-primary" th:text="#{stats.load}">[Load]</button>
 			</form>
+			<div class="table-responsive" th:if="${statsDto.value} != null">
+				<table class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th th:text="#{instance.id}">[ID]</th>
+							<th th:text="#{instance.name}">[Name]</th>
+							<th th:text="#{stats.table.header.value}">[Stat]</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td th:text="${statsDto.entity.symbolicId}">[ID]</td>
+							<td id="statEntityName" th:text="${statsDto.entity.name}">[Name]</td>
+							<td th:text="${statsDto.value}">[Stat]</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 </body>

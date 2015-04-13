@@ -30,10 +30,10 @@ public class Product extends Entity{
     private String brand;
     
     @Transient
-    private Long amount;
+    private Long amount = 0L;
     
-    private Long requested;
-    private Long dispensed;
-    private Long expired;
-    private Long stocked;
+    private Long requested = 0L;
+    private Long dispensed = 0L;
+    private Long expired = 0L;
+    private Long stocked = 0L;
 }

@@ -169,7 +169,7 @@ public class StatServiceImpl implements StatService {
         if(Category.class.equals(clazz)){
             dispensed = computeTotalByCriteria(entityId, clazz, ProductStat.DISPENSED);
             totalDispensed = computeTotal(Category.class, ProductStat.DISPENSED);
-        }if(Clazz.class.equals(clazz)){
+        }else if(Clazz.class.equals(clazz)){
             dispensed = computeTotalByCriteria(entityId, clazz, ProductStat.DISPENSED);
             Clazz productClazz = clazzPersistenceService.findById(entityId);
             totalDispensed = computeTotalByCriteria(productClazz.getCategory().getId(), Category.class, ProductStat.DISPENSED); 

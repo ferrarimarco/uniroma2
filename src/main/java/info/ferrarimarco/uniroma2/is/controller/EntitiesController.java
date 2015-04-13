@@ -97,9 +97,8 @@ public class EntitiesController extends AbstractController{
             }else if(Operation.REMOVE_INSTANCES.equals(instanceDto.getOperation())){
                 Long count = productInstancePersistenceService.countInstancesByProductId(instanceDto.getProductId());
                 if(count > instanceDto.getNewAmount()){
-                    instanceDto.setNewAmount(count - instanceDto.getNewAmount());
-                    product.setRequested(product.getRequested() + count);
-                    product.setDispensed(product.getDispensed() + count);
+                    product.setRequested(product.getRequested() + instanceDto.getNewAmount());
+                    product.setDispensed(product.getDispensed() + instanceDto.getNewAmount());
                     
                     Page<ProductInstance> productInstances = null;
                     int pageIndex = -1;
@@ -124,6 +123,8 @@ public class EntitiesController extends AbstractController{
                     product.setRequested(product.getRequested() + (instanceDto.getNewAmount() - count));
                 }
             }
+            
+            productPersistenceService.save(product);
             
             return index("product", model, pageable);
         }else{
