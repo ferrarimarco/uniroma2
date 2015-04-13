@@ -9,14 +9,9 @@ $('#editEntityModal').on('show.bs.modal', function(event) {
 	$('#productBarcode', modal).val(button.data('entity-barcode'));
 	$('#productBrand', modal).val(button.data('entity-brand'));
 	
-	if(button.data('entity-brand') != undefined){
+	if(button.data('entity-clazz') != undefined){
 		// Set entity class
 		$("#productClass option:contains(" + button.data('entity-clazz') + ")", modal).attr('selected', true);		
-	}else{
-		if($("#emptyClassOption") != undefined || $("#emptyClassOption").length > 0){
-			$('#productClass', modal).prepend("<option id='emptyClassOption' value=''></option>").val('');
-			emptyAdded = true;
-		}
 	}
 	
 	$('#productId', modal).val(button.data('entity-id'));
