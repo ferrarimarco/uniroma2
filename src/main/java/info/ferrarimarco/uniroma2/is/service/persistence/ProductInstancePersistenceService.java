@@ -9,4 +9,5 @@ public interface ProductInstancePersistenceService extends EntityPersistenceServ
     Long countByProductId(String productId);
     Long countInstancesByProductId(String productId);
     Page<ProductInstance> findByProductId(String productId, Pageable pageable);
+    Long deleteExpired();
 }

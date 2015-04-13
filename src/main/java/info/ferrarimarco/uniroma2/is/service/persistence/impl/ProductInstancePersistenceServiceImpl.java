@@ -11,10 +11,15 @@ import info.ferrarimarco.uniroma2.is.service.persistence.ProductInstancePersiste
 import lombok.Getter;
 import lombok.NonNull;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+
+import com.mongodb.WriteResult;
 
 @Service
 public class ProductInstancePersistenceServiceImpl extends EntityPersistenceServiceImpl<ProductInstance> implements ProductInstancePersistenceService {
@@ -56,6 +61,14 @@ public class ProductInstancePersistenceServiceImpl extends EntityPersistenceServ
     @Override
     public Page<ProductInstance> findByProductId(String productId, Pageable pageable) {
         return getRepository().findByProductId(productId, pageable);
+    }
+
+    @Override
+    public Long deleteExpired() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("expirationDate").lt(new DateTime()));
+        mongoTemplate.remove(query, ProductInstance.class);
+        return null;
     }
 
 }

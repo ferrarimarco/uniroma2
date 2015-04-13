@@ -32,7 +32,7 @@ public class EntitiesController extends AbstractController{
 
         String viewName = null;
 
-        if("product".equals(entityName) || "instance".equals(entityName)){
+        if("product".equals(entityName) || "productInstance".equals(entityName)){
             Page<Product> allEntitesPage = productPersistenceService.findAll(pageable);
             for(Product product : allEntitesPage){
                 product.setAmount(productInstancePersistenceService.countInstancesByProductId(product.getId()));
@@ -85,7 +85,7 @@ public class EntitiesController extends AbstractController{
             
             productPersistenceService.save(productDto.asProductClone());
             return index(entityName, model, pageable);
-        }if("productInstance".equals(entityName)){
+        }else if("productInstance".equals(entityName)){
             Product product = productPersistenceService.findById(instanceDto.getProductId());
             if(product == null){
                 throw new NullPointerException("product");
@@ -125,10 +125,25 @@ public class EntitiesController extends AbstractController{
             }
             
             productPersistenceService.save(product);
-            
-            return index("product", model, pageable);
         }else{
             throw new IllegalArgumentException("Entity name not valid");
         }
+        
+        return index(entityName, model, pageable);
+    }
+    
+    @RequestMapping(value = {"{entityName}/delete/expired", "/{entityName}/delete/expired"}, method = RequestMethod.GET)
+    public String removeExpiredEntities(@PathVariable("entityName") String entityName, Model model){
+        if(StringUtils.isBlank(entityName)){
+            throw new IllegalArgumentException("Entity name cannot be null");
+        }
+
+        if("productInstance".equals(entityName)){
+            productInstancePersistenceService.deleteExpired();
+        }else{
+            throw new IllegalArgumentException("Entity name not valid");
+        }
+        
+        return index(entityName, model, null);
     }
 }
