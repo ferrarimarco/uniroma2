@@ -1,3 +1,7 @@
+$(function(){
+	$('[data-toggle="confirmation"]').confirmation();
+});
+
 $('#editEntityModal').on('show.bs.modal', function(event) {
 	var button = $(event.relatedTarget); // Button that triggered the modal
 	var modal = $('#editEntityModal');
@@ -9,7 +13,10 @@ $('#editEntityModal').on('show.bs.modal', function(event) {
 		// Set entity class
 		$("#productClass option:contains(" + button.data('entity-clazz') + ")", modal).attr('selected', true);		
 	}else{
-		$('#productClass', modal).prepend("<option value=''></option>").val('');
+		if($("#emptyClassOption") != undefined || $("#emptyClassOption").length > 0){
+			$('#productClass', modal).prepend("<option id='emptyClassOption' value=''></option>").val('');
+			emptyAdded = true;
+		}
 	}
 	
 	$('#productId', modal).val(button.data('entity-id'));
