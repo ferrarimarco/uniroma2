@@ -1,5 +1,6 @@
 package info.ferrarimarco.uniroma2.is.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import info.ferrarimarco.uniroma2.is.model.Constants;
 import info.ferrarimarco.uniroma2.is.model.Product;
 import info.ferrarimarco.uniroma2.is.model.ProductInstance;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/entities")
+@Slf4j
 public class EntitiesController extends AbstractController{
 
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.GET)
@@ -56,9 +58,9 @@ public class EntitiesController extends AbstractController{
             @PathVariable("entityId") String entityId){
         if("product".equals(entityName)){
             return productPersistenceService.findById(entityId);
+        }else{
+            throw new IllegalArgumentException("Entity name not valid");
         }
-
-        return null;
     }
 
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.POST)
@@ -83,7 +85,8 @@ public class EntitiesController extends AbstractController{
                 productDto.setId(null);
             }
             
-            productPersistenceService.save(productDto.asProductClone());
+            Product p = productPersistenceService.save(productDto.asProductClone());
+            log.info("Saved product: {}", p);
             return index(entityName, model, pageable);
         }else if("productInstance".equals(entityName)){
             Product product = productPersistenceService.findById(instanceDto.getProductId());
@@ -94,7 +97,9 @@ public class EntitiesController extends AbstractController{
             if(Operation.ADD_INSTANCES.equals(instanceDto.getOperation())){
                 productInstancePersistenceService.save(instanceDto.asProductInstanceClone());
                 product.setStocked(product.getStocked() + instanceDto.getNewAmount());
+                log.info("Added {} instances for {}", instanceDto.getNewAmount(), product);
             }else if(Operation.REMOVE_INSTANCES.equals(instanceDto.getOperation())){
+                log.info("Removing {} instances for {}", instanceDto.getNewAmount(), product);
                 Long count = productInstancePersistenceService.countInstancesByProductId(instanceDto.getProductId());
                 if(count > instanceDto.getNewAmount()){
                     product.setRequested(product.getRequested() + instanceDto.getNewAmount());
@@ -143,6 +148,8 @@ public class EntitiesController extends AbstractController{
         }else{
             throw new IllegalArgumentException("Entity name not valid");
         }
+        
+        log.info("Removed expired instances for {}", entityName);
         
         return index(entityName, model, null);
     }
