@@ -11,9 +11,8 @@
 			<div th:replace="fragments/editInstancesModal.html :: editInstancesModal">[Edit instances modal]</div>
 			<a href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#editEntityModal" th:text="#{base.create}">[Create]</a>
 			<a href="#" class="btn btn-lg btn-warning" data-toggle="confirmation" th:text="#{base.removeExpired}" th:attr="
-						data-btnOkLabel=#{base.remove}" th:href="@{/entities/productInstance/delete/expired}">[Remove Expired]</a>
-			<a href="#" class="btn btn-lg btn-warning" th:text="#{base.removeExpired}" th:attr="
-						data-btnOkLabel=#{base.remove}" th:href="@{/entities/productInstance/delete/expired}">[Remove Expired]</a>
+						data-btnOkLabel=#{base.remove},
+						data-href=@{/entities/productInstance/delete/expired}" th:href="@{/entities/productInstance/delete/expired}">[Remove Expired]</a>
 			<div layout:fragment="entitiesTable">[Entities Table]</div>
 			<div th:replace="fragments/tablePagingFooter.html :: pagingFooter(|/entities/${entityName}|,
 			${allEntitiesPage.number}, ${allEntitiesPage.size})">[Paging footer]</div>
