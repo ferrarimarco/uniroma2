@@ -1,15 +1,22 @@
 package info.ferrarimarco.uniroma2.is.service.persistence.impl;
 
-import java.util.List;
-
+//imports as static
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 import info.ferrarimarco.uniroma2.is.model.Constants;
 import info.ferrarimarco.uniroma2.is.model.Product;
 import info.ferrarimarco.uniroma2.is.model.ProductInstance;
 import info.ferrarimarco.uniroma2.is.persistence.repositories.ClazzRepository;
 import info.ferrarimarco.uniroma2.is.persistence.repositories.EntityRepository;
 import info.ferrarimarco.uniroma2.is.persistence.repositories.ProductInstanceRepository;
-import info.ferrarimarco.uniroma2.is.persistence.repositories.ProductRepository;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductInstancePersistenceService;
+import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
+
+import java.util.List;
+
+import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -24,20 +31,17 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.WriteResult;
-
-
-//imports as static
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
-
 @Service
 public class ProductInstancePersistenceServiceImpl extends EntityPersistenceServiceImpl<ProductInstance> implements ProductInstancePersistenceService {
-
+    
+    @Data
+    class ProductInstanceSumAggregation{
+        private String productId;
+        private Long sum;
+    }
+    
     @Autowired
-    private ProductRepository productRepository;
+    private ProductPersistenceService productPersistenceService;
 
     @Autowired
     @Getter
@@ -84,15 +88,24 @@ public class ProductInstancePersistenceServiceImpl extends EntityPersistenceServ
         int pageNumber = -1;
 
         do{
-            productPage = productRepository.findAll(new PageRequest(++pageNumber, 30));
-
+            productPage = productPersistenceService.findAll(new PageRequest(++pageNumber, 30));
+            
+            DateTime now = new DateTime();
+            
             Aggregation aggregation = newAggregation(
-                    match(Criteria.where("expirationDate").lt(new DateTime())),
-                    group("productId").sum("amount").as("expiredSum"),
-                    project("productId").and("expiredSum")
+                    match(Criteria.where("expirationDate").lt(now)),
+                    group("productId").sum("amount").as("sum"),
+                    project("sum").and("productId").previousOperation()
                     );
-            AggregationResults<Object> groupResults = mongoTemplate.aggregate(aggregation, ProductInstance.class, Object.class);
-            List<Object> result = groupResults.getMappedResults();
+            AggregationResults<ProductInstanceSumAggregation> groupResults = mongoTemplate.aggregate(aggregation, ProductInstance.class, ProductInstanceSumAggregation.class);
+            
+            for(ProductInstanceSumAggregation productInstanceSumAggregation : groupResults.getMappedResults()){
+                Product p = productPersistenceService.findById(productInstanceSumAggregation.getProductId());
+                p.setExpired(p.getExpired() + productInstanceSumAggregation.getSum());
+                Query removeQuery = new Query();
+                removeQuery.addCriteria(Criteria.where("productId").is(productInstanceSumAggregation.getProductId()).and("expirationDate").lt(now));
+                mongoTemplate.remove(removeQuery, ProductInstance.class);
+            }
             
         }while (!productPage.isLast());
     }
