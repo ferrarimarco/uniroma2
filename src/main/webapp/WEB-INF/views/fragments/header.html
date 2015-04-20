@@ -10,14 +10,11 @@
 					<li>
 						<a href="#" th:href="@{/index.html}" th:text="#{header.menu.home}">[Home]</a>
 					</li>
-					<li>
+					<li th:if="${#authorization.expression('isAuthenticated()')}">
 						<a href="#" th:href="@{/stats}" th:text="#{header.menu.stats}">[Statistics]</a>
 					</li>
-					<li>
+					<li th:if="${#authorization.expression('isAuthenticated()')}">
 						<a href="#" th:href="@{/entities/product}" th:text="#{header.menu.instance}">[Product Management]</a>
-					</li>
-					<li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-						<a href="#" th:href="@{/users}" th:text="#{header.menu.users}">[User Management]</a>
 					</li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
