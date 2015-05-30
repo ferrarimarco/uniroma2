@@ -34,62 +34,23 @@ public class StatServiceImpl implements StatService {
     private ProductPersistenceService productPersistenceService;
 
     private Long computeTotal(Class<? extends Entity> criteriaClass, ProductStat productStat){
-        int pageIndex = -1;
-        Long total = 0L;
-
-        Page<Product> products = null;
-        do{
-            if(Category.class.equals(criteriaClass)){
-                products = productPersistenceService.findAll(new PageRequest(++pageIndex, 10));
-            }else if(Clazz.class.equals(criteriaClass)){
-                products = productPersistenceService.findAll(new PageRequest(++pageIndex, 10));
-            }else{
-                throw new IllegalArgumentException("Entity class not handled");
-            }
-
-            for(Product product : products){
-                switch(productStat){
-                case DISPENSED:
-                    total += product.getDispensed();
-                    break;
-                case EXPIRED:
-                    total += product.getExpired();
-                    break;
-                case REQUESTED:
-                    total += product.getRequested();
-                    break;
-                case STOCKED:
-                    total += product.getStocked();
-                    break;
-                }
-            }
-        }while(products != null && products.hasNext());
-
-        return total;        
+        return computeTotalByCriteria(null, null, productStat);
     }
 
     private Long computeTotalByCriteria(String criteriaId, Class<? extends Entity> criteriaClass, ProductStat productStat){
         int pageIndex = -1;
         Long total = 0L;
-        Entity criteria = null;
-        if(Category.class.equals(criteriaClass)){
-            criteria = categoryPersistenceService.findById(criteriaId);
-        }else if(Clazz.class.equals(criteriaClass)){
-            criteria = clazzPersistenceService.findById(criteriaId);
-        }else{
-            throw new IllegalArgumentException("Entity class not handled");
-        }
-
-        if(criteria == null){
-            throw new NullPointerException("criteria cannot be null");
-        }
 
         Page<Product> products = null;
         do{
             if(Category.class.equals(criteriaClass)){
-                products = productPersistenceService.findByCategory((Category) criteria, new PageRequest(++pageIndex, 10));
+                Category criteria = categoryPersistenceService.findById(criteriaId);
+                products = productPersistenceService.findByCategory(criteria, new PageRequest(++pageIndex, 10));
             }else if(Clazz.class.equals(criteriaClass)){
+                Clazz criteria = clazzPersistenceService.findById(criteriaId);
                 products = productPersistenceService.findByClazz((Clazz) criteria, new PageRequest(++pageIndex, 10));
+            }else if(criteriaId == null && criteriaClass == null){
+                products = productPersistenceService.findAll(new PageRequest(++pageIndex, 10));
             }else{
                 throw new IllegalArgumentException("Entity class not handled");
             }
@@ -155,7 +116,7 @@ public class StatServiceImpl implements StatService {
         }
 
         if(totalStocked <= 0){
-            throw new ArithmeticException ("Cannot compute success stat. This item has not been requested yet.");
+            throw new ArithmeticException ("Cannot compute perishability stat. This item has not been stocked yet.");
         }
 
         return totalExpired.doubleValue()/totalStocked.doubleValue();
@@ -182,7 +143,7 @@ public class StatServiceImpl implements StatService {
         }
 
         if(totalDispensed <= 0){
-            throw new ArithmeticException ("Cannot compute success stat. This item has not been requested yet.");
+            throw new ArithmeticException ("Cannot compute liking stat. This item has not been dispensed yet.");
         }
 
         return dispensed.doubleValue()/totalDispensed.doubleValue();
