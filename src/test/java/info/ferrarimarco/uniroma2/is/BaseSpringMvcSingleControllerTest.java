@@ -1,24 +1,19 @@
 package info.ferrarimarco.uniroma2.is;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
+import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.testng.annotations.BeforeClass;
 
-public class BaseSpringMvcSingleControllerTest extends BaseSpringMvcTest{
-    protected MockMvc mockMvc;
+@Slf4j
+public abstract class BaseSpringMvcSingleControllerTest extends BaseSpringMvcTest{
     
-    private Object controller;
-    
-    protected void setupMockMvc(Object controller){
-        this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        this.controller = controller;
+    protected void setupMockMvc(Object... controllers){
+        this.mockMvc = MockMvcBuilders.standaloneSetup(controllers).build();
     }
-    
-    @BeforeClass(groups = {"springMvcTestInit"}, dependsOnGroups = {"springBaseTestInit"})
-    protected void setup(){
-        assertThat(controller, notNullValue());
+
+    @Override
+    protected void setupMockMvc() {
+        log.warn("This class does context initialization. Initialize single controllers instead.");
+        throw new UnsupportedOperationException("This class does context initialization. Initialize single controllers instead.");
     }
 }

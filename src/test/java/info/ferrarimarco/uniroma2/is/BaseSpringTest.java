@@ -6,6 +6,11 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
 
 public abstract class BaseSpringTest extends AbstractTestNGSpringContextTests {
+    
+    public BaseSpringTest() {
+        super();
+    }
+    
     @BeforeClass(groups = {"springBaseTestInit"})
     protected void setupBaseTest() throws Exception {
         assertThat(applicationContext, notNullValue());
