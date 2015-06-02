@@ -24,7 +24,7 @@ public abstract class EntityPersistenceServiceImpl<T extends Entity> implements 
     protected abstract MongoRepository<T, String> getRepository();
     
     /**
-     * This should return the same object returned by getRepository.
+     * This must return the same object returned by getRepository.
      */
     protected abstract EntityRepository<T> getEntityRepository();
     

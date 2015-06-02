@@ -29,7 +29,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class StatServiceImplTest{
+public class StatServiceImplUT{
     
     private enum IndexType{
         SUCCESS, LIKING, PERISHABILITY
@@ -125,42 +125,42 @@ public class StatServiceImplTest{
         assertThat(result, equalTo(expected));
     }
     
-    @Test(groups = { "unitTestGroup", "springServicesTestGroup" })
+    @Test(groups = { "unitTests", "springServicesTestGroup" })
     public void successByCategory(){
         computeIndex(IndexType.SUCCESS, category.getId(), Category.class);
         verify(categoryPersistenceService, times(2)).findById(category.getId());
         verify(productPersistenceService, times(2)).findByCategory(eq(category), isA(PageRequest.class));
     }
     
-    @Test(groups = { "unitTestGroup", "springServicesTestGroup" })
+    @Test(groups = { "unitTests", "springServicesTestGroup" })
     public void successByClazz(){
         computeIndex(IndexType.SUCCESS, clazz.getId(), Clazz.class);
         verify(clazzPersistenceService, times(2)).findById(clazz.getId());
         verify(productPersistenceService, times(2)).findByClazz(eq(clazz), isA(PageRequest.class));
     }
     
-    @Test(groups = { "unitTestGroup", "springServicesTestGroup" })
+    @Test(groups = { "unitTests", "springServicesTestGroup" })
     public void perishabilityByCategory(){
         computeIndex(IndexType.PERISHABILITY, category.getId(), Category.class);
         verify(categoryPersistenceService, times(2)).findById(category.getId());
         verify(productPersistenceService, times(2)).findByCategory(eq(category), isA(PageRequest.class));
     }
     
-    @Test(groups = { "unitTestGroup", "springServicesTestGroup" })
+    @Test(groups = { "unitTests", "springServicesTestGroup" })
     public void perishabilityByClazz(){
         computeIndex(IndexType.PERISHABILITY, clazz.getId(), Clazz.class);
         verify(clazzPersistenceService, times(2)).findById(clazz.getId());
         verify(productPersistenceService, times(2)).findByClazz(eq(clazz), isA(PageRequest.class));
     }
     
-    @Test(groups = { "unitTestGroup", "springServicesTestGroup" })
+    @Test(groups = { "unitTests", "springServicesTestGroup" })
     public void likingByCategory(){
         computeIndex(IndexType.LIKING, category.getId(), Category.class);
         verify(categoryPersistenceService, times(1)).findById(category.getId());
         verify(productPersistenceService, times(1)).findByCategory(eq(category), isA(PageRequest.class));
     }
     
-    @Test(groups = { "unitTestGroup", "springServicesTestGroup" })
+    @Test(groups = { "unitTests", "springServicesTestGroup" })
     public void likingByClazz(){
         computeIndex(IndexType.LIKING, clazz.getId(), Clazz.class);
         verify(clazzPersistenceService, times(2)).findById(clazz.getId());

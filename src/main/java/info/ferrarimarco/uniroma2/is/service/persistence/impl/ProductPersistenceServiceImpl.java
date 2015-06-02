@@ -31,7 +31,7 @@ public class ProductPersistenceServiceImpl extends EntityPersistenceServiceImpl<
     private ClazzRepository classRepository;
     
     @Autowired
-    private CategoryPersistenceService categoryPersistenceService ;
+    private CategoryPersistenceService categoryPersistenceService;
     
     @Override
     public List<Product> findByCategory(Category category) {

@@ -27,7 +27,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class StatServiceImplProductIndexesTest {
+public class StatServiceImplProductIndexesUT {
     @Mock
     private ProductPersistenceService productPersistenceService;
     
@@ -90,7 +90,7 @@ public class StatServiceImplProductIndexesTest {
         Mockito.reset(clazzPersistenceService);
     }
     
-    @Test(groups = { "unitTestGroup", "springServicesTestGroup" })
+    @Test(groups = { "unitTests", "springServicesTestGroup" })
     public void successProductTest(){
         double result = statService.success(notEmptyProduct.getId(), Product.class);
         double expected = notEmptyProduct.getDispensed().doubleValue()/notEmptyProduct.getRequested().doubleValue();
@@ -99,7 +99,7 @@ public class StatServiceImplProductIndexesTest {
         verify(productPersistenceService).findById(eq(notEmptyProduct.getId()));
     }
     
-    @Test(groups = { "unitTestGroup", "springServicesTestGroup" })
+    @Test(groups = { "unitTests", "springServicesTestGroup" })
     public void perishabilityProductTest(){
         double result = statService.perishability(notEmptyProduct.getId(), Product.class);
         double expected = notEmptyProduct.getExpired().doubleValue()/notEmptyProduct.getStocked().doubleValue();
@@ -108,7 +108,7 @@ public class StatServiceImplProductIndexesTest {
         verify(productPersistenceService).findById(eq(notEmptyProduct.getId()));
     }
     
-    @Test(groups = { "unitTestGroup", "springServicesTestGroup" })
+    @Test(groups = { "unitTests", "springServicesTestGroup" })
     public void likingProductTest(){
         double result = statService.liking(notEmptyProduct.getId(), Product.class);
         double expected = notEmptyProduct.getDispensed().doubleValue()/(emptyProduct.getDispensed().doubleValue()+notEmptyProduct.getDispensed().doubleValue());
@@ -118,21 +118,21 @@ public class StatServiceImplProductIndexesTest {
         verify(clazzPersistenceService, times(1)).findById(clazz.getId());
     }
     
-    @Test(groups = { "unitTestGroup", "springServicesTestGroup" }, expectedExceptions = ArithmeticException.class)
+    @Test(groups = { "unitTests", "springServicesTestGroup" }, expectedExceptions = ArithmeticException.class)
     public void successProductNotRequestedTest(){
         when(productPersistenceService.findByClazz(eq(clazz), notNull(PageRequest.class))).thenReturn(emptyProductPage);
         statService.success(emptyProduct.getId(), Product.class);
         verify(productPersistenceService).findById(eq(emptyProduct.getId()));
     }
     
-    @Test(groups = { "unitTestGroup", "springServicesTestGroup" }, expectedExceptions = ArithmeticException.class)
+    @Test(groups = { "unitTests", "springServicesTestGroup" }, expectedExceptions = ArithmeticException.class)
     public void perishabilityProductNotStockedTest(){
         when(productPersistenceService.findByClazz(eq(clazz), notNull(PageRequest.class))).thenReturn(emptyProductPage);
         statService.perishability(emptyProduct.getId(), Product.class);
         verify(productPersistenceService).findById(eq(emptyProduct.getId()));
     }
     
-    @Test(groups = { "unitTestGroup", "springServicesTestGroup" }, expectedExceptions = ArithmeticException.class)
+    @Test(groups = { "unitTests", "springServicesTestGroup" }, expectedExceptions = ArithmeticException.class)
     public void likingProductNotStockedTest(){
         when(productPersistenceService.findByClazz(eq(clazz), notNull(PageRequest.class))).thenReturn(emptyProductPage);
         statService.liking(emptyProduct.getId(), Product.class);
