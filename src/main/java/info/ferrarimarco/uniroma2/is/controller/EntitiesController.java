@@ -28,10 +28,6 @@ public class EntitiesController extends AbstractController{
 
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.GET)
     public String index(@PathVariable("entityName") String entityName, Model model, Pageable pageable) {
-        if(StringUtils.isBlank(entityName)){
-            throw new IllegalArgumentException("Entity name cannot be null");
-        }
-
         String viewName = null;
 
         if("product".equals(entityName) || "productInstance".equals(entityName)){
@@ -44,7 +40,7 @@ public class EntitiesController extends AbstractController{
             model.addAttribute(new InstanceDto());
             viewName = "products.html";
         }else{
-            throw new IllegalArgumentException("Entity name not valid");
+            throw new IllegalArgumentException("Entity name not valid: " + entityName);
         }
         
         model.addAttribute(Constants.ENTITY_NAME_MODEL_KEY, entityName);
