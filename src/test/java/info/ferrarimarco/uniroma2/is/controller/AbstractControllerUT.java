@@ -1,5 +1,7 @@
 package info.ferrarimarco.uniroma2.is.controller;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import info.ferrarimarco.uniroma2.is.BaseSpringMvcSingleControllerTest;
 import info.ferrarimarco.uniroma2.is.config.context.RootConfig;
@@ -15,11 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 
 @ContextConfiguration(classes = {RootConfig.class, SpringMvcConfig.class})
@@ -36,6 +40,9 @@ public abstract class AbstractControllerUT extends BaseSpringMvcSingleController
     @Mock
     protected ProductInstancePersistenceService productInstancePersistenceService;
     
+    protected Category category;
+    protected Clazz clazz;
+    
     protected abstract AbstractController getController();
     
     @BeforeClass(groups = {"springUTinit"})
@@ -49,9 +56,9 @@ public abstract class AbstractControllerUT extends BaseSpringMvcSingleController
     }
     
     protected void setupMocksForGenericModelAttributes(){
-        Category category = new Category();
+        category = new Category();
         category.setId("cat-id");
-        Clazz clazz = new Clazz();
+        clazz = new Clazz();
         clazz.setId("clazz-id");
         clazz.setCategory(category);
         
@@ -62,5 +69,14 @@ public abstract class AbstractControllerUT extends BaseSpringMvcSingleController
         
         when(categoryPersistenceService.findAll()).thenReturn(categories);
         when(clazzPersistenceService.findAll()).thenReturn(clazzes);
+    }
+    
+    @AfterMethod(dependsOnGroups = "genericModelAttributesNeeded")
+    public void verifyGenericModelAttributeMocks(){
+        verify(categoryPersistenceService, times(1)).findAll();
+        verify(clazzPersistenceService, times(1)).findAll();
+        
+        Mockito.reset(categoryPersistenceService);
+        Mockito.reset(clazzPersistenceService);
     }
 }
