@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/entities")
 @Slf4j
 public class EntitiesController extends AbstractController{
+    
+    public static final String PRODUCTS_VIEW_NAME = "products.html";
+    public static final String ALL_ENTITIES_PAGE_MODEL_KEY = "allEntitiesPage";
 
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.GET)
     public String index(@PathVariable("entityName") String entityName, Model model, Pageable pageable) {
@@ -32,13 +35,14 @@ public class EntitiesController extends AbstractController{
 
         if("product".equals(entityName) || "productInstance".equals(entityName)){
             Page<Product> allEntitesPage = productPersistenceService.findAll(pageable);
-            for(Product product : allEntitesPage){
-                product.setAmount(productInstancePersistenceService.countInstancesByProductId(product.getId()));
-            }
-            model.addAttribute("allEntitiesPage", allEntitesPage);
+            if(allEntitesPage != null)
+                for(Product product : allEntitesPage){
+                    product.setAmount(productInstancePersistenceService.countInstancesByProductId(product.getId()));
+                }
+            model.addAttribute(ALL_ENTITIES_PAGE_MODEL_KEY, allEntitesPage);
             model.addAttribute(new ProductDto());
             model.addAttribute(new InstanceDto());
-            viewName = "products.html";
+            viewName = EntitiesController.PRODUCTS_VIEW_NAME;
         }else{
             throw new IllegalArgumentException("Entity name not valid: " + entityName);
         }
