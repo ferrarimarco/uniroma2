@@ -241,7 +241,7 @@
 					<!-- Sets the VM argument line used when unit tests are run. -->
 					<argLine>${surefireArgLine}</argLine>
 					<!-- Skips unit tests if the value of skip.unit.tests property is true -->
-					<skipTests>${skip.unit.tests}</skipTests>
+					<skipTests>${skipTests}</skipTests>
 					<workingDirectory>${project.build.directory}/</workingDirectory>
 					<suiteXmlFiles>
 						<suiteXmlFile>testng.xml</suiteXmlFile>
