@@ -29,6 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 
 @ContextConfiguration(classes = {RootConfig.class, SpringMvcConfig.class})
 public abstract class AbstractControllerUT extends BaseSpringMvcSingleControllerTest{
@@ -54,13 +55,13 @@ public abstract class AbstractControllerUT extends BaseSpringMvcSingleController
     @BeforeClass(groups = {"springUTinit"})
     protected void setup(){
         MockitoAnnotations.initMocks(this);
-        setupMocksForGenericModelAttributes();
         PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = new PageableHandlerMethodArgumentResolver();
         pageableHandlerMethodArgumentResolver.setOneIndexedParameters(true);
         pageableHandlerMethodArgumentResolver.setFallbackPageable(new PageRequest(0, 10));
         this.setupMockMvc(new Object[]{getController()}, new HandlerMethodArgumentResolver[] {pageableHandlerMethodArgumentResolver});
     }
     
+    @BeforeMethod(groups = {"springUTinit"})
     protected void setupMocksForGenericModelAttributes(){
         category = new Category();
         category.setId("cat-id");
