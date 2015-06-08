@@ -65,14 +65,11 @@ public class EntitiesController extends AbstractController{
 
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.POST)
     public String postEntity(@PathVariable("entityName") String entityName, Model model, Pageable pageable, @ModelAttribute ProductDto productDto, @ModelAttribute InstanceDto instanceDto) {
-        if(StringUtils.isBlank(entityName)){
-            throw new IllegalArgumentException("Entity name cannot be null");
-        }
-        
         if ("product".equals(entityName)) {
-            if (productDto.getClazz() == null) {
+            if (productDto.getClazz() == null && !StringUtils.isBlank(productDto.getClazzId()))
                 productDto.setClazz(clazzPersistenceService.findById(productDto.getClazzId()));
-            }
+            else
+                throw new IllegalArgumentException("Product class cannot be null");
             
             if(productDto.getCategory() == null){
                 productDto.setCategory(productDto.getClazz().getCategory());
