@@ -5,7 +5,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import info.ferrarimarco.uniroma2.is.model.Constants;
@@ -68,6 +69,24 @@ public class EntitiesControllerUT extends AbstractControllerUT {
         assertThat(resultProduct, equalTo(product));
     }
     
+    @Test(expectedExceptions = NestedServletException.class)
+    public void postEntityNotHandledTest() throws Exception{
+        mockMvc.perform(post("/entities/invalidName")).andExpect(status().isInternalServerError());
+    }
+    
+    @Test(groups = { "unitTests", "springServicesTestGroup", "genericModelAttributesNeeded" })
+    public void postEntityProductTest() throws Exception{
+        String entityName = "product";
+        mockMvc.perform(post("/entities/" + entityName)
+                    .param("clazzId", clazz.getId())
+                    .param("brand", product.getBrand())
+                    .param("name", product.getName()))
+                .andExpect(status().isOk())
+                .andReturn();
+        verify(clazzPersistenceService, times(1)).findById(clazz.getId());
+        verify(productPersistenceService, times(1)).save(notNull(Product.class));
+    }
+
     @Override
     protected AbstractController getController() {
         return entitiesController;
