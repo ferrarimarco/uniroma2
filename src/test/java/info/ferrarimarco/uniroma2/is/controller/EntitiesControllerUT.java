@@ -5,18 +5,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import info.ferrarimarco.uniroma2.is.model.Constants;
 import info.ferrarimarco.uniroma2.is.model.Product;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.mockito.InjectMocks;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
@@ -24,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.NestedServletException;
 import org.testng.annotations.Test;
 
+import com.jayway.jsonpath.JsonPath;
 
 @WebAppConfiguration
 public class EntitiesControllerUT extends AbstractControllerUT {
@@ -38,16 +35,10 @@ public class EntitiesControllerUT extends AbstractControllerUT {
     
     @Test(groups = { "unitTests", "springServicesTestGroup", "genericModelAttributesNeeded" })
     public void indexProductTest() throws Exception{
-        Product product = Product.builder().category(category).clazz(clazz).brand("product-brand").build();
-        product.setId("product-id");
-
-        List<Product> products = new ArrayList<>();
-        products.add(product);
-        Page<Product> productsPage = new PageImpl<Product>(products);
-        
-        when(productPersistenceService.findAll(notNull(PageRequest.class))).thenReturn(productsPage);
         String entityName = "product";
-        MvcResult result = mockMvc.perform(get("/entities/" + entityName)).andExpect(status().isOk()).andReturn();
+        MvcResult result = mockMvc.perform(get("/entities/" + entityName))
+                .andExpect(status().isOk())
+                .andReturn();
         
         verify(productPersistenceService, times(1)).findAll(notNull(PageRequest.class));
         verify(productInstancePersistenceService, times(1)).countInstancesByProductId(product.getId());
@@ -61,7 +52,22 @@ public class EntitiesControllerUT extends AbstractControllerUT {
         assertThat(allEntitiesPage.getContent().get(0), equalTo(product));
         assertThat((String) modelAndView.getModelMap().get(Constants.ENTITY_NAME_MODEL_KEY), equalTo(entityName));
     }
-
+    
+    @Test(expectedExceptions = NestedServletException.class)
+    public void getEntityNonHandledEntityTest() throws Exception{
+        mockMvc.perform(get("/entities/invalidName/invalidId")).andExpect(status().isInternalServerError());
+    }
+    
+    @Test(groups = { "unitTests", "springServicesTestGroup", "genericModelAttributesNeeded" })
+    public void getEntityTest() throws Exception{
+        MvcResult result = mockMvc.perform(get("/entities/product/" + product.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andReturn();
+        Product resultProduct = JsonPath.parse(result.getResponse().getContentAsString()).read("$", Product.class);
+        assertThat(resultProduct, equalTo(product));
+    }
+    
     @Override
     protected AbstractController getController() {
         return entitiesController;
