@@ -15,6 +15,7 @@ public abstract class BaseSpringMvcContextTest extends BaseSpringMvcTest{
     @Override
     protected void setupMockMvc() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        super.setupBaseSpringMvcTest();
     }
 
     @Override

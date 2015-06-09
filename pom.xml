@@ -250,9 +250,21 @@
 					<!-- Skips unit tests if the value of skip.unit.tests property is true -->
 					<skipTests>${skipTests}</skipTests>
 					<workingDirectory>${project.build.directory}/</workingDirectory>
+					<groups>unitTests</groups>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.18.1</version>
+				<configuration>
+					<!-- Skips tests if the value of skip.unit.tests property is true -->
+					<skipTests>${skipTests}</skipTests>
+					<skipITs>${skipTests}</skipITs>
 					<suiteXmlFiles>
 						<suiteXmlFile>testng.xml</suiteXmlFile>
 					</suiteXmlFiles>
+					<groups>integrationTests</groups>
 				</configuration>
 			</plugin>
 			<plugin>

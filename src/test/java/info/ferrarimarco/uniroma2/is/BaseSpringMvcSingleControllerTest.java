@@ -28,5 +28,7 @@ public abstract class BaseSpringMvcSingleControllerTest extends BaseSpringMvcTes
             this.mockMvc = builder.build();
         else
             this.mockMvc = builder.setCustomArgumentResolvers(argumentResolvers).build();
+        
+        super.setupBaseSpringMvcTest();
     }
 }

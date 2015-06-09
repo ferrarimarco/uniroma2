@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.testng.annotations.BeforeClass;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Option;
@@ -24,8 +23,7 @@ public abstract class BaseSpringMvcTest extends BaseSpringTest{
     protected abstract void setupMockMvc(Object[] controllers);
     protected abstract void setupMockMvc(Object[] controllers, HandlerMethodArgumentResolver[] argumentResolvers);
     
-    @BeforeClass(groups = {"springMvcTestInit"}, dependsOnGroups = {"springUTinit"})
-    protected void mockMvcInitTest(){
+    protected void setupBaseSpringMvcTest(){
         assertThat(mockMvc, notNullValue());
         
         // Configure json-path

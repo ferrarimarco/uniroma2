@@ -18,6 +18,8 @@ import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceServi
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -32,7 +34,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
 @ContextConfiguration(classes = {RootConfig.class, SpringMvcConfig.class})
-public abstract class AbstractControllerUT extends BaseSpringMvcSingleControllerTest{
+@Slf4j
+public abstract class AbstractControllerTest extends BaseSpringMvcSingleControllerTest{
     @Mock
     protected CategoryPersistenceService categoryPersistenceService;
     
@@ -52,17 +55,19 @@ public abstract class AbstractControllerUT extends BaseSpringMvcSingleController
     
     protected abstract AbstractController getController();
     
-    @BeforeClass(groups = {"springUTinit"})
+    @BeforeClass(groups = { "unitTests" })
     protected void setup(){
+        log.debug("Initializing AbstractController");
         MockitoAnnotations.initMocks(this);
         PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = new PageableHandlerMethodArgumentResolver();
         pageableHandlerMethodArgumentResolver.setOneIndexedParameters(true);
         pageableHandlerMethodArgumentResolver.setFallbackPageable(new PageRequest(0, 10));
-        this.setupMockMvc(new Object[]{getController()}, new HandlerMethodArgumentResolver[] {pageableHandlerMethodArgumentResolver});
+        super.setupMockMvc(new Object[]{getController()}, new HandlerMethodArgumentResolver[] {pageableHandlerMethodArgumentResolver});
     }
     
-    @BeforeMethod(groups = {"springUTinit"})
+    @BeforeMethod(groups = { "unitTests" })
     protected void setupMocksForGenericModelAttributes(){
+        log.debug("Setting up mocks for generic ModelAttributes");
         category = new Category();
         category.setId("cat-id");
         category.setName("cat-name");
@@ -94,7 +99,7 @@ public abstract class AbstractControllerUT extends BaseSpringMvcSingleController
         when(productPersistenceService.findAll(notNull(PageRequest.class))).thenReturn(productsPage);
     }
     
-    @AfterMethod(dependsOnGroups = "genericModelAttributesNeeded")
+    @AfterMethod(groups = { "unitTests" })
     public void verifyGenericModelAttributeMocks(){
         verify(categoryPersistenceService, times(1)).findAll();
         verify(clazzPersistenceService, times(1)).findAll();

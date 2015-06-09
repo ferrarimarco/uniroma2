@@ -24,17 +24,17 @@ import org.testng.annotations.Test;
 import com.jayway.jsonpath.JsonPath;
 
 @WebAppConfiguration
-public class EntitiesControllerUT extends AbstractControllerUT {
+public class EntitiesControllerTest extends AbstractControllerTest {
     
     @InjectMocks
     private EntitiesController entitiesController;
     
-    @Test(expectedExceptions = NestedServletException.class)
+    @Test(groups = { "unitTests" }, expectedExceptions = NestedServletException.class)
     public void indexNonHandledEntityTest() throws Exception{
         mockMvc.perform(get("/entities/invalidName")).andExpect(status().isInternalServerError());
     }
     
-    @Test(groups = { "unitTests", "springServicesTestGroup", "genericModelAttributesNeeded" })
+    @Test(groups = { "unitTests" })
     public void indexProductTest() throws Exception{
         String entityName = "product";
         MvcResult result = mockMvc.perform(get("/entities/" + entityName))
@@ -54,12 +54,12 @@ public class EntitiesControllerUT extends AbstractControllerUT {
         assertThat((String) modelAndView.getModelMap().get(Constants.ENTITY_NAME_MODEL_KEY), equalTo(entityName));
     }
     
-    @Test(expectedExceptions = NestedServletException.class)
+    @Test(groups = { "unitTests" }, expectedExceptions = NestedServletException.class)
     public void getEntityNonHandledEntityTest() throws Exception{
         mockMvc.perform(get("/entities/invalidName/invalidId")).andExpect(status().isInternalServerError());
     }
     
-    @Test(groups = { "unitTests", "springServicesTestGroup", "genericModelAttributesNeeded" })
+    @Test(groups = { "unitTests" })
     public void getEntityTest() throws Exception{
         MvcResult result = mockMvc.perform(get("/entities/product/" + product.getId()))
                 .andExpect(status().isOk())
@@ -69,12 +69,12 @@ public class EntitiesControllerUT extends AbstractControllerUT {
         assertThat(resultProduct, equalTo(product));
     }
     
-    @Test(expectedExceptions = NestedServletException.class)
+    @Test(groups = { "unitTests" }, expectedExceptions = NestedServletException.class)
     public void postEntityNotHandledTest() throws Exception{
         mockMvc.perform(post("/entities/invalidName")).andExpect(status().isInternalServerError());
     }
     
-    @Test(groups = { "unitTests", "springServicesTestGroup", "genericModelAttributesNeeded" })
+    @Test(groups = { "unitTests" })
     public void postEntityProductTest() throws Exception{
         String entityName = "product";
         mockMvc.perform(post("/entities/" + entityName)
