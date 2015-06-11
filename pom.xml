@@ -261,6 +261,9 @@
 						<goals>
 							<goal>stop</goal>
 						</goals>
+						<configuration>
+							<skip>${skipTests}</skip>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
