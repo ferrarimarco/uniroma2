@@ -5,8 +5,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import info.ferrarimarco.uniroma2.is.BaseSpringMvcSingleControllerTest;
-import info.ferrarimarco.uniroma2.is.config.context.RootConfig;
-import info.ferrarimarco.uniroma2.is.config.servlet.SpringMvcConfig;
 import info.ferrarimarco.uniroma2.is.model.Category;
 import info.ferrarimarco.uniroma2.is.model.Clazz;
 import info.ferrarimarco.uniroma2.is.model.Product;
