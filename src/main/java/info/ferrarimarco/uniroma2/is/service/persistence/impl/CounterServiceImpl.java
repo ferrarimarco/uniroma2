@@ -1,7 +1,5 @@
 package info.ferrarimarco.uniroma2.is.service.persistence.impl;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -28,13 +26,6 @@ public class CounterServiceImpl implements CounterService {
     @Value("${config.persistence.counter.increment}")
     private long counterIncrement;
 
-    @PostConstruct
-    private void initializeCounters(){
-        if(!mongoTemplate.collectionExists(Counter.class)){
-            mongoTemplate.createCollection(Counter.class);
-        }
-    }
-
     @Override
     public long getNextCategorySequence() {
         return increaseCounter(Constants.CATEGORY_SYM_ID_COUNTER_NAME);
@@ -56,6 +47,10 @@ public class CounterServiceImpl implements CounterService {
     }
     
     private long increaseCounter(String counterName){
+        if(!mongoTemplate.collectionExists(Counter.class)){
+            mongoTemplate.createCollection(Counter.class);
+        }
+        
         Query query = new Query(Criteria.where("name").is(counterName));
         Update update = new Update().inc("sequence", counterIncrement);
 
