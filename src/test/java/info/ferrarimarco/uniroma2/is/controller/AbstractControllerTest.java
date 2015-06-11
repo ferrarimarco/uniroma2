@@ -27,14 +27,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
-@ContextConfiguration(classes = {RootConfig.class, SpringMvcConfig.class})
 @Slf4j
+@TestExecutionListeners(inheritListeners = false, listeners = {})
 public abstract class AbstractControllerTest extends BaseSpringMvcSingleControllerTest{
     @Mock
     protected CategoryPersistenceService categoryPersistenceService;
