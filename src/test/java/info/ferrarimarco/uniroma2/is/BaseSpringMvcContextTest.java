@@ -1,5 +1,7 @@
 package info.ferrarimarco.uniroma2.is;
 
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,8 @@ public abstract class BaseSpringMvcContextTest extends BaseSpringMvcTest{
     
     @Override
     protected void setupMockMvc() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(springSecurity()).build();
         super.setupBaseSpringMvcTest();
     }
 
