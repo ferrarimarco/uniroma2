@@ -3,4 +3,4 @@ services:
   - mongodb
 before_script:
   - sleep 15
-script: mvn test -P local
+script: mvn install -P local
