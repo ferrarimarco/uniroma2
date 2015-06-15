@@ -1,6 +1,4 @@
 language: java
-services:
-  - mongodb
 before_script:
   - sleep 15
 script: mvn install -P local
