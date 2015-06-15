@@ -51,7 +51,7 @@ public class MongoDbInitializer implements ApplicationListener<ContextRefreshedE
             mongoTemplate.dropCollection(Category.class);
         }
         
-        // Initialize categories
+        // Initialise categories
         if(!mongoTemplate.collectionExists(Category.class)){
             for(String category : categories){
                 Category c = new Category();
@@ -61,7 +61,7 @@ public class MongoDbInitializer implements ApplicationListener<ContextRefreshedE
             }
         }
         
-        // Initialize categories
+        // Initialise categories
         if(!mongoTemplate.collectionExists(Clazz.class)){
             String[] classCategoryTuples = rawClasses.split(";");
             

@@ -133,7 +133,7 @@ public class StatServiceImplProductIndexesTest {
     }
     
     @Test(groups = { "unitTests" }, expectedExceptions = ArithmeticException.class)
-    public void likingProductNotStockedTest(){
+    public void likingProductNotDispensedTest(){
         when(productPersistenceService.findByClazz(eq(clazz), notNull(PageRequest.class))).thenReturn(emptyProductPage);
         statService.liking(emptyProduct.getId(), Product.class);
         verify(productPersistenceService).findById(eq(emptyProduct.getId()));
