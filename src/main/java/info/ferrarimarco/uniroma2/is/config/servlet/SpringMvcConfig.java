@@ -1,7 +1,16 @@
 package info.ferrarimarco.uniroma2.is.config.servlet;
 
+import info.ferrarimarco.uniroma2.is.controller.application.StatsApplicationController;
+import info.ferrarimarco.uniroma2.is.service.StatService;
+import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceService;
+import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
+import info.ferrarimarco.uniroma2.is.service.persistence.ProductInstancePersistenceService;
+import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
+
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
@@ -60,5 +69,11 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
         configurer.favorParameter(false);
         configurer.useJaf(false).
         mediaType("json", MediaType.APPLICATION_JSON);
+    }
+    
+    @Bean
+    @Autowired
+    public StatsApplicationController statsApplicationController(StatService statService, ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService){
+        return new StatsApplicationController(statService, productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
     }
 }
