@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.is.controller;
+package info.ferrarimarco.uniroma2.is.controller.spring;
 
 import lombok.extern.slf4j.Slf4j;
 import info.ferrarimarco.uniroma2.is.model.Constants;

@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.is.controller;
+package info.ferrarimarco.uniroma2.is.controller.spring;
 
 import java.util.List;
 

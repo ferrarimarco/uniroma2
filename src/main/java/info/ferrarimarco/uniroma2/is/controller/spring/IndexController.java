@@ -1,4 +1,4 @@
-package info.ferrarimarco.uniroma2.is.controller;
+package info.ferrarimarco.uniroma2.is.controller.spring;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

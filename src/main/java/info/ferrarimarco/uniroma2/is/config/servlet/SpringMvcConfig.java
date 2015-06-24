@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan("info.ferrarimarco.uniroma2.is.controller")
+@ComponentScan("info.ferrarimarco.uniroma2.is.controller.spring")
 public class SpringMvcConfig extends WebMvcConfigurerAdapter {
 
     // Dispatcher configuration for serving static resources
