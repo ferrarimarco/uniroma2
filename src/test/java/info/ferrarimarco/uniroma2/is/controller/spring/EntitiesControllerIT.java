@@ -47,10 +47,10 @@ public class EntitiesControllerIT extends AbstractIT{
                 .andReturn();
 
         ModelAndView modelAndView = result.getModelAndView();
-        assertThat(modelAndView.getViewName(), equalTo(EntitiesController.PRODUCTS_VIEW_NAME));
+        assertThat(modelAndView.getViewName(), equalTo(Constants.PRODUCTS_VIEW_NAME));
 
         @SuppressWarnings("unchecked")
-        Page<Product> allEntitiesPage = (Page<Product>) modelAndView.getModelMap().get(EntitiesController.ALL_ENTITIES_PAGE_MODEL_KEY);
+        Page<Product> allEntitiesPage = (Page<Product>) modelAndView.getModelMap().get(Constants.ALL_ENTITIES_PAGE_MODEL_KEY);
         assertThat(allEntitiesPage.getNumberOfElements(), is(greaterThanOrEqualTo(0)));
         assertThat((String) modelAndView.getModelMap().get(Constants.ENTITY_NAME_MODEL_KEY), equalTo(entityName));
     }

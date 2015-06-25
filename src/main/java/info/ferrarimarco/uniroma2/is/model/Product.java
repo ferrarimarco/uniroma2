@@ -17,11 +17,9 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 @Builder
 public class Product extends Entity{
     
-    @NonNull
     @DBRef
     private Category category;
     
-    @NonNull
     @DBRef
     private Clazz clazz;
     private String barCode;

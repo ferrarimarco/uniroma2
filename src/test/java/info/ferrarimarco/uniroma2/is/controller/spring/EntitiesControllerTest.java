@@ -47,10 +47,10 @@ public class EntitiesControllerTest extends AbstractControllerTest {
         verify(productInstancePersistenceService, times(1)).countInstancesByProductId(product.getId());
         
         ModelAndView modelAndView = result.getModelAndView();
-        assertThat(modelAndView.getViewName(), equalTo(EntitiesController.PRODUCTS_VIEW_NAME));
+        assertThat(modelAndView.getViewName(), equalTo(Constants.PRODUCTS_VIEW_NAME));
         
         @SuppressWarnings("unchecked")
-        Page<Product> allEntitiesPage = (Page<Product>) modelAndView.getModelMap().get(EntitiesController.ALL_ENTITIES_PAGE_MODEL_KEY);
+        Page<Product> allEntitiesPage = (Page<Product>) modelAndView.getModelMap().get(Constants.ALL_ENTITIES_PAGE_MODEL_KEY);
         assertThat(allEntitiesPage.getNumberOfElements(), equalTo(productsPage.getNumberOfElements()));
         assertThat(allEntitiesPage.getContent().get(0), equalTo(product));
         assertThat((String) modelAndView.getModelMap().get(Constants.ENTITY_NAME_MODEL_KEY), equalTo(entityName));

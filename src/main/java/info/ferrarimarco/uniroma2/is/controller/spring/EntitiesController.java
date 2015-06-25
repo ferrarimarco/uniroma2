@@ -1,6 +1,8 @@
 package info.ferrarimarco.uniroma2.is.controller.spring;
 
 import lombok.extern.slf4j.Slf4j;
+import info.ferrarimarco.uniroma2.is.controller.application.CreateUpdateProductApplicationController;
+import info.ferrarimarco.uniroma2.is.controller.application.LoadEntityApplicationController;
 import info.ferrarimarco.uniroma2.is.model.Constants;
 import info.ferrarimarco.uniroma2.is.model.Product;
 import info.ferrarimarco.uniroma2.is.model.ProductInstance;
@@ -9,6 +11,7 @@ import info.ferrarimarco.uniroma2.is.model.dto.ProductDto;
 import info.ferrarimarco.uniroma2.is.model.dto.ProductDto.Operation;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,26 +29,24 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Slf4j
 public class EntitiesController extends AbstractController{
     
-    public static final String PRODUCTS_VIEW_NAME = "products.html";
-    public static final String ALL_ENTITIES_PAGE_MODEL_KEY = "allEntitiesPage";
+    @Autowired
+    private LoadEntityApplicationController loadEntityApplicationController;
+    
+    @Autowired
+    private CreateUpdateProductApplicationController createUpdateProductApplicationController;
 
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.GET)
     public String index(@PathVariable("entityName") String entityName, Model model, Pageable pageable) {
         String viewName = null;
 
-        if("product".equals(entityName) || "productInstance".equals(entityName)){
-            Page<Product> allEntitesPage = productPersistenceService.findAll(pageable);
-            if(allEntitesPage != null)
-                for(Product product : allEntitesPage){
-                    product.setAmount(productInstancePersistenceService.countInstancesByProductId(product.getId()));
-                }
-            model.addAttribute(ALL_ENTITIES_PAGE_MODEL_KEY, allEntitesPage);
+        if(Constants.PRODUCT_ENTITY_NAME.equals(entityName)){
+            Page<Product> allEntitesPage = loadEntityApplicationController.loadProductPage(pageable);
+            model.addAttribute(Constants.ALL_ENTITIES_PAGE_MODEL_KEY, allEntitesPage);
             model.addAttribute(new ProductDto());
             model.addAttribute(new InstanceDto());
-            viewName = EntitiesController.PRODUCTS_VIEW_NAME;
-        }else{
+            viewName = Constants.PRODUCTS_VIEW_NAME;
+        }else
             throw new IllegalArgumentException("Entity name not valid: " + entityName);
-        }
         
         model.addAttribute(Constants.ENTITY_NAME_MODEL_KEY, entityName);
         
@@ -56,35 +57,20 @@ public class EntitiesController extends AbstractController{
     @ResponseBody
     public Product getEntity(@PathVariable("entityName") String entityName,
             @PathVariable("entityId") String entityId){
-        if("product".equals(entityName)){
-            return productPersistenceService.findById(entityId);
-        }else{
+        if("product".equals(entityName))
+            return loadEntityApplicationController.loadProduct(entityId);
+        else
             throw new IllegalArgumentException("Entity name not valid");
-        }
     }
 
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.POST)
-    public String postEntity(@PathVariable("entityName") String entityName, Model model, Pageable pageable, @ModelAttribute ProductDto productDto, @ModelAttribute InstanceDto instanceDto) {
+    public String postEntity(@PathVariable("entityName") String entityName, @ModelAttribute ProductDto productDto, @ModelAttribute InstanceDto instanceDto) {
         if ("product".equals(entityName)) {
-            if (productDto.getClazz() == null && !StringUtils.isBlank(productDto.getClazzId()))
-                productDto.setClazz(clazzPersistenceService.findById(productDto.getClazzId()));
+            // This may be an update request: it's an update of productDto has an ID
+            if (StringUtils.isBlank(productDto.getId()))
+                createUpdateProductApplicationController.createNewProduct(productDto.getClazzId(), productDto.asProductClone());
             else
-                throw new IllegalArgumentException("Product class cannot be null");
-            
-            if(productDto.getCategory() == null){
-                productDto.setCategory(productDto.getClazz().getCategory());
-            }
-            
-            // This may be an update request
-            if (productDto.getId() != null && productPersistenceService.exists(productDto.getId())) { // Update
-                productDto.setId(productDto.getId());
-            } else {
-                productDto.setId(null);
-            }
-            
-            Product p = productPersistenceService.save(productDto.asProductClone());
-            log.info("Saved product: {}", p);
-            return index(entityName, model, pageable);
+                createUpdateProductApplicationController.updateExistingProduct(productDto.getClazzId(), productDto.asProductClone());
         }else if("productInstance".equals(entityName)){
             Product product = productPersistenceService.findById(instanceDto.getProductId());
             if(product == null){
@@ -127,11 +113,10 @@ public class EntitiesController extends AbstractController{
             }
             
             productPersistenceService.save(product);
-        }else{
+        }else
             throw new IllegalArgumentException("Entity name not valid");
-        }
         
-        return index(entityName, model, pageable);
+        return "redirect:/entities/product";
     }
     
     @RequestMapping(value = {"{entityName}/delete/expired", "/{entityName}/delete/expired"}, method = RequestMethod.GET)

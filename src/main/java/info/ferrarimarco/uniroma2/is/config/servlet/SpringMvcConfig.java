@@ -1,5 +1,7 @@
 package info.ferrarimarco.uniroma2.is.config.servlet;
 
+import info.ferrarimarco.uniroma2.is.controller.application.CreateUpdateProductApplicationController;
+import info.ferrarimarco.uniroma2.is.controller.application.LoadEntityApplicationController;
 import info.ferrarimarco.uniroma2.is.controller.application.StatsApplicationController;
 import info.ferrarimarco.uniroma2.is.service.StatService;
 import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceService;
@@ -75,5 +77,17 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
     @Autowired
     public StatsApplicationController statsApplicationController(StatService statService, ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService){
         return new StatsApplicationController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, statService);
+    }
+    
+    @Bean
+    @Autowired
+    public LoadEntityApplicationController loadEntityApplicationController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService){
+        return new LoadEntityApplicationController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
+    }
+    
+    @Bean
+    @Autowired
+    public CreateUpdateProductApplicationController createUpdateProductApplicationController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService){
+        return new CreateUpdateProductApplicationController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
     }
 }
