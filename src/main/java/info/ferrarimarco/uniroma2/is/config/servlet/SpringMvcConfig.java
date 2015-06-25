@@ -74,6 +74,6 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
     @Bean
     @Autowired
     public StatsApplicationController statsApplicationController(StatService statService, ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService){
-        return new StatsApplicationController(statService, productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
+        return new StatsApplicationController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, statService);
     }
 }

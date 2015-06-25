@@ -2,7 +2,6 @@ package info.ferrarimarco.uniroma2.is.controller.application;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import info.ferrarimarco.uniroma2.is.model.Category;
@@ -20,24 +19,20 @@ import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceServi
 import org.apache.commons.lang.exception.ExceptionUtils;
 
 @Slf4j
-@AllArgsConstructor
-public class StatsApplicationController {
+public class StatsApplicationController extends AbstractApplicationController{
     
     @NonNull
     private StatService statService;
     
-    @NonNull
-    private ProductPersistenceService productPersistenceService;
-    
-    @NonNull
-    private ProductInstancePersistenceService productInstancePersistenceService;
+    public StatsApplicationController(ProductPersistenceService productPersistenceService,
+            ProductInstancePersistenceService productInstancePersistenceService,
+            ClazzPersistenceService clazzPersistenceService,
+            CategoryPersistenceService categoryPersistenceService,
+            @NonNull StatService statService) {
+        super(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
+        this.statService = statService;
+    }
 
-    @NonNull
-    private ClazzPersistenceService clazzPersistenceService;
-    
-    @NonNull
-    private CategoryPersistenceService categoryPersistenceService;
-    
     public StatResult computeIndex(String indexType, String criteriaId, Class<? extends Entity> criteriaClass){
         double result = 0.0;
         try{
