@@ -1,5 +1,6 @@
 package info.ferrarimarco.uniroma2.is.config.servlet;
 
+import info.ferrarimarco.uniroma2.is.controller.application.AddRemoveProductInstanceController;
 import info.ferrarimarco.uniroma2.is.controller.application.CreateUpdateProductApplicationController;
 import info.ferrarimarco.uniroma2.is.controller.application.LoadEntityApplicationController;
 import info.ferrarimarco.uniroma2.is.controller.application.StatsApplicationController;
@@ -89,5 +90,11 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
     @Autowired
     public CreateUpdateProductApplicationController createUpdateProductApplicationController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService){
         return new CreateUpdateProductApplicationController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
+    }
+    
+    @Bean
+    @Autowired
+    public AddRemoveProductInstanceController addRemoveProductInstanceController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService){
+        return new AddRemoveProductInstanceController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
     }
 }

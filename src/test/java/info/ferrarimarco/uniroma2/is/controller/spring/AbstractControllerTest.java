@@ -5,14 +5,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import info.ferrarimarco.uniroma2.is.BaseSpringMvcSingleControllerTest;
-import info.ferrarimarco.uniroma2.is.controller.spring.AbstractController;
+import info.ferrarimarco.uniroma2.is.controller.application.CreateUpdateProductApplicationController;
+import info.ferrarimarco.uniroma2.is.controller.application.LoadEntityApplicationController;
 import info.ferrarimarco.uniroma2.is.model.Category;
 import info.ferrarimarco.uniroma2.is.model.Clazz;
 import info.ferrarimarco.uniroma2.is.model.Product;
-import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceService;
-import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
-import info.ferrarimarco.uniroma2.is.service.persistence.ProductInstancePersistenceService;
-import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,17 +32,12 @@ import org.testng.annotations.BeforeMethod;
 @Slf4j
 @TestExecutionListeners(inheritListeners = false, listeners = {})
 public abstract class AbstractControllerTest extends BaseSpringMvcSingleControllerTest{
-    @Mock
-    protected CategoryPersistenceService categoryPersistenceService;
     
     @Mock
-    protected ClazzPersistenceService clazzPersistenceService;
+    protected LoadEntityApplicationController loadEntityApplicationController;
     
     @Mock
-    protected ProductPersistenceService productPersistenceService;
-    
-    @Mock
-    protected ProductInstancePersistenceService productInstancePersistenceService;
+    protected CreateUpdateProductApplicationController createUpdateProductApplicationController;
     
     protected Category category;
     protected Clazz clazz;
@@ -70,40 +62,35 @@ public abstract class AbstractControllerTest extends BaseSpringMvcSingleControll
         category = new Category();
         category.setId("cat-id");
         category.setName("cat-name");
-        when(categoryPersistenceService.findById(category.getId())).thenReturn(category);
         
         clazz = new Clazz();
         clazz.setId("clazz-id");
         clazz.setCategory(category);
         clazz.setName("clazz-name");
-        when(clazzPersistenceService.findById(clazz.getId())).thenReturn(clazz);
         
         List<Category> categories = new ArrayList<>();
         categories.add(category);
-        when(categoryPersistenceService.findAll()).thenReturn(categories);
+        when(loadEntityApplicationController.getAllCategories()).thenReturn(categories);
         
         List<Clazz> clazzes = new ArrayList<>();
         clazzes.add(clazz);
-        when(clazzPersistenceService.findAll()).thenReturn(clazzes);
+        when(loadEntityApplicationController.getAllClasses()).thenReturn(clazzes);
         
         product = Product.builder().category(category).clazz(clazz).brand("brand").build();
         product.setId("prod1-id");
         product.setName("product-name");
-        when(productPersistenceService.findById(product.getId())).thenReturn(product);
+        when(loadEntityApplicationController.loadProduct(product.getId())).thenReturn(product);
 
         List<Product> products = new ArrayList<>();
         products.add(product);
         productsPage = new PageImpl<Product>(products);
-        
-        when(productPersistenceService.findAll(notNull(PageRequest.class))).thenReturn(productsPage);
+        when(loadEntityApplicationController.loadProductPage(notNull(PageRequest.class))).thenReturn(productsPage);
     }
     
     @AfterMethod(groups = { "unitTests" })
     public void verifyGenericModelAttributeMocks(){
-        verify(categoryPersistenceService, times(1)).findAll();
-        verify(clazzPersistenceService, times(1)).findAll();
-        
-        Mockito.reset(categoryPersistenceService);
-        Mockito.reset(clazzPersistenceService);
+        verify(loadEntityApplicationController, times(1)).getAllCategories();
+        verify(loadEntityApplicationController, times(1)).getAllClasses();
+        Mockito.reset(loadEntityApplicationController);
     }
 }

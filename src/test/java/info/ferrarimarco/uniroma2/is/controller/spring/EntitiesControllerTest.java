@@ -1,22 +1,20 @@
 package info.ferrarimarco.uniroma2.is.controller.spring;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.notNull;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import info.ferrarimarco.uniroma2.is.controller.spring.AbstractController;
-import info.ferrarimarco.uniroma2.is.controller.spring.EntitiesController;
 import info.ferrarimarco.uniroma2.is.model.Constants;
 import info.ferrarimarco.uniroma2.is.model.Product;
 
 import org.mockito.InjectMocks;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.servlet.ModelAndView;
@@ -38,13 +36,10 @@ public class EntitiesControllerTest extends AbstractControllerTest {
     
     @Test(groups = { "unitTests" })
     public void indexProductTest() throws Exception{
-        String entityName = "product";
+        String entityName = Constants.PRODUCT_ENTITY_NAME;
         MvcResult result = mockMvc.perform(get("/entities/" + entityName))
                 .andExpect(status().isOk())
                 .andReturn();
-        
-        verify(productPersistenceService, times(1)).findAll(notNull(PageRequest.class));
-        verify(productInstancePersistenceService, times(1)).countInstancesByProductId(product.getId());
         
         ModelAndView modelAndView = result.getModelAndView();
         assertThat(modelAndView.getViewName(), equalTo(Constants.PRODUCTS_VIEW_NAME));
@@ -78,15 +73,13 @@ public class EntitiesControllerTest extends AbstractControllerTest {
     
     @Test(groups = { "unitTests" })
     public void postEntityProductTest() throws Exception{
-        String entityName = "product";
-        mockMvc.perform(post("/entities/" + entityName)
+        mockMvc.perform(post("/entities/" + Constants.PRODUCT_ENTITY_NAME)
                     .param("clazzId", clazz.getId())
                     .param("brand", product.getBrand())
                     .param("name", product.getName()))
-                .andExpect(status().isOk())
+                .andExpect(status().is(HttpStatus.FOUND.value()))
                 .andReturn();
-        verify(clazzPersistenceService, times(1)).findById(clazz.getId());
-        verify(productPersistenceService, times(1)).save(notNull(Product.class));
+        verify(createUpdateProductApplicationController, times(1)).createNewProduct(eq(clazz.getId()), notNull(Product.class));
     }
 
     @Override
