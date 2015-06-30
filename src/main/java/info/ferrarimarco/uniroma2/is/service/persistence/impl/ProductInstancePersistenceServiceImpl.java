@@ -1,6 +1,5 @@
 package info.ferrarimarco.uniroma2.is.service.persistence.impl;
 
-//imports as static
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
@@ -8,13 +7,14 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.proj
 import info.ferrarimarco.uniroma2.is.model.Constants;
 import info.ferrarimarco.uniroma2.is.model.Product;
 import info.ferrarimarco.uniroma2.is.model.ProductInstance;
-import info.ferrarimarco.uniroma2.is.persistence.repositories.ClazzRepository;
 import info.ferrarimarco.uniroma2.is.persistence.repositories.EntityRepository;
 import info.ferrarimarco.uniroma2.is.persistence.repositories.ProductInstanceRepository;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductInstancePersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Data;
 import lombok.Getter;
@@ -46,9 +46,6 @@ public class ProductInstancePersistenceServiceImpl extends EntityPersistenceServ
     @Autowired
     @Getter
     private ProductInstanceRepository repository;
-
-    @Autowired
-    private ClazzRepository classRepository;
 
     @Override
     protected EntityRepository<ProductInstance> getEntityRepository() {
@@ -83,9 +80,11 @@ public class ProductInstancePersistenceServiceImpl extends EntityPersistenceServ
     }
 
     @Override
-    public void deleteExpired() {
+    public Map<String,Long> deleteExpired() {
         Page<Product> productPage;
         int pageNumber = -1;
+        
+        Map<String,Long> result = new HashMap<>();
 
         do{
             productPage = productPersistenceService.findAll(new PageRequest(++pageNumber, 30));
@@ -101,13 +100,15 @@ public class ProductInstancePersistenceServiceImpl extends EntityPersistenceServ
             
             for(ProductInstanceSumAggregation productInstanceSumAggregation : groupResults.getMappedResults()){
                 Product p = productPersistenceService.findById(productInstanceSumAggregation.getProductId());
-                p.setExpired(p.getExpired() + productInstanceSumAggregation.getSum());
+                result.put(p.getId(), productInstanceSumAggregation.getSum());
                 Query removeQuery = new Query();
                 removeQuery.addCriteria(Criteria.where("productId").is(productInstanceSumAggregation.getProductId()).and("expirationDate").lt(now));
                 mongoTemplate.remove(removeQuery, ProductInstance.class);
             }
             
         }while (!productPage.isLast());
+        
+        return result;
     }
 
 }

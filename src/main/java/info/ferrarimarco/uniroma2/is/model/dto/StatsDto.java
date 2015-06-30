@@ -2,7 +2,6 @@ package info.ferrarimarco.uniroma2.is.model.dto;
 
 import org.apache.commons.lang.StringUtils;
 
-import info.ferrarimarco.uniroma2.is.model.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,11 @@ public class StatsDto {
     private String categoryId;
     private String clazzId;
     private String productId;
-    private Entity entity;
+    private String symbolicId;
+    private String categoryName;
+    private String clazzName;
+    private String productName;
+    private String entityName;
     private Double value;
     private String indexType;
     

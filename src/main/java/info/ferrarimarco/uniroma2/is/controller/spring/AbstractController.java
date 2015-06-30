@@ -15,11 +15,11 @@ public class AbstractController {
     
     @ModelAttribute("allClasses")
     protected List<Clazz> getAllClasses(){
-        return loadEntityApplicationController.getAllClasses();
+        return loadEntityApplicationController.loadAllClasses();
     }
     
     @ModelAttribute("allCategories")
     protected List<Category> getAllCategories(){
-        return loadEntityApplicationController.getAllCategories();
+        return loadEntityApplicationController.loadAllCategories();
     }
 }

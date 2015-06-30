@@ -1,9 +1,17 @@
 package info.ferrarimarco.uniroma2.is.service;
 
-import info.ferrarimarco.uniroma2.is.model.Entity;
 
 public interface StatService {
-    Double perishability(String entityId, Class<? extends Entity> clazz);
-    Double success(String entityId, Class<? extends Entity> clazz);
-    Double liking(String entityId, Class<? extends Entity> clazz);
+    Double perishability(String entityId);
+    Double success(String entityId);
+    Double liking(String entityId);
+    void addRequested(String productId, Long value);
+    void addDispensed(String productId, Long value);
+    void addExpired(String productId, Long value);
+    void addStocked(String productId, Long value);
+    Long getRequested(String productId);
+    Long getDispensed(String productId);
+    Long getExpired(String productId);
+    Long getStocked(String productId);
+    
 }

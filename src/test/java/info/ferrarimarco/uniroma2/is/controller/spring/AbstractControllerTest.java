@@ -70,11 +70,11 @@ public abstract class AbstractControllerTest extends BaseSpringMvcSingleControll
         
         List<Category> categories = new ArrayList<>();
         categories.add(category);
-        when(loadEntityApplicationController.getAllCategories()).thenReturn(categories);
+        when(loadEntityApplicationController.loadAllCategories()).thenReturn(categories);
         
         List<Clazz> clazzes = new ArrayList<>();
         clazzes.add(clazz);
-        when(loadEntityApplicationController.getAllClasses()).thenReturn(clazzes);
+        when(loadEntityApplicationController.loadAllClasses()).thenReturn(clazzes);
         
         product = Product.builder().category(category).clazz(clazz).brand("brand").build();
         product.setId("prod1-id");
@@ -89,8 +89,8 @@ public abstract class AbstractControllerTest extends BaseSpringMvcSingleControll
     
     @AfterMethod(groups = { "unitTests" })
     public void verifyGenericModelAttributeMocks(){
-        verify(loadEntityApplicationController, times(1)).getAllCategories();
-        verify(loadEntityApplicationController, times(1)).getAllClasses();
+        verify(loadEntityApplicationController, times(1)).loadAllCategories();
+        verify(loadEntityApplicationController, times(1)).loadAllClasses();
         Mockito.reset(loadEntityApplicationController);
     }
 }

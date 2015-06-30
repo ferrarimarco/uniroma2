@@ -1,15 +1,11 @@
 package info.ferrarimarco.uniroma2.is.controller.spring;
 
-import java.util.List;
-
 import info.ferrarimarco.uniroma2.is.controller.application.StatsApplicationController;
-import info.ferrarimarco.uniroma2.is.model.Category;
-import info.ferrarimarco.uniroma2.is.model.Clazz;
 import info.ferrarimarco.uniroma2.is.model.Constants;
-import info.ferrarimarco.uniroma2.is.model.Entity;
 import info.ferrarimarco.uniroma2.is.model.Product;
 import info.ferrarimarco.uniroma2.is.model.dto.StatsDto;
-import info.ferrarimarco.uniroma2.is.model.util.StatResult;
+
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +22,10 @@ public class StatsController extends AbstractController {
 
     @Autowired
     private StatsApplicationController statsApplicationController;
-
+    
     @ModelAttribute("allProducts")
     private List<Product> getAllProducts(){
-        return statsApplicationController.loadAllProducts();
+        return loadEntityApplicationController.loadAllProducts();
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -50,23 +46,21 @@ public class StatsController extends AbstractController {
     @RequestMapping(method = RequestMethod.POST)
     public String getStats(Model model, @ModelAttribute StatsDto statsDto){
         if(!statsDto.isEmpty()){
-            Class<? extends Entity> criteriaClass = null;
             String criteriaId = null;
             if(!StringUtils.isBlank(statsDto.getCategoryId())){
-                criteriaClass = Category.class;
                 criteriaId = statsDto.getCategoryId();
+                statsDto.setEntityName(statsDto.getCategoryName());
             }else if(!StringUtils.isBlank(statsDto.getClazzId())){
-                criteriaClass = Clazz.class;
                 criteriaId = statsDto.getClazzId();
+                statsDto.setEntityName(statsDto.getClazzName());
             }else if(!StringUtils.isBlank(statsDto.getProductId())){
-                criteriaClass = Product.class;
                 criteriaId = statsDto.getProductId();
+                statsDto.setEntityName(statsDto.getProductName());
             }else
                 throw new IllegalArgumentException("Cannot choose a stat for: " + statsDto.toString());
             
-            StatResult result = statsApplicationController.computeIndex(statsDto.getIndexType(), criteriaId, criteriaClass);
-            statsDto.setValue(result.getStat());
-            statsDto.setEntity(result.getEntity());
+            Double result = statsApplicationController.computeIndex(statsDto.getIndexType(), criteriaId);
+            statsDto.setValue(result);
         }
 
         return index(model, statsDto);

@@ -1,45 +1,51 @@
 package info.ferrarimarco.uniroma2.is.controller.application;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
-import info.ferrarimarco.uniroma2.is.model.Product;
 import info.ferrarimarco.uniroma2.is.model.ProductInstance;
+import info.ferrarimarco.uniroma2.is.service.StatService;
 import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductInstancePersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 @Slf4j
 public class AddRemoveProductInstanceController extends AbstractApplicationController {
-
+    
+    // TODO add stats for classes and categories also
+    // TODO create entity stat if it does not exist. Better to do this when creating a new product (I have all the info I need: class, cat...)
+    
+    @NonNull
+    private StatService statService;
+    
     public AddRemoveProductInstanceController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService,
-            ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService) {
+            ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService, StatService statService) {
         super(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
+        this.statService = statService;
     }
     
     public void addProductInstance(ProductInstance productInstance, Long newAmount){
-        Product product = loadProduct(productInstance.getId());
         productInstancePersistenceService.save(productInstance);
-        product.setStocked(product.getStocked() + newAmount);
-        productPersistenceService.save(product);
-        log.info("Added {} instances for {}", newAmount, product);
+        statService.addStocked(productInstance.getProductId(), newAmount);
+        log.info("Added {} instances for {}", newAmount, productInstance.getProductId());
     }
     
     public void removeProductInstance(ProductInstance productInstance, Long newAmount){
-        Product product = loadProduct(productInstance.getId());
-        log.info("Removing {} instances for {}", newAmount, product);
+        log.info("Removing {} instances for {}", newAmount, productInstance.getProductId());
         Long count = productInstancePersistenceService.countInstancesByProductId(productInstance.getProductId());
-        
         if(count > newAmount){
-            product.setRequested(product.getRequested() + newAmount);
-            product.setDispensed(product.getDispensed() + newAmount);
+            statService.addRequested(productInstance.getProductId(), newAmount);
+            statService.addDispensed(productInstance.getProductId(), newAmount);
             
             Page<ProductInstance> productInstances = null;
             int pageIndex = -1;
             do{
-                productInstances = productInstancePersistenceService.findByProductId(product.getId(), new PageRequest(++pageIndex, 10));
+                productInstances = productInstancePersistenceService.findByProductId(productInstance.getProductId(), new PageRequest(++pageIndex, 10));
                 for(int i = 0; i < productInstances.getContent().size() && newAmount > 0; i++){
                     ProductInstance pi = productInstances.getContent().get(i);
                     if(pi.getAmount() <= newAmount){
@@ -53,24 +59,15 @@ public class AddRemoveProductInstanceController extends AbstractApplicationContr
                 }
             }
             while(newAmount > 0);
-        }else{
-            product.setRequested(product.getRequested() + (newAmount - count));
-        }
-        productPersistenceService.save(product);
+        }else
+            statService.addRequested(productInstance.getProductId(), newAmount - count);
     }
     
     public void removeExpiredProductInstances(){
-        productInstancePersistenceService.deleteExpired();
-        log.info("Removed expired product instances");
+        Map<String,Long> expiredProductIdToQuantity = productInstancePersistenceService.deleteExpired();
+        for(String productId : expiredProductIdToQuantity.keySet()){
+            statService.addExpired(productId, expiredProductIdToQuantity.get(productId));
+            log.info("Removed {} expired product instances for {}", expiredProductIdToQuantity.keySet(), productId);
+        }
     }
-    
-    private Product loadProduct(String productId){
-        Product product = productPersistenceService.findById(productId);
-        
-        if(product == null)
-            throw new NullPointerException("product");
-        
-        return product;
-    }
-
 }

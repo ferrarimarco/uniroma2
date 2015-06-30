@@ -1,5 +1,7 @@
 package info.ferrarimarco.uniroma2.is.service.persistence;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -9,5 +11,5 @@ public interface ProductInstancePersistenceService extends EntityPersistenceServ
     Long countByProductId(String productId);
     Long countInstancesByProductId(String productId);
     Page<ProductInstance> findByProductId(String productId, Pageable pageable);
-    void deleteExpired();
+    Map<String, Long> deleteExpired();
 }

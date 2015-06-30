@@ -15,12 +15,16 @@ import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceServi
 
 public class LoadEntityApplicationController extends AbstractApplicationController{
     
-    public List<Clazz> getAllClasses(){
+    public List<Clazz> loadAllClasses(){
         return clazzPersistenceService.findAll();
     }
     
-    public List<Category> getAllCategories(){
+    public List<Category> loadAllCategories(){
         return categoryPersistenceService.findAll();
+    }
+    
+    public List<Product> loadAllProducts() {
+        return productPersistenceService.findAll();
     }
     
     public LoadEntityApplicationController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService,

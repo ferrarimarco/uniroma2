@@ -46,6 +46,11 @@ public class CounterServiceImpl implements CounterService {
         return increaseCounter(Constants.PRODUCT_INSTANCE_COUNTER_NAME);
     }
     
+    @Override
+    public long getNextEntityStatSequence() {
+        return increaseCounter(Constants.ENTITY_STAT_COUNTER_NAME);
+    }
+    
     private long increaseCounter(String counterName){
         if(!mongoTemplate.collectionExists(Counter.class)){
             mongoTemplate.createCollection(Counter.class);

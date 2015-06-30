@@ -44,6 +44,9 @@
 							</li>
 						</ul>
 					</div>
+					<input type="hidden" id="categoryName" th:field="*{categoryName}" th:value="${category.name}" />
+					<input type="hidden" id="categoryName" th:field="*{categoryName}" th:value="${clazz.name}" />
+					<input type="hidden" id="categoryName" th:field="*{categoryName}" th:value="${product.name}" />
 				</fieldset>
 				<button type="submit" id="statsFormSubmit" form="productStatsForm" class="btn btn-primary" th:text="#{base.load}">[Load]</button>
 			</form>
@@ -58,8 +61,8 @@
 					</thead>
 					<tbody>
 						<tr>
-							<td th:text="${statsDto.entity.symbolicId}">[ID]</td>
-							<td id="statEntityName" th:text="${statsDto.entity.name}">[Name]</td>
+							<td th:text="${statsDto.symbolicId}">[ID]</td>
+							<td id="statEntityName" th:text="${statsDto.entityName}">[Name]</td>
 							<td th:text="${statsDto.value}">[Stat]</td>
 						</tr>
 					</tbody>

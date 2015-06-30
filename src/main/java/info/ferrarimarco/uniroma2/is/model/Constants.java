@@ -10,6 +10,7 @@ public class Constants {
     public static final String CLASS_SYM_ID_COUNTER_NAME = "class";
     public static final String PRODUCT_SYM_ID_COUNTER_NAME = "product";
     public static final String PRODUCT_INSTANCE_COUNTER_NAME = "productInstance";
+    public static final String ENTITY_STAT_COUNTER_NAME = "entityStat";
 
     public static final String PRODUCTS_VIEW_NAME = "products.html";
     

@@ -76,8 +76,8 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
     
     @Bean
     @Autowired
-    public StatsApplicationController statsApplicationController(StatService statService, ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService){
-        return new StatsApplicationController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, statService);
+    public StatsApplicationController statsApplicationController(StatService statService){
+        return new StatsApplicationController(statService);
     }
     
     @Bean
@@ -94,7 +94,7 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
     
     @Bean
     @Autowired
-    public AddRemoveProductInstanceController addRemoveProductInstanceController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService){
-        return new AddRemoveProductInstanceController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
+    public AddRemoveProductInstanceController addRemoveProductInstanceController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService, StatService statService){
+        return new AddRemoveProductInstanceController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, statService);
     }
 }

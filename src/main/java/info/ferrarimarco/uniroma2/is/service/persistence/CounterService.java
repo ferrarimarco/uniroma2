@@ -5,4 +5,5 @@ public interface CounterService {
     long getNextClazzSequence();
     long getNextProductSequence();
     long getNextProductEntitySequence();
+    long getNextEntityStatSequence();
 }

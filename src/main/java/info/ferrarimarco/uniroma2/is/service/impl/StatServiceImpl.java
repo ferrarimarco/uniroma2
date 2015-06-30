@@ -1,20 +1,24 @@
 package info.ferrarimarco.uniroma2.is.service.impl;
 
-import info.ferrarimarco.uniroma2.is.model.Category;
-import info.ferrarimarco.uniroma2.is.model.Clazz;
-import info.ferrarimarco.uniroma2.is.model.Entity;
-import info.ferrarimarco.uniroma2.is.model.Product;
+import info.ferrarimarco.uniroma2.is.model.EntityStat;
 import info.ferrarimarco.uniroma2.is.service.StatService;
-import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceService;
-import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
-import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
+import info.ferrarimarco.uniroma2.is.service.persistence.EntityStatPersistenceService;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class StatServiceImpl implements StatService {
 
     private enum ProductStat{
@@ -24,128 +28,153 @@ public class StatServiceImpl implements StatService {
         STOCKED
     }
 
-    @Autowired
-    private CategoryPersistenceService categoryPersistenceService;
+    private Map<String,EntityStat> stats;
 
     @Autowired
-    private ClazzPersistenceService clazzPersistenceService;
+    private EntityStatPersistenceService entityStatPersistenceService;
 
-    @Autowired
-    private ProductPersistenceService productPersistenceService;
-
-    private Long computeTotal(Class<? extends Entity> criteriaClass, ProductStat productStat){
-        return computeTotalByCriteria(null, null, productStat);
+    @PostConstruct
+    private void init(){
+        log.debug("Loading entityStats");
+        List<EntityStat> entityStats = entityStatPersistenceService.findAll(); 
+        stats = new HashMap<>(entityStats.size());
+        for(EntityStat entityStat : entityStats)
+            stats.put(entityStat.getEntityId(), entityStat);
     }
 
-    private Long computeTotalByCriteria(String criteriaId, Class<? extends Entity> criteriaClass, ProductStat productStat){
-        int pageIndex = -1;
+    @PreDestroy
+    private void tearDown(){
+        log.debug("Saving entityStats");
+        for(String entityId : stats.keySet())
+            entityStatPersistenceService.save(stats.get(entityId));
+    }
+
+    private Long computeTotal(ProductStat productStat){
         Long total = 0L;
+        for(String entityId : stats.keySet())
+            total += getStatByCriteria(entityId, productStat);
+        return total;
+    }
 
-        Page<Product> products = null;
-        do{
-            if(Category.class.equals(criteriaClass)){
-                Category criteria = categoryPersistenceService.findById(criteriaId);
-                products = productPersistenceService.findByCategory(criteria, new PageRequest(++pageIndex, 10));
-            }else if(Clazz.class.equals(criteriaClass)){
-                Clazz criteria = clazzPersistenceService.findById(criteriaId);
-                products = productPersistenceService.findByClazz((Clazz) criteria, new PageRequest(++pageIndex, 10));
-            }else if(criteriaId == null && criteriaClass == null){
-                products = productPersistenceService.findAll(new PageRequest(++pageIndex, 10));
-            }else{
-                throw new IllegalArgumentException("Entity class not handled");
-            }
-
-            for(Product product : products){
-                switch(productStat){
-                case DISPENSED:
-                    total += product.getDispensed();
-                    break;
-                case EXPIRED:
-                    total += product.getExpired();
-                    break;
-                case REQUESTED:
-                    total += product.getRequested();
-                    break;
-                case STOCKED:
-                    total += product.getStocked();
-                    break;
-                }
-            }
-        }while(products != null && products.hasNext());
-
-        return total;        
+    private Long getStatByCriteria(String criteriaId, ProductStat productStat){
+        switch(productStat){
+        case DISPENSED:
+            return stats.get(criteriaId).getDispensed();
+        case EXPIRED:
+            return stats.get(criteriaId).getExpired();
+        case REQUESTED:
+            return stats.get(criteriaId).getRequested();
+        case STOCKED:
+            return stats.get(criteriaId).getStocked();
+        default:
+            throw new IllegalArgumentException("Cannot select stat");
+        }
     }
 
     @Override
-    public Double success(String entityId, Class<? extends Entity> clazz) {
-        Long totalDispensed = 0L;
-        Long totalRequested = 0L;
+    public Double success(String entityId) {
+        Long totalDispensed = getStatByCriteria(entityId, ProductStat.DISPENSED);
+        Long totalRequested = getStatByCriteria(entityId, ProductStat.REQUESTED);
 
-        if(Category.class.equals(clazz) || Clazz.class.equals(clazz)){
-            totalDispensed = computeTotalByCriteria(entityId, clazz, ProductStat.DISPENSED);
-            totalRequested = computeTotalByCriteria(entityId, clazz, ProductStat.REQUESTED);
-        }else if(Product.class.equals(clazz)){
-            Product product = productPersistenceService.findById(entityId);
-            totalDispensed = product.getDispensed();
-            totalRequested = product.getRequested();
-        }else{
-            throw new IllegalArgumentException("Entity class not handled");
-        }
-
-        if(totalRequested <= 0){
+        if(totalRequested <= 0)
             throw new ArithmeticException ("Cannot compute success stat. This item has not been requested yet.");
-        }
 
         return totalDispensed.doubleValue()/totalRequested.doubleValue();
     }
-    
+
     @Override
-    public Double perishability(String entityId, Class<? extends Entity> clazz) {
-        Long totalExpired = 0L;
-        Long totalStocked = 0L;
+    public Double perishability(String entityId) {
+        Long totalExpired = getStatByCriteria(entityId, ProductStat.EXPIRED);
+        Long totalStocked = getStatByCriteria(entityId, ProductStat.STOCKED);
 
-        if(Category.class.equals(clazz) || Clazz.class.equals(clazz)){
-            totalExpired = computeTotalByCriteria(entityId, clazz, ProductStat.EXPIRED);
-            totalStocked = computeTotalByCriteria(entityId, clazz, ProductStat.STOCKED);
-        }else if(Product.class.equals(clazz)){
-            Product product = productPersistenceService.findById(entityId);
-            totalExpired = product.getExpired();
-            totalStocked = product.getRequested();
-        }else{
-            throw new IllegalArgumentException("Entity class not handled");
-        }
-
-        if(totalStocked <= 0){
+        if(totalStocked <= 0)
             throw new ArithmeticException ("Cannot compute perishability stat. This item has not been stocked yet.");
-        }
 
         return totalExpired.doubleValue()/totalStocked.doubleValue();
     }
 
     @Override
-    public Double liking(String entityId, Class<? extends Entity> clazz) {
-        Long dispensed = 0L;
+    public Double liking(String entityId) {
+        Long dispensed = getStatByCriteria(entityId, ProductStat.DISPENSED);
         Long totalDispensed = 0L;
-
-        if(Category.class.equals(clazz)){
-            dispensed = computeTotalByCriteria(entityId, clazz, ProductStat.DISPENSED);
-            totalDispensed = computeTotal(Category.class, ProductStat.DISPENSED);
-        }else if(Clazz.class.equals(clazz)){
-            dispensed = computeTotalByCriteria(entityId, clazz, ProductStat.DISPENSED);
-            Clazz productClazz = clazzPersistenceService.findById(entityId);
-            totalDispensed = computeTotalByCriteria(productClazz.getCategory().getId(), Category.class, ProductStat.DISPENSED); 
-        }else if(Product.class.equals(clazz)){
-            Product product = productPersistenceService.findById(entityId);
-            dispensed = product.getDispensed();
-            totalDispensed = computeTotalByCriteria(product.getClazz().getId(), Clazz.class, ProductStat.DISPENSED);
-        }else{
-            throw new IllegalArgumentException("Entity class not handled");
-        }
-
-        if(totalDispensed <= 0){
+        EntityStat entityStat = stats.get(entityId);
+        if(StringUtils.isBlank(entityStat.getParentEntityId()))
+            // Get all the products
+            totalDispensed = computeTotal(ProductStat.DISPENSED);
+        else
+            totalDispensed = getStatByCriteria(entityStat.getParentEntityId(), ProductStat.DISPENSED);
+        
+        if(totalDispensed <= 0)
             throw new ArithmeticException ("Cannot compute liking stat. This item has not been dispensed yet.");
-        }
 
         return dispensed.doubleValue()/totalDispensed.doubleValue();
+    }
+    
+    private void addStatForProduct(String productId, Long value, ProductStat productStatType){
+        EntityStat productStat = stats.get(productId);
+        EntityStat clazzStat = stats.get(productStat.getParentEntityId());
+        EntityStat categoryStat = stats.get(clazzStat.getParentEntityId());
+        switch(productStatType){
+        case DISPENSED:
+            stats.get(productStat.getEntityId()).setDispensed(productStat.getDispensed() + value);
+            stats.get(clazzStat.getEntityId()).setDispensed(clazzStat.getDispensed() + value);
+            stats.get(categoryStat.getEntityId()).setDispensed(categoryStat.getDispensed() + value);
+            break;
+        case EXPIRED:
+            stats.get(productStat.getEntityId()).setExpired(productStat.getExpired() + value);
+            stats.get(clazzStat.getEntityId()).setExpired(clazzStat.getExpired() + value);
+            stats.get(categoryStat.getEntityId()).setExpired(categoryStat.getExpired() + value);
+            break;
+        case REQUESTED:
+            stats.get(productStat.getEntityId()).setRequested(productStat.getRequested() + value);
+            stats.get(clazzStat.getEntityId()).setRequested(clazzStat.getRequested() + value);
+            stats.get(categoryStat.getEntityId()).setRequested(categoryStat.getRequested() + value);
+            break;
+        case STOCKED:
+            stats.get(productStat.getEntityId()).setStocked(productStat.getStocked() + value);
+            stats.get(clazzStat.getEntityId()).setStocked(clazzStat.getStocked() + value);
+            stats.get(categoryStat.getEntityId()).setStocked(categoryStat.getStocked() + value);
+            break;
+        }
+    }
+
+    @Override
+    public void addRequested(String productId, Long value) {
+        addStatForProduct(productId, value, ProductStat.REQUESTED);
+    }
+
+    @Override
+    public void addDispensed(String productId, Long value) {
+        addStatForProduct(productId, value, ProductStat.DISPENSED);
+    }
+
+    @Override
+    public void addExpired(String productId, Long value) {
+        addStatForProduct(productId, value, ProductStat.EXPIRED);
+    }
+
+    @Override
+    public void addStocked(String productId, Long value) {
+        addStatForProduct(productId, value, ProductStat.STOCKED);
+    }
+
+    @Override
+    public Long getRequested(String productId) {
+        return stats.get(productId).getRequested();
+    }
+
+    @Override
+    public Long getDispensed(String productId) {
+        return stats.get(productId).getDispensed();
+    }
+
+    @Override
+    public Long getExpired(String productId) {
+        return stats.get(productId).getExpired();
+    }
+
+    @Override
+    public Long getStocked(String productId) {
+        return stats.get(productId).getStocked();
     }
 }
