@@ -1,6 +1,5 @@
 package info.ferrarimarco.uniroma2.is.service;
 
-
 public interface StatService {
     Double perishability(String entityId);
     Double success(String entityId);
@@ -13,5 +12,6 @@ public interface StatService {
     Long getDispensed(String productId);
     Long getExpired(String productId);
     Long getStocked(String productId);
+    void initProductStat(String productId, String clazzId, String categoryId);
     
 }

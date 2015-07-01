@@ -29,7 +29,7 @@ public class LoadEntityApplicationController extends AbstractApplicationControll
     
     public LoadEntityApplicationController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService,
             ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService) {
-        super(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
+        super(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, null);
     }
     
     public Page<Product> loadProductPage(Pageable pageable){

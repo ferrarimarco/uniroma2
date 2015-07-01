@@ -1,14 +1,13 @@
 package info.ferrarimarco.uniroma2.is.controller.application;
 
-import java.util.Map;
-
 import info.ferrarimarco.uniroma2.is.model.ProductInstance;
-import info.ferrarimarco.uniroma2.is.service.StatService;
 import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductInstancePersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
-import lombok.NonNull;
+
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
@@ -17,16 +16,9 @@ import org.springframework.data.domain.PageRequest;
 @Slf4j
 public class AddRemoveProductInstanceController extends AbstractApplicationController {
     
-    // TODO add stats for classes and categories also
-    // TODO create entity stat if it does not exist. Better to do this when creating a new product (I have all the info I need: class, cat...)
-    
-    @NonNull
-    private StatService statService;
-    
     public AddRemoveProductInstanceController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService,
-            ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService, StatService statService) {
-        super(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
-        this.statService = statService;
+            ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService) {
+        super(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, null);
     }
     
     public void addProductInstance(ProductInstance productInstance, Long newAmount){

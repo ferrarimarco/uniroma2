@@ -1,5 +1,6 @@
 package info.ferrarimarco.uniroma2.is.controller.application;
 
+import info.ferrarimarco.uniroma2.is.service.StatService;
 import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductInstancePersistenceService;
@@ -12,4 +13,5 @@ public abstract class AbstractApplicationController {
     protected ProductInstancePersistenceService productInstancePersistenceService;
     protected ClazzPersistenceService clazzPersistenceService;
     protected CategoryPersistenceService categoryPersistenceService;
+    protected StatService statService;
 }

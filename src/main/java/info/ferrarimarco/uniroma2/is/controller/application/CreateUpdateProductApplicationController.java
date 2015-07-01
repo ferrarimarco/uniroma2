@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import info.ferrarimarco.uniroma2.is.model.Product;
+import info.ferrarimarco.uniroma2.is.service.StatService;
 import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductInstancePersistenceService;
@@ -14,8 +15,8 @@ import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceServi
 public class CreateUpdateProductApplicationController extends AbstractApplicationController {
 
     public CreateUpdateProductApplicationController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService,
-            ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService) {
-        super(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
+            ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService, StatService statService) {
+        super(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, statService);
     }
     
     public void createNewProduct(@NonNull String clazzId, @NonNull Product product){
@@ -40,5 +41,6 @@ public class CreateUpdateProductApplicationController extends AbstractApplicatio
         product.setCategory(product.getClazz().getCategory());
         Product p = productPersistenceService.save(product);
         log.info("Saved product: {}", p);
+        statService.initProductStat(product.getId(), product.getClazz().getId(), product.getCategory().getId());
     }
 }

@@ -33,11 +33,14 @@ public class StatServiceImpl implements StatService {
     @Autowired
     private EntityStatPersistenceService entityStatPersistenceService;
 
+    public StatServiceImpl() {
+        stats = new HashMap<>();
+    }
+
     @PostConstruct
     private void init(){
         log.debug("Loading entityStats");
         List<EntityStat> entityStats = entityStatPersistenceService.findAll(); 
-        stats = new HashMap<>(entityStats.size());
         for(EntityStat entityStat : entityStats)
             stats.put(entityStat.getEntityId(), entityStat);
     }
@@ -49,10 +52,61 @@ public class StatServiceImpl implements StatService {
             entityStatPersistenceService.save(stats.get(entityId));
     }
 
+    @Override
+    public void initProductStat(String productId, String clazzId, String categoryId){
+        // Init product stat
+        if(!stats.containsKey(productId))
+            stats.put(productId, 
+                    EntityStat.builder()
+                    .entityId(productId)
+                    .parentEntityId(clazzId)
+                    .dispensed(0L)
+                    .expired(0L)
+                    .requested(0L)
+                    .stocked(0L)
+                    .build()
+                    );
+        else
+            log.warn("Stat for {} has already been initialized");
+
+        // Init clazz stat if necessary
+        if(!stats.containsKey(clazzId))
+            stats.put(clazzId, 
+                    EntityStat.builder()
+                    .entityId(clazzId)
+                    .parentEntityId(categoryId)
+                    .dispensed(0L)
+                    .expired(0L)
+                    .requested(0L)
+                    .stocked(0L)
+                    .build()
+                    );
+
+        // Init category stat if necessary
+        if(!stats.containsKey(categoryId))
+            stats.put(categoryId, 
+                    EntityStat.builder()
+                    .entityId(categoryId)
+                    .parentEntityId(null)
+                    .dispensed(0L)
+                    .expired(0L)
+                    .requested(0L)
+                    .stocked(0L)
+                    .build()
+                    );
+    }
+
+    public void clearStats(){
+        stats.clear();
+    }
+
     private Long computeTotal(ProductStat productStat){
         Long total = 0L;
-        for(String entityId : stats.keySet())
-            total += getStatByCriteria(entityId, productStat);
+        for(String entityId : stats.keySet()){
+            // Get only categories
+            if(stats.get(entityId).getParentEntityId() == null)
+                total += getStatByCriteria(entityId, productStat);
+        }
         return total;
     }
 
@@ -103,13 +157,13 @@ public class StatServiceImpl implements StatService {
             totalDispensed = computeTotal(ProductStat.DISPENSED);
         else
             totalDispensed = getStatByCriteria(entityStat.getParentEntityId(), ProductStat.DISPENSED);
-        
+
         if(totalDispensed <= 0)
             throw new ArithmeticException ("Cannot compute liking stat. This item has not been dispensed yet.");
 
         return dispensed.doubleValue()/totalDispensed.doubleValue();
     }
-    
+
     private void addStatForProduct(String productId, Long value, ProductStat productStatType){
         EntityStat productStat = stats.get(productId);
         EntityStat clazzStat = stats.get(productStat.getParentEntityId());

@@ -88,13 +88,13 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
     
     @Bean
     @Autowired
-    public CreateUpdateProductApplicationController createUpdateProductApplicationController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService){
-        return new CreateUpdateProductApplicationController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
+    public CreateUpdateProductApplicationController createUpdateProductApplicationController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService, StatService statService){
+        return new CreateUpdateProductApplicationController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, statService);
     }
     
     @Bean
     @Autowired
-    public AddRemoveProductInstanceController addRemoveProductInstanceController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService, StatService statService){
-        return new AddRemoveProductInstanceController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, statService);
+    public AddRemoveProductInstanceController addRemoveProductInstanceController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService){
+        return new AddRemoveProductInstanceController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService);
     }
 }

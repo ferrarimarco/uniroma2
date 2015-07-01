@@ -10,12 +10,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 @Slf4j
 public class StatsApplicationController extends AbstractApplicationController{
     
-    @NonNull
-    private StatService statService;
-    
     public StatsApplicationController(@NonNull StatService statService) {
-        super(null, null, null, null);
-        this.statService = statService;
+        super(null, null, null, null, statService);
     }
 
     public Double computeIndex(String indexType, String criteriaId){
