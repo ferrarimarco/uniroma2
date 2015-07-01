@@ -2,21 +2,14 @@ package info.ferrarimarco.uniroma2.is.service.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-
-import lombok.extern.slf4j.Slf4j;
 import info.ferrarimarco.uniroma2.is.config.context.RootConfig;
-import info.ferrarimarco.uniroma2.is.model.Category;
-import info.ferrarimarco.uniroma2.is.model.Clazz;
-import info.ferrarimarco.uniroma2.is.model.Product;
-import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceService;
-import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
-import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
+import info.ferrarimarco.uniroma2.is.service.persistence.EntityStatPersistenceService;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -25,95 +18,63 @@ import org.testng.annotations.Test;
 public class StatServiceImplProductIndexesIT extends AbstractTestNGSpringContextTests{
     
     @Autowired
-    private CategoryPersistenceService categoryPersistenceService;
+    private EntityStatPersistenceService entityStatPersistenceService;
     
-    @Autowired
-    private ClazzPersistenceService clazzPersistenceService;
+    private String productId = "prod";
+    private String clazzId = "clazz";
+    private String categoryId = "cat";
     
-    @Autowired
-    private ProductPersistenceService productPersistenceService;
-    
-    private Clazz clazz;
-    private Product emptyProduct;
-    private Product notEmptyProduct;
+    private String emptyProduct = "emptyProd";
+    private String emptyClazz = "emptyClazz";
+    private String emptyCategory = "emptyCategory";
     
     @Autowired
     private StatServiceImpl statService;
     
-    @BeforeClass(groups = { "integrationTests" })
-    protected void setup(){
-        Category cat = new Category();
-        cat.setName("cat");
-        cat = categoryPersistenceService.save(cat);
-        clazz = new Clazz();
-        clazz.setCategory(cat);
-        clazz.setName("clazz");
-        clazz = clazzPersistenceService.save(clazz);
-    }
-    
-    @AfterClass(groups = { "integrationTests" })
+    @AfterMethod(groups = { "integrationTests" })
     protected void teardown(){
-        productPersistenceService.delete(emptyProduct.getId());
-        productPersistenceService.delete(notEmptyProduct.getId());
-        clazzPersistenceService.delete(clazz.getId());
-        categoryPersistenceService.delete(clazz.getCategory().getId());
+        statService.clearStats();
     }
     
     @BeforeMethod(groups = { "integrationTests" })
     protected void initializeProducts(){
         log.debug("Initializing Products");
-        emptyProduct = new Product();
-        emptyProduct.setDispensed(0L);
-        emptyProduct.setRequested(0L);
-        emptyProduct.setExpired(0L);
-        emptyProduct.setStocked(0L);
-        emptyProduct.setClazz(clazz);
-        emptyProduct = productPersistenceService.save(emptyProduct);
+        statService.initProductStat(productId, clazzId, categoryId);
+        statService.addDispensed(productId, 1L);
+        statService.addRequested(productId, 1L);
+        statService.addExpired(productId, 1L);
+        statService.addStocked(productId, 1L);
         
-        notEmptyProduct = new Product();
-        notEmptyProduct.setDispensed(0L);
-        notEmptyProduct.setRequested(1L);
-        notEmptyProduct.setExpired(1L);
-        notEmptyProduct.setStocked(1L);
-        notEmptyProduct.setClazz(clazz);
-        notEmptyProduct = productPersistenceService.save(notEmptyProduct);
+        statService.initProductStat(emptyProduct, emptyClazz, emptyCategory);
     }
     
     @Test(groups = { "integrationTests" })
     public void successProductTest(){
-        double result = statService.success(notEmptyProduct.getId(), Product.class);
-        double expected = notEmptyProduct.getDispensed().doubleValue()/notEmptyProduct.getRequested().doubleValue();
-        assertThat(result, equalTo(expected));
+        assertThat(statService.success(productId), equalTo(1.0));
     }
     
     @Test(groups = { "integrationTests" })
     public void perishabilityProductTest(){
-        double result = statService.perishability(notEmptyProduct.getId(), Product.class);
-        double expected = notEmptyProduct.getExpired().doubleValue()/notEmptyProduct.getStocked().doubleValue();
-        assertThat(result, equalTo(expected));
+        assertThat(statService.perishability(productId), equalTo(1.0));
     }
     
     @Test(groups = { "integrationTests" })
     public void likingProductTest(){
-        notEmptyProduct.setDispensed(1L);
-        notEmptyProduct = productPersistenceService.save(notEmptyProduct);
-        double result = statService.liking(notEmptyProduct.getId(), Product.class);
-        double expected = notEmptyProduct.getDispensed().doubleValue()/(emptyProduct.getDispensed().doubleValue()+notEmptyProduct.getDispensed().doubleValue());
-        assertThat(result, equalTo(expected));
+        assertThat(statService.liking(productId), equalTo(1.0));
     }
     
     @Test(groups = { "integrationTests" }, expectedExceptions = ArithmeticException.class)
     public void successProductNotRequestedTest(){
-        statService.success(emptyProduct.getId(), Product.class);
+        statService.success(emptyProduct);
     }
     
     @Test(groups = { "integrationTests" }, expectedExceptions = ArithmeticException.class)
     public void perishabilityProductNotStockedTest(){
-        statService.perishability(emptyProduct.getId(), Product.class);
+        statService.perishability(emptyProduct);
     }
     
     @Test(groups = { "integrationTests" }, expectedExceptions = ArithmeticException.class)
     public void likingProductNotDispensedTest(){
-        statService.liking(emptyProduct.getId(), Product.class);
+        statService.liking(emptyProduct);
     }
 }

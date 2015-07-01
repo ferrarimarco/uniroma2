@@ -2,30 +2,13 @@ package info.ferrarimarco.uniroma2.is.service.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
-import info.ferrarimarco.uniroma2.is.model.Category;
-import info.ferrarimarco.uniroma2.is.model.Clazz;
-import info.ferrarimarco.uniroma2.is.model.Entity;
-import info.ferrarimarco.uniroma2.is.model.Product;
-import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceService;
-import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
-import info.ferrarimarco.uniroma2.is.service.persistence.ProductPersistenceService;
-
-import java.util.ArrayList;
-import java.util.List;
+import info.ferrarimarco.uniroma2.is.service.persistence.EntityStatPersistenceService;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -36,134 +19,158 @@ public class StatServiceImplTest{
     }
     
     @Mock
-    private CategoryPersistenceService categoryPersistenceService;
-    
-    @Mock
-    private ClazzPersistenceService clazzPersistenceService;
-    
-    @Mock
-    private ProductPersistenceService productPersistenceService;
+    private EntityStatPersistenceService entityStatPersistenceService;
     
     @InjectMocks
     private StatServiceImpl statService;
     
-    private Category category;
-    private Clazz clazz;
+    private String productId = "prod";
+    private String clazzId = "clazz";
+    private String categoryId = "cat";
     
-    private List<Product> products;
-    private Page<Product> productPage;
-    
-    @BeforeClass(groups = { "unitTests" })
-    protected void setup(){
-        category = new Category();
-        category.setId("cat-id");
-        
-        clazz = new Clazz();
-        clazz.setId("clazz-id");
-        clazz.setCategory(category);
-        
-        Product product = new Product();
-        product.setId("prod-id");
-        product.setCategory(category);
-        product.setClazz(clazz);
-        product.setDispensed(0L);
-        product.setRequested(0L);
-        product.setStocked(1L);
-        
-        Product product2 = new Product();
-        product2.setId("prod-id2");
-        product2.setCategory(category);
-        product2.setClazz(clazz);
-        product2.setDispensed(1L);
-        product2.setRequested(1L);
-        product2.setStocked(1L);
-        
-        products = new ArrayList<>();
-        products.add(product);
-        products.add(product2);
-        productPage = new PageImpl<Product>(products);
-    }
+    private String emptyProduct = "emptyProd";
+    private String emptyClazz = "emptyClazz";
+    private String emptyCategory = "emptyCategory";
     
     @BeforeMethod(groups = { "unitTests" })
     protected void setupMethod(){
         MockitoAnnotations.initMocks(this);
-        when(categoryPersistenceService.findById(eq(category.getId()))).thenReturn(category);
-        when(clazzPersistenceService.findById(eq(clazz.getId()))).thenReturn(clazz);
-        when(productPersistenceService.findByCategory(eq(category), notNull(PageRequest.class))).thenReturn(productPage);
-        when(productPersistenceService.findByClazz(eq(clazz), notNull(PageRequest.class))).thenReturn(productPage);
-        when(productPersistenceService.findAll(notNull(PageRequest.class))).thenReturn(productPage);
     }
     
     @AfterMethod(groups = { "unitTests" })
     protected void cleanupMethod(){
-        Mockito.reset(categoryPersistenceService);
-        Mockito.reset(clazzPersistenceService);
-        Mockito.reset(productPersistenceService);
+        Mockito.reset(entityStatPersistenceService);
+        statService.clearStats();
     }
     
-    private void computeIndex(IndexType indexType, String criteriaId, Class<? extends Entity> entityClass){
-        double result = 0.0;
-        double expected = 1.0;
+    @Test(groups = { "unitTests" })
+    public void initProductStatTest(){
+        statService.initProductStat(productId, clazzId, categoryId);
+        assertThat(statService.getDispensed(productId), equalTo(0L));
+        assertThat(statService.getExpired(productId), equalTo(0L));
+        assertThat(statService.getRequested(productId), equalTo(0L));
+        assertThat(statService.getStocked(productId), equalTo(0L));
+    }
+    
+    @Test(groups = { "unitTests" })
+    public void addDispensedTest(){
+        statService.initProductStat(productId, clazzId, categoryId);
+        statService.addDispensed(productId, 1L);
+        assertThat(statService.getDispensed(productId), equalTo(1L));
+        assertThat(statService.getDispensed(clazzId), equalTo(1L));
+        assertThat(statService.getDispensed(categoryId), equalTo(1L));
+    }
+    
+    @Test(groups = { "unitTests" })
+    public void addExpiredTest(){
+        statService.initProductStat(productId, clazzId, categoryId);
+        statService.addExpired(productId, 1L);
+        assertThat(statService.getExpired(productId), equalTo(1L));
+        assertThat(statService.getExpired(clazzId), equalTo(1L));
+        assertThat(statService.getExpired(categoryId), equalTo(1L));
+    }
+    
+    @Test(groups = { "unitTests" })
+    public void addRequestedTest(){
+        statService.initProductStat(productId, clazzId, categoryId);
+        statService.addRequested(productId, 1L);
+        assertThat(statService.getRequested(productId), equalTo(1L));
+        assertThat(statService.getRequested(clazzId), equalTo(1L));
+        assertThat(statService.getRequested(categoryId), equalTo(1L));
+    }
+    
+    @Test(groups = { "unitTests" })
+    public void addStockedTest(){
+        statService.initProductStat(productId, clazzId, categoryId);
+        statService.addStocked(productId, 1L);
+        assertThat(statService.getStocked(productId), equalTo(1L));
+        assertThat(statService.getStocked(clazzId), equalTo(1L));
+        assertThat(statService.getStocked(categoryId), equalTo(1L));
+    }
+    
+    private void computeIndex(IndexType indexType, String entityId){
+        double result = -1.0;
+        
+        statService.initProductStat(productId, clazzId, categoryId);
+        statService.addDispensed(productId, 1L);
+        statService.addRequested(productId, 1L);
+        statService.addExpired(productId, 1L);
+        statService.addStocked(productId, 1L);
+        
+        statService.initProductStat(emptyProduct, emptyClazz, emptyCategory);
         
         switch(indexType){
         case LIKING:
-            expected = 1.0;
-            result = statService.liking(criteriaId, entityClass);
+            result = statService.liking(entityId);
             break;
         case PERISHABILITY:
-            expected = (products.get(0).getExpired().doubleValue() + products.get(1).getExpired().doubleValue())
-                    /(products.get(0).getStocked().doubleValue() + products.get(1).getStocked().doubleValue());
-            result = statService.perishability(criteriaId, entityClass);
+            result = statService.perishability(entityId);
             break;
         case SUCCESS:
-            expected = (products.get(0).getDispensed().doubleValue() + products.get(1).getDispensed().doubleValue())
-            /(products.get(0).getRequested().doubleValue() + products.get(1).getRequested().doubleValue());
-            result = statService.success(criteriaId, entityClass);
+            result = statService.success(entityId);
             break;
         }
         
-        assertThat(result, equalTo(expected));
+        assertThat(result, equalTo(1.0));
     }
     
     @Test(groups = { "unitTests" })
     public void successByCategory(){
-        computeIndex(IndexType.SUCCESS, category.getId(), Category.class);
-        verify(categoryPersistenceService, times(2)).findById(category.getId());
-        verify(productPersistenceService, times(2)).findByCategory(eq(category), isA(PageRequest.class));
+        computeIndex(IndexType.SUCCESS, categoryId);
     }
     
     @Test(groups = { "unitTests" })
     public void successByClazz(){
-        computeIndex(IndexType.SUCCESS, clazz.getId(), Clazz.class);
-        verify(clazzPersistenceService, times(2)).findById(clazz.getId());
-        verify(productPersistenceService, times(2)).findByClazz(eq(clazz), isA(PageRequest.class));
+        computeIndex(IndexType.SUCCESS, clazzId);
     }
     
     @Test(groups = { "unitTests" })
     public void perishabilityByCategory(){
-        computeIndex(IndexType.PERISHABILITY, category.getId(), Category.class);
-        verify(categoryPersistenceService, times(2)).findById(category.getId());
-        verify(productPersistenceService, times(2)).findByCategory(eq(category), isA(PageRequest.class));
+        computeIndex(IndexType.PERISHABILITY, categoryId);
     }
     
     @Test(groups = { "unitTests" })
     public void perishabilityByClazz(){
-        computeIndex(IndexType.PERISHABILITY, clazz.getId(), Clazz.class);
-        verify(clazzPersistenceService, times(2)).findById(clazz.getId());
-        verify(productPersistenceService, times(2)).findByClazz(eq(clazz), isA(PageRequest.class));
+        computeIndex(IndexType.PERISHABILITY, clazzId);
     }
     
     @Test(groups = { "unitTests" })
     public void likingByCategory(){
-        computeIndex(IndexType.LIKING, category.getId(), Category.class);
-        verify(categoryPersistenceService, times(1)).findById(category.getId());
-        verify(productPersistenceService, times(1)).findByCategory(eq(category), isA(PageRequest.class));
+        computeIndex(IndexType.LIKING, categoryId);
     }
     
     @Test(groups = { "unitTests" })
     public void likingByClazz(){
-        computeIndex(IndexType.LIKING, clazz.getId(), Clazz.class);
-        verify(clazzPersistenceService, times(2)).findById(clazz.getId());
-        verify(productPersistenceService, times(1)).findByClazz(eq(clazz), isA(PageRequest.class));
+        computeIndex(IndexType.LIKING, clazzId);
+    }
+    
+    @Test(groups = { "unitTests" })
+    public void successProductTest(){
+        computeIndex(IndexType.LIKING, productId);
+    }
+    
+    @Test(groups = { "unitTests" })
+    public void perishabilityProductTest(){
+        computeIndex(IndexType.LIKING, productId);
+    }
+    
+    @Test(groups = { "unitTests" })
+    public void likingProductTest(){
+        computeIndex(IndexType.LIKING, productId);
+    }
+    
+    @Test(groups = { "unitTests" }, expectedExceptions = ArithmeticException.class)
+    public void successProductNotRequestedTest(){
+        computeIndex(IndexType.SUCCESS, emptyProduct);
+    }
+    
+    @Test(groups = { "unitTests" }, expectedExceptions = ArithmeticException.class)
+    public void perishabilityProductNotStockedTest(){
+        computeIndex(IndexType.PERISHABILITY, emptyProduct);
+    }
+    
+    @Test(groups = { "unitTests" }, expectedExceptions = ArithmeticException.class)
+    public void likingProductNotDispensedTest(){
+        computeIndex(IndexType.LIKING, emptyProduct);
     }
 }
