@@ -25,6 +25,7 @@ public class CreateUpdateProductApplicationController extends AbstractApplicatio
             
         product.setId(null);
         saveProduct(clazzId, product);
+        log.info("Created new product: {}", product.toString());
     }
     
     public void updateExistingProduct(@NonNull String clazzId, @NonNull Product product){
@@ -33,6 +34,7 @@ public class CreateUpdateProductApplicationController extends AbstractApplicatio
             createNewProduct(clazzId, product);
         }else{
             saveProduct(clazzId, product);
+            log.info("Updated product: {}", product.toString());
         }
     }
     

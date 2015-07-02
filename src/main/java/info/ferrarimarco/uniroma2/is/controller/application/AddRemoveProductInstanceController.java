@@ -31,6 +31,7 @@ public class AddRemoveProductInstanceController extends AbstractApplicationContr
         log.info("Removing {} instances for {}", newAmount, productInstance.getProductId());
         Long count = productInstancePersistenceService.countInstancesByProductId(productInstance.getProductId());
         if(count > newAmount){
+            log.info("Removed {} instances for {}", newAmount, productInstance.getProductId());
             statService.addRequested(productInstance.getProductId(), newAmount);
             statService.addDispensed(productInstance.getProductId(), newAmount);
             
