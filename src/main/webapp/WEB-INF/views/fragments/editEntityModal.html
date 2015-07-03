@@ -15,7 +15,6 @@
 					<div class="modal-body">
 						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/product}" th:object="${productDto}" id="editProductForm">
 							<fieldset>
-								<legend id="editProductModalLegend" th:text="#{instance.modalLegend}">[Product Information]</legend>
 								<div class="form-group">
 									<label class="control-label" for="productName" th:text="#{instance.name}">[Name]</label>
 									<input type="text" class="form-control" id="productName" placeholder="Name" th:field="*{name}" required="required" />

@@ -15,7 +15,6 @@
 					<div class="modal-body">
 						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/productInstance}" th:object="${instanceDto}" id="editInstanceForm">
 							<fieldset>
-								<legend id="editInstanceModalLegend" th:text="#{instance.modalLegend} + ': '">[Edit instance modal legend]</legend>
 								<div class="form-group" id="operationField">
 									<label class="control-label" for="operationField" th:text="#{instance.operation}">[Operation]</label>
 									<ul>
