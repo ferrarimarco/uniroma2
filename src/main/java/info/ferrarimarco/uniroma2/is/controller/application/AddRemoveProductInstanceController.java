@@ -1,6 +1,7 @@
 package info.ferrarimarco.uniroma2.is.controller.application;
 
 import info.ferrarimarco.uniroma2.is.model.ProductInstance;
+import info.ferrarimarco.uniroma2.is.service.StatService;
 import info.ferrarimarco.uniroma2.is.service.persistence.CategoryPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ClazzPersistenceService;
 import info.ferrarimarco.uniroma2.is.service.persistence.ProductInstancePersistenceService;
@@ -17,8 +18,8 @@ import org.springframework.data.domain.PageRequest;
 public class AddRemoveProductInstanceController extends AbstractApplicationController {
     
     public AddRemoveProductInstanceController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService,
-            ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService) {
-        super(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, null);
+            ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService, StatService statService) {
+        super(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, statService);
     }
     
     public void addProductInstance(ProductInstance productInstance, Long newAmount){
