@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,13 +42,6 @@ public class StatServiceImpl implements StatService {
         List<EntityStat> entityStats = entityStatPersistenceService.findAll(); 
         for(EntityStat entityStat : entityStats)
             stats.put(entityStat.getEntityId(), entityStat);
-    }
-
-    @PreDestroy
-    private void tearDown(){
-        log.debug("Saving entityStats");
-        for(String entityId : stats.keySet())
-            entityStatPersistenceService.save(stats.get(entityId));
     }
 
     @Override
@@ -170,26 +162,35 @@ public class StatServiceImpl implements StatService {
         EntityStat categoryStat = stats.get(clazzStat.getParentEntityId());
         switch(productStatType){
         case DISPENSED:
-            stats.get(productStat.getEntityId()).setDispensed(productStat.getDispensed() + value);
-            stats.get(clazzStat.getEntityId()).setDispensed(clazzStat.getDispensed() + value);
-            stats.get(categoryStat.getEntityId()).setDispensed(categoryStat.getDispensed() + value);
+            productStat.setDispensed(productStat.getDispensed() + value);
+            clazzStat.setDispensed(clazzStat.getDispensed() + value);
+            categoryStat.setDispensed(categoryStat.getDispensed() + value);
             break;
         case EXPIRED:
-            stats.get(productStat.getEntityId()).setExpired(productStat.getExpired() + value);
-            stats.get(clazzStat.getEntityId()).setExpired(clazzStat.getExpired() + value);
-            stats.get(categoryStat.getEntityId()).setExpired(categoryStat.getExpired() + value);
+            productStat.setExpired(productStat.getExpired() + value);
+            clazzStat.setExpired(clazzStat.getExpired() + value);
+            categoryStat.setExpired(categoryStat.getExpired() + value);
             break;
         case REQUESTED:
-            stats.get(productStat.getEntityId()).setRequested(productStat.getRequested() + value);
-            stats.get(clazzStat.getEntityId()).setRequested(clazzStat.getRequested() + value);
-            stats.get(categoryStat.getEntityId()).setRequested(categoryStat.getRequested() + value);
+            productStat.setRequested(productStat.getRequested() + value);
+            clazzStat.setRequested(clazzStat.getRequested() + value);
+            categoryStat.setRequested(categoryStat.getRequested() + value);
             break;
         case STOCKED:
-            stats.get(productStat.getEntityId()).setStocked(productStat.getStocked() + value);
-            stats.get(clazzStat.getEntityId()).setStocked(clazzStat.getStocked() + value);
-            stats.get(categoryStat.getEntityId()).setStocked(categoryStat.getStocked() + value);
+            productStat.setStocked(productStat.getStocked() + value);
+            clazzStat.setStocked(clazzStat.getStocked() + value);
+            categoryStat.setStocked(categoryStat.getStocked() + value);
             break;
         }
+        saveStatsAsync(productStat, clazzStat, categoryStat);
+        log.info("Added {} for product {}", productStatType, productId);
+    }
+    
+    private void saveStatsAsync(EntityStat productStat, EntityStat clazzStat, EntityStat categoryStat){
+        log.debug("Asynchronously saving entity stats for {}", productStat.getEntityId());
+        entityStatPersistenceService.saveAsync(productStat);
+        entityStatPersistenceService.saveAsync(clazzStat);
+        entityStatPersistenceService.saveAsync(categoryStat);
     }
 
     @Override

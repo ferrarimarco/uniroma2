@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,5 +28,11 @@ public class EntityStatServiceImpl extends EntityPersistenceServiceImpl<EntitySt
     public EntityStat save(@NonNull EntityStat entityStat){
         entityStat.setSymbolicId(Constants.ENTITY_STAT_COUNTER_NAME + counterService.getNextEntityStatSequence());
         return super.save(entityStat);
+    }
+    
+    @Override
+    @Async
+    public void saveAsync(EntityStat entity){
+        getRepository().save(entity);
     }
 }
