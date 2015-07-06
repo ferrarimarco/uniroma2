@@ -232,4 +232,9 @@ public class StatServiceImpl implements StatService {
     public Long getStocked(String productId) {
         return stats.get(productId).getStocked();
     }
+
+    @Override
+    public void deleteByEntityId(String id) {
+        stats.remove(id);
+    }
 }

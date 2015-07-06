@@ -13,5 +13,5 @@ public interface StatService {
     Long getExpired(String productId);
     Long getStocked(String productId);
     void initProductStat(String productId, String clazzId, String categoryId);
-    
+    void deleteByEntityId(String id);
 }

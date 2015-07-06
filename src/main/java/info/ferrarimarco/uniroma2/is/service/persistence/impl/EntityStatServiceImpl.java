@@ -35,4 +35,10 @@ public class EntityStatServiceImpl extends EntityPersistenceServiceImpl<EntitySt
     public void saveAsync(EntityStat entity){
         getRepository().save(entity);
     }
+
+    @Override
+    @Async
+    public void deleteAsync(String id) {
+        getRepository().delete(id);
+    }
 }
