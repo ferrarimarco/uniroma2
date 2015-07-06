@@ -1,7 +1,8 @@
 package info.ferrarimarco.uniroma2.is.controller.spring;
 
-import info.ferrarimarco.uniroma2.is.controller.application.AddRemoveProductInstanceController;
+import info.ferrarimarco.uniroma2.is.controller.application.AddRemoveProductInstanceApplicationController;
 import info.ferrarimarco.uniroma2.is.controller.application.CreateUpdateProductApplicationController;
+import info.ferrarimarco.uniroma2.is.controller.application.DeleteProductApplicationController;
 import info.ferrarimarco.uniroma2.is.model.Constants;
 import info.ferrarimarco.uniroma2.is.model.Product;
 import info.ferrarimarco.uniroma2.is.model.dto.InstanceDto;
@@ -29,7 +30,10 @@ public class EntitiesController extends AbstractController{
     private CreateUpdateProductApplicationController createUpdateProductApplicationController;
     
     @Autowired
-    private AddRemoveProductInstanceController addRemoveProductInstanceController;
+    private AddRemoveProductInstanceApplicationController addRemoveProductInstanceController;
+
+    @Autowired
+    private DeleteProductApplicationController deleteProductApplicationController;
 
     @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.GET)
     public String index(@PathVariable("entityName") String entityName, Model model, Pageable pageable) {
@@ -58,7 +62,7 @@ public class EntitiesController extends AbstractController{
             throw new IllegalArgumentException("Entity name not valid");
     }
 
-    @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.POST)
+    @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.POST, params = "save")
     public String postEntity(@PathVariable("entityName") String entityName, @ModelAttribute ProductDto productDto, @ModelAttribute InstanceDto instanceDto) {
         if (Constants.PRODUCT_ENTITY_NAME.equals(entityName)) {
             // This may be an update request: it's an update if productDto has an ID
@@ -71,6 +75,19 @@ public class EntitiesController extends AbstractController{
                 addRemoveProductInstanceController.addProductInstance(instanceDto.asProductInstanceClone(), instanceDto.getNewAmount());
             else if(Operation.REMOVE_INSTANCES.equals(instanceDto.getOperation()))
                 addRemoveProductInstanceController.removeProductInstance(instanceDto.asProductInstanceClone(), instanceDto.getNewAmount());
+        }else
+            throw new IllegalArgumentException("Entity name not valid");
+        
+        return "redirect:/entities/product";
+    }
+    
+    @RequestMapping(value = {"{entityName}", "/{entityName}"}, method = RequestMethod.POST, params = "delete")
+    public String deleteEntity(@PathVariable("entityName") String entityName, @ModelAttribute ProductDto productDto, @ModelAttribute InstanceDto instanceDto) {
+        if (Constants.PRODUCT_ENTITY_NAME.equals(entityName)) {
+            if (StringUtils.isBlank(productDto.getId()))
+                throw new IllegalArgumentException("Entity ID cannot be null");
+            else
+                deleteProductApplicationController.deleteExistingProduct(productDto.getId());
         }else
             throw new IllegalArgumentException("Entity name not valid");
         

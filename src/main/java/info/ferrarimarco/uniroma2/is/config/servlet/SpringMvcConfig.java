@@ -1,7 +1,8 @@
 package info.ferrarimarco.uniroma2.is.config.servlet;
 
-import info.ferrarimarco.uniroma2.is.controller.application.AddRemoveProductInstanceController;
+import info.ferrarimarco.uniroma2.is.controller.application.AddRemoveProductInstanceApplicationController;
 import info.ferrarimarco.uniroma2.is.controller.application.CreateUpdateProductApplicationController;
+import info.ferrarimarco.uniroma2.is.controller.application.DeleteProductApplicationController;
 import info.ferrarimarco.uniroma2.is.controller.application.LoadEntityApplicationController;
 import info.ferrarimarco.uniroma2.is.controller.application.StatsApplicationController;
 import info.ferrarimarco.uniroma2.is.service.StatService;
@@ -94,7 +95,13 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
     
     @Bean
     @Autowired
-    public AddRemoveProductInstanceController addRemoveProductInstanceController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService, StatService statService){
-        return new AddRemoveProductInstanceController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, statService);
+    public AddRemoveProductInstanceApplicationController addRemoveProductInstanceController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, ClazzPersistenceService clazzPersistenceService, CategoryPersistenceService categoryPersistenceService, StatService statService){
+        return new AddRemoveProductInstanceApplicationController(productPersistenceService, productInstancePersistenceService, clazzPersistenceService, categoryPersistenceService, statService);
+    }
+    
+    @Bean
+    @Autowired
+    public DeleteProductApplicationController deleteProductApplicationController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, StatService statService){
+        return new DeleteProductApplicationController(productPersistenceService, productInstancePersistenceService, statService);
     }
 }
