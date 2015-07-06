@@ -13,12 +13,9 @@ public class StatsDto {
     private String categoryId;
     private String clazzId;
     private String productId;
-    private String symbolicId;
-    private String categoryName;
-    private String clazzName;
-    private String productName;
-    private String entityName;
-    private Double value;
+    private Double successValue;
+    private Double likingValue;
+    private Double perishabilityValue;
     private String indexType;
     
     public boolean isEmpty() {

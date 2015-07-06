@@ -35,7 +35,7 @@ public class StatsController extends AbstractController {
 
         if(!model.containsAttribute(Conventions.getVariableName(StatsDto.class)))
             model.addAttribute(statsDto);
-
+        
         model.addAttribute(Constants.SUCCESS_INDEX, Constants.SUCCESS_INDEX);
         model.addAttribute(Constants.LIKING_INDEX, Constants.LIKING_INDEX);
         model.addAttribute(Constants.PERISHABILITY_INDEX, Constants.PERISHABILITY_INDEX);
@@ -49,18 +49,19 @@ public class StatsController extends AbstractController {
             String criteriaId = null;
             if(!StringUtils.isBlank(statsDto.getCategoryId())){
                 criteriaId = statsDto.getCategoryId();
-                statsDto.setEntityName(statsDto.getCategoryName());
             }else if(!StringUtils.isBlank(statsDto.getClazzId())){
                 criteriaId = statsDto.getClazzId();
-                statsDto.setEntityName(statsDto.getClazzName());
             }else if(!StringUtils.isBlank(statsDto.getProductId())){
                 criteriaId = statsDto.getProductId();
-                statsDto.setEntityName(statsDto.getProductName());
             }else
                 throw new IllegalArgumentException("Cannot choose a stat for: " + statsDto.toString());
             
-            Double result = statsApplicationController.computeIndex(statsDto.getIndexType(), criteriaId);
-            statsDto.setValue(result);
+            Double value = statsApplicationController.computeIndex(Constants.SUCCESS_INDEX, criteriaId);
+            statsDto.setSuccessValue(value);
+            value = statsApplicationController.computeIndex(Constants.LIKING_INDEX, criteriaId);
+            statsDto.setLikingValue(value);
+            value = statsApplicationController.computeIndex(Constants.PERISHABILITY_INDEX, criteriaId);
+            statsDto.setPerishabilityValue(value);
         }
 
         return index(model, statsDto);
