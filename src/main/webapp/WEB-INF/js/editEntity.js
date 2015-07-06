@@ -12,7 +12,8 @@ $('#editEntityModal').on('show.bs.modal', function(event) {
 	if(button.data('entity-clazz') != undefined){
 		// Set entity class
 		$("#productClass option:contains(" + button.data('entity-clazz') + ")", modal).attr('selected', true);		
-	}
+	}else
+		$('#deleteEntityButton').prop('disabled', true);
 	
 	$('#productId', modal).val(button.data('entity-id'));
 	
