@@ -111,4 +111,9 @@ public class ProductInstancePersistenceServiceImpl extends EntityPersistenceServ
         return result;
     }
 
+    @Override
+    public Long deleteByProductId(String productId) {
+        return getRepository().deleteByProductId(productId);
+    }
+
 }

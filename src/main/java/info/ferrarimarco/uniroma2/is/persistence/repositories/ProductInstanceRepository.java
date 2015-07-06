@@ -12,4 +12,5 @@ public interface ProductInstanceRepository extends EntityRepository<ProductInsta
     Long countByProductId(String productId);
     List<ProductInstance> findByProductId(String productId);
     Page<ProductInstance> findByProductId(String productId, Pageable pageable);
+    Long deleteByProductId(String productId);
 }
