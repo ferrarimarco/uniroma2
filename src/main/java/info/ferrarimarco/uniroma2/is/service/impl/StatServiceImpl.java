@@ -47,7 +47,7 @@ public class StatServiceImpl implements StatService {
     @Override
     public void initProductStat(String productId, String clazzId, String categoryId){
         // Init product stat
-        if(!stats.containsKey(productId))
+        if(!stats.containsKey(productId)){
             stats.put(productId, 
                     EntityStat.builder()
                     .entityId(productId)
@@ -58,11 +58,12 @@ public class StatServiceImpl implements StatService {
                     .stocked(0L)
                     .build()
                     );
-        else
+            saveStatAsync(stats.get(productId));
+        }else
             log.warn("Stat for {} has already been initialized");
 
         // Init clazz stat if necessary
-        if(!stats.containsKey(clazzId))
+        if(!stats.containsKey(clazzId)){
             stats.put(clazzId, 
                     EntityStat.builder()
                     .entityId(clazzId)
@@ -73,9 +74,11 @@ public class StatServiceImpl implements StatService {
                     .stocked(0L)
                     .build()
                     );
+            saveStatAsync(stats.get(clazzId));
+        }
 
         // Init category stat if necessary
-        if(!stats.containsKey(categoryId))
+        if(!stats.containsKey(categoryId)){
             stats.put(categoryId, 
                     EntityStat.builder()
                     .entityId(categoryId)
@@ -86,6 +89,8 @@ public class StatServiceImpl implements StatService {
                     .stocked(0L)
                     .build()
                     );
+            saveStatAsync(stats.get(categoryId));
+        }
     }
 
     public void clearStats(){
@@ -103,17 +108,22 @@ public class StatServiceImpl implements StatService {
     }
 
     private Long getStatByCriteria(String criteriaId, ProductStat productStat){
-        switch(productStat){
-        case DISPENSED:
-            return stats.get(criteriaId).getDispensed();
-        case EXPIRED:
-            return stats.get(criteriaId).getExpired();
-        case REQUESTED:
-            return stats.get(criteriaId).getRequested();
-        case STOCKED:
-            return stats.get(criteriaId).getStocked();
-        default:
-            throw new IllegalArgumentException("Cannot select stat");
+        if(stats.containsKey(criteriaId))
+            switch(productStat){
+            case DISPENSED:
+                return stats.get(criteriaId).getDispensed();
+            case EXPIRED:
+                return stats.get(criteriaId).getExpired();
+            case REQUESTED:
+                return stats.get(criteriaId).getRequested();
+            case STOCKED:
+                return stats.get(criteriaId).getStocked();
+            default:
+                throw new IllegalArgumentException("Cannot select stat");
+            }
+        else{
+            log.debug("No stat found for {}. Returning 0");
+            return 0L;
         }
     }
 
@@ -144,12 +154,13 @@ public class StatServiceImpl implements StatService {
         Long dispensed = getStatByCriteria(entityId, ProductStat.DISPENSED);
         Long totalDispensed = 0L;
         EntityStat entityStat = stats.get(entityId);
-        if(StringUtils.isBlank(entityStat.getParentEntityId()))
-            // Get all the products
-            totalDispensed = computeTotal(ProductStat.DISPENSED);
-        else
-            totalDispensed = getStatByCriteria(entityStat.getParentEntityId(), ProductStat.DISPENSED);
-
+        if(entityStat != null){
+            if(StringUtils.isBlank(entityStat.getParentEntityId()))
+                // Get all the products
+                totalDispensed = computeTotal(ProductStat.DISPENSED);
+            else
+                totalDispensed = getStatByCriteria(entityStat.getParentEntityId(), ProductStat.DISPENSED);
+        }
         if(totalDispensed <= 0)
             throw new ArithmeticException ("Cannot compute liking stat. This item has not been dispensed yet.");
 
@@ -182,15 +193,20 @@ public class StatServiceImpl implements StatService {
             categoryStat.setStocked(categoryStat.getStocked() + value);
             break;
         }
-        saveStatsAsync(productStat, clazzStat, categoryStat);
+        saveProductStatsAsync(productStat, clazzStat, categoryStat);
         log.info("Added {} for product {}", productStatType, productId);
     }
     
-    private void saveStatsAsync(EntityStat productStat, EntityStat clazzStat, EntityStat categoryStat){
+    private void saveProductStatsAsync(EntityStat productStat, EntityStat clazzStat, EntityStat categoryStat){
         log.debug("Asynchronously saving entity stats for {}", productStat.getEntityId());
-        entityStatPersistenceService.saveAsync(productStat);
-        entityStatPersistenceService.saveAsync(clazzStat);
-        entityStatPersistenceService.saveAsync(categoryStat);
+        saveStatAsync(productStat);
+        saveStatAsync(clazzStat);
+        saveStatAsync(categoryStat);
+    }
+    
+    private void saveStatAsync(EntityStat entityStat){
+        log.debug("Asynchronously saving entity stat {}", entityStat);
+        entityStatPersistenceService.saveAsync(entityStat);
     }
 
     @Override
