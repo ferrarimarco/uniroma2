@@ -5,8 +5,6 @@ import info.ferrarimarco.uniroma2.is.service.StatService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
-
 @Slf4j
 public class StatsApplicationController extends AbstractApplicationController{
     
@@ -31,7 +29,7 @@ public class StatsApplicationController extends AbstractApplicationController{
                 throw new IllegalArgumentException("Cannot choose a index for: " + indexType);
             }
         }catch(ArithmeticException e){
-            log.warn("Cannot compute {} index: {}", indexType, ExceptionUtils.getStackTrace(e));
+            log.warn("Cannot compute {} index: {}", indexType, e.getMessage());
         }
         
         return result;
