@@ -68,7 +68,8 @@ public class EntitiesControllerTest extends AbstractControllerTest {
     
     @Test(groups = { "unitTests" }, expectedExceptions = NestedServletException.class)
     public void postEntityNotHandledTest() throws Exception{
-        mockMvc.perform(post("/entities/invalidName")).andExpect(status().isInternalServerError());
+        mockMvc.perform(post("/entities/invalidName")
+                .param("save", "save")).andExpect(status().isInternalServerError());
     }
     
     @Test(groups = { "unitTests" })
@@ -76,7 +77,8 @@ public class EntitiesControllerTest extends AbstractControllerTest {
         mockMvc.perform(post("/entities/" + Constants.PRODUCT_ENTITY_NAME)
                     .param("clazzId", clazz.getId())
                     .param("brand", product.getBrand())
-                    .param("name", product.getName()))
+                    .param("name", product.getName())
+                    .param("save", "save"))
                 .andExpect(status().is(HttpStatus.FOUND.value()))
                 .andReturn();
         verify(createUpdateProductApplicationController, times(1)).createNewProduct(eq(clazz.getId()), notNull(Product.class));

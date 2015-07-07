@@ -58,6 +58,7 @@ public class EntitiesControllerIT extends AbstractIT{
     @Test(groups = { "integrationTests" }, expectedExceptions = NestedServletException.class)
     public void postEntityNotHandledTest() throws Exception{
         mockMvc.perform(post("/entities/invalidName")
+                .param("save", "save")
                 .with(csrf())
                 .with(user("admin").password("password").roles("USER","ADMIN")))
                 .andExpect(status().isInternalServerError());
