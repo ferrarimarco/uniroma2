@@ -1,5 +1,6 @@
 package info.ferrarimarco.uniroma2.is.model.dto;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -21,10 +22,8 @@ public class InstanceDto {
     private static final DateTimeFormatter expirationDateFormatter = DateTimeFormat.forPattern("dd/MM/yyyy");
     
     public ProductInstance asProductInstanceClone(){
-        return ProductInstance.builder()
-                .productId(getProductId())
-                .amount(getNewAmount())
-                .expirationDate(expirationDateFormatter.parseDateTime(getExpirationDate()))
-            .build();
+        return StringUtils.isBlank(getExpirationDate()) 
+                ? ProductInstance.builder().productId(getProductId()).amount(getNewAmount()).build()
+                : ProductInstance.builder().productId(getProductId()).amount(getNewAmount()).expirationDate(expirationDateFormatter.parseDateTime(getExpirationDate())).build();
     }
 }
