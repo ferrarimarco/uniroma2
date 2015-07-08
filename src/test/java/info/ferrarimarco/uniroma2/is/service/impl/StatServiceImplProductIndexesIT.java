@@ -44,6 +44,7 @@ public class StatServiceImplProductIndexesIT extends AbstractTestNGSpringContext
         statService.addRequested(productId, 1L);
         statService.addExpired(productId, 1L);
         statService.addStocked(productId, 1L);
+        statService.addDefected(productId, 1L);
         
         statService.initProductStat(emptyProduct, emptyClazz, emptyCategory);
     }
@@ -63,6 +64,11 @@ public class StatServiceImplProductIndexesIT extends AbstractTestNGSpringContext
         assertThat(statService.liking(productId), equalTo(1.0));
     }
     
+    @Test(groups = { "integrationTests" })
+    public void defectingProductTest(){
+        assertThat(statService.defecting(productId), equalTo(1.0));
+    }
+    
     @Test(groups = { "integrationTests" }, expectedExceptions = ArithmeticException.class)
     public void successProductNotRequestedTest(){
         statService.success(emptyProduct);
@@ -76,5 +82,10 @@ public class StatServiceImplProductIndexesIT extends AbstractTestNGSpringContext
     @Test(groups = { "integrationTests" }, expectedExceptions = ArithmeticException.class)
     public void likingProductNotDispensedTest(){
         statService.liking(emptyProduct);
+    }
+    
+    @Test(groups = { "integrationTests" }, expectedExceptions = ArithmeticException.class)
+    public void defectingProductNotDefectingTest(){
+        statService.defecting(emptyProduct);
     }
 }

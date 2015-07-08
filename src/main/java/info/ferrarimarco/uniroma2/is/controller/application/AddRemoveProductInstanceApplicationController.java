@@ -64,4 +64,8 @@ public class AddRemoveProductInstanceApplicationController extends AbstractAppli
             log.info("Removed {} expired product instances for {}", expiredProductIdToQuantity.keySet(), productId);
         }
     }
+
+    public void addDefectedProductInstance(ProductInstance productInstance, Long newAmount) {
+        statService.addDefected(productInstance.getProductId(), newAmount);
+    }
 }

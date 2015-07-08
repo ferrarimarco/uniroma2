@@ -26,6 +26,10 @@
 											<input type="radio" id="operationRadioRemove" th:field="*{operation}" value="REMOVE_INSTANCES" />
 											<label for="operationRadioRemove" th:text="#{instance.removeInstances}">[Remove instances]</label>
 										</li>
+										<li class="radio">
+											<input type="radio" id="operationRadioAddDefected" th:field="*{operation}" value="ADD_DEFECTED_INSTANCES" />
+											<label for="operationRadioAddDefected" th:text="#{instance.addDefectedInstances}">[Add defected instances]</label>
+										</li>
 									</ul>
 								</div>
 								<div class="form-group" id="productAmountField">

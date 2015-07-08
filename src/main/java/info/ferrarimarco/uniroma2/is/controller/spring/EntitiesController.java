@@ -75,6 +75,8 @@ public class EntitiesController extends AbstractController{
                 addRemoveProductInstanceController.addProductInstance(instanceDto.asProductInstanceClone(), instanceDto.getNewAmount());
             else if(Operation.REMOVE_INSTANCES.equals(instanceDto.getOperation()))
                 addRemoveProductInstanceController.removeProductInstance(instanceDto.asProductInstanceClone(), instanceDto.getNewAmount());
+            else if(Operation.ADD_DEFECTED_INSTANCES.equals(instanceDto.getOperation()))
+                addRemoveProductInstanceController.addDefectedProductInstance(instanceDto.asProductInstanceClone(), instanceDto.getNewAmount());
         }else
             throw new IllegalArgumentException("Entity name not valid");
         

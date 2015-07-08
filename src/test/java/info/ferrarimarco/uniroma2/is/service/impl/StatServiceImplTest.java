@@ -15,7 +15,7 @@ import org.testng.annotations.Test;
 public class StatServiceImplTest{
     
     private enum IndexType{
-        SUCCESS, LIKING, PERISHABILITY
+        SUCCESS, LIKING, PERISHABILITY, DEFECTING
     }
     
     @Mock
@@ -50,6 +50,7 @@ public class StatServiceImplTest{
         assertThat(statService.getExpired(productId), equalTo(0L));
         assertThat(statService.getRequested(productId), equalTo(0L));
         assertThat(statService.getStocked(productId), equalTo(0L));
+        assertThat(statService.getDefected(productId), equalTo(0L));
     }
     
     @Test(groups = { "unitTests" })
@@ -88,6 +89,15 @@ public class StatServiceImplTest{
         assertThat(statService.getStocked(categoryId), equalTo(1L));
     }
     
+    @Test(groups = { "unitTests" })
+    public void addDefectedTest(){
+        statService.initProductStat(productId, clazzId, categoryId);
+        statService.addDefected(productId, 1L);
+        assertThat(statService.getDefected(productId), equalTo(1L));
+        assertThat(statService.getDefected(clazzId), equalTo(1L));
+        assertThat(statService.getDefected(categoryId), equalTo(1L));
+    }
+    
     private void computeIndex(IndexType indexType, String entityId){
         double result = -1.0;
         
@@ -96,6 +106,7 @@ public class StatServiceImplTest{
         statService.addRequested(productId, 1L);
         statService.addExpired(productId, 1L);
         statService.addStocked(productId, 1L);
+        statService.addDefected(productId, 1L);
         
         statService.initProductStat(emptyProduct, emptyClazz, emptyCategory);
         
@@ -108,6 +119,9 @@ public class StatServiceImplTest{
             break;
         case SUCCESS:
             result = statService.success(entityId);
+            break;
+        case DEFECTING:
+            result = statService.defecting(entityId);
             break;
         }
         
@@ -145,6 +159,16 @@ public class StatServiceImplTest{
     }
     
     @Test(groups = { "unitTests" })
+    public void defectingByCategory(){
+        computeIndex(IndexType.DEFECTING, categoryId);
+    }
+    
+    @Test(groups = { "unitTests" })
+    public void defectingByClazz(){
+        computeIndex(IndexType.DEFECTING, clazzId);
+    }
+    
+    @Test(groups = { "unitTests" })
     public void successProductTest(){
         computeIndex(IndexType.LIKING, productId);
     }
@@ -157,6 +181,11 @@ public class StatServiceImplTest{
     @Test(groups = { "unitTests" })
     public void likingProductTest(){
         computeIndex(IndexType.LIKING, productId);
+    }
+    
+    @Test(groups = { "unitTests" })
+    public void defectingProductTest(){
+        computeIndex(IndexType.DEFECTING, productId);
     }
     
     @Test(groups = { "unitTests" }, expectedExceptions = ArithmeticException.class)
@@ -172,5 +201,10 @@ public class StatServiceImplTest{
     @Test(groups = { "unitTests" }, expectedExceptions = ArithmeticException.class)
     public void likingProductNotDispensedTest(){
         computeIndex(IndexType.LIKING, emptyProduct);
+    }
+    
+    @Test(groups = { "unitTests" }, expectedExceptions = ArithmeticException.class)
+    public void defectingProductNotDispensedTest(){
+        computeIndex(IndexType.DEFECTING, emptyProduct);
     }
 }

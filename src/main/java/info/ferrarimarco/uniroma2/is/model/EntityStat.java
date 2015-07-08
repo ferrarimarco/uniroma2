@@ -18,4 +18,5 @@ public class EntityStat extends Entity{
     private Long dispensed = 0L;
     private Long expired = 0L;
     private Long stocked = 0L;
+    private Long defected = 0L;
 }

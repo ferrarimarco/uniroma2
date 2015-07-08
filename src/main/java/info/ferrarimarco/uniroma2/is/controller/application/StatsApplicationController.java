@@ -25,6 +25,9 @@ public class StatsApplicationController extends AbstractApplicationController{
             case Constants.PERISHABILITY_INDEX:
                 result = statService.perishability(criteriaId);
                 break;
+            case Constants.DEFECTING_INDEX:
+                result = statService.defecting(criteriaId);
+                break;
             default:
                 throw new IllegalArgumentException("Cannot choose a index for: " + indexType);
             }

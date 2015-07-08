@@ -16,6 +16,7 @@ public class StatsDto {
     private Double successValue;
     private Double likingValue;
     private Double perishabilityValue;
+    private Double defectingValue;
     private String indexType;
     
     public boolean isEmpty() {

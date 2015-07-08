@@ -23,4 +23,5 @@ public class Constants {
     public static final String SUCCESS_INDEX = "SUCCESS";
     public static final String LIKING_INDEX = "LIKING";
     public static final String PERISHABILITY_INDEX = "PERISHABILITY";
+    public static final String DEFECTING_INDEX = "DEFECTING";
 }

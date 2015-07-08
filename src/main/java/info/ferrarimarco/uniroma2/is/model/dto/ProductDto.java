@@ -14,7 +14,8 @@ public class ProductDto extends Product {
     
     public enum Operation{
         ADD_INSTANCES,
-        REMOVE_INSTANCES
+        REMOVE_INSTANCES, 
+        ADD_DEFECTED_INSTANCES
     }
     
     private String clazzId;

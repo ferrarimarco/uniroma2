@@ -39,6 +39,7 @@ public class StatsController extends AbstractController {
         model.addAttribute(Constants.SUCCESS_INDEX, Constants.SUCCESS_INDEX);
         model.addAttribute(Constants.LIKING_INDEX, Constants.LIKING_INDEX);
         model.addAttribute(Constants.PERISHABILITY_INDEX, Constants.PERISHABILITY_INDEX);
+        model.addAttribute(Constants.DEFECTING_INDEX, Constants.DEFECTING_INDEX);
 
         return "stats.html";
     }
@@ -62,6 +63,8 @@ public class StatsController extends AbstractController {
             statsDto.setLikingValue(value);
             value = statsApplicationController.computeIndex(Constants.PERISHABILITY_INDEX, criteriaId);
             statsDto.setPerishabilityValue(value);
+            value = statsApplicationController.computeIndex(Constants.DEFECTING_INDEX, criteriaId);
+            statsDto.setDefectingValue(value);
         }
 
         return index(model, statsDto);

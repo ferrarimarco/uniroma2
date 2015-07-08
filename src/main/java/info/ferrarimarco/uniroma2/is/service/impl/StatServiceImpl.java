@@ -24,7 +24,8 @@ public class StatServiceImpl implements StatService {
         REQUESTED,
         DISPENSED,
         EXPIRED,
-        STOCKED
+        STOCKED,
+        DEFECTED
     }
 
     private Map<String,EntityStat> stats;
@@ -56,6 +57,7 @@ public class StatServiceImpl implements StatService {
                     .expired(0L)
                     .requested(0L)
                     .stocked(0L)
+                    .defected(0L)
                     .build()
                     );
             saveStatAsync(stats.get(productId));
@@ -72,6 +74,7 @@ public class StatServiceImpl implements StatService {
                     .expired(0L)
                     .requested(0L)
                     .stocked(0L)
+                    .defected(0L)
                     .build()
                     );
             saveStatAsync(stats.get(clazzId));
@@ -87,6 +90,7 @@ public class StatServiceImpl implements StatService {
                     .expired(0L)
                     .requested(0L)
                     .stocked(0L)
+                    .defected(0L)
                     .build()
                     );
             saveStatAsync(stats.get(categoryId));
@@ -118,6 +122,8 @@ public class StatServiceImpl implements StatService {
                 return stats.get(criteriaId).getRequested();
             case STOCKED:
                 return stats.get(criteriaId).getStocked();
+            case DEFECTED:
+                return stats.get(criteriaId).getDefected();
             default:
                 throw new IllegalArgumentException("Cannot select stat");
             }
@@ -166,6 +172,17 @@ public class StatServiceImpl implements StatService {
 
         return dispensed.doubleValue()/totalDispensed.doubleValue();
     }
+    
+    @Override
+    public Double defecting(String entityId) {
+        Long totalDefected = getStatByCriteria(entityId, ProductStat.DEFECTED);
+        Long totalDispensed = getStatByCriteria(entityId, ProductStat.DISPENSED);
+
+        if(totalDispensed <= 0)
+            throw new ArithmeticException ("Cannot compute defecting stat. This item has not been dispensed yet.");
+
+        return totalDefected.doubleValue()/totalDispensed.doubleValue();
+    }
 
     private void addStatForProduct(String productId, Long value, ProductStat productStatType){
         EntityStat productStat = stats.get(productId);
@@ -191,6 +208,11 @@ public class StatServiceImpl implements StatService {
             productStat.setStocked(productStat.getStocked() + value);
             clazzStat.setStocked(clazzStat.getStocked() + value);
             categoryStat.setStocked(categoryStat.getStocked() + value);
+            break;
+        case DEFECTED:
+            productStat.setDefected(productStat.getDefected() + value);
+            clazzStat.setDefected(clazzStat.getDefected() + value);
+            categoryStat.setDefected(categoryStat.getDefected() + value);
             break;
         }
         saveProductStatsAsync(productStat, clazzStat, categoryStat);
@@ -228,6 +250,11 @@ public class StatServiceImpl implements StatService {
     public void addStocked(String productId, Long value) {
         addStatForProduct(productId, value, ProductStat.STOCKED);
     }
+    
+    @Override
+    public void addDefected(String productId, Long value){
+        addStatForProduct(productId, value, ProductStat.DEFECTED);
+    }
 
     @Override
     public Long getRequested(String productId) {
@@ -247,6 +274,11 @@ public class StatServiceImpl implements StatService {
     @Override
     public Long getStocked(String productId) {
         return stats.get(productId).getStocked();
+    }
+    
+    @Override
+    public Long getDefected(String productId){
+        return stats.get(productId).getDefected();
     }
 
     @Override
