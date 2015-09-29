@@ -1,19 +1,15 @@
 package info.ferrarimarco.uniroma2.is.controller.spring;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
-import info.ferrarimarco.uniroma2.is.AbstractIT;
-import info.ferrarimarco.uniroma2.is.config.context.RootConfig;
-import info.ferrarimarco.uniroma2.is.config.servlet.SpringMvcConfig;
-import info.ferrarimarco.uniroma2.is.controller.spring.EntitiesController;
-import info.ferrarimarco.uniroma2.is.model.Constants;
-import info.ferrarimarco.uniroma2.is.model.Product;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -22,12 +18,15 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.NestedServletException;
 import org.testng.annotations.Test;
 
+import info.ferrarimarco.uniroma2.is.AbstractIT;
+import info.ferrarimarco.uniroma2.is.config.context.RootConfig;
+import info.ferrarimarco.uniroma2.is.config.servlet.SpringMvcConfig;
+import info.ferrarimarco.uniroma2.is.model.Constants;
+import info.ferrarimarco.uniroma2.is.model.Product;
+
 @ContextConfiguration(classes = {RootConfig.class, SpringMvcConfig.class})
 @WebAppConfiguration
 public class EntitiesControllerIT extends AbstractIT{
-
-    @Autowired
-    private EntitiesController entitiesController;
 
     @Test(groups = { "integrationTests" }, expectedExceptions = NestedServletException.class)
     public void indexNonHandledEntityTest() throws Exception{
