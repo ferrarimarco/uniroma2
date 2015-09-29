@@ -21,12 +21,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.webjars.WebJarAssetLocator;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,6 +65,7 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
         jacksonMessageConverter.setObjectMapper(mapper);
         jacksonMessageConverter.setPrettyPrint(true);
         converters.add(jacksonMessageConverter);
+        converters.add(new ResourceHttpMessageConverter());
         super.configureMessageConverters(converters);
     }
 
@@ -72,7 +75,9 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
         configurer.favorPathExtension(true);
         configurer.favorParameter(false);
         configurer.useJaf(false).
-        mediaType("json", MediaType.APPLICATION_JSON);
+        mediaType("json", MediaType.APPLICATION_JSON)
+        .mediaType("js", new MediaType("application", "javascript"))
+        .mediaType("css", new MediaType("text", "css"));
     }
     
     @Bean
@@ -103,5 +108,10 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter {
     @Autowired
     public DeleteProductApplicationController deleteProductApplicationController(ProductPersistenceService productPersistenceService, ProductInstancePersistenceService productInstancePersistenceService, StatService statService){
         return new DeleteProductApplicationController(productPersistenceService, productInstancePersistenceService, statService);
+    }
+    
+    @Bean
+    public WebJarAssetLocator webJarAssetLocator(){
+    	return new WebJarAssetLocator();
     }
 }
