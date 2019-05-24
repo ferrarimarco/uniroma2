@@ -1,0 +1,37 @@
+<?page title="SII Heartbeat Monitor"?>
+
+<window title="SII Heartbeat Monitor" border="normal" width="100%"
+	height="100%"
+	apply="org.zkoss.bind.BindComposer"
+	viewModel="@id('vm') @init('info.ferrarimarco.uniroma2.sii.heartmonitor.zk.viewmodel.IndexViewModel')">
+	<grid sclass="loginGrid" onOK="@command('login')">
+		<columns>
+			<column id="captionCol" align="right" hflex="1" />
+			<column id="textCol" align="left" hflex="1" />
+		</columns>
+		<rows>
+			<row id="usernameRow">
+				<cell id="usernameCaption">
+					<label value="Username: " />
+				</cell>
+				<cell id="usernameText">
+					<textbox value="@save(vm.userName)"  />
+				</cell>
+			</row>
+			<row id="passwordRow">
+				<cell id="passwordCaption">
+					<label value="Password: " />
+				</cell>
+				<cell id="passwordText">
+					<textbox type="password" value="@save(vm.password)"/>
+				</cell>
+			</row>
+			<row id="buttonRow">
+				<cell colspan="2" align="right" id="buttonText">
+					<separator spacing="10px" />
+					<button label="Login" autodisable="true" onClick="@command('login')" />
+				</cell>
+			</row>
+		</rows>
+	</grid>
+</window>
