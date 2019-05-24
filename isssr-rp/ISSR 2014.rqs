@@ -1,0 +1,18 @@
+[Project]
+Owner=Unknown
+Name=ISSR 2014
+GUID={80085634-6735-4761-A04E-5EF1178E9BDE}
+CQWebURL=
+isTrackChangesAllowed=1
+Description=
+Owner Key=17
+Revision number=1.0015
+Prefix=
+NbrRequirements=115
+Directory=C:\Users\flaminux\Desktop\ISSR 2014\ferrari-marco-uniroma2\ISSR 2014.rqs
+Key=1
+
+[Application]
+Data file version=1.0041
+Program Version=9.1200.0.1
+
