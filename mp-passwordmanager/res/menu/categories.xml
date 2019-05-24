@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item android:id="@+id/new_category_menu_item"
+          android:icon="@drawable/content_new"
+          android:title="@string/new_category_menu_item"
+          android:showAsAction="always" />
+    
+    <item android:id="@+id/reset_master_password_menu_item"
+          android:title="@string/master_password_menu_item"
+          android:showAsAction="never" />
+</menu>

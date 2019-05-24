@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MP Password Manager</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_master_password_init">Master Password Initialization</string>
+    <string name="masterPasswordHint">Insert Master Password</string>
+    <string name="confirmMasterPasswordHint">Confirm Master Password</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="masterPasswordOkConfirmation">Master Password Configured Successfully</string>
+    <string name="masterPasswordNotConfirmed">The passwords do not match</string>
+    <string name="masterPasswordLengthError">The Master Password must be exactly 8 characters long</string>
+    <string name="title_activity_authentication">Authentication</string>
+    <string name="auth_table_dummy_string">--</string>
+    <string name="auth_table_label">Master Password: </string>
+    <string name="title_activity_categories">Categories</string>
+    <string name="category_content_description">Category</string>
+    <string name="bank_category">Bank</string>
+    <string name="devices_category">Devices</string>
+    <string name="email_category">Email</string>
+    <string name="empty_category">Create new subcategory</string>
+    <string name="other_category">Other</string>
+    <string name="web_category">Web</string>
+    <string name="subcategory_name">Subcategory name</string>
+    <string name="create_new_category_dialog_title">Create new category</string>
+    <string name="edit_category_dialog_title">Edit category</string>
+    <string name="invalid_category_name">Invalid category name</string>
+    <string name="invalid_category_icon">Please select an icon for the new category</string>
+    <string name="copy_confirmation">The password has been copied to the clipboard</string>
+    <string name="title_activity_passwords">Passwords</string>
+    <string name="no_passwords_in_category">This category is empty</string>
+    <string name="new_category_menu_item">Create new category</string>
+    <string name="edit_category_menu_item">Edit</string>
+    <string name="delete_category_menu_item">Delete</string>
+    <string name="create_new_password_dialog_title">Create new password entry</string>
+    <string name="edit_password_dialog_title">Edit password entry</string>
+    <string name="user_id_name">Id</string>
+    <string name="password_name">Password</string>
+    <string name="invalid_password_user_id">Invalid id</string>
+    <string name="invalid_password_value">Invalid password</string>
+    <string name="password_deleted_toast">Password deleted</string>
+    <string name="category_deleted_toast">Category deleted</string>
+    <string name="aes">AES</string>
+    <string name="blowfish">Blowfish</string>
+    <string name="title_activity_password_hash">PasswordHashActivity</string>
+    <string name="masterPasswordInvalidChars">The password contains invalid characters: - \'</string>
+    <string name="master_password_menu_item">Reset master password</string>
+    <string name="master_password_dialog_title">Reset master password</string>
+    <string name="master_password_dialog_text">Are you sure to reset the master password? This action will delete ALL the passwords!</string>
+    <string name="master_password_wrong">Wrong master password. Retry.</string>
+
+</resources>
