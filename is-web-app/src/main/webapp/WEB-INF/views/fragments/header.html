@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+	<div class="navbar navbar-inverse navbar-fixed-top" th:fragment="header">
+		<div class="container">
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav">
+					<li>
+						<a href="#" th:href="@{/index.html}" th:text="#{header.menu.home}">[Home]</a>
+					</li>
+					<li th:if="${#authorization.expression('isAuthenticated()')}">
+						<a href="#" th:href="@{/stats}" th:text="#{header.menu.stats}">[Statistics]</a>
+					</li>
+					<li th:if="${#authorization.expression('isAuthenticated()')}">
+						<a href="#" th:href="@{/entities/product}" th:text="#{header.menu.instance}">[Product Management]</a>
+					</li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li th:if="${#authorization.expression('!isAuthenticated()')}">
+						<a href="#" th:href="@{/login.html}" th:text="#{header.signin}">[Sign in]</a>
+					</li>
+					<li th:if="${#authorization.expression('isAuthenticated()')}">
+						<a href="#" th:href="@{/logout.html}" th:text="#{header.signout}">[Sign Out]</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

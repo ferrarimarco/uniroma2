@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/baseLayout.html">
+<head>
+<title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE" th:text="#{base.title}">[All entities page]</title>
+</head>
+<body>
+	<div class="container">
+		<div layout:fragment="content">
+			<h2 th:text="#{instance.tabletitle}">[Table Title]</h2>
+			<div th:replace="fragments/editEntityModal.html :: editEntityModal">[Edit entity modal]</div>
+			<div th:replace="fragments/editInstancesModal.html :: editInstancesModal">[Edit instances modal]</div>
+			<a href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#editEntityModal" th:text="#{base.create}">[Create]</a>
+			<a href="#" class="btn btn-lg btn-warning" data-toggle="confirmation" th:text="#{base.removeExpired}" th:attr="
+						data-btnOkLabel=#{base.remove},
+						data-href=@{/entities/productInstance/delete/expired}" th:href="@{/entities/productInstance/delete/expired}">[Remove Expired]</a>
+			<div layout:fragment="entitiesTable">[Entities Table]</div>
+			<div th:replace="fragments/tablePagingFooter.html :: pagingFooter(|/entities/${entityName}|,
+			${allEntitiesPage.number}, ${allEntitiesPage.size})">[Paging footer]</div>
+		</div>
+	</div>
+</body>
+</html>

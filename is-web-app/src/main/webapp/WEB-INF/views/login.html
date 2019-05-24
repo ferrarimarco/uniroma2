@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layouts/baseLayout.html">
+<head>
+<title th:text="#{login.title}">[Login]</title>
+</head>
+<body>
+	<div class="container">
+		<div layout:fragment="content">
+			<form name="login_form" th:action="@{/login.html}" method="post">
+				<fieldset>
+					<legend th:text="#{login.form.legend}">[Login Legend]</legend>
+					<p th:if="${loginError}" th:text="#{login.error.credentials}">[Error bad credentials]</p>
+					<label for="username" th:text="#{base.username}">[Username]</label> <input type="text" id="username"
+						name="username" /> <label for="password" th:text="#{base.password}">[Password]</label> <input type="password"
+						id="password" name="password" />
+					<div class="form-actions">
+						<button type="submit" class="btn" th:text="#{login.form.signin}">[Sign in button]</button>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+</body>
+</html>

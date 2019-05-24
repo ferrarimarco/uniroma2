@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>[Edit entity modal]</title>
+</head>
+<body>
+	<div th:fragment="editEntityModal">
+		<div class="modal fade" id="editEntityModal" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title" id="editEntityModalLabel" th:text="#{instance.modalTitle}">[Modal Title]</h4>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal" method="post" action="#" th:action="@{/entities/product}" th:object="${productDto}" id="editProductForm">
+							<fieldset>
+								<div class="form-group">
+									<label class="control-label" for="productName" th:text="#{instance.name}">[Name]</label>
+									<input type="text" class="form-control" id="productName" placeholder="Name" th:field="*{name}" required="required" />
+								</div>
+								<div class="form-group">
+									<label class="control-label" for="productClass" th:text="#{instance.class}">[Class]</label>
+									<select class="form-control" id="productClass" th:field="*{clazzId}" required="required">
+										<option th:each="clazz : ${allClasses}" th:value="${clazz.id}" th:text="${clazz.name}" >[Class (Category)]</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label class="control-label" for="productBarcode" th:text="#{instance.barcode}">[Barcode]</label>
+									<input type="text" class="form-control" id="productBarcode" placeholder="Barcode" th:field="*{barCode}" disabled="disabled" value="" />
+								</div>
+								<div class="form-group">
+									<label class="control-label" for="productBrand" th:text="#{instance.brand}">[Brand]</label>
+									<input type="text" class="form-control" id="productBrand" placeholder="Brand" th:field="*{brand}" required="required" />
+								</div>
+								<div>
+									<input type="hidden" id="productId" th:field="*{id}" value="" />
+								</div>
+							</fieldset>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="submit" form="editProductForm" class="btn btn-primary" th:text="#{base.save}" name="save">[Save]</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{base.cancel}">[Cancel]</button>
+						<button type="submit" form="editProductForm" id="deleteEntityButton" class="btn btn-danger" th:text="#{instance.deleteInstance}" name="delete">[Delete Entity]</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>
