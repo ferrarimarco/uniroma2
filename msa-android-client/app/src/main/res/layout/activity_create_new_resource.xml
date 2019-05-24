@@ -1,0 +1,68 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/create_new_resource_form"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.CreateNewResourceActivity">
+
+    <LinearLayout
+        android:id="@+id/create_new_resource_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/resourceTitleEditText"
+            android:hint="@string/resource_title_hint" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/resourceDescriptionEditText"
+            android:hint="@string/resource_description_hint"
+            android:singleLine="false"
+            android:minLines="5"
+            android:lines="5"
+            android:gravity="start"
+            android:scrollbars="vertical" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/resourceAcquisitionModeEditText"
+            android:hint="@string/resource_acquisition_mode_hint" />
+
+
+        <LinearLayout
+            android:id="@+id/resource_ttl_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/resource_ttl_amount"
+                android:hint="@string/resource_ttl_hint"
+                android:maxLength="2" />
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/resource_ttl_spinner"
+                android:layout_gravity="center_horizontal"
+                android:entries="@array/resource_ttl_array" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</ScrollView>

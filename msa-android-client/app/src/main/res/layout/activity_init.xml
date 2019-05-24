@@ -1,0 +1,19 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="#0099cc"
+             android:theme="@style/FullscreenTheme"
+             tools:context="info.ferrarimarco.uniroma2.msa.resourcesharing.app.activities.InitActivity">
+
+    <TextView
+        android:id="@+id/init_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:keepScreenOn="true"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:textSize="50sp"
+        android:gravity="center"
+        android:text="@string/init_splash_text"/>
+</FrameLayout>
