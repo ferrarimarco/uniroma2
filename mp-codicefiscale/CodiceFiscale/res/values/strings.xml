@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Codice Fiscale</string>
+    <string name="action_settings">Settings</string>
+    <string name="name">Name</string>
+    <string name="surname">Surname</string>
+    <string name="male">M</string>
+    <string name="female">F</string>
+    <string name="pickDateButtonText">&#8230;</string>
+    <string name="province">Province</string>
+    <string name="city">City</string>
+    <string name="cfPlaceHolder">XXXXXXXXXXXXXXXX</string>
+    <string name="dateEditTextHint">Date</string>
+
+</resources>

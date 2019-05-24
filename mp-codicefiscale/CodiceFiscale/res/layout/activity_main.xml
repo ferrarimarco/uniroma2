@@ -1,0 +1,35 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <fragment
+        android:id="@+id/personDataFragment"
+        android:name="info.ferrarimarco.android.mp.codicefiscale.PersonDataFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout="@layout/person_data_fragment_layout" />
+    
+    <fragment
+        android:id="@+id/birthDateFragment"
+        android:name="info.ferrarimarco.android.mp.codicefiscale.BirthDateFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout="@layout/birth_date_fragment_layout" />
+
+	<fragment
+	    android:id="@+id/BirthPlaceDataFragment"
+	    android:name="info.ferrarimarco.android.mp.codicefiscale.BirthPlaceDataFragment"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    tools:layout="@layout/birth_place_data_fragment_layout" />
+
+	<fragment
+	    android:id="@+id/CfResultsFragment"
+	    android:name="info.ferrarimarco.android.mp.codicefiscale.CfResultsFragment"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    tools:layout="@layout/cf_results_fragment_layout" />
+
+</LinearLayout>
