@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="MSA Resource Sharing Test Suite" verbose="1">
+	<test name="Service tests">
+		<packages>
+			<package name="info.ferrarimarco.uniroma2.msa.resourcesharing.services.*" />
+		</packages>
+	</test>
+	<test name="GCM tests">
+		<packages>
+			<package name="info.ferrarimarco.uniroma2.msa.resourcesharing.io.gcm.*" />
+		</packages>
+	</test>
+</suite>
